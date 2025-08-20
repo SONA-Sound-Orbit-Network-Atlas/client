@@ -23,7 +23,7 @@
     "noFallthroughCasesInSwitch": true,
     "noUncheckedSideEffectImports": true,
 
-    /* Paths */
+    /* Path mapping */
     "baseUrl": ".",
     "paths": {
       "@/*": ["src/*"]

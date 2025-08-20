@@ -1,19 +1,8 @@
-import { Routes, Route, BrowserRouter } from "react-router-dom"
-import StellarSystem from "./pages/StellarSystem"
+import { RouterProvider } from "react-router-dom"
+import router from "./router/router"
 
 function App() {
-
-  return (
-    <>
-      <h1>SONA</h1>
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<StellarSystem />} />
-          <Route path="/stellar-system" element={<StellarSystem />} />
-        </Routes>
-      </BrowserRouter>
-    </>
-  )
+  return <RouterProvider router={router} />
 }
 
 export default App
