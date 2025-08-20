@@ -5,6 +5,8 @@ import DummySphere from "./DummySphere";
 
 // 화면 표시
 export default function Scene() {
+
+    const axesHelper = new THREE.AxesHelper(5);
     return (
       <>
         {/* 조명 설정 */}
@@ -27,7 +29,7 @@ export default function Scene() {
         <Grid args={[20, 20]} />
         
         {/* 축 헬퍼 */}
-        <primitive object = {new THREE.AxesHelper(5)}/>
+        <primitive object = {axesHelper}/>
        
         <CustomOrbitControls />
       </>
