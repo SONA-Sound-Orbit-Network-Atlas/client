@@ -1,16 +1,24 @@
 import { useEffect } from 'react';
 import { useFrame } from '@react-three/fiber';
 import { EffectComposer, Bloom } from '@react-three/postprocessing';
+import { OrbitControls } from '@react-three/drei';
 import * as THREE from 'three';
 import StarsField from './StarsField';
-import HeroCube from './HeroCube';
+import ImageCarousel from './ImageCarousel';
 
 type Props = {
   ready: boolean;
-  totalPages?: number;
+  autoExpandStars?: boolean;
+  useOrbitControls?: boolean;
+  zoom?: number;
 };
 
-export default function Scene({ ready, totalPages = 5 }: Props) {
+export default function Scene({
+  ready,
+  autoExpandStars = false,
+  useOrbitControls = false,
+  zoom = 10,
+}: Props) {
   // ready 전에는 배경 어둡게, ready 이후 서서히 밝기/색상 보간
   useFrame(({ scene }, dt) => {
     const bg = scene.background as THREE.Color | null;
@@ -25,23 +33,32 @@ export default function Scene({ ready, totalPages = 5 }: Props) {
 
   return (
     <>
-      <color attach="background" args={['#001122']} />{' '}
-      {/* 살짝 푸른빛이 도는 배경 */}
+      <color attach="background" args={['#000000']} />
+      {/* 카메라 컨트롤 - ScrollControls 사용 시에는 비활성화 */}
+      {useOrbitControls && (
+        <OrbitControls
+          enablePan={true}
+          enableZoom={true}
+          enableRotate={true}
+          minDistance={5}
+          maxDistance={50}
+          enableDamping={false}
+        />
+      )}
       <ambientLight intensity={0.3} />
       <directionalLight position={[3, 5, 2]} intensity={0.8} />
-      <StarsField count={2500} /> {/* 배경 조명 효과를 위해 별 개수 증가 */}
-      <HeroCube totalPages={totalPages} />
-      {/* 블룸 효과 */}
+      <StarsField count={2500} autoExpand={autoExpandStars} />
+      {/* 이미지 갤러리 */}
+      <ImageCarousel zoom={zoom} />
+      {/* 블룸 효과 - 이미지 밝기 조절 */}
       <EffectComposer>
         <Bloom
-          intensity={1.5}
-          luminanceThreshold={0.1}
-          luminanceSmoothing={0.9}
-          radius={0.4}
+          intensity={0.3} // 블룸 강도 낮춤 (1.5 → 0.3)
+          luminanceThreshold={0.8} // 밝기 임계값 높임 (0.0 → 0.8) - 더 밝은 것만 빛남
+          luminanceSmoothing={0.4}
+          radius={0.5} // 블룸 범위 축소 (0.85 → 0.5)
         />
       </EffectComposer>
-      {/* 필요 시 scroll.offset으로 글로벌 타임라인을 만들 수 있음 */}
-      {/* console.log(scroll.offset) */}
     </>
   );
 }
