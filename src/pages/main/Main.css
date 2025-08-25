@@ -1,0 +1,373 @@
+/* 기본 리셋 */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+}
+
+/* 기본 요소 리셋 */
+html,
+body,
+div,
+span,
+applet,
+object,
+iframe,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p,
+blockquote,
+pre,
+a,
+abbr,
+acronym,
+address,
+big,
+cite,
+code,
+del,
+dfn,
+em,
+img,
+ins,
+kbd,
+q,
+s,
+samp,
+small,
+strike,
+strong,
+sub,
+sup,
+tt,
+var,
+b,
+u,
+i,
+center,
+dl,
+dt,
+dd,
+ol,
+ul,
+li,
+fieldset,
+form,
+label,
+legend,
+table,
+caption,
+tbody,
+tfoot,
+thead,
+tr,
+th,
+td,
+article,
+aside,
+canvas,
+details,
+embed,
+figure,
+figcaption,
+footer,
+header,
+hgroup,
+menu,
+nav,
+output,
+ruby,
+section,
+summary,
+time,
+mark,
+audio,
+video {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  font-size: 100%;
+  font: inherit;
+  vertical-align: baseline;
+}
+
+/* 리스트 스타일 제거 */
+ol,
+ul {
+  list-style: none;
+}
+
+/* 인용문 스타일 제거 */
+blockquote,
+q {
+  quotes: none;
+}
+blockquote:before,
+blockquote:after,
+q:before,
+q:after {
+  content: '';
+  content: none;
+}
+
+/* 테이블 리셋 */
+table {
+  border-collapse: collapse;
+  border-spacing: 0;
+}
+
+/* 버튼 리셋 */
+button {
+  background: none;
+  border: none;
+  padding: 0;
+  margin: 0;
+  cursor: pointer;
+  font: inherit;
+  color: inherit;
+  text-decoration: none;
+  outline: none;
+}
+
+/* 입력 요소 리셋 */
+input,
+textarea,
+select {
+  font: inherit;
+  color: inherit;
+  background: none;
+  border: none;
+  outline: none;
+  padding: 0;
+  margin: 0;
+}
+
+/* 링크 리셋 */
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+/* 이미지 리셋 */
+img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+  width: 100%;
+  margin: 0;
+}
+
+/* 스크롤 설정: ScrollControls가 스크롤을 완전히 제어 */
+body {
+  overflow: hidden; /* ScrollControls가 모든 스크롤 제어 */
+}
+
+html {
+  overflow-x: hidden;
+}
+
+/* 메인 페이지 컨테이너 */
+.main-page {
+  position: relative;
+  width: 100%;
+  height: 100vh; /* ScrollControls가 내부적으로 높이 관리 */
+  opacity: 0;
+  transition: opacity 1s ease;
+}
+
+.main-page.visible {
+  opacity: 1;
+}
+
+/* 3D 배경 캔버스 */
+.background-canvas {
+  position: fixed !important;
+  inset: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  display: block !important;
+  pointer-events: auto; /* 스크롤 이벤트 감지를 위해 활성화 */
+}
+
+/* UI 레이어 */
+.ui-layer {
+  position: relative;
+  width: 100%;
+  height: calc(var(--total-pages, 5) * 100vh); /* 섹션 수에 따른 동적 높이 */
+  pointer-events: auto;
+  padding-top: 80px; /* 헤더 높이만큼 여백 */
+}
+
+/* 사용하지 않는 기존 로딩 스타일 (정리 예정) */
+
+/* Loading 컴포넌트 전용 컨테이너 */
+.loading-page-container {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  background: #0b0b0d;
+  display: grid;
+  place-items: center;
+  z-index: 1000;
+}
+
+.loading-inner {
+  text-align: center;
+  color: #fff;
+}
+
+.loading-text {
+  margin-bottom: 2rem;
+}
+
+.sona-title {
+  font-size: 4rem;
+  font-weight: bold;
+  margin-bottom: 1rem;
+  background: linear-gradient(45deg, #0ea5e9, #06b6d4, #10b981);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: glow 2s ease-in-out infinite alternate;
+}
+
+.sona-subtitle {
+  font-size: 1.2rem;
+  font-weight: 300;
+  letter-spacing: 0.1em;
+  min-height: 2em;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.3em;
+}
+
+.word {
+  opacity: 0;
+  transform: translateY(20px) scale(0.8);
+  transition: all 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  display: inline-block;
+}
+
+.word.visible {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+
+.loading-enter {
+  padding: 0.75rem 1.25rem;
+  border-radius: 999px;
+  border: 2px solid #0ea5e9;
+  background: transparent;
+  color: #0ea5e9;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  opacity: 0;
+  transform: translateY(10px);
+}
+
+.loading-enter.fade-in {
+  animation: fadeInUp 0.8s ease forwards;
+}
+
+.loading-enter:hover {
+  background: #0ea5e9;
+  color: white;
+  transform: translateY(-2px);
+  box-shadow: 0 10px 25px rgba(14, 165, 233, 0.3);
+}
+
+.loading-progress {
+  opacity: 0.7;
+  margin-top: 1rem;
+  font-size: 0.9rem;
+}
+
+@keyframes glow {
+  0% {
+    text-shadow: 0 0 10px rgba(14, 165, 233, 0.5);
+  }
+  100% {
+    text-shadow:
+      0 0 20px rgba(14, 165, 233, 0.8),
+      0 0 30px rgba(6, 182, 212, 0.6);
+  }
+}
+
+@keyframes fadeInUp {
+  0% {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* 헤더 */
+.header-inner {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000; /* 캔버스보다 위에 */
+  padding: 16px 24px;
+  display: flex;
+  gap: 16px;
+  color: #fff;
+  background: rgba(0, 0, 0, 0.1); /* 약간의 배경 */
+  /* backdrop-filter: blur(10px); */
+}
+
+.nav a {
+  color: #fff;
+  text-decoration: none;
+  margin-right: 12px;
+}
+
+/* 섹션 */
+.section-wrap {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow-y: auto;
+  scroll-snap-type: y mandatory;
+}
+
+.section {
+  height: 100vh;
+  width: 100%;
+  display: grid;
+  place-content: center;
+  color: white;
+  padding: 4rem 6rem;
+  scroll-snap-align: start;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.6);
+}
+
+/* 푸터 */
+.footer-inner {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 10;
+  padding: 12px 24px;
+  color: #9ca3af;
+}
