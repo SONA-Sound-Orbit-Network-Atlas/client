@@ -8,7 +8,7 @@ import * as THREE from "three";
  * @returns 카메라 및 이동 제어 컴포넌트
  */
 
-export default function QuarterViewOrbitControls() {
+export default function QuarterViewControls() {
     return (
       <OrbitControls
         enableRotate={false}
