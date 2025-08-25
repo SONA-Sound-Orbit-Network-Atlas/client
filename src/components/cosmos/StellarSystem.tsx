@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useRef } from "react";
 import Star from "./Star"
 import Planet from "./Planet"
 import { useThree, useFrame } from "@react-three/fiber";

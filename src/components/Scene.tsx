@@ -1,6 +1,6 @@
 import { Grid} from '@react-three/drei';
 import * as THREE from 'three';
-import CustomOrbitControls from "./CustomOrbitControls";
+import QuarterViewOrbitControls from "./controllers/QuarterViewOrbitControls";
 import Galaxy from "./cosmos/Galaxy";
 
 // 화면 표시
@@ -26,7 +26,7 @@ export default function Scene() {
         {/* 축 헬퍼 */}
         <primitive object = {axesHelper}/>
        
-        <CustomOrbitControls />
+        <QuarterViewOrbitControls />
       </>
     )
   }
