@@ -1,7 +1,7 @@
 import { Canvas } from "@react-three/fiber"
 import { Suspense } from "react"
 import Scene from "../components/Scene"
-
+import DebugMessage from "@/components/DebugMessage"
 
 export default function GalaxyPage() {
   const canvasStyle = {
@@ -12,6 +12,7 @@ export default function GalaxyPage() {
   return (
     <div>
       <h1>Galaxy</h1>
+      <DebugMessage />
       <Canvas
         style={canvasStyle}
         shadows

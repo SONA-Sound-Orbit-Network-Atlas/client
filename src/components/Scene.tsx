@@ -2,11 +2,23 @@ import { Grid} from '@react-three/drei';
 import * as THREE from 'three';
 import QuarterViewControls from "./controllers/QuarterViewControls";
 import Galaxy from "./cosmos/Galaxy";
+import { useSceneStore } from '@/stores/useSceneStore';
+import { useEffect } from 'react';
+import OrbitViewControls from './controllers/OrbitViewControls';
 
 // 화면 표시
 export default function Scene() {
-
+    const { viewMode, focusedPosition, setViewMode } = useSceneStore();
     const axesHelper = new THREE.AxesHelper(5);
+
+    useEffect(() => {
+        if (focusedPosition) {
+            setViewMode('StellarSystem');
+        } else {
+            setViewMode('Galaxy');
+        }
+    }, [focusedPosition]);
+
     return (
       <>
         {/* 조명 설정 */}
@@ -26,7 +38,8 @@ export default function Scene() {
         {/* 축 헬퍼 */}
         <primitive object = {axesHelper}/>
        
-        <QuarterViewControls />
+        {viewMode === 'Galaxy' && <QuarterViewControls />}
+        {viewMode === 'StellarSystem' && <OrbitViewControls targetPosition={focusedPosition || new THREE.Vector3(0,0,0)} />}
       </>
     )
   }

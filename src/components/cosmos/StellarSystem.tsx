@@ -3,6 +3,7 @@ import Star from "./Star"
 import Planet from "./Planet"
 import { useThree, useFrame } from "@react-three/fiber";
 import * as THREE from "three";
+import { useSceneStore } from "@/stores/useSceneStore";
 
 //항성계 컴포넌트 
 
@@ -10,6 +11,8 @@ import * as THREE from "three";
 export default function StellarSystem({StellarSysyemPos }: { 
     StellarSysyemPos: [number, number, number]
   }) {
+    const { setFocusedPosition } = useSceneStore();
+
     const ref = useRef<THREE.Group>(null);
     const detailGroupRef = useRef<THREE.Group>(null);
     const lowDetailMesh = useRef<THREE.Mesh>(null);
@@ -46,12 +49,13 @@ export default function StellarSystem({StellarSysyemPos }: {
         <Planet position={[4, -2, 1]} color="#feca57" size={0.6} />
         <Planet position={[-4, 1, -1]} color="#ff9ff3" size={0.9} />
        </group>
-       <mesh ref={lowDetailMesh} >
+       <mesh ref={lowDetailMesh} onClick={() => setFocusedPosition(new THREE.Vector3(...StellarSysyemPos))}>
                 <sphereGeometry args={[1.5, 16, 16]} />
                 <meshStandardMaterial color="#ff6b6b"
                     emissive="#ffffff"
                     emissiveIntensity={0.5}
-                    toneMapped={false} />
+                    toneMapped={false} 
+                    />
         </mesh>
        
        </group>

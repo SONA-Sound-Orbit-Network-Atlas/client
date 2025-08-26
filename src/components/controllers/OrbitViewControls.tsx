@@ -1,5 +1,8 @@
 import { OrbitControls } from "@react-three/drei";
+import type { OrbitControls as OrbitControlsImpl } from "three-stdlib";
 import * as THREE from "three";
+import { useEffect, useRef } from "react";
+import { useThree, useFrame } from "@react-three/fiber";
 
 /**
  * X,Z축 이동
@@ -8,27 +11,34 @@ import * as THREE from "three";
  * @returns 카메라 및 이동 제어 컴포넌트
  */
 
+interface OrbitViewControlsProps {
+  targetPosition: THREE.Vector3;
+}
 
+export default function OrbitViewControls({ targetPosition }: OrbitViewControlsProps) {
 
-export default function OrbitViewControls() {
-    return (
-      <OrbitControls
-        enableRotate={false}
-        enablePan={true}
-        screenSpacePanning={false}
-        enableZoom={true}
-        mouseButtons={{
-          LEFT: THREE.MOUSE.PAN,
-          MIDDLE: THREE.MOUSE.DOLLY,
-          RIGHT: THREE.MOUSE.ROTATE
-        }}
-        // 추가 커스터마이징
-        panSpeed={0.8}           // 패닝 속도
-        zoomSpeed={1.2}          // 줌 속도
-        minDistance={2}          // 최소 줌 거리
-        maxDistance={50}         // 최대 줌 거리
-        maxPolarAngle={Math.PI / 2.5}  // 최대 수직 각도 (쿼터뷰 제한)
-        minPolarAngle={Math.PI / 6}    // 최소 수직 각도
-      />
-    );
-  }
+  const controls = useRef<OrbitControlsImpl>(null);
+  const { camera } = useThree();
+
+  useFrame(() => {
+    if (targetPosition && controls.current) {
+      const offset = new THREE.Vector3(5, 5, 3);
+      const targetCameraPos = targetPosition.clone().add(offset);
+      
+      // 부드러운 카메라 이동
+      camera.position.lerp(targetCameraPos, 0.02);
+      controls.current.target.lerp(targetPosition, 0.02);
+    }
+  });
+
+  return (
+    <OrbitControls 
+      ref={controls}
+      enableDamping={true}
+      dampingFactor={0.05}
+      enableRotate={true}
+      enableZoom={true}
+      enablePan={true}
+    />
+  );
+}
