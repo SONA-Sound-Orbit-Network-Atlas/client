@@ -3,7 +3,7 @@ import { Suspense } from "react"
 import Scene from "../components/Scene"
 
 
-export default function StellarSystem() {
+export default function GalaxyPage() {
   const canvasStyle = {
     background: '#1a1a1a',
     width: '100vw',
@@ -11,7 +11,7 @@ export default function StellarSystem() {
   };
   return (
     <div>
-      <h1>Stellar System</h1>
+      <h1>Galaxy</h1>
       <Canvas
         style={canvasStyle}
         shadows

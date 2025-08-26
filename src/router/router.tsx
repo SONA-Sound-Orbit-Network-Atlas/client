@@ -1,6 +1,6 @@
 import { createBrowserRouter } from 'react-router-dom';
 import Main from '@/pages/main/Main';
-import StellarSystem from '@/pages/StellarSystem';
+import GalaxyPage from '@/pages/GalaxyPage';
 import NotFound from '@/pages/NotFound';
 
 const router = createBrowserRouter([
@@ -9,8 +9,8 @@ const router = createBrowserRouter([
     element: <Main />,
   },
   {
-    path: '/stellar-system',
-    element: <StellarSystem />,
+    path: '/galaxy',
+    element: <GalaxyPage />,
   },
   {
     path: '*',
