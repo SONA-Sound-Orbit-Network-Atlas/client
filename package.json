@@ -23,6 +23,7 @@
     "react-router-dom": "^7.8.1",
     "tailwindcss": "^4.1.12",
     "three": "^0.179.1",
+    "three-stdlib": "^2.36.0",
     "tone": "^15.1.22",
     "zustand": "^5.0.7"
   },
