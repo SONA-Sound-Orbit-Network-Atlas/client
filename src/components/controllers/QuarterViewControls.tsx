@@ -9,6 +9,8 @@ import * as THREE from "three";
  */
 
 export default function QuarterViewControls() {
+  
+
     return (
       <OrbitControls
         enableRotate={false}

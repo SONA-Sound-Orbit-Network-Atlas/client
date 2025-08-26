@@ -1,8 +1,9 @@
 import { OrbitControls } from "@react-three/drei";
 import type { OrbitControls as OrbitControlsImpl } from "three-stdlib";
 import * as THREE from "three";
-import { useEffect, useRef } from "react";
+import { useRef, useEffect } from "react";
 import { useThree, useFrame } from "@react-three/fiber";
+import { useSceneStore } from "@/stores/useSceneStore";
 
 /**
  * X,Z축 이동
@@ -17,17 +18,48 @@ interface OrbitViewControlsProps {
 
 export default function OrbitViewControls({ targetPosition }: OrbitViewControlsProps) {
 
-  const controls = useRef<OrbitControlsImpl>(null);
-  const { camera } = useThree();
+  //test code
+  const { setCameraIsMoving,setViewMode } = useSceneStore();
 
-  useFrame(() => {
-    if (targetPosition && controls.current) {
+  const isMovingRef = useRef<boolean>(false);
+  const controls = useRef<OrbitControlsImpl>(null);
+  const startTimeRef = useRef<number>(0);
+  const { camera } = useThree();
+  const duration = 2;
+
+  useEffect(()=>{
+    isMovingRef.current = true;
+    setCameraIsMoving(true);
+  },[targetPosition]);
+
+  useFrame((state, deltaTime) => {
+    // 줌 거리 체크 (항상 실행)
+    if (controls.current && !isMovingRef.current) {
+      const distance = controls.current.getDistance();
+      if (distance > 20) {
+        setViewMode('Galaxy');
+      }
+    }
+
+    // 카메라 이동 로직
+    if (targetPosition && controls.current && isMovingRef.current) {
       const offset = new THREE.Vector3(5, 5, 3);
       const targetCameraPos = targetPosition.clone().add(offset);
-      
+
+      //경과 시간 계산
+      startTimeRef.current += deltaTime;
+      const progress = Math.min(startTimeRef.current / duration, 1.0);
+      const easedProgress = easeInOutCubic(progress);
+
       // 부드러운 카메라 이동
-      camera.position.lerp(targetCameraPos, 0.02);
-      controls.current.target.lerp(targetPosition, 0.02);
+      camera.position.lerp(targetCameraPos, easedProgress);
+      controls.current.target.lerp(targetPosition, easedProgress);
+      
+      const distance = camera.position.distanceTo(targetCameraPos);
+      if(distance < 0.1){
+        isMovingRef.current = false;
+        setCameraIsMoving(false);
+      }
     }
   });
 
@@ -36,9 +68,14 @@ export default function OrbitViewControls({ targetPosition }: OrbitViewControlsP
       ref={controls}
       enableDamping={true}
       dampingFactor={0.05}
-      enableRotate={true}
-      enableZoom={true}
-      enablePan={true}
+      enableRotate={!isMovingRef.current}
+      enableZoom={!isMovingRef.current}
+      enablePan={!isMovingRef.current}
     />
   );
+}
+
+// 부드러운 이동을 위한 함수
+function easeInOutCubic(t: number): number {
+  return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
 }
