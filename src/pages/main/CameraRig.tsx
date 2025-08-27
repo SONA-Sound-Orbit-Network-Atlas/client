@@ -10,7 +10,7 @@ type Props = {
   zEnd?: number;
 };
 
-export default function CameraRig({ zStart = 15, zEnd = -2 }: Props) {
+export default function CameraRig({ zStart = 15, zEnd = -6 }: Props) {
   const { camera } = useThree();
   const lookAt = new THREE.Vector3(0, 0, -4.5); // 별모임 중심
 
@@ -20,20 +20,26 @@ export default function CameraRig({ zStart = 15, zEnd = -2 }: Props) {
     const maxScroll = (state.sections - 1) * window.innerHeight;
     const o = Math.min(scrollTop / maxScroll, 1); // 0..1
 
-    // 스크롤에 따라 더 빠르게 줌인되도록 곡선 적용
-    const easedScroll = Math.pow(o, 0.3); // 0.3 제곱으로 매우 극적인 줌인
+    // 섹션별로 단계적으로 확대되는 효과
+    const sectionProgress = o * (state.sections - 1); // 0 ~ 5 범위
+    const currentSection = Math.floor(sectionProgress);
+    const sectionOffset = sectionProgress - currentSection;
 
-    // zEnd를 -2로 설정하여 별모임(z=-4.5) 중앙으로 들어가기
-    const safeZEnd = Math.max(-2, zEnd);
+    // 각 섹션마다 일정한 크기로 "확" 줌인되는 효과
+    const easedOffset = Math.pow(sectionOffset, 2); // 더 강한 가속으로 극적인 줌
+    const easedScroll = (currentSection + easedOffset) / (state.sections - 1);
+
+    // zEnd를 -6으로 설정하여 별모임(z=-4.5) 뒤편까지 들어가기
+    const safeZEnd = Math.max(-6, zEnd);
     const targetZ = THREE.MathUtils.lerp(zStart, safeZEnd, easedScroll);
 
     // OrthographicCamera의 경우 zoom 속성을 직접 조정하여 시각적 줌 효과 생성
     if (camera.type === 'OrthographicCamera') {
       const orthoCamera = camera as THREE.OrthographicCamera;
 
-      // 기본 줌에서 스크롤에 따라 줌 대폭 증가 (75 → 400)
+      // 기본 줌에서 스크롤에 따라 줌 대폭 증가 (75 → 1000)
       const baseZoom = 75;
-      const maxZoom = 400;
+      const maxZoom = 1000; // 훨씬 더 큰 줌으로 별모임 속으로
       const targetZoom = THREE.MathUtils.lerp(baseZoom, maxZoom, easedScroll);
 
       // 부드러운 줌 전환

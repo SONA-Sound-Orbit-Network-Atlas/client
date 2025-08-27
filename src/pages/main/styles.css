@@ -39,6 +39,8 @@ body {
   overflow-x: hidden;
   pointer-events: auto;
   z-index: 1;
+  scroll-snap-type: y mandatory;
+  scroll-behavior: smooth;
 }
 
 /* 섹션 스타일 */
@@ -48,6 +50,7 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
+  scroll-snap-align: start;
 }
 
 /* Canvas 스타일 */
