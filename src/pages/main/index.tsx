@@ -8,33 +8,53 @@ import { TitleText, BodyText } from './components/Text';
 import { ScrollIndicator } from './components/ScrollIndicator';
 import state from './store';
 import './styles.css';
+import { useNavigate } from 'react-router-dom';
 
 // 메인 App 컴포넌트
 export default function App() {
+  const navigate = useNavigate();
   const scrollArea = useRef<HTMLDivElement>(null);
-  const [scrolled, setScrolled] = useState(true);
+  const [isScrolled, setIsScrolled] = useState(false);
+  const [isInCTASection, setIsInCTASection] = useState(false);
 
   const onScroll = (e: React.UIEvent<HTMLDivElement>) => {
-    state.top = e.currentTarget.scrollTop;
-    setScrolled(false);
+    const scrollTop = e.currentTarget.scrollTop;
+    const windowHeight = window.innerHeight;
+
+    state.top = scrollTop;
+    setIsScrolled(scrollTop > 0);
+
+    // CTA 섹션 위치 계산 (6개 섹션: intro(80vh) + 4개 text(80vh) + CTA(100vh))
+    const ctaSectionStart = windowHeight * (state.sections - 1 - 0.3) * 0.8; // 5개 섹션 * 80vh = 400vh + 화면절반
+
+    // CTA 섹션에 있는지 확인
+    const inCTASection = scrollTop >= ctaSectionStart;
+    setIsInCTASection(inCTASection);
   };
 
   useEffect(() => {
     if (scrollArea.current) {
-      state.top = scrollArea.current.scrollTop;
+      const el = scrollArea.current;
+      state.top = el.scrollTop;
 
-      // wheel 이벤트도 추가하여 더 자주 업데이트
+      // wheel 이벤트 - 스크롤 속도 제한
+      let isScrolling = false;
       const handleWheel = (e: WheelEvent) => {
-        const newScrollTop = scrollArea.current!.scrollTop + e.deltaY;
+        if (isScrolling) return;
+
+        isScrolling = true;
+        setTimeout(() => {
+          isScrolling = false;
+        }, 100); // 100ms 딜레이로 스크롤 속도 제한
+
+        const newScrollTop = el.scrollTop + e.deltaY;
         state.top = Math.max(0, newScrollTop);
       };
 
-      scrollArea.current.addEventListener('wheel', handleWheel);
+      el.addEventListener('wheel', handleWheel);
 
       return () => {
-        if (scrollArea.current) {
-          scrollArea.current.removeEventListener('wheel', handleWheel);
-        }
+        el.removeEventListener('wheel', handleWheel);
       };
     }
   }, []);
@@ -67,144 +87,66 @@ export default function App() {
 
       {/* DOM 스크롤 영역과 HTML 콘텐츠를 함께 관리 */}
       <div className="scrollArea" ref={scrollArea} onScroll={onScroll}>
-        {scrolled && <ScrollIndicator />}
+        {isScrolled ? null : <ScrollIndicator />}
 
         {/* Section 1: Intro */}
-        <div className="section" style={{ height: '80vh' }}>
-          {/* <div
-            style={{
-              position: 'absolute',
-              bottom: '10vh',
-              left: '5vw',
-              zIndex: 10,
-              display: 'flex',
-              flexDirection: 'column',
-              gap: '0.1em',
-            }}
-          >
-            {['Sound', 'Orbit', 'Network', 'Atlas'].map((text, index) => (
-              <div
-                key={index}
-                style={{
-                  color: '#eaeaea',
-                  fontSize: 'min(8vw, 140px)',
-                  fontWeight: 800,
-                  lineHeight: 1.06,
-                  letterSpacing: '-0.02em',
-                  opacity: 1,
-                  transition: 'opacity 0.3s ease',
-                }}
-              >
-                {text}
-              </div>
-            ))}
-          </div> */}
-        </div>
+        <div className="section h-[80vh]"></div>
 
         {/* Text - 1 */}
-        <div className="section" style={{ height: '80vh' }}>
-          <div
-            style={{
-              position: 'absolute',
-              top: '22vh',
-              left: '8vw',
-              width: '600px',
-              zIndex: 10,
-            }}
-          >
+        <div className="section h-[80vh]">
+          <div className="absolute top-[22vh] left-[8vw] w-[600px] z-10">
             <TitleText>Sound</TitleText>
             <BodyText>사운드와 공간을 엮어 경험을 만듭니다.</BodyText>
           </div>
         </div>
 
         {/* Text - 2 */}
-        <div className="section" style={{ height: '80vh' }}>
-          <div
-            style={{
-              textAlign: 'center',
-            }}
-          >
+        <div className="section h-[80vh]">
+          <div className="text-center">
             <TitleText>Orbit</TitleText>
             <BodyText>데이터를 사운드로 번역해 서사를 구축합니다.</BodyText>
           </div>
         </div>
 
         {/* Text - 3 */}
-        <div className="section" style={{ height: '80vh' }}>
-          <div
-            style={{
-              position: 'absolute',
-              top: '22vh',
-              right: '8vw',
-              width: '600px',
-              zIndex: 10,
-              textAlign: 'right',
-            }}
-          >
+        <div className="section h-[80vh]">
+          <div className="absolute top-[22vh] right-[8vw] w-[600px] z-10 text-right">
             <TitleText>Network</TitleText>
-            <BodyText>데이터를 사운드로 번역해 서사를 구축합니다.</BodyText>
+            <BodyText>여러 사람들과 음악을 공유해보세요.</BodyText>
           </div>
         </div>
 
         {/* Text - 4 */}
-        <div className="section" style={{ height: '80vh' }}>
-          <div
-            style={{
-              textAlign: 'center',
-            }}
-          >
+        <div className="section h-[80vh]">
+          <div className="text-center">
             <TitleText>Atlas</TitleText>
             <BodyText>이 모든 것을 하나로</BodyText>
           </div>
         </div>
 
         {/* Section 6: CTA */}
-        <div className="section" style={{ height: '70vh' }}>
-          <div
-            style={{
-              position: 'absolute',
-              top: '50%',
-              left: '50%',
-              transform: 'translate(-50%, -50%)',
-              textAlign: 'center',
-              zIndex: 10,
-            }}
-          >
-            <button
-              style={{
-                background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                border: 'none',
-                borderRadius: '50px',
-                padding: '20px 40px',
-                fontSize: 'clamp(18px, 2.5vw, 24px)',
-                fontWeight: 600,
-                color: '#fff',
-                cursor: 'pointer',
-                boxShadow: '0 10px 30px rgba(102, 126, 234, 0.3)',
-                transition: 'all 0.3s ease',
-                minWidth: '200px',
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.transform =
-                  'translate(-50%, -50%) scale(1.05)';
-                e.currentTarget.style.boxShadow =
-                  '0 15px 40px rgba(102, 126, 234, 0.4)';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.transform =
-                  'translate(-50%, -50%) scale(1)';
-                e.currentTarget.style.boxShadow =
-                  '0 10px 30px rgba(102, 126, 234, 0.3)';
-              }}
-              onClick={() => {
-                console.log('Go to Galaxy clicked!');
-              }}
-            >
-              Go to Galaxy
-            </button>
-          </div>
+        <div className="section h-screen">
+          {/* 이 섹션은 이제 빈 공간으로 유지 */}
         </div>
       </div>
+
+      {/* 플로팅 CTA 버튼 */}
+      {isScrolled && (
+        <button
+          className={`fixed z-50 bg-transparent border-2 border-white rounded-2xl py-5 px-10 text-[clamp(18px,2.5vw,24px)] font-semibold text-white cursor-pointer transition-all duration-300 ease-in-out min-w-[200px] hover:bg-black hover:border-white hover:shadow-[0_0_40px_rgba(255,255,255,0.4)] 
+            ${
+              isInCTASection
+                ? 'top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2  shadow-[0_0_30px_rgba(255,255,255,0.2)] '
+                : 'bottom-[5%] right-[5%] translate-x-0 translate-y-0 scale-70  shadow-[0_0_30px_rgba(255,255,255,0.1)] '
+            }
+            `}
+          onClick={() => {
+            navigate('/galaxy');
+          }}
+        >
+          go to Galaxy
+        </button>
+      )}
     </>
   );
 }
