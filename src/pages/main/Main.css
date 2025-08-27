@@ -1,382 +1,143 @@
 /* 기본 리셋 */
-*,
-*::before,
-*::after {
-  box-sizing: border-box;
-  padding: 0;
-  margin: 0;
-}
-
-/* 기본 요소 리셋 */
-html,
-body,
-div,
-span,
-applet,
-object,
-iframe,
-h1,
-h2,
-h3,
-h4,
-h5,
-h6,
-p,
-blockquote,
-pre,
-a,
-abbr,
-acronym,
-address,
-big,
-cite,
-code,
-del,
-dfn,
-em,
-img,
-ins,
-kbd,
-q,
-s,
-samp,
-small,
-strike,
-strong,
-sub,
-sup,
-tt,
-var,
-b,
-u,
-i,
-center,
-dl,
-dt,
-dd,
-ol,
-ul,
-li,
-fieldset,
-form,
-label,
-legend,
-table,
-caption,
-tbody,
-tfoot,
-thead,
-tr,
-th,
-td,
-article,
-aside,
-canvas,
-details,
-embed,
-figure,
-figcaption,
-footer,
-header,
-hgroup,
-menu,
-nav,
-output,
-ruby,
-section,
-summary,
-time,
-mark,
-audio,
-video {
-  margin: 0;
-  padding: 0;
-  border: 0;
-  font-size: 100%;
-  font: inherit;
-  vertical-align: baseline;
-}
-
-/* 리스트 스타일 제거 */
-ol,
-ul {
-  list-style: none;
-}
-
-/* 인용문 스타일 제거 */
-blockquote,
-q {
-  quotes: none;
-}
-blockquote:before,
-blockquote:after,
-q:before,
-q:after {
-  content: '';
-  content: none;
-}
-
-/* 테이블 리셋 */
-table {
-  border-collapse: collapse;
-  border-spacing: 0;
-}
-
-/* 버튼 리셋 */
-button {
-  background: none;
-  border: none;
-  padding: 0;
-  margin: 0;
-  cursor: pointer;
-  font: inherit;
-  color: inherit;
-  text-decoration: none;
-  outline: none;
-}
-
-/* 입력 요소 리셋 */
-input,
-textarea,
-select {
-  font: inherit;
-  color: inherit;
-  background: none;
-  border: none;
-  outline: none;
-  padding: 0;
-  margin: 0;
-}
-
-/* 링크 리셋 */
-a {
-  color: inherit;
-  text-decoration: none;
-}
-
-/* 이미지 리셋 */
-img {
-  max-width: 100%;
-  height: auto;
-  display: block;
-}
-
 html,
 body,
 #root {
-  height: 100%;
   width: 100%;
+  height: 100%;
   margin: 0;
 }
 
-/* 스크롤 설정: ScrollControls가 스크롤을 완전히 제어 */
 body {
-  overflow: hidden; /* ScrollControls가 모든 스크롤 제어 */
+  background: linear-gradient(#12071f, #000000);
 }
 
-html {
-  overflow-x: hidden;
+/* 남아있는 배경 데코 지우기 */
+.stage::before,
+.stage::after,
+body::before,
+body::after {
+  content: none !important;
+  display: none !important;
 }
 
-/* 메인 페이지 컨테이너 */
-.main-page {
-  position: relative;
-  width: 100%;
-  height: 100vh; /* ScrollControls가 내부적으로 높이 관리 */
-  opacity: 0;
-  transition: opacity 1s ease;
+canvas {
+  background: #000;
 }
 
-.main-page.visible {
-  opacity: 1;
-}
-
-/* 3D 배경 캔버스 */
-.background-canvas {
-  position: fixed !important;
-  inset: 0 !important;
-  width: 100% !important;
-  height: 100% !important;
-  display: block !important;
-  pointer-events: auto; /* 스크롤 이벤트 감지를 위해 활성화 */
-}
-
-/* UI 레이어 */
-.ui-layer {
-  position: relative;
-  width: 100%;
-  height: calc(var(--total-pages, 5) * 100vh); /* 섹션 수에 따른 동적 높이 */
-  pointer-events: auto;
-  padding-top: 80px; /* 헤더 높이만큼 여백 */
-}
-
-/* 사용하지 않는 기존 로딩 스타일 (정리 예정) */
-
-/* Loading 컴포넌트 전용 컨테이너 */
-.loading-page-container {
+/* ====== 1) Canvas + Overlay 들어가는 고정 레이어 ====== */
+.stage {
   position: fixed;
   inset: 0;
-  width: 100vw;
-  height: 100vh;
-  background: #0b0b0d;
-  display: grid;
-  place-items: center;
-  z-index: 1000;
 }
 
-.loading-inner {
-  text-align: center;
-  color: #fff;
-}
-
-.loading-text {
-  margin-bottom: 2rem;
-}
-
-.sona-title {
-  font-size: 4rem;
-  font-weight: bold;
-  margin-bottom: 1rem;
-  background: linear-gradient(45deg, #0ea5e9, #06b6d4, #10b981);
-  background-clip: text;
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  animation: glow 2s ease-in-out infinite alternate;
-}
-
-.sona-subtitle {
-  font-size: 1.2rem;
-  font-weight: 300;
-  letter-spacing: 0.1em;
-  min-height: 2em;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 0.3em;
-}
-
-.word {
-  opacity: 0;
-  transform: translateY(20px) scale(0.8);
-  transition: all 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-  display: inline-block;
-}
-
-.word.visible {
-  opacity: 1;
-  transform: translateY(0) scale(1);
-}
-
-.loading-enter {
-  padding: 0.75rem 1.25rem;
-  border-radius: 999px;
-  border: 2px solid #0ea5e9;
-  background: transparent;
-  color: #0ea5e9;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  opacity: 0;
-  transform: translateY(10px);
-}
-
-.loading-enter.fade-in {
-  animation: fadeInUp 0.8s ease forwards;
-}
-
-.loading-enter:hover {
-  background: #0ea5e9;
-  color: white;
-  transform: translateY(-2px);
-  box-shadow: 0 10px 25px rgba(14, 165, 233, 0.3);
-}
-
-.loading-progress {
-  opacity: 0.7;
-  margin-top: 1rem;
-  font-size: 0.9rem;
-}
-
-@keyframes glow {
-  0% {
-    text-shadow: 0 0 10px rgba(14, 165, 233, 0.5);
-  }
-  100% {
-    text-shadow:
-      0 0 20px rgba(14, 165, 233, 0.8),
-      0 0 30px rgba(6, 182, 212, 0.6);
-  }
-}
-
-@keyframes fadeInUp {
-  0% {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-  100% {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-/* 헤더 */
-.header-inner {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  z-index: 1000; /* 캔버스보다 위에 */
-  padding: 16px 24px;
-  display: flex;
-  gap: 16px;
-  color: #fff;
-  background: rgba(0, 0, 0, 0.1); /* 약간의 배경 */
-  /* backdrop-filter: blur(10px); */
-}
-
-.nav a {
-  color: #fff;
-  text-decoration: none;
-  margin-right: 12px;
-}
-
-/* 페이지 섹션 (인트로 + 기존 섹션) */
-.page-section {
-  height: 100vh;
-  width: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-/* 섹션 */
-.section-wrap {
-  position: relative;
-  width: 100%;
-  height: 100%;
-  overflow-y: auto;
-  scroll-snap-type: y mandatory;
-}
-
-.section {
-  height: 100vh;
-  width: 100%;
-  display: grid;
-  place-content: center;
-  color: white;
-  padding: 4rem 6rem;
-  scroll-snap-align: start;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.6);
-}
-
-/* 푸터 */
-.footer-inner {
+/* R3F 캔버스가 꽉 차게 */
+.stage canvas {
   position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  z-index: 10;
-  padding: 12px 24px;
-  color: #9ca3af;
+  inset: 0;
+  display: block;
+  /* 캔버스 이벤트 막고, 위의 오버레이/로딩/스크롤은 허용 */
+  pointer-events: auto;
+}
+
+/* 오버레이(텍스트 컨테이너) — 캔버스 위 */
+.overlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none; /* 기본 통과 */
+}
+
+/* 필요한 요소만 클릭 가능하게 하려면 내부만 auto */
+.overlay * {
+  pointer-events: auto;
+}
+
+/* 예시 텍스트 스타일(원하시는 대로 조정) */
+.overlay .dot {
+  position: absolute;
+  top: 60px;
+  left: 60px;
+  max-width: 520px;
+  color: #e6e6e6;
+  letter-spacing: 0.04em;
+  line-height: 1.6;
+}
+
+.overlay .dot > h1 {
+  margin: 0 0 10px 0;
+  font-weight: 700;
+  font-size: clamp(24px, 6vw, 72px);
+  color: #ffffff;
+}
+
+.overlay .caption {
+  position: absolute;
+  top: 40px;
+  right: 60px;
+  margin: 0;
+  color: #ffffff;
+  font-size: clamp(18px, 6vw, 80px);
+  font-weight: 200;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ====== 2) 스크롤 길이 담당 레이어 ====== */
+.scrollArea {
+  position: relative;
+  height: 100vh;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  /* 스크롤 레이어는 이벤트 허용 */
+  pointer-events: auto;
+}
+
+/* 전역에 이런 규칙이 남아 있으면 클릭 막힙니다. 꼭 제거!
+   #root > div > div { pointer-events: none; }
+*/
+/* 인트로 텍스트 레이아웃 */
+.intro-wrap {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: flex-end; /* 하단 정렬 */
+  justify-content: flex-start; /* 좌측 정렬 */
+  padding: 8vh 6vw; /* 화면 여백 */
+  pointer-events: none; /* 인트로는 클릭 통과 */
+}
+
+.intro-title {
+  margin: 0;
+  line-height: 0.96;
+  font-weight: 800;
+  color: #eaeaea;
+  font-size: clamp(40px, 8vw, 140px);
+  letter-spacing: -0.02em;
+}
+
+/* 각 단어는 개별 줄 */
+.intro-title .word {
+  display: block;
+  opacity: 0;
+  transform: translateY(10px) scale(0.98);
+  animation: intro-pop 700ms cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+}
+
+/* 순차 등장 (로드 직후 S → O → N → A) */
+.intro-title .w1 {
+  animation-delay: 0s;
+}
+.intro-title .w2 {
+  animation-delay: 0.2s;
+}
+.intro-title .w3 {
+  animation-delay: 0.4s;
+}
+.intro-title .w4 {
+  animation-delay: 0.6s;
+}
+
+@keyframes intro-pop {
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
 }
