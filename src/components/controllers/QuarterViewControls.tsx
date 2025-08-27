@@ -1,5 +1,9 @@
+import { useSceneStore } from "@/stores/useSceneStore";
 import { OrbitControls } from "@react-three/drei";
+import { useThree } from "@react-three/fiber";
+import { useRef, useEffect } from "react";
 import * as THREE from "three";
+import type { OrbitControls as OrbitControlsImpl } from "three-stdlib";
 
 /**
  * X,Z축 이동
@@ -9,11 +13,19 @@ import * as THREE from "three";
  */
 
 export default function QuarterViewControls() {
-  
+  const { cameraTarget } = useSceneStore();
+  const controls = useRef<OrbitControlsImpl>(null);
+  const { camera } = useThree();
+  useEffect(()=>{
+    if(controls.current ){
+      controls.current.target.copy(cameraTarget);
+    }
+  },[cameraTarget]);  
 
     return (
       <OrbitControls
-        enableRotate={false}
+        ref={controls}
+        enableRotate={true}
         enablePan={true}
         screenSpacePanning={false}
         enableZoom={true}

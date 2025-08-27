@@ -19,7 +19,7 @@ interface OrbitViewControlsProps {
 export default function OrbitViewControls({ targetPosition }: OrbitViewControlsProps) {
 
   //test code
-  const { setCameraIsMoving,setViewMode } = useSceneStore();
+  const { setCameraIsMoving,setViewMode,setCameraTarget } = useSceneStore();
 
   const isMovingRef = useRef<boolean>(false);
   const controls = useRef<OrbitControlsImpl>(null);
@@ -37,6 +37,7 @@ export default function OrbitViewControls({ targetPosition }: OrbitViewControlsP
     if (controls.current && !isMovingRef.current) {
       const distance = controls.current.getDistance();
       if (distance > 20) {
+        setCameraTarget(targetPosition);
         setViewMode('Galaxy');
       }
     }
