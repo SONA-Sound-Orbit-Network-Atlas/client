@@ -27,10 +27,6 @@ export default function App() {
       const handleWheel = (e: WheelEvent) => {
         const newScrollTop = scrollArea.current!.scrollTop + e.deltaY;
         state.top = Math.max(0, newScrollTop);
-        console.log('Wheel Event:', {
-          deltaY: e.deltaY,
-          newScrollTop: state.top,
-        });
       };
 
       scrollArea.current.addEventListener('wheel', handleWheel);

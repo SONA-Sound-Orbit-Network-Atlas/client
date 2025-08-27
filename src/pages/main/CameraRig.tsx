@@ -20,16 +20,6 @@ export default function CameraRig({ zStart = 15, zEnd = -2 }: Props) {
     const maxScroll = (state.sections - 1) * window.innerHeight;
     const o = Math.min(scrollTop / maxScroll, 1); // 0..1
 
-    // 디버깅: 스크롤 진행률 확인
-    if (Math.floor(scrollTop) % 200 === 0) {
-      console.log('CameraRig Debug:', {
-        scrollTop,
-        scrollProgress: o,
-        currentZ: camera.position.z,
-        currentZoom: (camera as THREE.OrthographicCamera).zoom,
-      });
-    }
-
     // 스크롤에 따라 더 빠르게 줌인되도록 곡선 적용
     const easedScroll = Math.pow(o, 0.3); // 0.3 제곱으로 매우 극적인 줌인
 
@@ -56,12 +46,6 @@ export default function CameraRig({ zStart = 15, zEnd = -2 }: Props) {
 
       // 줌 변경 후 projection matrix 업데이트 필수!
       orthoCamera.updateProjectionMatrix();
-
-      console.log('Zoom Update:', {
-        currentZoom: orthoCamera.zoom,
-        targetZoom,
-        scrollProgress: o,
-      });
     }
 
     // 더 빠른 카메라 이동을 위해 damping 값 증가
