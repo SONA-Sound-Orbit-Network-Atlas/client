@@ -1,12 +1,24 @@
 import { Grid} from '@react-three/drei';
 import * as THREE from 'three';
-import CustomOrbitControls from "./CustomOrbitControls";
-import DummySphere from "./DummySphere";
+import QuarterViewControls from "./controllers/QuarterViewControls";
+import Galaxy from "./cosmos/Galaxy";
+import { useSceneStore } from '@/stores/useSceneStore';
+import { useEffect } from 'react';
+import OrbitViewControls from './controllers/OrbitViewControls';
 
 // 화면 표시
 export default function Scene() {
-
+    const { viewMode, focusedPosition, setViewMode } = useSceneStore();
     const axesHelper = new THREE.AxesHelper(5);
+
+    useEffect(() => {
+        if (focusedPosition) {
+            setViewMode('StellarSystem');
+        } else {
+            setViewMode('Galaxy');
+        }
+    }, [focusedPosition]);
+
     return (
       <>
         {/* 조명 설정 */}
@@ -16,14 +28,9 @@ export default function Scene() {
           intensity={1} 
           castShadow
         />
+        {/* 별자리 시스템 */}
+        <Galaxy />
         
-        {/* 여러 개의 구체들을 다양한 위치에 배치 */}
-        <DummySphere position={[0, 0, 0]} color="#ff6b6b" size={1.5} />
-        <DummySphere position={[3, 2, 0]} color="#4ecdc4" size={1} />
-        <DummySphere position={[-3, -1, 2]} color="#45b7d1" size={0.8} />
-        <DummySphere position={[0, 3, -2]} color="#96ceb4" size={1.2} />
-        <DummySphere position={[4, -2, 1]} color="#feca57" size={0.6} />
-        <DummySphere position={[-4, 1, -1]} color="#ff9ff3" size={0.9} />
         
         {/* 그리드 헬퍼 (공간감을 위해) */}
         <Grid args={[20, 20]} />
@@ -31,7 +38,8 @@ export default function Scene() {
         {/* 축 헬퍼 */}
         <primitive object = {axesHelper}/>
        
-        <CustomOrbitControls />
+        {viewMode === 'Galaxy' && <QuarterViewControls />}
+        {viewMode === 'StellarSystem' && <OrbitViewControls targetPosition={focusedPosition ?? new THREE.Vector3(0,0,0)} />}
       </>
     )
   }

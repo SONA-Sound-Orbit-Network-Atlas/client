@@ -1,0 +1,1 @@
+export type LODLevel = 'detail' | 'far' | 'veryFar'
