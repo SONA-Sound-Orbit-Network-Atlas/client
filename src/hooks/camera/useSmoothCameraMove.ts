@@ -25,9 +25,15 @@ export function useSmoothCameraMove({
     const isMovingRef = useRef<boolean>(false);
     const startTimeRef = useRef<number>(0);
     const {camera} = useThree();
+    // 카메라 이동 오프셋
+    const offset = new THREE.Vector3(5, 5, 3);
+    const targetCameraPosRef = useRef<THREE.Vector3>(targetPosition.clone().add(offset));
 
     useEffect(()=>{
     if(targetPosition){
+        //카메라 이동 로직을 위한 타겟 포지션 설정
+        targetCameraPosRef.current = targetPosition.clone().add(offset);
+        //카메라 이동 로직 시작
         isMovingRef.current = true;
         startTimeRef.current = 0;
         setCameraIsMoving(true);
@@ -37,19 +43,16 @@ export function useSmoothCameraMove({
 
 useFrame((state, deltaTime) => {
     if(targetPosition && isMovingRef.current){
-        //카메라 이동 로직직
-        const offset = new THREE.Vector3(5, 5, 3);
-        const targetCameraPos = targetPosition.clone().add(offset);
         //경과 시간 계산
         startTimeRef.current += deltaTime;
         const progress = Math.min(startTimeRef.current / duration, 1.0);      
         const easedProgress = easeInOutCubic(progress);
         // 부드러운 카메라 이동
-        camera.position.lerp(targetCameraPos, easedProgress);
+        camera.position.lerp(targetCameraPosRef.current, easedProgress);
         controlsRef?.target.lerp(targetPosition, easedProgress);
 
         // 카메라 이동 완료 체크
-        const distance = camera.position.distanceTo(targetCameraPos);
+        const distance = camera.position.distanceTo(targetCameraPosRef.current);
         if(distance < 0.1){
             isMovingRef.current = false;
             setCameraIsMoving(false);

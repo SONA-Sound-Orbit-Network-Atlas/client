@@ -43,7 +43,6 @@ export default function OrbitViewControls({ targetPosition }: OrbitViewControlsP
     onMoveEnd:handleMoveEnd
   });
 
-  //issue : distance 값이 행성이 바뀔 떄 초기화 되지 않아서 첫 번째 작동 이후로 의도와 다른 작동을 함
   // 거리 계산 로직 
   useFrame(()=>{
     distanceRef.current = controls.current?.getDistance() || 0;
