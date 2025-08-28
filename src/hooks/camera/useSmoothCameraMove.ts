@@ -32,32 +32,27 @@ export function useSmoothCameraMove({
         startTimeRef.current = 0;
         setCameraIsMoving(true);
         onMoveStart?.();
-        console.log('부드러운 이동 시작');
     }
-},[targetPosition]);
+},[targetPosition,onMoveStart]); // setCameraIsMoving은 로깅용이기 때문에 의존성 배열에 포함X
 
 useFrame((state, deltaTime) => {
     if(targetPosition && isMovingRef.current){
         //카메라 이동 로직직
         const offset = new THREE.Vector3(5, 5, 3);
         const targetCameraPos = targetPosition.clone().add(offset);
-        console.log('CheckPoint 2');
         //경과 시간 계산
         startTimeRef.current += deltaTime;
         const progress = Math.min(startTimeRef.current / duration, 1.0);      
         const easedProgress = easeInOutCubic(progress);
-        console.log('CheckPoint 3');
         // 부드러운 카메라 이동
         camera.position.lerp(targetCameraPos, easedProgress);
         controlsRef?.target.lerp(targetPosition, easedProgress);
 
         // 카메라 이동 완료 체크
         const distance = camera.position.distanceTo(targetCameraPos);
-        console.log('distance',distance);
         if(distance < 0.1){
             isMovingRef.current = false;
-            setCameraIsMoving(isMovingRef.current);
-            console.log('부드러운 이동 완료');
+            setCameraIsMoving(false);
             onMoveEnd?.();
         }
     }

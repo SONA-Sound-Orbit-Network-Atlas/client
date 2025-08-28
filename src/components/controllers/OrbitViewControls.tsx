@@ -1,10 +1,11 @@
 import { OrbitControls } from "@react-three/drei";
+import { useFrame } from "@react-three/fiber";
 import type { OrbitControls as OrbitControlsImpl } from "three-stdlib";
 import * as THREE from "three";
-import { useRef, useEffect } from "react";
-import { useThree, useFrame } from "@react-three/fiber";
+import { useRef, useCallback } from "react";
 import { useSceneStore } from "@/stores/useSceneStore";
 import { useSmoothCameraMove } from "@/hooks/camera/useSmoothCameraMove";
+import { UseChangeViewModeOnOutOfDistance } from "@/hooks/camera/UseChangeViewModeOnOutOfDistance";
 
 /**
  * X,Z축 이동
@@ -13,7 +14,6 @@ import { useSmoothCameraMove } from "@/hooks/camera/useSmoothCameraMove";
  * @returns 카메라 및 이동 제어 컴포넌트
  */
 
-
 interface OrbitViewControlsProps {
   targetPosition: THREE.Vector3;
 }
@@ -21,34 +21,40 @@ interface OrbitViewControlsProps {
 export default function OrbitViewControls({ targetPosition }: OrbitViewControlsProps) {
 
   //test code
-  const { setViewMode,setCameraTarget } = useSceneStore();
+  const { setCameraTarget } = useSceneStore();
 
   const isMovingRef = useRef<boolean>(false);
   const controls = useRef<OrbitControlsImpl>(null);
-  const duration = 2; // 카메라 이동 시간간
+  const distanceRef = useRef<number>(0);
+  const duration = 2; // 카메라 이동 시간
 
-  useEffect(()=>{
-    // 테스트용
-    setCameraTarget(targetPosition);
-  },[targetPosition]);
-
+  const handleMoveStart = useCallback(() => {
+    isMovingRef.current = true;
+  }, []);
+  const handleMoveEnd = useCallback(() => {
+    isMovingRef.current = false;
+  }, []);
   // 카메라 이동 로직
   useSmoothCameraMove({
     targetPosition,
     controlsRef: controls.current,
     duration,
-    onMoveStart:()=>{isMovingRef.current = true;},
-    onMoveEnd:()=>{isMovingRef.current = false;}
+    onMoveStart:handleMoveStart,
+    onMoveEnd:handleMoveEnd
   });
 
-  useFrame(() => {
-    // 줌 거리 체크 (항상 실행)
-    if (controls.current && !isMovingRef.current) {
-      const distance = controls.current.getDistance();
-      if (distance > 20) {
-        setCameraTarget(targetPosition);
-        setViewMode('Galaxy');
-      }
+  //issue : distance 값이 행성이 바뀔 떄 초기화 되지 않아서 첫 번째 작동 이후로 의도와 다른 작동을 함
+  // 거리 계산 로직 
+  useFrame(()=>{
+    distanceRef.current = controls.current?.getDistance() || 0;
+  });
+  UseChangeViewModeOnOutOfDistance({
+    distanceRef: distanceRef,
+    targetDistance: 20,
+    movementLockRef: isMovingRef,
+    onOutOfDistance:()=>{
+      //TODO : zomeout 되면서 카메라 변경시 화면을 그대로 이어가기위해 카메라 타겟 설정중입니다. 추후 리팩토링 필요
+      setCameraTarget(targetPosition);
     }
   });
 
@@ -62,9 +68,4 @@ export default function OrbitViewControls({ targetPosition }: OrbitViewControlsP
       enablePan={false}
     />
   );
-}
-
-// 부드러운 이동을 위한 함수
-function easeInOutCubic(t: number): number {
-  return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
 }
