@@ -1,6 +1,5 @@
 import { useSceneStore } from "@/stores/useSceneStore";
 import { OrbitControls } from "@react-three/drei";
-import { useThree } from "@react-three/fiber";
 import { useRef, useEffect } from "react";
 import * as THREE from "three";
 import type { OrbitControls as OrbitControlsImpl } from "three-stdlib";
@@ -15,7 +14,6 @@ import type { OrbitControls as OrbitControlsImpl } from "three-stdlib";
 export default function QuarterViewControls() {
   const { cameraTarget } = useSceneStore();
   const controls = useRef<OrbitControlsImpl>(null);
-  const { camera } = useThree();
   useEffect(()=>{
     if(controls.current ){
       controls.current.target.copy(cameraTarget);
