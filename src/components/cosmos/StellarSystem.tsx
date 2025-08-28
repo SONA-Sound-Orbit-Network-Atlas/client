@@ -8,8 +8,8 @@ import { useSceneStore } from "@/stores/useSceneStore";
 //항성계 컴포넌트 
 
 
-export default function StellarSystem({StellarSysyemPos }: { 
-    StellarSysyemPos: [number, number, number]
+export default function StellarSystem({stellarSystemPos }: { 
+    stellarSystemPos: [number, number, number]
   }) {
     const { setFocusedPosition } = useSceneStore();
 
@@ -17,7 +17,7 @@ export default function StellarSystem({StellarSysyemPos }: {
     const detailGroupRef = useRef<THREE.Group>(null);
     const lowDetailMesh = useRef<THREE.Mesh>(null);
     const { camera } = useThree();
-    const systemPos = new THREE.Vector3(...StellarSysyemPos);
+    const systemPos = new THREE.Vector3(...stellarSystemPos);
 
     useFrame(()=>{
         if(!ref.current || !detailGroupRef.current || !lowDetailMesh.current) return;
@@ -40,7 +40,7 @@ export default function StellarSystem({StellarSysyemPos }: {
     });
 
     return (
-    <group ref={ref} position={StellarSysyemPos}>
+    <group ref={ref} position={stellarSystemPos}>
        <group ref={detailGroupRef} >
         <Star position={[0, 0, 0]} color="#ff6b6b" size={1.5} />
         <Planet position={[3, 2, 0]} color="#4ecdc4" size={1} />
@@ -49,7 +49,7 @@ export default function StellarSystem({StellarSysyemPos }: {
         <Planet position={[4, -2, 1]} color="#feca57" size={0.6} />
         <Planet position={[-4, 1, -1]} color="#ff9ff3" size={0.9} />
        </group>
-       <mesh ref={lowDetailMesh} onClick={() => setFocusedPosition(new THREE.Vector3(...StellarSysyemPos))}>
+       <mesh ref={lowDetailMesh} onClick={() => setFocusedPosition(new THREE.Vector3(...stellarSystemPos))}>
                 <sphereGeometry args={[1.5, 16, 16]} />
                 <meshStandardMaterial color="#ff6b6b"
                     emissive="#ffffff"
