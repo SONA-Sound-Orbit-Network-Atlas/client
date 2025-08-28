@@ -17,11 +17,11 @@ export default function StellarSystem({StellarSysyemPos }: {
     const detailGroupRef = useRef<THREE.Group>(null);
     const lowDetailMesh = useRef<THREE.Mesh>(null);
     const { camera } = useThree();
+    const systemPos = new THREE.Vector3(...StellarSysyemPos);
 
     useFrame(()=>{
         if(!ref.current || !detailGroupRef.current || !lowDetailMesh.current) return;
 
-        const systemPos = new THREE.Vector3(...StellarSysyemPos);
         const distance = camera.position.distanceTo(systemPos);
 
         //factor 값을 계산
