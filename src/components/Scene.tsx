@@ -39,7 +39,7 @@ export default function Scene() {
         <primitive object = {axesHelper}/>
        
         {viewMode === 'Galaxy' && <QuarterViewControls />}
-        {viewMode === 'StellarSystem' && <OrbitViewControls targetPosition={focusedPosition || new THREE.Vector3(0,0,0)} />}
+        {viewMode === 'StellarSystem' && <OrbitViewControls targetPosition={focusedPosition ?? new THREE.Vector3(0,0,0)} />}
       </>
     )
   }

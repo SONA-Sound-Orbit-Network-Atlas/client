@@ -22,7 +22,6 @@ export function UseChangeViewModeOnOutOfDistance({ distanceRef,targetDistance=20
         // 줌 거리 체크 (항상 실행)
         if(movementLockRef.current) return;  
         if (distanceRef.current > targetDistance) {   
-            console.log('줌 거리 초과');    
             setViewMode('Galaxy');
             onOutOfDistance?.();
         }
