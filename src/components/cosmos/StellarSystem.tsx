@@ -66,7 +66,14 @@ export default function StellarSystem({
       onClick={() => setSelectedStellarSystemId(id)}
     >
       <group ref={detailGroupRef}>
-        <Star position={[0, 0, 0]} color="#ff6b6b" size={1.5} />
+        <Star
+          position={[0, 0, 0]}
+          color="#ff6b6b"
+          size={1.5}
+          onClick={() =>
+            setFocusedPosition(new THREE.Vector3(...stellarSystemPos))
+          }
+        />
         <Planet position={[3, 2, 0]} color="#4ecdc4" size={1} />
         <Planet position={[-3, -1, 2]} color="#45b7d1" size={0.8} />
         <Planet position={[0, 3, -2]} color="#96ceb4" size={1.2} />
