@@ -1,72 +1,52 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import 'tailwindcss';
+@import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
 
-:root {
-  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
-  line-height: 1.5;
-  font-weight: 400;
+@theme {
+  --font-sans:
+    'Pretendard', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
+    'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif,
+    'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
 
-  color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
+  /* Primary */
+  --color-primary-100: #e9f2fc;
+  --color-primary-200: #b7d6f5;
+  --color-primary-300: #63b3ed;
+  --color-primary-400: #478c8d;
+  --color-primary-500: #32678c;
+  --color-primary-600: #1f445e;
+  --color-primary-700: #0d2433;
 
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
+  /* Secondary */
+  --color-secondary-100: #e0d8f9;
+  --color-secondary-200: #bea9f2;
+  --color-secondary-300: #9f7aea;
+  --color-secondary-400: #8346df;
+  --color-secondary-500: #5c28a5;
+  --color-secondary-600: #351463;
+  --color-secondary-700: #180632;
 
-a {
-  font-weight: 500;
-  color: #646cff;
-  text-decoration: inherit;
-}
-a:hover {
-  color: #535bf2;
-}
+  /* Tertiary */
+  --color-tertiary-100: #daf6fc;
+  --color-tertiary-200: #76e4f7;
+  --color-tertiary-300: #53b8cc;
+  --color-tertiary-400: #3f93a0;
+  --color-tertiary-500: #2d6c76;
+  --color-tertiary-600: #1b484f;
+  --color-tertiary-700: #0b262b;
 
-body {
-  margin: 0;
-  display: flex;
-  place-items: center;
-  min-width: 320px;
-  min-height: 100vh;
-}
+  /* State Colors */
+  --color-success: #68d391;
+  --color-error: #f56565;
+  --color-warning: #f6e05e;
 
-h1 {
-  font-size: 3.2em;
-  line-height: 1.1;
-}
+  /* Gray scale */
+  --color-gray-bg: #101010;
+  --color-gray-surface: #111111;
+  --color-gray-card: #1f1f1f;
+  --color-gray-border: #333333;
 
-button {
-  border-radius: 8px;
-  border: 1px solid transparent;
-  padding: 0.6em 1.2em;
-  font-size: 1em;
-  font-weight: 500;
-  font-family: inherit;
-  background-color: #1a1a1a;
-  cursor: pointer;
-  transition: border-color 0.25s;
-}
-button:hover {
-  border-color: #646cff;
-}
-button:focus,
-button:focus-visible {
-  outline: 4px auto -webkit-focus-ring-color;
-}
-
-@media (prefers-color-scheme: light) {
-  :root {
-    color: #213547;
-    background-color: #ffffff;
-  }
-  a:hover {
-    color: #747bff;
-  }
-  button {
-    background-color: #f9f9f9;
-  }
+  /* Text */
+  --color-text-white: #f3f3f3;
+  --color-text-secondary: #a0aec0;
+  --color-text-muted: #718096;
 }
