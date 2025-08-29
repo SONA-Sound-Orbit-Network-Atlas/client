@@ -98,7 +98,7 @@ export default function StellarSystem({
     detailGroupRef.current.scale.set(factor, factor, factor);
     lowDetailMesh.current.scale.set(1 - factor, 1 - factor, 1 - factor);
 
-    // 뷰 모드에 따른 회전 처리
+    //뷰 모드에 따른 회전 처리
     if (viewMode === 'StellarSystem') {
       if (selectedStellarSystemId === id) {
         // 선택된 항성계만 카메라 방향을 따라감
@@ -127,17 +127,25 @@ export default function StellarSystem({
             setFocusedPosition(new THREE.Vector3(...stellarSystemPos))
           }
         />
-        {planets.map((planet, index) => (
-          <Planet
-            key={index}
-            orbitRadius={planet.orbitRadius}
-            orbitSpeed={planet.orbitSpeed}
-            planetSize={planet.planetSize}
-            planetColor={planet.planetColor}
-            rotationSpeed={planet.rotationSpeed}
-            inclination={planet.inclination}
-          />
-        ))}
+        {planets.map((planet, index) => {
+          // StellarSystem 뷰에서 선택된 항성계일 때 inclination을 0으로
+          const effectiveInclination =
+            viewMode === 'StellarSystem' && selectedStellarSystemId === id
+              ? 0 // 위에서 보는 시점 (모든 궤도가 수평)
+              : planet.inclination; // 원래 기울기 유지
+
+          return (
+            <Planet
+              key={index}
+              orbitRadius={planet.orbitRadius}
+              orbitSpeed={planet.orbitSpeed}
+              planetSize={planet.planetSize}
+              planetColor={planet.planetColor}
+              rotationSpeed={planet.rotationSpeed}
+              inclination={effectiveInclination}
+            />
+          );
+        })}
       </group>
       <mesh
         ref={lowDetailMesh}
