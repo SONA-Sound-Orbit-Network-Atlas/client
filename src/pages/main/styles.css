@@ -14,10 +14,14 @@ body,
 
 body {
   overscroll-behavior: none;
-  background: #0c0f13;
-  color: white;
   font-family:
     -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+}
+
+/* Main 페이지에서만 적용되는 스타일 */
+.main-page {
+  background: #0c0f13;
+  color: white;
   overflow: hidden;
 }
 
@@ -62,8 +66,8 @@ canvas {
   z-index: 0;
 }
 
-/* 텍스트 선택 방지 */
-* {
+/* 텍스트 선택 방지 - Main 페이지에서만 적용 */
+.main-page * {
   -webkit-user-select: none;
   -moz-user-select: none;
   -ms-user-select: none;

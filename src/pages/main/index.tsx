@@ -60,7 +60,7 @@ export default function App() {
   }, []);
 
   return (
-    <>
+    <div className="main-page">
       <Canvas
         linear
         dpr={[1, 2]}
@@ -147,7 +147,7 @@ export default function App() {
           go to Galaxy
         </button>
       )}
-    </>
+    </div>
   );
 }
 
