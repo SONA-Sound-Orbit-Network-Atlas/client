@@ -12,9 +12,13 @@ export default function Star({
   onClick?: () => void;
 }) {
   return (
-    <mesh position={position} onClick={onClick}>
+    <mesh position={position} onClick={onClick} receiveShadow={false}>
       <sphereGeometry args={[size, 32, 32]} />
-      <meshStandardMaterial color={color} />
+      <meshStandardMaterial
+        color={color}
+        emissive={color}
+        emissiveIntensity={0.5}
+      />
     </mesh>
   );
 }

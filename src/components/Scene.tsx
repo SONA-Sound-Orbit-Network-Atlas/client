@@ -22,7 +22,11 @@ export default function Scene() {
     <>
       {/* 조명 설정 */}
       <ambientLight intensity={0.4} />
-      <directionalLight position={[10, 10, 5]} intensity={1} castShadow />
+      {/* <directionalLight
+        position={[10, 10, 5]}
+        intensity={1}
+        castShadow={false}
+      /> */}
       {/* 별자리 시스템 */}
       <Galaxy />
 
