@@ -1,4 +1,4 @@
-import { useRef } from 'react';
+import { useRef, useState } from 'react';
 import Star from './Star';
 import Planet from './Planet';
 import { useThree, useFrame } from '@react-three/fiber';
@@ -6,6 +6,53 @@ import * as THREE from 'three';
 import { useSceneStore } from '@/stores/useSceneStore';
 
 //항성계 컴포넌트
+
+type Planet = {
+  orbitRadius: number;
+  orbitSpeed: number;
+  planetSize: number;
+  planetColor: string;
+  rotationSpeed: number;
+};
+
+//mock data
+const mockPlanets: Planet[] = [
+  {
+    orbitRadius: 5,
+    orbitSpeed: 0.5,
+    planetSize: 1,
+    planetColor: '#4ecdc4',
+    rotationSpeed: 0.5,
+  },
+  {
+    orbitRadius: 3,
+    orbitSpeed: 0.3,
+    planetSize: 0.8,
+    planetColor: '#45b7d1',
+    rotationSpeed: 0.3,
+  },
+  {
+    orbitRadius: 4,
+    orbitSpeed: 0.4,
+    planetSize: 1.2,
+    planetColor: '#96ceb4',
+    rotationSpeed: 0.4,
+  },
+  {
+    orbitRadius: 2,
+    orbitSpeed: 0.2,
+    planetSize: 0.6,
+    planetColor: '#feca57',
+    rotationSpeed: 0.2,
+  },
+  {
+    orbitRadius: 1,
+    orbitSpeed: 0.1,
+    planetSize: 0.9,
+    planetColor: '#ff9ff3',
+    rotationSpeed: 0.1,
+  },
+];
 
 export default function StellarSystem({
   stellarSystemPos,
@@ -26,6 +73,8 @@ export default function StellarSystem({
   const lowDetailMesh = useRef<THREE.Mesh>(null);
   const { camera } = useThree();
   const systemPos = new THREE.Vector3(...stellarSystemPos);
+
+  const [planets] = useState<Planet[]>(mockPlanets);
 
   useFrame(() => {
     // 항성계 LOD 처리
@@ -51,12 +100,17 @@ export default function StellarSystem({
     detailGroupRef.current.scale.set(factor, factor, factor);
     lowDetailMesh.current.scale.set(1 - factor, 1 - factor, 1 - factor);
 
-    // 선택된 항성계가 화면과 flat하게 보여주기
-    // if (viewMode === 'StellarSystem' && selectedStellarSystemId === id) {
-    //   detailGroupRef.current.quaternion.copy(camera.quaternion);
-    // } else {
-    //   detailGroupRef.current.quaternion.identity();
-    // }
+    // 뷰 모드에 따른 회전 처리
+    if (viewMode === 'StellarSystem') {
+      if (selectedStellarSystemId === id) {
+        // 선택된 항성계만 카메라 방향을 따라감
+        detailGroupRef.current.quaternion.copy(camera.quaternion);
+      }
+      // 선택되지 않은 항성계는 기존 방향 유지 (아무것도 하지 않음)
+    } else {
+      // Galaxy 뷰에서는 모든 항성계가 기본 방향
+      detailGroupRef.current.quaternion.identity();
+    }
   });
 
   return (
@@ -74,11 +128,16 @@ export default function StellarSystem({
             setFocusedPosition(new THREE.Vector3(...stellarSystemPos))
           }
         />
-        <Planet position={[3, 2, 0]} color="#4ecdc4" size={1} />
-        <Planet position={[-3, -1, 2]} color="#45b7d1" size={0.8} />
-        <Planet position={[0, 3, -2]} color="#96ceb4" size={1.2} />
-        <Planet position={[4, -2, 1]} color="#feca57" size={0.6} />
-        <Planet position={[-4, 1, -1]} color="#ff9ff3" size={0.9} />
+        {planets.map((planet, index) => (
+          <Planet
+            key={index}
+            orbitRadius={planet.orbitRadius}
+            orbitSpeed={planet.orbitSpeed}
+            planetSize={planet.planetSize}
+            planetColor={planet.planetColor}
+            rotationSpeed={planet.rotationSpeed}
+          />
+        ))}
       </group>
       <mesh
         ref={lowDetailMesh}
