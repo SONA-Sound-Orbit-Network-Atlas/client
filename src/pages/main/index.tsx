@@ -7,7 +7,7 @@ import CameraRig from './CameraRig';
 import { TitleText, BodyText } from './components/Text';
 import { ScrollIndicator } from './components/ScrollIndicator';
 import state from './store';
-import './styles.css';
+// import './styles.css';
 import { useNavigate } from 'react-router-dom';
 
 // 메인 App 컴포넌트
