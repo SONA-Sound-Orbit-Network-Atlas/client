@@ -82,7 +82,7 @@ export default function StellarSystem({
     const distance = camera.position.distanceTo(systemPos);
 
     //factor 값을 계산
-    const minDistance = 20; // 거리가 20 이하면 완전히 보임
+    const minDistance = 100; // 거리가 20 이하면 완전히 보임
     const fadeRange = 10; // 20~30 거리에서 페이드 아웃
     const maxOpacity = 1; // 최대 투명도
     const minOpacity = 0; // 최소 투명도

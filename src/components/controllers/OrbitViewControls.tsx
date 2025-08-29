@@ -1,16 +1,16 @@
-import { OrbitControls } from "@react-three/drei";
-import { useFrame } from "@react-three/fiber";
-import type { OrbitControls as OrbitControlsImpl } from "three-stdlib";
-import * as THREE from "three";
-import { useRef, useCallback } from "react";
-import { useSceneStore } from "@/stores/useSceneStore";
-import { useSmoothCameraMove } from "@/hooks/camera/useSmoothCameraMove";
-import { UseChangeViewModeOnOutOfDistance } from "@/hooks/camera/UseChangeViewModeOnOutOfDistance";
+import { OrbitControls } from '@react-three/drei';
+import { useFrame } from '@react-three/fiber';
+import type { OrbitControls as OrbitControlsImpl } from 'three-stdlib';
+import * as THREE from 'three';
+import { useRef, useCallback } from 'react';
+import { useSceneStore } from '@/stores/useSceneStore';
+import { useSmoothCameraMove } from '@/hooks/camera/useSmoothCameraMove';
+import { UseChangeViewModeOnOutOfDistance } from '@/hooks/camera/UseChangeViewModeOnOutOfDistance';
 
 /**
  * X,Z축 이동
  * y축 이동 제한
- * 쿼터뷰 이동방식 구현 
+ * 쿼터뷰 이동방식 구현
  * @returns 카메라 및 이동 제어 컴포넌트
  */
 
@@ -18,8 +18,9 @@ interface OrbitViewControlsProps {
   targetPosition: THREE.Vector3;
 }
 
-export default function OrbitViewControls({ targetPosition }: OrbitViewControlsProps) {
-
+export default function OrbitViewControls({
+  targetPosition,
+}: OrbitViewControlsProps) {
   //test code
   const { setCameraTarget } = useSceneStore();
 
@@ -39,26 +40,26 @@ export default function OrbitViewControls({ targetPosition }: OrbitViewControlsP
     targetPosition,
     controlsRef: controls.current,
     duration,
-    onMoveStart:handleMoveStart,
-    onMoveEnd:handleMoveEnd
+    onMoveStart: handleMoveStart,
+    onMoveEnd: handleMoveEnd,
   });
 
-  // 거리 계산 로직 
-  useFrame(()=>{
+  // 거리 계산 로직
+  useFrame(() => {
     distanceRef.current = controls.current?.getDistance() || 0;
   });
   UseChangeViewModeOnOutOfDistance({
     distanceRef: distanceRef,
-    targetDistance: 20,
+    targetDistance: 60,
     movementLockRef: isMovingRef,
-    onOutOfDistance:()=>{
+    onOutOfDistance: () => {
       //TODO : zomeout 되면서 카메라 변경시 화면을 그대로 이어가기위해 카메라 타겟 설정중입니다. 추후 리팩토링 필요
       setCameraTarget(targetPosition);
-    }
+    },
   });
 
   return (
-    <OrbitControls 
+    <OrbitControls
       ref={controls}
       enableDamping={true}
       dampingFactor={0.05}
