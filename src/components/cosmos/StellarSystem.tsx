@@ -8,28 +8,23 @@ import { useSceneStore } from '@/stores/useSceneStore';
 //항성계 컴포넌트
 
 type Planet = {
-  orbitRadius: number;
-  orbitSpeed: number;
-  planetSize: number;
-  planetColor: string;
-  rotationSpeed: number;
+  orbitRadius: number; // 최소: 0.1, 최대: 20 (궤도 반지름)
+  orbitSpeed: number; // 최소: 0.01, 최대: 5.0 (공전 속도)
+  planetSize: number; // 최소: 0.1, 최대: 3.0 (행성 크기)
+  planetColor: string; // 최소: 1자, 최대: 7자 (색상 코드)
+  rotationSpeed: number; // 최소: 0.01, 최대: 10.0 (자전 속도)
+  inclination: number; // 최소: -180, 최대: 180 (궤도 기울기, 도 단위)
 };
 
 //mock data
 const mockPlanets: Planet[] = [
   {
-    orbitRadius: 5,
-    orbitSpeed: 0.5,
-    planetSize: 1,
-    planetColor: '#4ecdc4',
-    rotationSpeed: 0.5,
-  },
-  {
     orbitRadius: 3,
     orbitSpeed: 0.3,
     planetSize: 0.8,
-    planetColor: '#45b7d1',
+    planetColor: '#FFFFFF',
     rotationSpeed: 0.3,
+    inclination: -180,
   },
   {
     orbitRadius: 4,
@@ -37,6 +32,7 @@ const mockPlanets: Planet[] = [
     planetSize: 1.2,
     planetColor: '#96ceb4',
     rotationSpeed: 0.4,
+    inclination: 120,
   },
   {
     orbitRadius: 2,
@@ -44,13 +40,15 @@ const mockPlanets: Planet[] = [
     planetSize: 0.6,
     planetColor: '#feca57',
     rotationSpeed: 0.2,
+    inclination: -35,
   },
   {
-    orbitRadius: 1,
+    orbitRadius: 5,
     orbitSpeed: 0.1,
     planetSize: 0.9,
     planetColor: '#ff9ff3',
     rotationSpeed: 0.1,
+    inclination: 15,
   },
 ];
 
@@ -105,6 +103,7 @@ export default function StellarSystem({
       if (selectedStellarSystemId === id) {
         // 선택된 항성계만 카메라 방향을 따라감
         detailGroupRef.current.quaternion.copy(camera.quaternion);
+        //detailGroupRef.current.rotation.set(-Math.PI / 2, 0, 0);
       }
       // 선택되지 않은 항성계는 기존 방향 유지 (아무것도 하지 않음)
     } else {
@@ -136,6 +135,7 @@ export default function StellarSystem({
             planetSize={planet.planetSize}
             planetColor={planet.planetColor}
             rotationSpeed={planet.rotationSpeed}
+            inclination={planet.inclination}
           />
         ))}
       </group>
