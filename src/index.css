@@ -1,5 +1,9 @@
 @import 'tailwindcss';
+@import 'tw-animate-css';
+
 @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
+
+@custom-variant dark (&:is(.dark *));
 
 @theme {
   --font-sans:
@@ -28,6 +32,8 @@
   /* Tertiary */
   --color-tertiary-100: #daf6fc;
   --color-tertiary-200: #76e4f7;
+  --color-tertiary-200-10: rgba(118, 228, 247, 0.1);
+  --color-tertiary-200-20: rgba(118, 228, 247, 0.2);
   --color-tertiary-300: #53b8cc;
   --color-tertiary-400: #3f93a0;
   --color-tertiary-500: #2d6c76;
@@ -49,4 +55,14 @@
   --color-text-white: #f3f3f3;
   --color-text-secondary: #a0aec0;
   --color-text-muted: #718096;
+
+  /* Navy colors */
+  --color-navy-opacity-100: #1e2532;
+  --color-navy-opacity-60: rgba(30, 37, 50, 0.6);
+
+  /* Border colors */
+  --color-border-primary: rgba(30, 37, 50, 0.6);
+  --color-border-secondary: rgba(30, 37, 50, 0.6);
+  --color-border-tertiary: rgba(30, 37, 50, 0.6);
+  --color-border-white: #2d3748;
 }
