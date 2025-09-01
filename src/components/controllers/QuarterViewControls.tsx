@@ -28,9 +28,9 @@ export default function QuarterViewControls() {
       screenSpacePanning={false}
       enableZoom={true}
       mouseButtons={{
-        LEFT: THREE.MOUSE.ROTATE,
+        LEFT: THREE.MOUSE.PAN,
         MIDDLE: THREE.MOUSE.DOLLY,
-        RIGHT: THREE.MOUSE.PAN,
+        RIGHT: THREE.MOUSE.ROTATE,
       }}
       // 추가 커스터마이징
       panSpeed={0.8} // 패닝 속도
