@@ -48,16 +48,6 @@
   --color-text-white: #f3f3f3;
   --color-text-secondary: #a0aec0;
   --color-text-muted: #718096;
-
-  /* Navy colors */
-  --color-navy-opacity-100: #1e2532;
-  --color-navy-opacity-60: rgba(30, 37, 50, 0.6);
-
-  /* Border colors */
-  --color-border-primary: rgba(30, 37, 50, 0.6);
-  --color-border-secondary: rgba(30, 37, 50, 0.6);
-  --color-border-tertiary: rgba(30, 37, 50, 0.6);
-  --color-border-white: #2d3748;
 }
 
 @theme inline {
