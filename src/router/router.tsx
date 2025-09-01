@@ -1,5 +1,5 @@
 import { createBrowserRouter } from 'react-router-dom';
-import Main from '@/pages/main/Main';
+import Main from '@/pages/Main';
 import SpacePage from '@/pages/SpacePage';
 import ComponentTestPage from '@/pages/ComponentTestPage';
 import ComponentsPage from '@/pages/ComponentsPage';

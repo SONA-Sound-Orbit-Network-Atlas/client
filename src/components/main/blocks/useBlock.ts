@@ -1,11 +1,11 @@
 import React, { useContext } from 'react';
 import { useThree } from '@react-three/fiber';
-import state from './store';
+import mainStore from '../store/mainStore';
 
 const offsetContext = React.createContext(0);
 
 export function useBlock() {
-  const { sections, pages, zoom } = state;
+  const { sections, pages, zoom } = mainStore;
   const { size, viewport } = useThree();
   const offset = useContext(offsetContext);
 

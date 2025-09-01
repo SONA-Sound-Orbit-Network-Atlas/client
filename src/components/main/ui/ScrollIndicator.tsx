@@ -48,27 +48,6 @@ export function ScrollIndicator() {
         Scroll
       </div>
 
-      {/* 화살표 아이콘 */}
-      <svg
-        width="24"
-        height="24"
-        viewBox="0 0 24 24"
-        fill="none"
-        xmlns="http://www.w3.org/2000/svg"
-        style={{
-          animation: 'bounce 2s infinite',
-        }}
-      >
-        <path
-          d="M7 10L12 15L17 10"
-          stroke="#ffffff"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          opacity="0.8"
-        />
-      </svg>
-
       {/* 귀여운 스크롤바 아이콘 */}
       <svg
         width="16"

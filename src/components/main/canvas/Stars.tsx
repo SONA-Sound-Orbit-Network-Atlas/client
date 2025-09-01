@@ -1,10 +1,10 @@
-import { useMemo, useRef } from 'react';
+import { useMemo, useRef, Suspense } from 'react';
 import { useFrame } from '@react-three/fiber';
 import { Points, PointMaterial } from '@react-three/drei';
 import * as THREE from 'three';
 import * as random from 'maath/random/dist/maath-random.esm';
 
-export default function Stars() {
+function StarsContent() {
   // 별 포인트 생성 (1000개의 별)
   const starsRef = useRef<THREE.Points>(null!);
   const starsRef2 = useRef<THREE.Points>(null!);
@@ -91,5 +91,13 @@ export default function Stars() {
         />
       </Points>
     </group>
+  );
+}
+
+export default function Stars() {
+  return (
+    <Suspense fallback={null}>
+      <StarsContent />
+    </Suspense>
   );
 }

@@ -1,33 +1,33 @@
-// src/pages/main/CameraRig.tsx
 import { useThree } from '@react-three/fiber';
 import * as THREE from 'three';
 import { useFrame } from '@react-three/fiber';
-import state from './store';
+import mainStore from '../store/mainStore';
 
-type Props = {
+type CameraRigProps = {
   // 줌의 시작/끝 z값 (퍼스펙티브라 z이동으로 줌 느낌)
   zStart?: number;
   zEnd?: number;
 };
 
-export default function CameraRig({ zStart = 15, zEnd = -6 }: Props) {
+export default function CameraRig({ zStart = 15, zEnd = -6 }: CameraRigProps) {
   const { camera } = useThree();
   const lookAt = new THREE.Vector3(0, 0, -4.5); // 별모임 중심
 
   useFrame((_, dt) => {
     // DOM 스크롤 위치를 사용하여 offset 계산
-    const scrollTop = state.top;
-    const maxScroll = (state.sections - 1) * window.innerHeight;
+    const scrollTop = mainStore.top;
+    const maxScroll = (mainStore.sections - 1) * window.innerHeight;
     const o = Math.min(scrollTop / maxScroll, 1); // 0..1
 
     // 섹션별로 단계적으로 확대되는 효과
-    const sectionProgress = o * (state.sections - 1); // 0 ~ 5 범위
+    const sectionProgress = o * (mainStore.sections - 1); // 0 ~ 5 범위
     const currentSection = Math.floor(sectionProgress);
     const sectionOffset = sectionProgress - currentSection;
 
     // 각 섹션마다 일정한 크기로 "확" 줌인되는 효과
     const easedOffset = Math.pow(sectionOffset, 2); // 더 강한 가속으로 극적인 줌
-    const easedScroll = (currentSection + easedOffset) / (state.sections - 1);
+    const easedScroll =
+      (currentSection + easedOffset) / (mainStore.sections - 1);
 
     // zEnd를 -6으로 설정하여 별모임(z=-4.5) 뒤편까지 들어가기
     const safeZEnd = Math.max(-6, zEnd);
