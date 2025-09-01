@@ -70,10 +70,7 @@ export default function App() {
         >
           <Suspense
             fallback={
-              <Html
-                center
-                className="p-2.5 -translate-x-1/2 -translate-y-1/2 text-gray-400"
-              >
+              <Html center className="loading">
                 Loading...
               </Html>
             }

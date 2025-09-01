@@ -1,8 +1,10 @@
 import { createBrowserRouter } from 'react-router-dom';
 import Main from '@/pages/main/Main';
-import GalaxyPage from '@/pages/GalaxyPage';
+import SpacePage from '@/pages/SpacePage';
+import ComponentTestPage from '@/pages/ComponentTestPage';
+import ComponentsPage from '@/pages/ComponentsPage';
 import AudioTestPage from '@/pages/AudioTestPage';
-import NotFound from '@/pages/NotFound';
+import NotFoundPage from '@/pages/NotFoundPage';
 
 const router = createBrowserRouter([
   {
@@ -10,8 +12,16 @@ const router = createBrowserRouter([
     element: <Main />,
   },
   {
-    path: '/galaxy',
-    element: <GalaxyPage />,
+    path: '/space',
+    element: <SpacePage />,
+  },
+  {
+    path: '/componentstest',
+    element: <ComponentTestPage />,
+  },
+  {
+    path: '/componentsPage',
+    element: <ComponentsPage />,
   },
   {
     path: '/audio-test',
@@ -19,7 +29,7 @@ const router = createBrowserRouter([
   },
   {
     path: '*',
-    element: <NotFound />,
+    element: <NotFoundPage />,
   },
 ]);
 
