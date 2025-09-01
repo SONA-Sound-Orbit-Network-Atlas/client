@@ -5,7 +5,7 @@ import * as THREE from 'three';
 import { useRef, useCallback } from 'react';
 import { useSceneStore } from '@/stores/useSceneStore';
 import { useSmoothCameraMove } from '@/hooks/camera/useSmoothCameraMove';
-import { UseChangeViewModeOnOutOfDistance } from '@/hooks/camera/UseChangeViewModeOnOutOfDistance';
+import { useChangeViewModeOnOutOfDistance } from '@/hooks/camera/useChangeViewModeOnOutOfDistance';
 
 /**
  * X,Z축 이동
@@ -48,7 +48,7 @@ export default function OrbitViewControls({
   useFrame(() => {
     distanceRef.current = controls.current?.getDistance() || 0;
   });
-  UseChangeViewModeOnOutOfDistance({
+  useChangeViewModeOnOutOfDistance({
     distanceRef: distanceRef,
     targetDistance: 60,
     movementLockRef: isMovingRef,
