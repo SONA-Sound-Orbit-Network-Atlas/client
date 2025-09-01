@@ -7,7 +7,7 @@ import CameraRig from './CameraRig';
 import { TitleText, BodyText } from './components/Text';
 import { ScrollIndicator } from './components/ScrollIndicator';
 import state from './store';
-import './styles.css';
+
 import { useNavigate } from 'react-router-dom';
 
 // 메인 App 컴포넌트
@@ -74,26 +74,41 @@ export default function App() {
             </Html>
           }
         >
-          {/* 별모임 - 전체 배경으로 항상 보임 */}
-          <Stars />
+          <Suspense
+            fallback={
+              <Html
+                center
+                className="p-2.5 -translate-x-1/2 -translate-y-1/2 text-gray-400"
+              >
+                Loading...
+              </Html>
+            }
+          >
+            {/* 별모임 - 전체 배경으로 항상 보임 */}
+            <Stars />
 
-          {/* 카메라 제어 */}
-          <CameraRig zStart={10} zEnd={3} />
+            {/* 카메라 제어 */}
+            <CameraRig zStart={10} zEnd={3} />
 
-          {/* 3D 콘텐츠 */}
-          <Content />
-        </Suspense>
-      </Canvas>
+            {/* 3D 콘텐츠 */}
+            <Content />
+          </Suspense>
+        </Canvas>
+      </div>
 
       {/* DOM 스크롤 영역과 HTML 콘텐츠를 함께 관리 */}
-      <div className="scrollArea" ref={scrollArea} onScroll={onScroll}>
+      <div
+        className="fixed top-0 left-0 w-screen h-screen overflow-y-auto overflow-x-hidden pointer-events-auto z-[1] snap-y snap-mandatory scroll-smooth text-white overscroll-none font-sans"
+        ref={scrollArea}
+        onScroll={onScroll}
+      >
         {isScrolled ? null : <ScrollIndicator />}
 
         {/* Section 1: Intro */}
-        <div className="section h-[80vh]"></div>
+        <div className="relative w-full flex items-center justify-center snap-start h-screen"></div>
 
         {/* Text - 1 */}
-        <div className="section h-[80vh]">
+        <div className="relative w-full flex items-center justify-center snap-start h-[80vh]">
           <div className="absolute top-[22vh] left-[8vw] w-[600px] z-10">
             <TitleText>Sound</TitleText>
             <BodyText>사운드와 공간을 엮어 경험을 만듭니다.</BodyText>
@@ -101,7 +116,7 @@ export default function App() {
         </div>
 
         {/* Text - 2 */}
-        <div className="section h-[80vh]">
+        <div className="relative w-full flex items-center justify-center snap-start h-[80vh]">
           <div className="text-center">
             <TitleText>Orbit</TitleText>
             <BodyText>데이터를 사운드로 번역해 서사를 구축합니다.</BodyText>
@@ -109,7 +124,7 @@ export default function App() {
         </div>
 
         {/* Text - 3 */}
-        <div className="section h-[80vh]">
+        <div className="relative w-full flex items-center justify-center snap-start h-[80vh]">
           <div className="absolute top-[22vh] right-[8vw] w-[600px] z-10 text-right">
             <TitleText>Network</TitleText>
             <BodyText>여러 사람들과 음악을 공유해보세요.</BodyText>
@@ -117,7 +132,7 @@ export default function App() {
         </div>
 
         {/* Text - 4 */}
-        <div className="section h-[80vh]">
+        <div className="relative w-full flex items-center justify-center snap-start h-[80vh]">
           <div className="text-center">
             <TitleText>Atlas</TitleText>
             <BodyText>이 모든 것을 하나로</BodyText>
@@ -125,7 +140,7 @@ export default function App() {
         </div>
 
         {/* Section 6: CTA */}
-        <div className="section h-screen">
+        <div className="relative w-full flex items-center justify-center snap-start h-screen">
           {/* 이 섹션은 이제 빈 공간으로 유지 */}
         </div>
       </div>
@@ -133,10 +148,10 @@ export default function App() {
       {/* 플로팅 CTA 버튼 */}
       {isScrolled && (
         <button
-          className={`fixed z-50 bg-transparent border-2 border-white rounded-2xl py-5 px-10 text-[clamp(18px,2.5vw,24px)] font-semibold text-white cursor-pointer transition-all duration-300 ease-in-out min-w-[200px] hover:bg-black hover:border-white hover:shadow-[0_0_40px_rgba(255,255,255,0.4)] 
+          className={`fixed z-50 bg-transparent  rounded-2xl py-5 px-10 text-[clamp(18px,2.5vw,24px)] font-semibold text-white cursor-pointer transition-all duration-300 ease-in-out min-w-[200px] hover:bg-black hover:border-white hover:shadow-[0_0_40px_rgba(255,255,255,0.4)] 
             ${
               isInCTASection
-                ? 'top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2  shadow-[0_0_30px_rgba(255,255,255,0.2)] '
+                ? 'border-2 border-white top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2  shadow-[0_0_30px_rgba(255,255,255,0.2)] '
                 : 'bottom-[5%] right-[5%] translate-x-0 translate-y-0 scale-70  shadow-[0_0_30px_rgba(255,255,255,0.1)] '
             }
             `}
