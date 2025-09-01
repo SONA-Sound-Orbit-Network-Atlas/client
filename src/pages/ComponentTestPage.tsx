@@ -1,7 +1,12 @@
 import React, { useState } from 'react';
-import { Checkbox } from '@/components/ui/Checkbox';
-import { Slider } from '@/components/ui/Slider';
-import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/Tabs';
+import { Checkbox } from '@/components/common/Checkbox';
+import { Slider } from '@/components/common/Slider';
+import {
+  Tabs,
+  TabsList,
+  TabsTrigger,
+  TabsContent,
+} from '@/components/common/Tabs';
 import {
   DropdownMenu,
   DropdownMenuTrigger,
@@ -16,7 +21,7 @@ import {
   DropdownMenuSubContent,
   DropdownMenuRadioGroup,
   DropdownMenuRadioItem,
-} from '@/components/ui/DropdownMenu';
+} from '@/components/common/DropdownMenu';
 import { ChevronDown, Settings, User, CreditCard, LogOut } from 'lucide-react';
 
 const ComponentTestPage: React.FC = () => {
