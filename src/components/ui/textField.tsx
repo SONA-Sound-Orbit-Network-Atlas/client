@@ -11,10 +11,7 @@ export default function TextField({
 }: TextFieldProps) {
   return (
     <div>
-      <label
-        className="block mb-2 text-[var(--color-text-muted)]"
-        htmlFor={htmlFor}
-      >
+      <label className="block mb-2 text-text-muted" htmlFor={htmlFor}>
         {label}
       </label>
       {children}
