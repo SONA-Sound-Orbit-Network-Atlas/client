@@ -1,63 +1,169 @@
-import { useRef } from "react";
-import Star from "./Star"
-import Planet from "./Planet"
-import { useThree, useFrame } from "@react-three/fiber";
-import * as THREE from "three";
-import { useSceneStore } from "@/stores/useSceneStore";
+import { useRef, useState } from 'react';
+import Star from './Star';
+import Planet from './Planet';
+import { useThree, useFrame } from '@react-three/fiber';
+import * as THREE from 'three';
+import { useSceneStore } from '@/stores/useSceneStore';
+import OrbitLine from './OrbitLine';
+import type { TPlanet } from '@/types/cosmos';
+//항성계 컴포넌트
 
-//항성계 컴포넌트 
+//mock data
+const mockPlanets: TPlanet[] = [
+  {
+    distanceFromStar: 3,
+    orbitSpeed: 0.3,
+    planetSize: 0.8,
+    planetColor: '#FFFFFF',
+    rotationSpeed: 0.3,
+    inclination: -180,
+    planetBrightness: 1,
+    eccentricity: 0.1,
+    tilt: 0,
+  },
+  {
+    distanceFromStar: 4,
+    orbitSpeed: 0.4,
+    planetSize: 1.2,
+    planetColor: '#96ceb4',
+    rotationSpeed: 0.4,
+    inclination: 120,
+    planetBrightness: 1,
+    eccentricity: 0.1,
+    tilt: 0,
+  },
+  {
+    distanceFromStar: 2,
+    orbitSpeed: 0.2,
+    planetSize: 0.6,
+    planetColor: '#feca57',
+    rotationSpeed: 0.2,
+    inclination: -35,
+    planetBrightness: 1,
+    eccentricity: 0.1,
+    tilt: 0,
+  },
+  {
+    distanceFromStar: 5,
+    orbitSpeed: 0.1,
+    planetSize: 0.9,
+    planetColor: '#ff9ff3',
+    rotationSpeed: 0.1,
+    inclination: 15,
+    planetBrightness: 1,
+    eccentricity: 0.1,
+    tilt: 0,
+  },
+];
 
+export default function StellarSystem({
+  stellarSystemPos,
+  id,
+}: {
+  stellarSystemPos: [number, number, number];
+  id: number;
+}) {
+  const {
+    setFocusedPosition,
+    selectedStellarSystemId,
+    viewMode,
+    setSelectedStellarSystemId,
+  } = useSceneStore();
 
-export default function StellarSystem({stellarSystemPos }: { 
-    stellarSystemPos: [number, number, number]
-  }) {
-    const { setFocusedPosition } = useSceneStore();
+  const ref = useRef<THREE.Group>(null);
+  const detailGroupRef = useRef<THREE.Group>(null);
+  const lowDetailMesh = useRef<THREE.Mesh>(null);
+  const { camera } = useThree();
+  const systemPos = new THREE.Vector3(...stellarSystemPos);
 
-    const ref = useRef<THREE.Group>(null);
-    const detailGroupRef = useRef<THREE.Group>(null);
-    const lowDetailMesh = useRef<THREE.Mesh>(null);
-    const { camera } = useThree();
-    const systemPos = new THREE.Vector3(...stellarSystemPos);
+  const [planets] = useState<TPlanet[]>(mockPlanets);
 
-    useFrame(()=>{
-        if(!ref.current || !detailGroupRef.current || !lowDetailMesh.current) return;
+  useFrame(() => {
+    // 항성계 LOD 처리
+    if (!ref.current || !detailGroupRef.current || !lowDetailMesh.current)
+      return;
 
-        const distance = camera.position.distanceTo(systemPos);
+    const distance = camera.position.distanceTo(systemPos);
 
-        //factor 값을 계산
-        const minDistance = 20;        // 거리가 20 이하면 완전히 보임
-        const fadeRange = 10;          // 20~30 거리에서 페이드 아웃
-        const maxOpacity = 1;          // 최대 투명도
-        const minOpacity = 0;          // 최소 투명도
-        
-        const factor = maxOpacity - Math.min(Math.max((distance - minDistance) / fadeRange, minOpacity), maxOpacity);
+    //factor 값을 계산
+    const minDistance = 100; // 거리가 20 이하면 완전히 보임
+    const fadeRange = 10; // 20~30 거리에서 페이드 아웃
+    const maxOpacity = 1; // 최대 투명도
+    const minOpacity = 0; // 최소 투명도
 
-        //메시 스케일 조정정
-        detailGroupRef.current.scale.set(factor, factor, factor);
-        lowDetailMesh.current.scale.set(1-factor, 1-factor, 1-factor);
+    const factor =
+      maxOpacity -
+      Math.min(
+        Math.max((distance - minDistance) / fadeRange, minOpacity),
+        maxOpacity
+      );
 
+    //메시 스케일 조정정
+    detailGroupRef.current.scale.set(factor, factor, factor);
+    lowDetailMesh.current.scale.set(1 - factor, 1 - factor, 1 - factor);
+  });
 
-    });
+  return (
+    <group
+      ref={ref}
+      position={stellarSystemPos}
+      onClick={() => setSelectedStellarSystemId(id)}
+    >
+      <group ref={detailGroupRef}>
+        <Star
+          position={[0, 0, 0]}
+          color="#ff6b6b"
+          size={1.5}
+          onClick={() =>
+            setFocusedPosition(new THREE.Vector3(...stellarSystemPos))
+          }
+        />
+        {planets.map((planet, index) => {
+          // StellarSystem 뷰에서 선택된 항성계일 때 inclination을 0으로
+          const effectiveInclination =
+            viewMode === 'StellarSystem' && selectedStellarSystemId === id
+              ? 0 // 위에서 보는 시점 (모든 궤도가 수평)
+              : planet.inclination; // 원래 기울기 유지
 
-    return (
-    <group ref={ref} position={stellarSystemPos}>
-       <group ref={detailGroupRef} >
-        <Star position={[0, 0, 0]} color="#ff6b6b" size={1.5} />
-        <Planet position={[3, 2, 0]} color="#4ecdc4" size={1} />
-        <Planet position={[-3, -1, 2]} color="#45b7d1" size={0.8} />
-        <Planet position={[0, 3, -2]} color="#96ceb4" size={1.2} />
-        <Planet position={[4, -2, 1]} color="#feca57" size={0.6} />
-        <Planet position={[-4, 1, -1]} color="#ff9ff3" size={0.9} />
-       </group>
-       <mesh ref={lowDetailMesh} onClick={() => setFocusedPosition(new THREE.Vector3(...stellarSystemPos))}>
-                <sphereGeometry args={[1.5, 16, 16]} />
-                <meshStandardMaterial color="#ff6b6b"
-                    emissive="#ffffff"
-                    emissiveIntensity={0.5}
-                    toneMapped={false} 
-                    />
-        </mesh>
-       
-       </group>
-    )
+          return (
+            <>
+              {viewMode === 'StellarSystem' &&
+                selectedStellarSystemId === id && (
+                  <OrbitLine
+                    orbitRadius={planet.distanceFromStar}
+                    inclination={effectiveInclination}
+                  />
+                )}
+              <Planet
+                key={index}
+                distanceFromStar={planet.distanceFromStar}
+                orbitSpeed={planet.orbitSpeed}
+                planetSize={planet.planetSize}
+                planetColor={planet.planetColor}
+                planetBrightness={planet.planetBrightness}
+                eccentricity={planet.eccentricity}
+                tilt={planet.tilt}
+                rotationSpeed={planet.rotationSpeed}
+                inclination={effectiveInclination}
+              />
+            </>
+          );
+        })}
+      </group>
+      <mesh
+        ref={lowDetailMesh}
+        onClick={() =>
+          setFocusedPosition(new THREE.Vector3(...stellarSystemPos))
+        }
+      >
+        <sphereGeometry args={[1.5, 16, 16]} />
+        <meshStandardMaterial
+          color="#ff6b6b"
+          emissive="#ffffff"
+          emissiveIntensity={0.5}
+          toneMapped={false}
+        />
+      </mesh>
+    </group>
+  );
 }
