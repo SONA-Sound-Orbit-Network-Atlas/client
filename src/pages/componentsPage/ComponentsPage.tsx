@@ -1,8 +1,8 @@
 import Button from '@/components/common/Button';
 import Card from '@/components/common/Card';
-import Input from '@/components/common/Input';
 import TextField from '@/components/common/TextField';
 import Textarea from '@/components/common/TextArea';
+import TextInput from '@/components/common/TextInput';
 
 const sectionStyle =
   'p-4 border-solid border-[1px] border-border-white rounded-[8px]';
@@ -66,14 +66,14 @@ export default function ComponentsPage() {
         <h3>input 타입 별, textarea 컴포넌트</h3>
         <div className="">
           <TextField label="textFiled label" htmlFor="textFiledInput">
-            <Input
+            <TextInput
               type="text"
               placeholder="input placeholder"
               id="textFiledInput"
             />
           </TextField>
           <TextField label="password input" htmlFor="passwordInput">
-            <Input
+            <TextInput
               type="password"
               placeholder="password 입력해주세요"
               id="passwordInput"
@@ -86,7 +86,7 @@ export default function ComponentsPage() {
 
         <h3>onChange 이벤트 핸들러 추가</h3>
         <TextField label="input 필드" htmlFor="inputOnChange">
-          <Input
+          <TextInput
             placeholder="input 입력 시 console.log 출력"
             onChange={(e) => console.log(e.target.value)}
             id="inputOnChange"
