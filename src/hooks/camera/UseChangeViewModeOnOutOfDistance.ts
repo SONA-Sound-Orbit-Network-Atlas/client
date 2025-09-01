@@ -9,19 +9,19 @@ import { useSceneStore } from '@/stores/useSceneStore';
  * @param onOutOfDistance 카메라 줌 거리 초과 시 콜백
  */
 
-interface UseChangeViewModeOnOutOfDistanceProps {
+interface useChangeViewModeOnOutOfDistanceProps {
   distanceRef: React.RefObject<number>;
   targetDistance: number;
   movementLockRef: React.RefObject<boolean>;
   onOutOfDistance?: () => void;
 }
 
-export function UseChangeViewModeOnOutOfDistance({
+export function useChangeViewModeOnOutOfDistance({
   distanceRef,
   targetDistance = 100,
   onOutOfDistance,
   movementLockRef,
-}: UseChangeViewModeOnOutOfDistanceProps) {
+}: useChangeViewModeOnOutOfDistanceProps) {
   const { setViewMode } = useSceneStore();
   useFrame(() => {
     // 줌 거리 체크 (항상 실행)
