@@ -1,7 +1,7 @@
 import React, { useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
-import state from './store';
+import mainStore from '../store/mainStore';
 import { useBlock, offsetContext } from './useBlock';
 
 type BlockProps = {
@@ -21,10 +21,10 @@ export function Block({ children, offset, factor = 1, ...props }: BlockProps) {
     if (!ref.current) return;
 
     const curY = ref.current.position.y;
-    const curTop = state.top;
+    const curTop = mainStore.top;
     ref.current.position.y = THREE.MathUtils.lerp(
       curY,
-      (curTop / state.zoom) * factor,
+      (curTop / mainStore.zoom) * factor,
       0.1
     );
   });
