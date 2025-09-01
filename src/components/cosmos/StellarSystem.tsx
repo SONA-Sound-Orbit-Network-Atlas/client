@@ -5,50 +5,54 @@ import { useThree, useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 import { useSceneStore } from '@/stores/useSceneStore';
 import OrbitLine from './OrbitLine';
+import type { TPlanet } from '@/types/cosmos';
 //항성계 컴포넌트
 
-type Planet = {
-  orbitRadius: number; // 최소: 0.1, 최대: 20 (궤도 반지름)
-  orbitSpeed: number; // 최소: 0.01, 최대: 5.0 (공전 속도)
-  planetSize: number; // 최소: 0.1, 최대: 3.0 (행성 크기)
-  planetColor: string; // 최소: 1자, 최대: 7자 (색상 코드)
-  rotationSpeed: number; // 최소: 0.01, 최대: 10.0 (자전 속도)
-  inclination: number; // 최소: -180, 최대: 180 (궤도 기울기, 도 단위)
-};
-
 //mock data
-const mockPlanets: Planet[] = [
+const mockPlanets: TPlanet[] = [
   {
-    orbitRadius: 3,
+    distanceFromStar: 3,
     orbitSpeed: 0.3,
     planetSize: 0.8,
     planetColor: '#FFFFFF',
     rotationSpeed: 0.3,
     inclination: -180,
+    planetBrightness: 1,
+    eccentricity: 0.1,
+    tilt: 0,
   },
   {
-    orbitRadius: 4,
+    distanceFromStar: 4,
     orbitSpeed: 0.4,
     planetSize: 1.2,
     planetColor: '#96ceb4',
     rotationSpeed: 0.4,
     inclination: 120,
+    planetBrightness: 1,
+    eccentricity: 0.1,
+    tilt: 0,
   },
   {
-    orbitRadius: 2,
+    distanceFromStar: 2,
     orbitSpeed: 0.2,
     planetSize: 0.6,
     planetColor: '#feca57',
     rotationSpeed: 0.2,
     inclination: -35,
+    planetBrightness: 1,
+    eccentricity: 0.1,
+    tilt: 0,
   },
   {
-    orbitRadius: 5,
+    distanceFromStar: 5,
     orbitSpeed: 0.1,
     planetSize: 0.9,
     planetColor: '#ff9ff3',
     rotationSpeed: 0.1,
     inclination: 15,
+    planetBrightness: 1,
+    eccentricity: 0.1,
+    tilt: 0,
   },
 ];
 
@@ -72,7 +76,7 @@ export default function StellarSystem({
   const { camera } = useThree();
   const systemPos = new THREE.Vector3(...stellarSystemPos);
 
-  const [planets] = useState<Planet[]>(mockPlanets);
+  const [planets] = useState<TPlanet[]>(mockPlanets);
 
   useFrame(() => {
     // 항성계 LOD 처리
@@ -126,16 +130,19 @@ export default function StellarSystem({
               {viewMode === 'StellarSystem' &&
                 selectedStellarSystemId === id && (
                   <OrbitLine
-                    orbitRadius={planet.orbitRadius}
+                    orbitRadius={planet.distanceFromStar}
                     inclination={effectiveInclination}
                   />
                 )}
               <Planet
                 key={index}
-                orbitRadius={planet.orbitRadius}
+                distanceFromStar={planet.distanceFromStar}
                 orbitSpeed={planet.orbitSpeed}
                 planetSize={planet.planetSize}
                 planetColor={planet.planetColor}
+                planetBrightness={planet.planetBrightness}
+                eccentricity={planet.eccentricity}
+                tilt={planet.tilt}
                 rotationSpeed={planet.rotationSpeed}
                 inclination={effectiveInclination}
               />
