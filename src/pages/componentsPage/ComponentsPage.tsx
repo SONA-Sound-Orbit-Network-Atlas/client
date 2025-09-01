@@ -5,11 +5,11 @@ import TextField from '@/components/common/textField';
 import Textarea from '@/components/common/textarea';
 
 const sectionStyle =
-  'p-4 border-solid border-[1px] border-[var(--color-border-white)] rounded-[8px]';
+  'p-4 border-solid border-[1px] border-border-white rounded-[8px]';
 
 export default function ComponentsPage() {
   return (
-    <div className="p-4 bg-[#222222] h-[100vh] overflow-y-auto text-[var(--color-text-secondary)]">
+    <div className="p-4 bg-[#222222] h-[100vh] overflow-y-auto text-text-secondary">
       <h1>컴포넌트 페이지</h1>
 
       <br />
