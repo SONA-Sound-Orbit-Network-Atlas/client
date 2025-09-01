@@ -1,425 +1,299 @@
-import React, { useState, useEffect, useRef } from 'react';
-import * as Tone from 'tone';
-import { AudioEngine } from '../audio/core/AudioEngine';
+import React, { useState, useEffect } from 'react';
 import type { 
   InstrumentRole, 
   PlanetPhysicalProperties, 
-  PatternParameters,
-  StarGlobalState,
-  KeyName,
-  ScaleName 
+  StarGlobalState
 } from '../types/audio';
+import { SolarSystem } from '../audio/core/SolarSystem';
 
-// 행성 객체의 인터페이스 정의
-interface Planet {
+// 간소화된 행성 인터페이스 (UI용)
+interface PlanetUI {
   id: string;
   name: string;
   role: InstrumentRole;
-  props: PlanetPhysicalProperties;
-  isPlaying: boolean;  // 현재 재생 중인지 여부
-  loop?: Tone.Loop;    // Tone.js Loop 객체 (선택적)
-  synth?: Tone.Synth | Tone.FMSynth | Tone.MembraneSynth; // 실제 악기 객체
+  properties: PlanetPhysicalProperties;
+  isPlaying: boolean;
 }
 
-// 오디오 테스트 패널 컴포넌트
+// 오디오 테스트 패널 컴포넌트 - 새로운 SolarSystem 아키텍처 사용
 const AudioTestPanel: React.FC = () => {
-  // AudioEngine 인스턴스 가져오기
-  const audioEngine = AudioEngine.instance;
+  // SolarSystem 인스턴스 가져오기 (싱글톤)
+  const solarSystem = SolarSystem.instance;
   
-  // 행성 목록을 관리하는 상태
-  const [planets, setPlanets] = useState<Planet[]>([]);
-  
-  // 오디오 컨텍스트 상태 관리
-  const [audioContextState, setAudioContextState] = useState<string>('suspended');
-  
-  // 엔진 초기화 상태
-  const [engineReady, setEngineReady] = useState(false);
-  
-  // 항성(전역) 설정 상태
-  const [starSettings, setStarSettings] = useState<StarGlobalState>({
+  // UI 상태 관리
+  const [planets, setPlanets] = useState<PlanetUI[]>([]);
+  const [starProperties, setStarProperties] = useState({ spin: 50, brightness: 70, color: 0, size: 50 });
+  const [starGlobalState, setStarGlobalState] = useState<StarGlobalState>({
     bpm: 120,
     volume: 70,
     key: 'C',
     scale: 'Major',
     complexity: 2
   });
+  const [engineReady, setEngineReady] = useState(false);
   
-  // useRef를 사용해 실시간 상태에 접근할 수 있도록 함 (React 클로저 문제 해결)
-  const planetsRef = useRef<Planet[]>([]);
-  
-  // planetsRef를 planets 상태와 동기화
+  // 초기 상태 로딩
   useEffect(() => {
-    planetsRef.current = planets;
-  }, [planets]);
-
-  // 오디오 컨텍스트 상태를 주기적으로 확인
-  useEffect(() => {
-    const checkAudioContext = () => {
-      try {
-        // AudioContext가 존재할 때만 상태 확인
-        if (typeof Tone !== 'undefined' && Tone.getContext) {
-          setAudioContextState(Tone.getContext().state);
-        }
-      } catch (error) {
-        // AudioContext 접근 실패 시 suspended로 설정
-        setAudioContextState('suspended');
-      }
+    const loadInitialState = () => {
+      const currentPlanets = solarSystem.getPlanets();
+      setPlanets(currentPlanets);
+      
+      const currentStarProperties = solarSystem.getStarProperties();
+      setStarProperties(currentStarProperties);
+      
+      const currentGlobalState = solarSystem.getStarGlobalState();
+      setStarGlobalState(currentGlobalState);
     };
-
-    // 컴포넌트 마운트 시 상태 확인
-    checkAudioContext();
     
-    // 1초마다 상태 확인
-    const interval = setInterval(checkAudioContext, 1000);
+    loadInitialState();
     
-    // 컴포넌트 언마운트 시 인터벌 정리
+    // 주기적으로 상태 업데이트 (재생 상태 변화 반영)
+    const interval = setInterval(loadInitialState, 1000);
+    
     return () => clearInterval(interval);
-  }, []);
+  }, [solarSystem]);
 
-  // 오디오 컨텍스트 및 엔진 초기화 함수
+  // 오디오 시스템 초기화
   const initAudio = async () => {
     try {
-      console.log('🎵 오디오 초기화 시작...');
+      console.log('🌌 SONA SolarSystem 초기화 시작...');
       
-      // 먼저 Tone.js AudioContext 시작 (사용자 제스처 필요)
-      if (Tone.getContext().state !== 'running') {
-        console.log('AudioContext 시작 중...');
-        await Tone.start();
-        console.log('✅ AudioContext 시작됨:', Tone.getContext().state);
-      }
-      
-      // AudioEngine 초기화 (내부적으로 Tone.start() 재호출하지만 안전함)
-      console.log('AudioEngine 초기화 중...');
-      await audioEngine.init();
-      
-      // 항성 설정 적용
-      console.log('항성 설정 적용 중...');
-      audioEngine.updateStar(starSettings);
-      
+      await solarSystem.initialize();
       setEngineReady(true);
-      console.log('🎉 SONA AudioEngine 초기화 완료!');
+      
+      // 초기 상태 다시 로딩
+      const currentStarProperties = solarSystem.getStarProperties();
+      setStarProperties(currentStarProperties);
+      
+      const currentGlobalState = solarSystem.getStarGlobalState();
+      setStarGlobalState(currentGlobalState);
+      
+      console.log('🎉 SONA SolarSystem 초기화 완료!');
     } catch (error) {
-      console.error('❌ 오디오 초기화 실패:', error);
-      // 사용자에게 알림
-      alert(`오디오 초기화에 실패했습니다: ${error}`);
+      console.error('❌ SolarSystem 초기화 실패:', error);
+      alert(`SolarSystem 초기화에 실패했습니다: ${error}`);
     }
   };
 
-  // 새로운 행성을 추가하는 함수 (역할을 선택할 수 있음)
+  // 새로운 행성 추가
   const addPlanet = (role: InstrumentRole) => {
-    // 새로운 행성 객체 생성
-    const newPlanet: Planet = {
-      id: `planet-${Date.now()}`, // 고유 ID 생성
-      name: `${role} Planet`,
-      role: role,
-      props: {
-        // 모든 속성을 랜덤 값으로 초기화
-        size: Math.random() * 100,
-        brightness: Math.random() * 100,
-        distance: Math.random() * 100,
-        speed: Math.random() * 100,
-        spin: Math.random() * 100,
-        eccentricity: Math.random() * 100,
-        color: Math.random() * 360,
-        tilt: (Math.random() - 0.5) * 180,
-        elevation: (Math.random() - 0.5) * 180,
-        phase: Math.random() * 360,
-      },
-      isPlaying: false, // 처음에는 재생하지 않음
-      synth: createSynthForRole(role), // 역할에 맞는 악기 생성
-    };
-
-    // 새로운 행성을 상태에 추가
-    setPlanets(prev => [...prev, newPlanet]);
-  };
-
-  // 역할에 따른 악기 생성 함수
-  const createSynthForRole = (role: InstrumentRole): Tone.Synth | Tone.FMSynth | Tone.MembraneSynth => {
-    switch (role) {
-      case 'DRUM':
-        // 드럼용 멤브레인 신스
-        return new Tone.MembraneSynth({
-          pitchDecay: 0.01,
-          octaves: 6,
-          oscillator: { type: 'sine' },
-          envelope: { attack: 0.001, decay: 0.4, sustain: 0.01, release: 1.4 }
-        }).toDestination();
-        
-      case 'BASS':
-        // 베이스용 FM 신스 (낮은 주파수)
-        return new Tone.FMSynth({
-          harmonicity: 0.25,
-          modulationIndex: 2,
-          detune: 0,
-          oscillator: { type: 'sine' },
-          envelope: { attack: 0.01, decay: 0.1, sustain: 0.8, release: 0.4 },
-          modulation: { type: 'square' },
-          modulationEnvelope: { attack: 0.5, decay: 0, sustain: 1, release: 0.5 }
-        }).toDestination();
-        
-      case 'CHORD':
-      case 'PAD':
-        // 코드/패드용 일반 신스 (부드러운 사운드)
-        return new Tone.Synth({
-          oscillator: { type: 'sawtooth' },
-          envelope: { attack: 0.1, decay: 0.2, sustain: 0.6, release: 0.8 }
-        }).toDestination();
-        
-      case 'MELODY':
-      case 'ARPEGGIO':
-      default:
-        // 멜로디/아르페지오용 일반 신스
-        return new Tone.Synth({
-          oscillator: { type: 'triangle' },
-          envelope: { attack: 0.01, decay: 0.1, sustain: 0.3, release: 0.5 }
-        }).toDestination();
+    if (!engineReady) {
+      alert('먼저 오디오 시스템을 초기화해주세요.');
+      return;
     }
-  };
-
-  // 역할에 따른 노트 생성 함수
-  const generateNoteForRole = (role: InstrumentRole, props: PlanetPhysicalProperties, stepIdx: number): string => {
-    // 기본 노트 배열 (C 메이저 스케일)
-    const notes = ['C', 'D', 'E', 'F', 'G', 'A', 'B'];
     
-    switch (role) {
-      case 'DRUM': {
-        // 드럼은 고정 노트 (킥드럼 사운드)
-        return 'C1';
-      }
-        
-      case 'BASS': {
-        // 베이스는 낮은 옥타브 (C1-C2)
-        const bassNote = notes[stepIdx % notes.length];
-        const bassOctave = 1 + Math.floor((props.size / 100) * 1); // 1-2 옥타브
-        return `${bassNote}${bassOctave}`;
-      }
-        
-      case 'CHORD':
-      case 'PAD': {
-        // 코드/패드는 중간 옥타브 (C3-C4)
-        const chordNote = notes[Math.floor((props.color / 360) * notes.length)];
-        const chordOctave = 3 + Math.floor((props.elevation + 90) / 180); // 3-4 옥타브
-        return `${chordNote}${chordOctave}`;
-      }
-        
-      case 'MELODY':
-      case 'ARPEGGIO':
-      default: {
-        // 멜로디/아르페지오는 높은 옥타브 (C4-C6)
-        const melodyNote = notes[(stepIdx + Math.floor(props.phase / 50)) % notes.length];
-        const melodyOctave = 4 + Math.floor((props.size / 100) * 2); // 4-6 옥타브
-        return `${melodyNote}${melodyOctave}`;
-      }
-    }
+    const planetId = solarSystem.addPlanet(role);
+    
+    // UI 상태 업데이트
+    const newPlanets = solarSystem.getPlanets();
+    setPlanets(newPlanets);
+    
+    console.log(`🪐 ${role} 행성 추가됨 (ID: ${planetId})`);
   };
 
-  // 행성 속성을 업데이트하는 함수
+  // 행성 속성 업데이트
   const updatePlanetProp = (id: string, key: keyof PlanetPhysicalProperties, value: number) => {
-    setPlanets(prev => prev.map(planet => 
-      planet.id === id 
-        ? { ...planet, props: { ...planet.props, [key]: value } }
-        : planet
-    ));
-  };
-
-  // 패턴 파라미터를 업데이트하는 함수
-  const updatePatternParam = (id: string, key: keyof PatternParameters, value: number) => {
-    // 현재는 간단한 매핑만 구현, 향후 확장 예정
-    setPlanets(prev => prev.map(planet => 
-      planet.id === id 
-        ? { ...planet, props: { ...planet.props, speed: value } }
-        : planet
-    ));
-  };
-
-  // 행성 트리거 (원샷 재생)
-  const triggerPlanet = (id: string) => {
-    const planet = planets.find(p => p.id === id);
-    if (planet) {
-      console.log(`${planet.name} 트리거됨!`);
-      // 향후 원샷 사운드 재생 로직 추가
+    const success = solarSystem.updatePlanetProperty(id, key, value);
+    
+    if (success) {
+      // UI 상태 업데이트
+      setPlanets(prev => prev.map(planet => 
+        planet.id === id 
+          ? { ...planet, properties: { ...planet.properties, [key]: value } }
+          : planet
+      ));
+      
+      console.log(`🪐 ${id}의 ${key} 속성이 ${value}로 업데이트됨`);
     }
   };
 
-  // 행성의 패턴을 토글하는 함수 (재생/정지)
+  // 행성 패턴 토글
   const togglePattern = async (id: string) => {
-    // 엔진이 초기화되지 않았다면 초기화
-    if (!audioEngine.isReady()) {
-      await initAudio();
-    }
-
-    setPlanets(prevPlanets => 
-      prevPlanets.map(planet => {
-        if (planet.id !== id) return planet;
-
-        // 현재 재생 중이라면 정지
-        if (planet.isPlaying && planet.loop) {
-          try {
-            // 기존 루프 정리 (AudioEngine 인스턴스 메서드 사용)
-            audioEngine.cleanupLoop(planet.loop);
-            
-            console.log(`${planet.name} 패턴이 정지되었습니다`);
-            
-            // 상태 업데이트: 재생 중지, 루프 제거
-            return {
-              ...planet,
-              isPlaying: false,
-              loop: undefined
-            };
-          } catch (error) {
-            console.error(`${planet.name} 정지 중 오류:`, error);
-            return planet;
-          }
-        }
-        
-        // 현재 정지 중이라면 재생 시작
-        try {
-          // 행성 속성을 패턴 파라미터로 변환
-          const patternParams: PatternParameters = {
-            pulses: Math.max(2, Math.round((planet.props.speed / 100) * 14 + 2)), // 2-16
-            steps: 16,
-            rotation: Math.round((planet.props.phase / 360) * 15), // 0-15
-            swingPct: Math.min(40, planet.props.eccentricity * 0.4), // 0-40
-            accentDb: (planet.props.eccentricity / 100) * 2, // 0-2
-            gateLen: 0.35 + (planet.props.distance / 100) * 0.5, // 0.35-0.85
-          };
-
-          // AudioEngine을 사용해 새로운 루프 생성
-          const newLoop = audioEngine.createPatternLoop(patternParams, (stepIdx, accent, time) => {
-            // 루프 콜백에서 실시간 상태 확인 (React 클로저 문제 해결)
-            const currentPlanet = planetsRef.current.find(p => p.id === id);
-            
-            // 행성이 삭제되었거나 더 이상 재생 중이 아니라면 무시
-            if (!currentPlanet || !currentPlanet.isPlaying) {
-              return; // 경고 로그 없이 조용히 반환
-            }
-            
-            // 실제 오디오 재생 로직
-            if (currentPlanet.synth) {
-              try {
-                // 역할에 따른 노트 생성
-                const note = generateNoteForRole(currentPlanet.role, currentPlanet.props, stepIdx);
-                const velocity = accent ? 0.8 : 0.5; // 액센트 처리
-                const duration = '16n'; // 16분음표 길이
-                
-                // 드럼의 경우 고정 노트, 다른 악기는 계산된 노트 사용
-                if (currentPlanet.role === 'DRUM') {
-                  currentPlanet.synth.triggerAttackRelease('C1', duration, time, velocity);
-                } else {
-                  currentPlanet.synth.triggerAttackRelease(note, duration, time, velocity);
-                }
-                
-                console.log(`${planet.name} [${stepIdx}] ${note} ${accent ? 'ACCENT' : 'normal'}`);
-              } catch (error) {
-                console.error(`${currentPlanet.name} 재생 오류:`, error);
-              }
-            }
-          });
-          
-          // 루프 시작 (AudioEngine이 Transport도 관리)
-          audioEngine.startLoop(newLoop);
-          console.log(`${planet.name} 패턴이 시작되었습니다`);
-          
-          // 상태 업데이트: 재생 시작, 새 루프 저장
-          return {
-            ...planet,
-            isPlaying: true,
-            loop: newLoop
-          };
-        } catch (error) {
-          console.error(`${planet.name} 시작 중 오류:`, error);
-          return planet;
-        }
-      })
-    );
+    const isNowPlaying = await solarSystem.togglePlanetPattern(id);
+    
+    // UI 상태 업데이트
+    setPlanets(prev => prev.map(planet => 
+      planet.id === id 
+        ? { ...planet, isPlaying: isNowPlaying }
+        : planet
+    ));
+    
+    const planet = planets.find(p => p.id === id);
+    console.log(`${planet?.name} 패턴 ${isNowPlaying ? '시작' : '정지'}됨`);
   };
 
-  // 행성을 삭제하는 함수
+  // 행성 삭제
   const removePlanet = (id: string) => {
-    // 먼저 해당 행성의 루프를 정리
-    planetsRef.current = planetsRef.current.map(p => 
-      p.id === id ? { ...p, isPlaying: false } : p
-    );
+    const success = solarSystem.removePlanet(id);
     
-    setPlanets(prev => {
-      const planet = prev.find(p => p.id === id);
-      
-      if (planet && planet.loop) {
-        try {
-          // AudioEngine 인스턴스 메서드로 루프 정리
-          audioEngine.cleanupLoop(planet.loop);
-          console.log(`${planet.name}의 루프가 정리되었습니다`);
-        } catch (error) {
-          console.error(`${planet.name} 루프 정리 중 오류:`, error);
-        }
-      }
-      
-      // 해당 행성을 제외한 새 배열 반환
-      return prev.filter(planet => planet.id !== id);
-    });
-  };
-
-  // 모든 행성의 패턴을 정지하는 함수
-  const stopAllPatterns = () => {
-    // AudioEngine의 stopAllLoops 사용
-    audioEngine.stopAllLoops();
-    
-    // 상태도 업데이트
-    setPlanets(prevPlanets => 
-      prevPlanets.map(planet => ({
-        ...planet,
-        isPlaying: false,
-        loop: undefined
-      }))
-    );
-  };
-
-  // 항성 설정을 업데이트하는 함수
-  const updateStarSetting = (key: keyof StarGlobalState, value: any) => {
-    const newSettings = { ...starSettings, [key]: value };
-    setStarSettings(newSettings);
-    
-    // AudioEngine에도 즉시 반영
-    if (audioEngine.isReady()) {
-      audioEngine.updateStar(newSettings);
+    if (success) {
+      // UI 상태 업데이트
+      setPlanets(prev => prev.filter(planet => planet.id !== id));
     }
   };
 
-  // 컴포넌트 언마운트 시 모든 루프 정리
-  useEffect(() => {
-    return () => {
-      audioEngine.stopAllLoops();
-    };
-  }, [audioEngine]);
+  // 모든 패턴 정지
+  const stopAllPatterns = () => {
+    solarSystem.stopAllPatterns();
+    
+    // UI 상태 업데이트
+    setPlanets(prev => prev.map(planet => ({ ...planet, isPlaying: false })));
+  };
+
+  // 항성 속성 업데이트
+  const updateStarProperty = (property: 'spin' | 'brightness' | 'color' | 'size', value: number) => {
+    solarSystem.updateStarProperty(property, value);
+    
+    // UI 상태 업데이트
+    setStarProperties(prev => ({ ...prev, [property]: value }));
+    
+    // 전역 상태도 업데이트
+    const newGlobalState = solarSystem.getStarGlobalState();
+    setStarGlobalState(newGlobalState);
+    
+    console.log(`⭐ 항성 ${property} → ${value} | 전역: ${JSON.stringify(newGlobalState)}`);
+  };
+
+  // 속성별 사운드 매핑 정보를 반환하는 함수 (새로운 Tri Hybrid + Dual 시스템)
+  const getSoundMappingInfo = (propName: keyof PlanetPhysicalProperties): string[] => {
+    switch (propName) {
+      // === Tri(Hybrid) 매핑 - 음색 중심 속성 (1→3) ===
+      case 'color':
+        return ['Wavetable Index', 'Tone Tint (sigmoid)', 'Wavefold Amount (0.0-0.6)'];
+      case 'brightness':
+        return ['Filter Cutoff (800-16kHz)', 'Output Gain (-6 to 0dB)', 'Resonance Q (0.2-0.7)'];
+      case 'distance':  
+        return ['Reverb Send (role-based)', 'Delay Beats (0.25-1.5)', 'Reverb Size (0.2-0.9)'];
+      case 'tilt':
+        return ['Pan (-0.6 to 0.6)', 'MS Blend (0.3-0.7)', 'Stereo Width (0.2-1.0)'];
+      case 'spin':
+        return ['Tremolo Rate (0.5-8Hz)', 'Tremolo Depth (0.1-0.4)', 'Chorus Depth (0.05-0.5)'];
+        
+      // === Dual 매핑 - 멜로디·패턴 중심 속성 (1→2) ===
+      case 'size':
+        return ['Pitch Offset (±7 semitones)', 'Note Range Width (5-19 semitones)'];
+      case 'elevation':
+        return ['Octave Shift (±1)', 'Filter Type Morph (LP→BP→HP)'];
+        
+      // === Pattern 도메인 전용 ===
+      case 'speed':
+        return ['Pattern Rate (1/8-1/1)', 'Pattern Pulses (2-16)'];
+      case 'eccentricity':
+        return ['Swing Percentage (0-40%)', 'Accent Volume (0-2dB)'];
+      case 'phase':
+        return ['Pattern Rotation (0-15)', 'Quarter Accent Gate'];
+        
+      default:
+        return ['사운드 매핑 정보 없음'];
+    }
+  };
+
+  // 속성별 패턴 매핑 정보를 반환하는 함수 (새로운 도메인 분리)
+  const getPatternMappingInfo = (propName: keyof PlanetPhysicalProperties): string[] => {
+    switch (propName) {
+      // === 패턴 도메인 필수 속성 ===
+      case 'speed':
+        return ['Rate/Density (1/8-1/1)', 'Pulses (2-16)'];
+      case 'phase':
+        return ['Rotation (0-15)', 'Quarter Accent Gate'];
+      case 'eccentricity':
+        return ['Swing/Accent (0-40%)', 'Groove Feel (0-2dB)'];
+        
+      // === 패턴 도메인 선택 속성 ===
+      case 'brightness':
+        return ['Velocity Base', 'Note Intensity'];
+      case 'distance':
+        return ['Gate Length (0.35-0.85)', 'Note Duration'];
+      case 'color':
+        return ['Pattern Family Weight', 'Style Preference (Euclid/Backbeat)'];
+      case 'spin':
+        return ['Variation Cycle', 'Pattern Mutation (Seeded 모드)'];
+      case 'tilt':
+        return ['Humanize Timing (±ms)', 'Micro-timing Variation'];
+        
+      // === 비-패턴 도메인 ===
+      case 'size':
+      case 'elevation':
+        return ['Pitch 도메인 (패턴 영향 없음)'];
+        
+      default:
+        return [];
+    }
+  };
+
+  // 도메인별 색상 코딩
+  const getDomainColor = (propName: keyof PlanetPhysicalProperties): string => {
+    if (['speed', 'phase', 'eccentricity'].includes(propName)) {
+      return 'text-yellow-300'; // Pattern 도메인
+    } else if (['size', 'elevation'].includes(propName)) {
+      return 'text-green-300'; // Pitch 도메인
+    } else if (['color', 'brightness', 'distance', 'tilt', 'spin'].includes(propName)) {
+      return 'text-blue-300'; // Sound 도메인
+    }
+    return 'text-gray-300';
+  };
 
   // 사용 가능한 악기 역할 목록
   const instrumentRoles: InstrumentRole[] = ['DRUM', 'BASS', 'CHORD', 'MELODY', 'ARPEGGIO', 'PAD'];
 
-  // 키 목록
-  const keys: KeyName[] = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
-  
-  // 스케일 목록
-  const scales: ScaleName[] = ['Major', 'Minor', 'Dorian', 'Mixolydian', 'Lydian', 'Phrygian', 'Locrian'];
-
   return (
     <div className="p-4 space-y-6 bg-gray-900 text-white rounded-lg">
       <h2 className="text-2xl font-bold text-center">🌌 SONA Audio Test Panel</h2>
+      <p className="text-center text-gray-400 text-sm">새로운 SolarSystem 아키텍처 기반 | Tri Hybrid + Dual 매핑</p>
+      
+      {/* 도메인 구분 안내 */}
+      <div className="bg-gray-800 p-3 rounded-lg border border-gray-600">
+        <h3 className="text-sm font-semibold mb-2">🎨 SONA 매핑 도메인 구분</h3>
+        <div className="grid grid-cols-3 gap-2 text-xs">
+          <div className="text-yellow-300">
+            <strong>📊 Pattern:</strong> Speed, Phase, Eccentricity
+          </div>
+          <div className="text-green-300">
+            <strong>🎵 Pitch:</strong> Size, Elevation
+          </div>
+          <div className="text-blue-300">
+            <strong>🔊 Sound:</strong> Color, Brightness, Distance, Tilt, Spin
+          </div>
+        </div>
+        <p className="text-xs text-gray-400 mt-1">
+          Tri(Hybrid): 1속성→3파라미터 | Dual: 1속성→2파라미터 | 도메인 배타 제어
+        </p>
+      </div>
+
+      {/* 새로운 패턴 변화 안내 */}
+      <div className="bg-gray-800 p-3 rounded-lg border border-yellow-400">
+        <h3 className="text-sm font-semibold mb-2 text-yellow-400">🎯 패턴 변화 시스템 (Euclidean 기반)</h3>
+        <div className="grid grid-cols-1 gap-2 text-xs">
+          <div className="text-yellow-300">
+            <strong>⚡ Speed:</strong> 패턴 레이트(1/8-1/1) + 펄스 개수(2-16) → 밀도와 빠르기 제어
+          </div>
+          <div className="text-yellow-300">
+            <strong>🌙 Phase:</strong> 패턴 회전(0-15) + 액센트 게이트(quarters) → 패턴 시작점과 강조점 제어
+          </div>
+          <div className="text-yellow-300">
+            <strong>🎭 Eccentricity:</strong> 스윙(0-40%) + 액센트 강도(0-2dB) → 그루브감과 다이나믹 제어
+          </div>
+          <div className="text-blue-300 mt-1">
+            <strong>📏 Distance:</strong> 노트 지속시간(0.35-0.85) → 스타카토/레가토 제어
+          </div>
+        </div>
+        <p className="text-xs text-gray-400 mt-2">
+          ✨ 이제 각 행성의 패턴이 Euclidean 알고리즘으로 동적 생성됩니다!
+        </p>
+      </div>
       
       {/* 오디오 상태 및 초기화 */}
       <div className="text-center bg-gray-800 p-4 rounded-lg">
         <div className="mb-3">
           <p className="mb-2">
-            AudioContext: 
+            SolarSystem: 
             <span className={`ml-2 px-2 py-1 rounded ${
-              audioContextState === 'running' 
+              engineReady 
                 ? 'bg-green-600 text-white' 
                 : 'bg-yellow-600 text-black'
             }`}>
-              {audioContextState}
+              {engineReady ? 'Ready' : 'Not Ready'}
             </span>
-            {engineReady && (
-              <span className="ml-2 px-2 py-1 bg-blue-600 text-white rounded">Engine Ready</span>
-            )}
           </p>
         </div>
         
@@ -429,7 +303,7 @@ const AudioTestPanel: React.FC = () => {
               onClick={initAudio}
               className="px-6 py-3 bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors font-semibold"
             >
-              🎵 SONA 오디오 시작
+              🌌 SONA SolarSystem 시작
             </button>
             <p className="text-sm text-gray-400">
               브라우저 정책상 사용자 클릭 후에만 오디오를 시작할 수 있습니다
@@ -439,7 +313,7 @@ const AudioTestPanel: React.FC = () => {
         
         {engineReady && (
           <div className="text-green-400">
-            ✅ 오디오 시스템이 준비되었습니다! 행성을 추가하고 패턴을 재생해보세요.
+            ✅ SolarSystem이 준비되었습니다! 행성을 추가하고 패턴을 재생해보세요.
           </div>
         )}
       </div>
@@ -449,105 +323,60 @@ const AudioTestPanel: React.FC = () => {
         <h3 className="text-lg font-semibold mb-3 text-yellow-400">⭐ 항성 (전역 설정)</h3>
         
         <div className="grid grid-cols-2 gap-4">
-          {/* BPM 설정 */}
+          {/* Spin → BPM */}
           <div>
-            <label className="block mb-1 text-sm">BPM: {starSettings.bpm}</label>
-            <input
-              type="range"
-              min="60"
-              max="180"
-              value={starSettings.bpm}
-              onChange={(e) => {
-                const newSettings = { ...starSettings, bpm: parseInt(e.target.value) };
-                setStarSettings(newSettings);
-                if (engineReady) {
-                  audioEngine.updateStar(newSettings);
-                }
-              }}
-              className="w-full"
-            />
-          </div>
-
-          {/* 볼륨 설정 */}
-          <div>
-            <label className="block mb-1 text-sm">Volume: {starSettings.volume}</label>
+            <label className="block mb-1 text-sm">Spin: {starProperties.spin} → BPM: {starGlobalState.bpm}</label>
             <input
               type="range"
               min="0"
               max="100"
-              value={starSettings.volume}
-              onChange={(e) => {
-                const newSettings = { ...starSettings, volume: parseInt(e.target.value) };
-                setStarSettings(newSettings);
-                if (engineReady) {
-                  audioEngine.updateStar(newSettings);
-                }
-              }}
+              value={starProperties.spin}
+              onChange={(e) => updateStarProperty('spin', parseInt(e.target.value))}
               className="w-full"
             />
+            <div className="text-xs text-blue-300 mt-1">Spin → BPM (60-180)</div>
           </div>
 
-          {/* 키 설정 */}
+          {/* Brightness → Volume */}
           <div>
-            <label className="block mb-1 text-sm">Key: {starSettings.key}</label>
-            <select
-              value={starSettings.key}
-              onChange={(e) => {
-                const newSettings = { ...starSettings, key: e.target.value as KeyName };
-                setStarSettings(newSettings);
-                if (engineReady) {
-                  audioEngine.updateStar(newSettings);
-                }
-              }}
-              className="w-full bg-gray-700 text-white rounded p-1"
-            >
-              {keys.map(key => (
-                <option key={key} value={key}>{key}</option>
-              ))}
-            </select>
-          </div>
-
-          {/* 스케일 설정 */}
-          <div>
-            <label className="block mb-1 text-sm">Scale: {starSettings.scale}</label>
-            <select
-              value={starSettings.scale}
-              onChange={(e) => {
-                const newSettings = { ...starSettings, scale: e.target.value as ScaleName };
-                setStarSettings(newSettings);
-                if (engineReady) {
-                  audioEngine.updateStar(newSettings);
-                }
-              }}
-              className="w-full bg-gray-700 text-white rounded p-1"
-            >
-              {scales.map(scale => (
-                <option key={scale} value={scale}>{scale}</option>
-              ))}
-            </select>
-          </div>
-
-          {/* 복잡도 설정 */}
-          <div className="col-span-2">
-            <label className="block mb-1 text-sm">Complexity: {starSettings.complexity}</label>
+            <label className="block mb-1 text-sm">Brightness: {starProperties.brightness} → Volume: {starGlobalState.volume}</label>
             <input
               type="range"
-              min="1"
-              max="3"
-              step="1"
-              value={starSettings.complexity}
-              onChange={(e) => {
-                const newSettings = { ...starSettings, complexity: parseInt(e.target.value) as 1 | 2 | 3 };
-                setStarSettings(newSettings);
-                if (engineReady) {
-                  audioEngine.updateStar(newSettings);
-                }
-              }}
+              min="0"
+              max="100"
+              value={starProperties.brightness}
+              onChange={(e) => updateStarProperty('brightness', parseInt(e.target.value))}
               className="w-full"
             />
-            <div className="text-xs text-gray-400 mt-1">
-              1: Simple | 2: Medium | 3: Complex
-            </div>
+            <div className="text-xs text-blue-300 mt-1">Brightness → Volume (0-100)</div>
+          </div>
+
+          {/* Color → Key/Scale */}
+          <div>
+            <label className="block mb-1 text-sm">Color: {starProperties.color}° → {starGlobalState.key} {starGlobalState.scale}</label>
+            <input
+              type="range"
+              min="0"
+              max="360"
+              value={starProperties.color}
+              onChange={(e) => updateStarProperty('color', parseInt(e.target.value))}
+              className="w-full"
+            />
+            <div className="text-xs text-blue-300 mt-1">Color → Key/Scale</div>
+          </div>
+
+          {/* Size → Complexity */}
+          <div>
+            <label className="block mb-1 text-sm">Size: {starProperties.size} → Complexity: {starGlobalState.complexity}</label>
+            <input
+              type="range"
+              min="0"
+              max="100"
+              value={starProperties.size}
+              onChange={(e) => updateStarProperty('size', parseInt(e.target.value))}
+              className="w-full"
+            />
+            <div className="text-xs text-blue-300 mt-1">Size → Complexity (1-3)</div>
           </div>
         </div>
       </div>
@@ -631,145 +460,185 @@ const AudioTestPanel: React.FC = () => {
             </div>
 
             {/* 행성 속성 슬라이더들 */}
-            <div className="grid grid-cols-2 gap-3 text-sm">
+            <div className="grid grid-cols-1 gap-4 text-sm">
               {/* Size 슬라이더 */}
-              <div>
-                <label className="block mb-1">Size: {planet.props.size.toFixed(1)}</label>
+              <div className="border border-gray-600 p-3 rounded">
+                <label className="block mb-1 font-semibold">Size: {planet.properties.size.toFixed(1)}</label>
                 <input
                   type="range"
                   min="0"
                   max="100"
                   step="0.1"
-                  value={planet.props.size}
+                  value={planet.properties.size}
                   onChange={(e) => updatePlanetProp(planet.id, 'size', parseFloat(e.target.value))}
-                  className="w-full"
+                  className="w-full mb-2"
                 />
+                <div className={`text-xs ${getDomainColor('size')}`}>
+                  <div className="mb-1"><strong>🎵 Sound:</strong> {getSoundMappingInfo('size').join(' • ')}</div>
+                  <div><strong>🎼 Pattern:</strong> {getPatternMappingInfo('size').join(' • ')}</div>
+                </div>
               </div>
 
               {/* Brightness 슬라이더 */}
-              <div>
-                <label className="block mb-1">Brightness: {planet.props.brightness.toFixed(1)}</label>
+              <div className="border border-gray-600 p-3 rounded">
+                <label className="block mb-1 font-semibold">Brightness: {planet.properties.brightness.toFixed(1)}</label>
                 <input
                   type="range"
                   min="0"
                   max="100"
                   step="0.1"
-                  value={planet.props.brightness}
+                  value={planet.properties.brightness}
                   onChange={(e) => updatePlanetProp(planet.id, 'brightness', parseFloat(e.target.value))}
-                  className="w-full"
+                  className="w-full mb-2"
                 />
+                <div className={`text-xs ${getDomainColor('brightness')}`}>
+                  <div className="mb-1"><strong>🎵 Sound:</strong> {getSoundMappingInfo('brightness').join(' • ')}</div>
+                  <div><strong>🎼 Pattern:</strong> {getPatternMappingInfo('brightness').join(' • ')}</div>
+                </div>
               </div>
 
               {/* Distance 슬라이더 */}
-              <div>
-                <label className="block mb-1">Distance: {planet.props.distance.toFixed(1)}</label>
+              <div className="border border-gray-600 p-3 rounded">
+                <label className="block mb-1 font-semibold">Distance: {planet.properties.distance.toFixed(1)}</label>
                 <input
                   type="range"
                   min="0"
                   max="100"
                   step="0.1"
-                  value={planet.props.distance}
+                  value={planet.properties.distance}
                   onChange={(e) => updatePlanetProp(planet.id, 'distance', parseFloat(e.target.value))}
-                  className="w-full"
+                  className="w-full mb-2"
                 />
+                <div className={`text-xs ${getDomainColor('distance')}`}>
+                  <div className="mb-1"><strong>🎵 Sound:</strong> {getSoundMappingInfo('distance').join(' • ')}</div>
+                  <div><strong>🎼 Pattern:</strong> {getPatternMappingInfo('distance').join(' • ')}</div>
+                </div>
               </div>
 
               {/* Speed 슬라이더 */}
-              <div>
-                <label className="block mb-1">Speed: {planet.props.speed.toFixed(1)}</label>
+              <div className="border border-gray-600 p-3 rounded">
+                <label className="block mb-1 font-semibold">Speed: {planet.properties.speed.toFixed(1)}</label>
                 <input
                   type="range"
                   min="0"
                   max="100"
                   step="0.1"
-                  value={planet.props.speed}
+                  value={planet.properties.speed}
                   onChange={(e) => updatePlanetProp(planet.id, 'speed', parseFloat(e.target.value))}
-                  className="w-full"
+                  className="w-full mb-2"
                 />
+                <div className={`text-xs ${getDomainColor('speed')}`}>
+                  <div className="mb-1"><strong>🎵 Sound:</strong> {getSoundMappingInfo('speed').join(' • ')}</div>
+                  <div><strong>🎼 Pattern:</strong> {getPatternMappingInfo('speed').join(' • ')}</div>
+                </div>
               </div>
 
               {/* Spin 슬라이더 */}
-              <div>
-                <label className="block mb-1">Spin: {planet.props.spin.toFixed(1)}</label>
+              <div className="border border-gray-600 p-3 rounded">
+                <label className="block mb-1 font-semibold">Spin: {planet.properties.spin.toFixed(1)}</label>
                 <input
                   type="range"
                   min="0"
                   max="100"
                   step="0.1"
-                  value={planet.props.spin}
+                  value={planet.properties.spin}
                   onChange={(e) => updatePlanetProp(planet.id, 'spin', parseFloat(e.target.value))}
-                  className="w-full"
+                  className="w-full mb-2"
                 />
+                <div className={`text-xs ${getDomainColor('spin')}`}>
+                  <div className="mb-1"><strong>🎵 Sound:</strong> {getSoundMappingInfo('spin').join(' • ')}</div>
+                  <div><strong>🎼 Pattern:</strong> {getPatternMappingInfo('spin').join(' • ')}</div>
+                </div>
               </div>
 
               {/* Eccentricity 슬라이더 */}
-              <div>
-                <label className="block mb-1">Eccentricity: {planet.props.eccentricity.toFixed(1)}</label>
+              <div className="border border-gray-600 p-3 rounded">
+                <label className="block mb-1 font-semibold">Eccentricity: {planet.properties.eccentricity.toFixed(1)}</label>
                 <input
                   type="range"
                   min="0"
                   max="100"
                   step="0.1"
-                  value={planet.props.eccentricity}
+                  value={planet.properties.eccentricity}
                   onChange={(e) => updatePlanetProp(planet.id, 'eccentricity', parseFloat(e.target.value))}
-                  className="w-full"
+                  className="w-full mb-2"
                 />
+                <div className={`text-xs ${getDomainColor('eccentricity')}`}>
+                  <div className="mb-1"><strong>🎵 Sound:</strong> {getSoundMappingInfo('eccentricity').join(' • ')}</div>
+                  <div><strong>🎼 Pattern:</strong> {getPatternMappingInfo('eccentricity').join(' • ')}</div>
+                </div>
               </div>
 
               {/* Color 슬라이더 */}
-              <div>
-                <label className="block mb-1">Color: {planet.props.color.toFixed(1)}°</label>
+              <div className="border border-gray-600 p-3 rounded">
+                <label className="block mb-1 font-semibold">Color: {planet.properties.color.toFixed(1)}°</label>
                 <input
                   type="range"
                   min="0"
                   max="360"
                   step="1"
-                  value={planet.props.color}
+                  value={planet.properties.color}
                   onChange={(e) => updatePlanetProp(planet.id, 'color', parseFloat(e.target.value))}
-                  className="w-full"
+                  className="w-full mb-2"
                 />
+                <div className={`text-xs ${getDomainColor('color')}`}>
+                  <div className="mb-1"><strong>🎵 Sound:</strong> {getSoundMappingInfo('color').join(' • ')}</div>
+                  <div><strong>🎼 Pattern:</strong> {getPatternMappingInfo('color').join(' • ')}</div>
+                </div>
               </div>
 
               {/* Tilt 슬라이더 */}
-              <div>
-                <label className="block mb-1">Tilt: {planet.props.tilt.toFixed(1)}°</label>
+              <div className="border border-gray-600 p-3 rounded">
+                <label className="block mb-1 font-semibold">Tilt: {planet.properties.tilt.toFixed(1)}°</label>
                 <input
                   type="range"
                   min="-90"
                   max="90"
                   step="1"
-                  value={planet.props.tilt}
+                  value={planet.properties.tilt}
                   onChange={(e) => updatePlanetProp(planet.id, 'tilt', parseFloat(e.target.value))}
-                  className="w-full"
+                  className="w-full mb-2"
                 />
+                <div className={`text-xs ${getDomainColor('tilt')}`}>
+                  <div className="mb-1"><strong>🎵 Sound:</strong> {getSoundMappingInfo('tilt').join(' • ')}</div>
+                  <div><strong>🎼 Pattern:</strong> {getPatternMappingInfo('tilt').join(' • ')}</div>
+                </div>
               </div>
 
               {/* Elevation 슬라이더 */}
-              <div>
-                <label className="block mb-1">Elevation: {planet.props.elevation.toFixed(1)}°</label>
+              <div className="border border-gray-600 p-3 rounded">
+                <label className="block mb-1 font-semibold">Elevation: {planet.properties.elevation.toFixed(1)}°</label>
                 <input
                   type="range"
                   min="-90"
                   max="90"
                   step="1"
-                  value={planet.props.elevation}
+                  value={planet.properties.elevation}
                   onChange={(e) => updatePlanetProp(planet.id, 'elevation', parseFloat(e.target.value))}
-                  className="w-full"
+                  className="w-full mb-2"
                 />
+                <div className={`text-xs ${getDomainColor('elevation')}`}>
+                  <div className="mb-1"><strong>🎵 Sound:</strong> {getSoundMappingInfo('elevation').join(' • ')}</div>
+                  <div><strong>🎼 Pattern:</strong> {getPatternMappingInfo('elevation').join(' • ')}</div>
+                </div>
               </div>
 
               {/* Phase 슬라이더 */}
-              <div>
-                <label className="block mb-1">Phase: {planet.props.phase.toFixed(1)}°</label>
+              <div className="border border-gray-600 p-3 rounded">
+                <label className="block mb-1 font-semibold">Phase: {planet.properties.phase.toFixed(1)}°</label>
                 <input
                   type="range"
                   min="0"
                   max="360"
                   step="1"
-                  value={planet.props.phase}
+                  value={planet.properties.phase}
                   onChange={(e) => updatePlanetProp(planet.id, 'phase', parseFloat(e.target.value))}
-                  className="w-full"
+                  className="w-full mb-2"
                 />
+                <div className={`text-xs ${getDomainColor('phase')}`}>
+                  <div className="mb-1"><strong>🎵 Sound:</strong> {getSoundMappingInfo('phase').join(' • ')}</div>
+                  <div><strong>🎼 Pattern:</strong> {getPatternMappingInfo('phase').join(' • ')}</div>
+                </div>
               </div>
             </div>
           </div>

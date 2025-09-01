@@ -41,21 +41,21 @@ export class BassInstrument implements Instrument {
         decay: 0.4,
         sustain: 0.5,
         release: 0.8,
-        baseFrequency: 150, // 낮은 주파수에서 시작
+        baseFrequency: 80, // 낮은 주파수에서 시작 (한 옥타브 낮춤: 150 → 80Hz)
         octaves: 2
       }
     });
 
     // 서브 오실레이터 - 더 깊은 저음을 위한 보조 신디사이저
     this.subOscillator = new Tone.Oscillator({
-      frequency: 40,   // 기본 저음 주파수
+      frequency: 20,   // 기본 저음 주파수 (한 옥타브 낮춤: 40 → 20Hz)
       type: 'sine',    // 사인파 - 깨끗하고 깊은 저음
-      volume: -12      // 서브틀하게 설정
+      volume: -10      // 서브 오실레이터 볼륨 증가 (-12 → -10dB)
     });
 
     // 베이스 전용 로우패스 필터 - 고음을 제거하여 따뜻한 톤 생성
     this.bassFilter = new Tone.Filter({
-      frequency: 800,     // SONA 지침: BASS cutoff ≤ 3kHz
+      frequency: 600,     // SONA 지침: BASS cutoff ≤ 3kHz (더 어둡게: 800 → 600Hz)
       type: 'lowpass',    // 로우패스 - 고음 제거
       rolloff: -24,       // steep rolloff로 고음 완전 제거
       Q: 2                // 적당한 레조넌스
@@ -123,7 +123,7 @@ export class BassInstrument implements Instrument {
       }
       
       // 서브 오실레이터 주파수 설정 (메인 주파수의 절반 - 한 옥타브 아래)
-      this.subOscillator.frequency.setValueAtTime(frequency / 2, currentTime);
+      this.subOscillator.frequency.setValueAtTime(frequency / 4, currentTime); // 두 옥타브 아래로 변경 (더 깊은 저음)
       
       // 노트 지속 시간 계산 후 서브 오실레이터 정지
       const noteDurationSeconds = typeof duration === 'string' ? Tone.Time(duration).toSeconds() : duration;
@@ -152,7 +152,7 @@ export class BassInstrument implements Instrument {
         this.subOscillator.start(currentTime);
       }
       
-      this.subOscillator.frequency.setValueAtTime(frequency / 2, currentTime);
+      this.subOscillator.frequency.setValueAtTime(frequency / 4, currentTime); // 두 옥타브 아래로 변경
       
       // 짧은 지속시간으로 슬랩 효과
       const stopTime = currentTime + Tone.Time('16n').toSeconds();
@@ -180,7 +180,7 @@ export class BassInstrument implements Instrument {
 
     // 필터 컷오프 조절 (SONA 지침: BASS cutoff ≤ 3kHz)
     if (this.bassFilter) {
-      const cutoff = Math.max(80, Math.min(3000, params.cutoffHz * 0.6)); // 베이스 범위로 제한
+      const cutoff = Math.max(60, Math.min(2000, params.cutoffHz * 0.5)); // 베이스 범위로 제한 (더 어둡게)
       this.bassFilter.frequency.rampTo(cutoff, 0.04); // 40ms 스무딩
     }
     
@@ -198,8 +198,8 @@ export class BassInstrument implements Instrument {
     
     // 서브 오실레이터 볼륨 조절
     if (this.subOscillator) {
-      const subVolume = -15 + (params.outGainDb * 0.3);
-      this.subOscillator.volume.rampTo(Math.max(-20, Math.min(-8, subVolume)), 0.08);
+      const subVolume = -12 + (params.outGainDb * 0.4); // 서브 오실레이터 볼륨 증가
+      this.subOscillator.volume.rampTo(Math.max(-18, Math.min(-6, subVolume)), 0.08); // 범위 조정
     }
     
     // 엔벨로프 어택 조절

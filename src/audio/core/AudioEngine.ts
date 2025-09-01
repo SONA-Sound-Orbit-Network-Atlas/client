@@ -118,8 +118,12 @@ export class AudioEngine {
         console.log('♻️ 패턴 재롤링', { bars: this.barCounter, pulses: pattern.params.pulses });
       }
       
-      const stepIdx = step % pattern.steps.length;
-      if (pattern.steps[stepIdx] === 1) {
+      // 16스텝으로 정규화된 stepIdx 계산
+      const stepIdx = step % 16;
+      
+      // 패턴 내에서 해당 스텝이 활성화되어 있는지 확인
+      const patternStep = stepIdx % pattern.steps.length;
+      if (pattern.steps[patternStep] === 1) {
         // 개별 스텝 스윙 오프셋 적용 (짝수 16th만)
         let swingTime = time;
         if (adjustedParams.swingPct > 0 && (step % 2 === 1)) {
@@ -128,7 +132,7 @@ export class AudioEngine {
           swingTime = time + offset;
         }
         
-        trigger(stepIdx, pattern.accents[stepIdx] === 1, swingTime);
+        trigger(stepIdx, pattern.accents[patternStep] === 1, swingTime);
       }
       step++;
     }, '16n');
