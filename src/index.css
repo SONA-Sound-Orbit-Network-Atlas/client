@@ -1,7 +1,6 @@
+@import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
 @import 'tailwindcss';
 @import 'tw-animate-css';
-
-@import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
 
 @custom-variant dark (&:is(.dark *));
 
@@ -11,7 +10,6 @@
     'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif,
     'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
 
-  /* Primary */
   --color-primary-100: #e9f2fc;
   --color-primary-200: #b7d6f5;
   --color-primary-300: #63b3ed;
@@ -20,7 +18,6 @@
   --color-primary-600: #1f445e;
   --color-primary-700: #0d2433;
 
-  /* Secondary */
   --color-secondary-100: #e0d8f9;
   --color-secondary-200: #bea9f2;
   --color-secondary-300: #9f7aea;
@@ -29,7 +26,6 @@
   --color-secondary-600: #351463;
   --color-secondary-700: #180632;
 
-  /* Tertiary */
   --color-tertiary-100: #daf6fc;
   --color-tertiary-200: #76e4f7;
   --color-tertiary-200-10: rgba(118, 228, 247, 0.1);
@@ -40,18 +36,15 @@
   --color-tertiary-600: #1b484f;
   --color-tertiary-700: #0b262b;
 
-  /* State Colors */
   --color-success: #68d391;
   --color-error: #f56565;
   --color-warning: #f6e05e;
 
-  /* Gray scale */
   --color-gray-bg: #101010;
   --color-gray-surface: #111111;
   --color-gray-card: #1f1f1f;
   --color-gray-border: #333333;
 
-  /* Text */
   --color-text-white: #f3f3f3;
   --color-text-secondary: #a0aec0;
   --color-text-muted: #718096;
@@ -65,4 +58,62 @@
   --color-border-secondary: rgba(30, 37, 50, 0.6);
   --color-border-tertiary: rgba(30, 37, 50, 0.6);
   --color-border-white: #2d3748;
+}
+
+@theme inline {
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-ring: var(--ring);
+  --color-destructive: var(--destructive);
+}
+
+:root {
+  --radius: 0.625rem;
+
+  --background: #101010;
+  --foreground: #f3f3f3;
+
+  --card: #1f1f1f;
+  --card-foreground: #f3f3f3;
+  --primary: #63b3ed;
+  --primary-foreground: #f3f3f3;
+  --secondary: #9f7aea;
+  --secondary-foreground: #f3f3f3;
+  --muted: transparent;
+  --muted-foreground: #a0aec0;
+  --destructive: #f56565;
+  --border: #404040;
+  --ring: #63b3ed;
+}
+
+@layer base {
+  * {
+    border-color: var(--border);
+    outline-color: var(--ring);
+    outline-opacity: 0.5;
+  }
+  body {
+    background-color: var(--background);
+    color: var(--foreground);
+    font-family:
+      'Pretendard',
+      ui-sans-serif,
+      system-ui,
+      -apple-system,
+      BlinkMacSystemFont,
+      'Segoe UI',
+      Roboto,
+      'Helvetica Neue',
+      Arial,
+      'Noto Sans',
+      sans-serif,
+      'Apple Color Emoji',
+      'Segoe UI Emoji',
+      'Segoe UI Symbol',
+      'Noto Color Emoji';
+  }
 }

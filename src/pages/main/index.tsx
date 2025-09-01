@@ -60,13 +60,19 @@ export default function App() {
   }, []);
 
   return (
-    <>
-      <div className="block w-full fixed top-0 left-0 right-0 bottom-0 z-0 h-screen bg-[#0c0f13]">
-        <Canvas
-          linear
-          dpr={[1, 2]}
-          orthographic
-          camera={{ zoom: state.zoom, position: [0, 0, 500] }}
+    <div className="main-page">
+      <Canvas
+        linear
+        dpr={[1, 2]}
+        orthographic
+        camera={{ zoom: state.zoom, position: [0, 0, 500] }}
+      >
+        <Suspense
+          fallback={
+            <Html center className="loading">
+              Loading...
+            </Html>
+          }
         >
           <Suspense
             fallback={
@@ -156,7 +162,7 @@ export default function App() {
           go to Galaxy
         </button>
       )}
-    </>
+    </div>
   );
 }
 
