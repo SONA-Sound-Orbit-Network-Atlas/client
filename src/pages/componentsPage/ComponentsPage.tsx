@@ -22,6 +22,9 @@ export default function ComponentsPage() {
           <Button color="primary">primary</Button>
           <Button color="secondary">secondary</Button>
           <Button color="tertiary">tertiary</Button>
+          <Button color="tertiary" disabled>
+            disabled
+          </Button>
         </div>
         <h2>size 기준</h2>
         <div className="flex gap-4 align-center">
