@@ -1,8 +1,8 @@
-import Button from '@/components/ui/button';
-import Card from '@/components/ui/card';
-import Input from '@/components/ui/input';
-import TextField from '@/components/ui/textField';
-import Textarea from '@/components/ui/textarea';
+import Button from '@/components/common/button';
+import Card from '@/components/common/card';
+import Input from '@/components/common/input';
+import TextField from '@/components/common/textField';
+import Textarea from '@/components/common/textarea';
 
 const sectionStyle =
   'p-4 border-solid border-[1px] border-[var(--color-border-white)] rounded-[8px]';
