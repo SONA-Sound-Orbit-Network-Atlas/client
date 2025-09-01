@@ -2,7 +2,7 @@ import { createBrowserRouter } from 'react-router-dom';
 import Main from '@/pages/main/Main';
 import SpacePage from '@/pages/SpacePage';
 import ComponentTestPage from '@/pages/ComponentTestPage';
-import ComponentsPage from '@/pages/componentsPage/ComponentsPage';
+import ComponentsPage from '@/pages/ComponentsPage';
 import NotFoundPage from '@/pages/NotFoundPage';
 
 const router = createBrowserRouter([
