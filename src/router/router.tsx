@@ -1,9 +1,9 @@
 import { createBrowserRouter } from 'react-router-dom';
 import Main from '@/pages/main/Main';
-import GalaxyPage from '@/pages/GalaxyPage';
+import SpacePage from '@/pages/SpacePage';
 import ComponentTestPage from '@/pages/ComponentTestPage';
-import NotFound from '@/pages/NotFound';
 import ComponentsPage from '@/pages/componentsPage/ComponentsPage';
+import NotFoundPage from '@/pages/NotFoundPage';
 
 const router = createBrowserRouter([
   {
@@ -11,8 +11,8 @@ const router = createBrowserRouter([
     element: <Main />,
   },
   {
-    path: '/galaxy',
-    element: <GalaxyPage />,
+    path: '/space',
+    element: <SpacePage />,
   },
   {
     path: '/componentstest',
@@ -24,7 +24,7 @@ const router = createBrowserRouter([
   },
   {
     path: '*',
-    element: <NotFound />,
+    element: <NotFoundPage />,
   },
 ]);
 
