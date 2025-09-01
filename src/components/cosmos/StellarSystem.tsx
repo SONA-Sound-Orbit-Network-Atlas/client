@@ -74,11 +74,7 @@ export default function StellarSystem({
 
   const [planets] = useState<Planet[]>(mockPlanets);
 
-  const currentInclinations = useRef<number[]>(
-    planets.map((p) => p.inclination)
-  );
-
-  useFrame((state, deltaTime) => {
+  useFrame(() => {
     // 항성계 LOD 처리
     if (!ref.current || !detailGroupRef.current || !lowDetailMesh.current)
       return;
@@ -130,7 +126,6 @@ export default function StellarSystem({
               {viewMode === 'StellarSystem' &&
                 selectedStellarSystemId === id && (
                   <OrbitLine
-                    centerPosition={new THREE.Vector3(0, 0, 0)}
                     orbitRadius={planet.orbitRadius}
                     inclination={effectiveInclination}
                   />

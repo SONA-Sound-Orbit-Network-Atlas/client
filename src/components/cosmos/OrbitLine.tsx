@@ -2,13 +2,11 @@ import { useMemo } from 'react';
 import * as THREE from 'three';
 
 interface OrbitLineProps {
-  centerPosition: THREE.Vector3;
   orbitRadius: number;
   inclination: number;
 }
 
 export default function OrbitLine({
-  centerPosition,
   orbitRadius,
   inclination,
 }: OrbitLineProps) {
