@@ -4,7 +4,7 @@ import Planet from './Planet';
 import { useThree, useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 import { useSceneStore } from '@/stores/useSceneStore';
-
+import OrbitLine from './OrbitLine';
 //항성계 컴포넌트
 
 type Planet = {
@@ -74,7 +74,11 @@ export default function StellarSystem({
 
   const [planets] = useState<Planet[]>(mockPlanets);
 
-  useFrame(() => {
+  const currentInclinations = useRef<number[]>(
+    planets.map((p) => p.inclination)
+  );
+
+  useFrame((state, deltaTime) => {
     // 항성계 LOD 처리
     if (!ref.current || !detailGroupRef.current || !lowDetailMesh.current)
       return;
@@ -97,19 +101,6 @@ export default function StellarSystem({
     //메시 스케일 조정정
     detailGroupRef.current.scale.set(factor, factor, factor);
     lowDetailMesh.current.scale.set(1 - factor, 1 - factor, 1 - factor);
-
-    //뷰 모드에 따른 회전 처리
-    if (viewMode === 'StellarSystem') {
-      if (selectedStellarSystemId === id) {
-        // 선택된 항성계만 카메라 방향을 따라감
-        detailGroupRef.current.quaternion.copy(camera.quaternion);
-        //detailGroupRef.current.rotation.set(-Math.PI / 2, 0, 0);
-      }
-      // 선택되지 않은 항성계는 기존 방향 유지 (아무것도 하지 않음)
-    } else {
-      // Galaxy 뷰에서는 모든 항성계가 기본 방향
-      detailGroupRef.current.quaternion.identity();
-    }
   });
 
   return (
@@ -135,15 +126,25 @@ export default function StellarSystem({
               : planet.inclination; // 원래 기울기 유지
 
           return (
-            <Planet
-              key={index}
-              orbitRadius={planet.orbitRadius}
-              orbitSpeed={planet.orbitSpeed}
-              planetSize={planet.planetSize}
-              planetColor={planet.planetColor}
-              rotationSpeed={planet.rotationSpeed}
-              inclination={effectiveInclination}
-            />
+            <>
+              {viewMode === 'StellarSystem' &&
+                selectedStellarSystemId === id && (
+                  <OrbitLine
+                    centerPosition={new THREE.Vector3(0, 0, 0)}
+                    orbitRadius={planet.orbitRadius}
+                    inclination={effectiveInclination}
+                  />
+                )}
+              <Planet
+                key={index}
+                orbitRadius={planet.orbitRadius}
+                orbitSpeed={planet.orbitSpeed}
+                planetSize={planet.planetSize}
+                planetColor={planet.planetColor}
+                rotationSpeed={planet.rotationSpeed}
+                inclination={effectiveInclination}
+              />
+            </>
           );
         })}
       </group>
