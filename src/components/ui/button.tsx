@@ -10,11 +10,10 @@ const buttonVariants = cva(
     variants: {
       color: {
         primary:
-          'bg-gradient-to-r from-[var(--color-secondary-300)] to-[var(--color-primary-300)] text-[var(--color-text-white)] border-[var(--color-border-primary)]',
+          'bg-gradient-to-r from-secondary-300 to-primary-300 text-[var(--color-text-white)] border-[var(--color-border-primary)]',
         secondary:
-          'bg-gradient-to-r from-[var(--color-tertiary-200-10)] to-[var(--color-tertiary-200-20)] text-[var(--color-text-secondary)] border-[var(--color-border-secondary)]',
-        tertiary:
-          'text-[var(--color-text-white)] border-[var(--color-border-white)] bg-[var(--color-navy-opacity-100)]',
+          'bg-gradient-to-r from-tertiary-200-10 to-tertiary-200-20 text-[var(--color-text-secondary)] border-[var(--color-border-secondary)]',
+        tertiary: 'text-text-white border-border-white bg-navy-opacity-100',
       },
       size: {
         lg: 'h-[46px] px-5 font-semibold',
