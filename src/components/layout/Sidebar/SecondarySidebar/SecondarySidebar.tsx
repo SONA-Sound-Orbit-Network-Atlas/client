@@ -17,19 +17,14 @@ export default function SecondarySidebar() {
   return (
     <div
       className={cn(
-        'w-80 bg-gray-surface border-r border-gray-border',
+        'w-64 bg-gray-surface border-r border-gray-border',
         'p-4 flex flex-col gap-4'
       )}
     >
       {/* 헤더와 닫기 버튼 */}
       <div className="flex items-center justify-between mb-4">
         <div className="text-white font-semibold text-lg">{content.title}</div>
-        <button
-          onClick={closeSecondarySidebar}
-          className="p-2 hover:bg-gray-card rounded-lg transition-colors"
-        >
-          <FiX className="w-4 h-4 text-text-white" />
-        </button>
+        <FiX className="w-4 h-4 text-text-white" />
       </div>
 
       {/* 메뉴 내용 */}
