@@ -23,6 +23,14 @@ import {
   DropdownMenuRadioItem,
 } from '@/components/common/DropdownMenu';
 import { ChevronDown, Settings, User, CreditCard, LogOut } from 'lucide-react';
+import Button from '@/components/common/Button';
+import Card from '@/components/common/Card';
+import TextField from '@/components/common/TextField';
+import Textarea from '@/components/common/Textarea';
+import TextInput from '@/components/common/TextInput';
+import GalaxySystems from '@/components/panel/GalaxySystems';
+import { FaHeart } from 'react-icons/fa6';
+import { FiGithub } from 'react-icons/fi';
 
 const ComponentTestPage: React.FC = () => {
   const [checkboxState, setCheckboxState] = useState(false);
@@ -277,6 +285,172 @@ const ComponentTestPage: React.FC = () => {
               </DropdownMenuContent>
             </DropdownMenu>
           </div>
+        </section>
+
+        {/* Button 테스트 */}
+        <section className="mb-12 p-6 border rounded-lg">
+          <h2 className="text-2xl font-semibold mb-4 text-foreground">
+            Button 컴포넌트
+          </h2>
+          <div className="space-y-6">
+            {/* Variant 기준 */}
+            <div>
+              <h3 className="text-lg font-medium mb-3 text-foreground">
+                Variant 기준
+              </h3>
+              <div className="flex gap-4 items-center flex-wrap">
+                <Button color="primary">primary</Button>
+                <Button color="secondary">secondary</Button>
+                <Button color="tertiary">tertiary</Button>
+                <Button color="tertiary" disabled>
+                  disabled
+                </Button>
+              </div>
+            </div>
+
+            {/* Size 기준 */}
+            <div>
+              <h3 className="text-lg font-medium mb-3 text-foreground">
+                Size 기준
+              </h3>
+              <div className="flex gap-4 items-center flex-wrap">
+                <Button color="primary" size="lg">
+                  lg
+                </Button>
+                <Button color="primary" size="md">
+                  md
+                </Button>
+                <Button color="primary" size="sm">
+                  sm
+                </Button>
+                <Button color="primary" size="xs">
+                  xs
+                </Button>
+              </div>
+            </div>
+
+            {/* Icon 기준 */}
+            <div>
+              <h3 className="text-lg font-medium mb-3 text-foreground">
+                Icon + Text 기준
+              </h3>
+              <div className="flex gap-2 items-center flex-wrap">
+                <Button color="primary">
+                  <FiGithub />
+                  GITHUB
+                </Button>
+              </div>
+            </div>
+
+            {/* IconOnly 기준 */}
+            <div>
+              <h3 className="text-lg font-medium mb-3 text-foreground">
+                IconOnly 기준
+              </h3>
+              <div className="flex gap-4 items-center flex-wrap">
+                <Button color="primary" size="lg" iconOnly>
+                  <FaHeart />
+                </Button>
+                <Button color="primary" size="md" iconOnly>
+                  <FaHeart />
+                </Button>
+                <Button color="primary" size="sm" iconOnly>
+                  <FaHeart />
+                </Button>
+                <Button color="primary" size="xs" iconOnly>
+                  <FaHeart />
+                </Button>
+              </div>
+            </div>
+
+            {/* Click 이벤트 핸들러 */}
+            <div>
+              <h3 className="text-lg font-medium mb-3 text-foreground">
+                Click 이벤트 핸들러
+              </h3>
+              <div className="flex gap-2 items-center flex-wrap">
+                <Button color="primary" onClick={() => alert('click')}>
+                  클릭 시 alert
+                </Button>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* TextField 테스트 */}
+        <section className="mb-12 p-6 border rounded-lg">
+          <h2 className="text-2xl font-semibold mb-4 text-foreground">
+            TextField 컴포넌트
+          </h2>
+          <div className="space-y-6">
+            <div>
+              <h3 className="text-lg font-medium mb-3 text-foreground">
+                Input 타입별, Textarea 컴포넌트
+              </h3>
+              <div className="space-y-4">
+                <TextField label="TextField label" htmlFor="textFieldInput">
+                  <TextInput
+                    type="text"
+                    placeholder="input placeholder"
+                    id="textFieldInput"
+                  />
+                </TextField>
+                <TextField label="password input" htmlFor="passwordInput">
+                  <TextInput
+                    type="password"
+                    placeholder="password 입력해주세요"
+                    id="passwordInput"
+                  />
+                </TextField>
+                <TextField label="textarea 필드" htmlFor="textareaInput">
+                  <Textarea
+                    placeholder="textarea 입력해주세요"
+                    id="textareaInput"
+                  />
+                </TextField>
+              </div>
+            </div>
+
+            <div>
+              <h3 className="text-lg font-medium mb-3 text-foreground">
+                onChange 이벤트 핸들러
+              </h3>
+              <TextField label="input 필드" htmlFor="inputOnChange">
+                <TextInput
+                  placeholder="input 입력 시 console.log 출력"
+                  onChange={(e) => console.log(e.target.value)}
+                  id="inputOnChange"
+                />
+              </TextField>
+            </div>
+          </div>
+        </section>
+
+        {/* Card 테스트 */}
+        <section className="mb-12 p-6 border rounded-lg">
+          <h2 className="text-2xl font-semibold mb-4 text-foreground">
+            Card 컴포넌트
+          </h2>
+          <Card>
+            <p className="text-foreground">카드 컴포넌트</p>
+            <p className="text-muted-foreground">
+              Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam,
+              quos.
+              <br />
+              Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam,
+              quos.
+              <br />
+              Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam,
+            </p>
+          </Card>
+        </section>
+
+        {/* Galaxy Systems 테스트 */}
+        <section className="mb-12 p-6 border rounded-lg">
+          <h2 className="text-2xl font-semibold mb-4 text-foreground">
+            Galaxy Systems 컴포넌트
+          </h2>
+          <GalaxySystems />
         </section>
       </div>
     </div>

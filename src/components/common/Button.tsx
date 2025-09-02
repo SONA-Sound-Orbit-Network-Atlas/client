@@ -21,10 +21,20 @@ const buttonVariants = cva(
         sm: 'h-[38px] px-3',
         xs: 'h-[30px] px-2',
       },
+      iconOnly: {
+        true: 'gap-0', // 아이콘만 있을 때는 gap 제거
+      },
       disabled: {
         true: 'opacity-50 cursor-not-allowed pointer-events-none',
       },
     },
+    compoundVariants: [
+      // iconOnly가 true일 때 각 사이즈별로 width = height로 설정
+      { iconOnly: true, size: 'lg', class: 'w-[46px] px-0' },
+      { iconOnly: true, size: 'md', class: 'w-[40px] px-0' },
+      { iconOnly: true, size: 'sm', class: 'w-[38px] px-0' },
+      { iconOnly: true, size: 'xs', class: 'w-[30px] px-0' },
+    ],
     defaultVariants: {
       color: 'primary',
       size: 'lg',
@@ -36,10 +46,12 @@ function Button({
   className,
   color,
   size,
+  iconOnly = false,
   asChild = false,
   ...props
 }: React.ComponentProps<'button'> &
   VariantProps<typeof buttonVariants> & {
+    iconOnly?: boolean;
     asChild?: boolean;
   }) {
   const Comp = asChild ? Slot : 'button';
@@ -47,7 +59,7 @@ function Button({
   return (
     <Comp
       data-slot="button"
-      className={cn(buttonVariants({ color, size, className }))}
+      className={cn(buttonVariants({ color, size, iconOnly, className }))}
       {...props}
     />
   );
