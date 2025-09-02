@@ -30,7 +30,7 @@ export const sectionStyles = {
   bottom: {
     iconSize: 'w-5 h-5',
     iconColor: 'text-text-muted',
-    hoverEffect: 'hover:text-text-white',
-    selectedStyle: 'border border-text-white text-text-white',
+    hoverEffect: 'hover:text-text-secondary',
+    selectedStyle: 'text-text-white',
   },
 };
