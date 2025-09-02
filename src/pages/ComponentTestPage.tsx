@@ -28,7 +28,7 @@ import Card from '@/components/common/Card';
 import TextField from '@/components/common/TextField';
 import Textarea from '@/components/common/Textarea';
 import TextInput from '@/components/common/TextInput';
-import GalaxySystems from '@/components/panel/GalaxySystems';
+import GalaxySystems from '@/components/panel/galaxysystems/GalaxySystems';
 import { FaHeart } from 'react-icons/fa6';
 import { FiGithub } from 'react-icons/fi';
 
