@@ -3,16 +3,7 @@ import { GoDotFill } from 'react-icons/go';
 import ButtonToggleHeart from '@/components/common/ButtonToggleHeart';
 import { IoPlanetOutline } from 'react-icons/io5';
 import { FaRegHeart } from 'react-icons/fa';
-
-interface GalaxySystemCardProps {
-  rank: number;
-  galaxyName: string;
-  makerName: string;
-  createdAt: string;
-  planetCount: number;
-  favoriteCount: number;
-  myFavorite: boolean;
-}
+import type { Galaxy } from '@/types/galaxy';
 
 export default function GalaxySystemCard({
   rank,
@@ -22,7 +13,7 @@ export default function GalaxySystemCard({
   planetCount,
   favoriteCount,
   myFavorite,
-}: GalaxySystemCardProps) {
+}: Galaxy) {
   return (
     <Card>
       <div className="flex justify-between items-center">
