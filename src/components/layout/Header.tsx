@@ -1,6 +1,8 @@
 import React from 'react';
 import { cn } from '@/lib/utils';
 import sonaLogo from '@/assets/sona_logo_header_cropped_250w.png';
+import Button from '../common/Button';
+import { FiSave, FiArrowLeft } from 'react-icons/fi';
 
 interface HeaderProps {
   className?: string;
@@ -31,7 +33,24 @@ export default function Header({ className, children }: HeaderProps) {
 
       {/* 우측 사용자 메뉴 영역 */}
       <div className="flex items-center gap-3">
-        {/* 사용자 메뉴 버튼 등이 들어갈 자리 */}
+        {/* 항성계 정보 텍스트 */}
+        <div className="text-right mr-2">
+          <div className="text-white text-[14px] font-medium leading-tight">
+            항성계 이름
+          </div>
+          <div className="text-text-muted text-[12px] leading-tight">
+            by 제작자명
+          </div>
+        </div>
+
+        <Button color="tertiary" size="sm">
+          <FiSave className="w-4 h-4" />
+          SAVE
+        </Button>
+        <Button color="tertiary" size="sm">
+          <FiArrowLeft className="w-4 h-4" />
+          BACK TO GALAXY
+        </Button>
       </div>
     </header>
   );
