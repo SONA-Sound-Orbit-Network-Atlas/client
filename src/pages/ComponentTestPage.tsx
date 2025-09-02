@@ -28,7 +28,7 @@ import Card from '@/components/common/Card';
 import TextField from '@/components/common/TextField';
 import Textarea from '@/components/common/Textarea';
 import TextInput from '@/components/common/TextInput';
-import GalaxySystems from '@/components/panel/galaxysystems/GalaxySystems';
+import GalaxySystemIndex from '@/components/panel/galaxysystems/GalaxySystemIndex';
 import { FaHeart } from 'react-icons/fa6';
 import { FiGithub } from 'react-icons/fi';
 
@@ -293,10 +293,10 @@ const ComponentTestPage: React.FC = () => {
             Button 컴포넌트
           </h2>
           <div className="space-y-6">
-            {/* Variant 기준 */}
+            {/* Color 기준 */}
             <div>
               <h3 className="text-lg font-medium mb-3 text-foreground">
-                Variant 기준
+                Color 기준
               </h3>
               <div className="flex gap-4 items-center flex-wrap">
                 <Button color="primary">primary</Button>
@@ -450,7 +450,7 @@ const ComponentTestPage: React.FC = () => {
           <h2 className="text-2xl font-semibold mb-4 text-foreground">
             Galaxy Systems 컴포넌트
           </h2>
-          <GalaxySystems />
+          <GalaxySystemIndex />
         </section>
       </div>
     </div>

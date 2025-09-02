@@ -2,7 +2,7 @@ import * as React from 'react';
 import * as CheckboxPrimitive from '@radix-ui/react-checkbox';
 import { FaCheck } from 'react-icons/fa';
 
-import { cn } from '@/lib/utils';
+import { mergeClassNames } from '@/utils/mergeClassNames';
 
 interface CheckboxProps
   extends React.ComponentProps<typeof CheckboxPrimitive.Root> {
@@ -13,7 +13,7 @@ function Checkbox({ className, variant = 'primary', ...props }: CheckboxProps) {
   return (
     <CheckboxPrimitive.Root
       data-slot="checkbox"
-      className={cn(
+      className={mergeClassNames(
         'peer bg-transparent focus-visible:ring-ring/50 aria-invalid:ring-destructive/20 aria-invalid:border-destructive size-4 shrink-0 rounded-[4px] border shadow-xs transition-all outline-none focus-visible:ring-[3px] disabled:cursor-not-allowed disabled:opacity-50 cursor-pointer',
         // Primary variant (기본값)
         variant === 'primary' && [
