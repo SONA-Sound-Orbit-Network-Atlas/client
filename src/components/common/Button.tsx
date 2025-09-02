@@ -14,12 +14,18 @@ const buttonVariants = cva(
         secondary:
           'bg-tertiary-200-10 text-tertiary-200 border-tertiary-200-20',
         tertiary: 'text-text-white border-gray-border bg-gray-card',
+        transparent: 'text-text-muted border-none bg-transparent',
       },
       size: {
         lg: 'h-[46px] px-5 font-semibold',
         md: 'h-[40px] px-4',
         sm: 'h-[38px] px-3',
         xs: 'h-[30px] px-2',
+      },
+      textAlign: {
+        left: 'justify-start',
+        center: 'justify-center',
+        right: 'justify-end',
       },
       iconOnly: {
         true: 'gap-0', // 아이콘만 있을 때는 gap 제거
@@ -38,6 +44,7 @@ const buttonVariants = cva(
     defaultVariants: {
       color: 'primary',
       size: 'lg',
+      textAlign: 'center',
     },
   }
 );
@@ -46,11 +53,13 @@ function Button({
   className,
   color,
   size,
+  textAlign,
   iconOnly = false,
   asChild = false,
   ...props
 }: React.ComponentProps<'button'> &
   VariantProps<typeof buttonVariants> & {
+    textAlign?: 'left' | 'center' | 'right';
     iconOnly?: boolean;
     asChild?: boolean;
   }) {
@@ -59,7 +68,9 @@ function Button({
   return (
     <Comp
       data-slot="button"
-      className={cn(buttonVariants({ color, size, iconOnly, className }))}
+      className={cn(
+        buttonVariants({ color, size, iconOnly, textAlign, className })
+      )}
       {...props}
     />
   );
