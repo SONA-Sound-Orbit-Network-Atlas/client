@@ -2,6 +2,7 @@ import { Canvas } from '@react-three/fiber';
 import { Suspense } from 'react';
 import Scene from '../components/Scene';
 import DebugMessage from '@/components/DebugMessage';
+import Header from '@/components/common/Header';
 
 export default function SpacePage() {
   const canvasStyle = {
@@ -11,6 +12,7 @@ export default function SpacePage() {
   };
   return (
     <div>
+      <Header />
       <h1>Space</h1>
       <DebugMessage />
       <Canvas style={canvasStyle} shadows>
