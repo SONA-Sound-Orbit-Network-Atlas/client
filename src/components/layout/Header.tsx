@@ -1,5 +1,5 @@
 import React from 'react';
-import { cn } from '@/lib/utils';
+import { mergeClassNames } from '@/utils/mergeClassNames';
 import sonaLogo from '@/assets/sona_logo_header_cropped_250w.png';
 import Button from '../common/Button';
 import { FiSave, FiArrowLeft } from 'react-icons/fi';
@@ -12,7 +12,7 @@ interface HeaderProps {
 export default function Header({ className, children }: HeaderProps) {
   return (
     <header
-      className={cn(
+      className={mergeClassNames(
         'w-full bg-gray-surface/80 border-b border-gray-border',
         'h-16 px-6 flex items-center justify-between',
         'backdrop-blur-sm',

@@ -42,18 +42,6 @@ export default function Loading({ onComplete, setIsLoading }: LoadingProps) {
       setDisplayProgress((prev) => {
         const newProgress = Math.max(prev, targetProgress);
 
-        // 디버깅용 로그
-        console.log('Loading progress:', {
-          elapsed,
-          minTimeProgress,
-          r3fProgress,
-          isR3FComplete,
-          targetProgress,
-          displayProgress: newProgress,
-          total,
-          loaded,
-        });
-
         if (newProgress >= 100) {
           clearInterval(interval);
           // 로딩 완료 처리 - 테스트용으로 주석처리
