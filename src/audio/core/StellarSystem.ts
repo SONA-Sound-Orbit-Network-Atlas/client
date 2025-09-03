@@ -25,6 +25,22 @@ export class StellarSystem {
     }
     return this._instance;
   }
+
+  // === 랜덤 시드 관리 ===
+  setSeed(seed: number | string): void {
+    this.star.setSeed(seed);
+    console.log(`🌱 StellarSystem Seed 설정 (Star로 위임): ${seed}`);
+    // 재생 중인 행성 패턴 재생성하여 동일 결과 보장
+    for (const planet of this.planets.values()) {
+      if (planet.getIsPlaying()) {
+        // 행성 내부 regeneratePattern 은 private 이므로 stop/start 방식 사용
+        planet.stopPattern();
+        planet.startPattern().catch(err => console.error('Seed 재적용 패턴 시작 실패', err));
+      }
+    }
+  }
+
+  getSeed(): number | string | null { return this.star.getSeed(); }
   
   // 오디오 시스템 초기화
   async initialize(): Promise<void> {

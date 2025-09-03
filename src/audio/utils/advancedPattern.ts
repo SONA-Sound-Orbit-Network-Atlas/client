@@ -3,6 +3,7 @@
 
 import type { InstrumentRole, PatternParameters, GeneratedPattern } from '../../types/audio';
 import { clamp } from './mapping';
+import { RandomManager } from './random';
 
 // 역할별 패턴 특성 정의
 interface RoleCharacteristics {
@@ -111,7 +112,8 @@ function generateWeightedPattern(
   role: InstrumentRole, 
   pulses: number, 
   steps: number, 
-  complexity: number
+  complexity: number,
+  rng: RandomManager
 ): number[] {
   const chars = ROLE_CHARACTERISTICS[role];
   
@@ -126,7 +128,7 @@ function generateWeightedPattern(
   let pattern = advancedEuclideanRhythm(adjustedPulses, steps);
   
   // 역할별 음악적 조정
-  pattern = applyMusicalIntelligence(pattern, role, chars);
+  pattern = applyMusicalIntelligence(pattern, role, chars, rng);
   
   return pattern;
 }
@@ -135,32 +137,33 @@ function generateWeightedPattern(
 function applyMusicalIntelligence(
   pattern: number[], 
   role: InstrumentRole, 
-  chars: RoleCharacteristics
+  chars: RoleCharacteristics,
+  rng: RandomManager
 ): number[] {
   const steps = pattern.length;
   const result = [...pattern];
   
   switch (role) {
-    case 'BASS':
+  case 'BASS':
       // 베이스: 1박과 3박 강조, 4분음표 기반
       for (let i = 0; i < steps; i += 4) {
-        if (i < steps && Math.random() < 0.8) result[i] = 1; // 1박 강조
-        if (i + 2 < steps && Math.random() < 0.4) result[i + 2] = 1; // 3박 약간 강조
+    if (i < steps && rng.nextFloat() < 0.8) result[i] = 1; // 1박 강조
+    if (i + 2 < steps && rng.nextFloat() < 0.4) result[i + 2] = 1; // 3박 약간 강조
       }
       break;
       
-    case 'DRUM':
+  case 'DRUM':
       // 드럼: 백비트 강조 (2, 4박)
       for (let i = 1; i < steps; i += 4) {
-        if (i < steps && Math.random() < 0.9) result[i] = 1; // 2박 강조
-        if (i + 2 < steps && Math.random() < 0.9) result[i + 2] = 1; // 4박 강조
+    if (i < steps && rng.nextFloat() < 0.9) result[i] = 1; // 2박 강조
+    if (i + 2 < steps && rng.nextFloat() < 0.9) result[i + 2] = 1; // 4박 강조
       }
       break;
       
-    case 'MELODY':
+  case 'MELODY':
       // 멜로디: 싱코페이션과 다양한 리듬
       for (let i = 0; i < steps; i++) {
-        if (Math.random() < chars.syncopationTendency) {
+    if (rng.nextFloat() < chars.syncopationTendency) {
           // 싱코페이션: 강박을 약박으로 이동
           if (result[i] === 1 && i + 1 < steps) {
             result[i] = 0;
@@ -176,22 +179,22 @@ function applyMusicalIntelligence(
       return advancedEuclideanRhythm(arpPulses, steps);
     }
       
-    case 'PAD':
+  case 'PAD':
       // 패드: 긴 지속음, 적은 어택
       for (let i = 0; i < steps; i++) {
-        if (result[i] === 1 && Math.random() < chars.restImportance) {
+    if (result[i] === 1 && rng.nextFloat() < chars.restImportance) {
           // 일부 노트를 제거해서 공간감 확보
           if (i % 4 !== 0) result[i] = 0; // 강박 제외하고 제거
         }
       }
       break;
       
-    case 'CHORD':
+  case 'CHORD':
       // 코드: 화성적 리듬, 2박자 또는 4박자
       for (let i = 0; i < steps; i++) {
-        if (i % 2 === 0 && Math.random() < 0.7) {
+    if (i % 2 === 0 && rng.nextFloat() < 0.7) {
           result[i] = 1; // 짝수 박자 강조
-        } else if (i % 2 === 1 && Math.random() < 0.2) {
+    } else if (i % 2 === 1 && rng.nextFloat() < 0.2) {
           result[i] = 0; // 홀수 박자 약화
         }
       }
@@ -206,7 +209,8 @@ function generateAdvancedAccents(
   steps: number[], 
   phase: number, 
   eccentricity: number,
-  role: InstrumentRole
+  role: InstrumentRole,
+  rng: RandomManager
 ): number[] {
   const accents = new Array(steps.length).fill(0);
   const chars = ROLE_CHARACTERISTICS[role];
@@ -226,10 +230,8 @@ function generateAdvancedAccents(
   const additionalAccentProbability = (eccentricity / 100) * chars.accentStrength;
   
   for (let i = 0; i < steps.length; i++) {
-    if (steps[i] === 1 && accents[i] === 0) {
-      if (Math.random() < additionalAccentProbability) {
-        accents[i] = 1;
-      }
+    if (steps[i] === 1 && accents[i] === 0 && rng.nextFloat() < additionalAccentProbability) {
+      accents[i] = 1;
     }
   }
   
@@ -251,13 +253,14 @@ export function rotatePattern(pattern: number[], rotation: number): number[] {
 export function generateAdvancedPattern(
   params: PatternParameters,
   role: InstrumentRole,
-  globalComplexity: number = 2
+  globalComplexity: number = 2,
+  rng: RandomManager = RandomManager.instance
 ): GeneratedPattern {
   // 역할별 특성 가져오기
   const characteristics = ROLE_CHARACTERISTICS[role];
   
   // 가중치 기반 패턴 생성
-  let steps = generateWeightedPattern(role, params.pulses, params.steps, globalComplexity);
+  let steps = generateWeightedPattern(role, params.pulses, params.steps, globalComplexity, rng);
   
   // 회전 적용
   steps = rotatePattern(steps, params.rotation);
@@ -267,7 +270,8 @@ export function generateAdvancedPattern(
     steps, 
     params.phase || 0, 
     params.eccentricity || 0,
-    role
+    role,
+    rng
   );
   
   // 최종 파라미터 (역할별 가드레일 적용)

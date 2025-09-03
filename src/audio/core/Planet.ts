@@ -32,19 +32,8 @@ export class Planet {
   private patternParams: PatternParameters | null = null;
   private lastPatternUpdate = 0;
 
-  // 행성의 물리적 속성 (안전한 초기값 설정)
-  private properties: PlanetPhysicalProperties = {
-    size: 50 + Math.random() * 50, // 50-100 범위로 안전한 초기값
-    brightness: 50 + Math.random() * 50, // 50-100 범위로 안전한 초기값
-    distance: 25 + Math.random() * 50, // 25-75 범위로 안전한 초기값
-    speed: 30 + Math.random() * 40, // 30-70 범위로 안전한 초기값
-    spin: 20 + Math.random() * 60, // 20-80 범위로 안전한 초기값
-    eccentricity: 10 + Math.random() * 30, // 10-40 범위로 안전한 초기값
-    color: Math.random() * 360, // 0-360도
-    tilt: (Math.random() - 0.5) * 120, // -60~60도로 범위 제한
-    elevation: (Math.random() - 0.5) * 120, // -60~60도로 범위 제한
-    phase: Math.random() * 360, // 0-360도
-  };
+  // 행성의 물리적 속성 (생성자에서 초기화)
+  private properties!: PlanetPhysicalProperties;
 
   constructor(role: InstrumentRole, star: Star, customId?: string) {
     this.id = customId || `planet-${role}-${Date.now()}`;
@@ -55,10 +44,30 @@ export class Planet {
     // 역할에 따른 전용 악기 생성
     this.instrument = this.createInstrumentForRole(role);
 
+    // 결정론적 초기 속성 생성 (Star의 시드 기반)
+    this.initializeProperties();
+
     // 초기 속성 적용
     this.updateInstrument();
 
     console.log(`🪐 ${this.name} 생성됨 (ID: ${this.id})`);
+  }
+
+  // 결정론적 초기 속성 생성
+  private initializeProperties(): void {
+    const rng = this.star.getDomainRng(`planet-init-${this.role}`);
+    this.properties = {
+      size: 50 + rng.nextFloat() * 50, // 50-100
+      brightness: 50 + rng.nextFloat() * 50,
+      distance: 25 + rng.nextFloat() * 50,
+      speed: 30 + rng.nextFloat() * 40,
+      spin: 20 + rng.nextFloat() * 60,
+      eccentricity: 10 + rng.nextFloat() * 30,
+      color: rng.nextFloat() * 360,
+      tilt: (rng.nextFloat() - 0.5) * 120,
+      elevation: (rng.nextFloat() - 0.5) * 120,
+      phase: rng.nextFloat() * 360,
+    };
   }
 
   // SONA 매핑 시스템 구현 (Tri Hybrid + Dual)
@@ -372,11 +381,21 @@ export class Planet {
 
     // 패턴 파라미터 계산 및 고급 패턴 생성
     this.patternParams = this.calculatePatternParams();
+    const rng = this.star.getDomainRng(`pattern-${this.id}`);
     const generatedPattern = generateAdvancedPattern(
       this.patternParams, 
       this.role, 
-      this.star.getGlobalState().complexity
-    );    this.currentPattern = {
+      this.star.getGlobalState().complexity,
+      // Star 기반 랜덤 래퍼 생성 (advancedPattern 호환성)
+      {
+        nextFloat: () => rng.nextFloat(),
+        nextInt: (min: number, max: number) => rng.nextInt(min, max),
+        choice: <T>(arr: T[]) => rng.choice(arr),
+        setSeed: () => {},
+        getDomainRng: () => rng
+      } as any // 임시: advancedPattern 함수 시그니처 개선 필요
+    );
+    this.currentPattern = {
       steps: generatedPattern.steps,
       accents: generatedPattern.accents,
     };
@@ -452,10 +471,18 @@ export class Planet {
   private regeneratePattern(): void {
     if (!this.patternParams) return;
 
+    const rng = this.star.getDomainRng(`pattern-${this.id}`);
     const generatedPattern = generateAdvancedPattern(
       this.patternParams,
       this.role,
-      this.star.getGlobalState().complexity
+      this.star.getGlobalState().complexity,
+      {
+        nextFloat: () => rng.nextFloat(),
+        nextInt: (min: number, max: number) => rng.nextInt(min, max),
+        choice: <T>(arr: T[]) => rng.choice(arr),
+        setSeed: () => {},
+        getDomainRng: () => rng
+      } as any // 임시: advancedPattern 함수 시그니처 개선 필요
     );
 
     this.currentPattern = {
