@@ -55,16 +55,6 @@ export default function Planet({
       // 4. 자전
       meshRef.current.rotation.y += rotationSpeed * deltaTime;
       meshRef.current.rotation.z += tilt * deltaTime;
-
-      // 5. 빛 강도 적용
-      if (
-        meshRef.current.material &&
-        'emissiveIntensity' in meshRef.current.material
-      ) {
-        (
-          meshRef.current.material as THREE.MeshStandardMaterial
-        ).emissiveIntensity = planetBrightness;
-      }
     }
   });
 
@@ -74,7 +64,7 @@ export default function Planet({
       <meshStandardMaterial
         color={planetColor}
         emissive={isSelected ? '#ff0000' : '#000000'}
-        emissiveIntensity={isSelected ? 0.5 : 0}
+        emissiveIntensity={planetBrightness}
       />
     </mesh>
   );

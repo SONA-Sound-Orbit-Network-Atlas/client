@@ -46,7 +46,7 @@ export default function TestSliders() {
               );
             }
           }}
-          max={10}
+          max={5.0}
           min={0}
           step={0.1}
           label="행성 밝기"
@@ -75,8 +75,8 @@ export default function TestSliders() {
             }
           }}
           max={20}
-          min={1}
-          step={1}
+          min={0.1}
+          step={0.1}
           label="행성 공전 속도"
         />
         <Slider
