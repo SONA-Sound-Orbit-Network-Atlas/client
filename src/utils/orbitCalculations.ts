@@ -13,24 +13,21 @@ export function calculateOrbitPosition(
   eccentricity: number,
   angle: number
 ) {
-  // 2. 타원 궤도 계산 (이심률 적용)
+  // 타원 궤도 계산 (X-Z 평면에서만)
   const semiMajorAxis = distanceFromStar;
   const semiMinorAxis =
     distanceFromStar * Math.sqrt(1 - eccentricity * eccentricity);
 
-  // 타원 궤도 좌표 (semiMinorAxis 사용)
+  // 타원 궤도 좌표 (X-Z 평면)
   const baseX = semiMajorAxis * Math.cos(angle);
   const baseZ = semiMinorAxis * Math.sin(angle);
 
-  // 이심률에 따른 Y축 높이 조정 (타원 궤도면의 기울기)
-  const yOffset = eccentricity * semiMajorAxis * Math.sin(angle);
-
-  // 3. 기울기 적용 (Y축 회전)
+  // 기울기만 Y축에 적용 (이심률은 X-Z 평면에서만)
   const inclinationRad = (inclination * Math.PI) / 180;
   const x = baseX * Math.cos(inclinationRad) - baseZ * Math.sin(inclinationRad);
   const z = baseX * Math.sin(inclinationRad) + baseZ * Math.cos(inclinationRad);
-  const y =
-    distanceFromStar * Math.sin(inclinationRad) * Math.sin(angle) + yOffset;
+  const y = distanceFromStar * Math.sin(inclinationRad) * Math.sin(angle);
+  // yOffset 제거 - 이심률은 X-Z 평면에서만 작동
 
   return { x, y, z };
 }
