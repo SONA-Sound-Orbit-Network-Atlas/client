@@ -21,9 +21,9 @@ export default function FloatingCTAButton({
             ? 'border-2 border-white top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 shadow-[0_0_30px_rgba(255,255,255,0.2)]'
             : 'bottom-[5%] right-[5%] translate-x-0 translate-y-0 scale-70 shadow-[0_0_30px_rgba(255,255,255,0.1)]'
         }`}
-      onClick={() => navigate('/galaxy')}
+      onClick={() => navigate('/space')}
     >
-      go to Galaxy
+      go to Space
     </button>
   );
 }
