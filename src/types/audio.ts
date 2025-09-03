@@ -34,6 +34,8 @@ export interface PatternParameters {
   accentDb: number;       // 0..2
   gateLen: number;        // 0.35..0.85
   barsBetweenReroll?: number; // 패턴 재생성 주기 (4..16)
+  phase?: number;         // 0..360 (Phase 속성)
+  eccentricity?: number;  // 0..100 (Eccentricity 속성)
 }
 
 // 매핑된 저수준 오디오 파라미터 묶음 (Tri Hybrid + Dual)
