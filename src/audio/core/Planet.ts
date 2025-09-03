@@ -386,14 +386,7 @@ export class Planet {
       this.patternParams, 
       this.role, 
       this.star.getGlobalState().complexity,
-      // Star 기반 랜덤 래퍼 생성 (advancedPattern 호환성)
-      {
-        nextFloat: () => rng.nextFloat(),
-        nextInt: (min: number, max: number) => rng.nextInt(min, max),
-        choice: <T>(arr: T[]) => rng.choice(arr),
-        setSeed: () => {},
-        getDomainRng: () => rng
-      } as any // 임시: advancedPattern 함수 시그니처 개선 필요
+      rng // SeededRng는 IRandomSource와 호환
     );
     this.currentPattern = {
       steps: generatedPattern.steps,
@@ -476,13 +469,7 @@ export class Planet {
       this.patternParams,
       this.role,
       this.star.getGlobalState().complexity,
-      {
-        nextFloat: () => rng.nextFloat(),
-        nextInt: (min: number, max: number) => rng.nextInt(min, max),
-        choice: <T>(arr: T[]) => rng.choice(arr),
-        setSeed: () => {},
-        getDomainRng: () => rng
-      } as any // 임시: advancedPattern 함수 시그니처 개선 필요
+      rng // SeededRng는 IRandomSource와 호환
     );
 
     this.currentPattern = {

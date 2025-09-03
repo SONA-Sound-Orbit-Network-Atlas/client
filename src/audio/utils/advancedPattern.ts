@@ -4,6 +4,7 @@
 import type { InstrumentRole, PatternParameters, GeneratedPattern } from '../../types/audio';
 import { clamp } from './mapping';
 import { RandomManager } from './random';
+import type { IRandomSource } from '../interfaces/IRandomSource';
 
 // 역할별 패턴 특성 정의
 interface RoleCharacteristics {
@@ -113,7 +114,7 @@ function generateWeightedPattern(
   pulses: number, 
   steps: number, 
   complexity: number,
-  rng: RandomManager
+  rng: IRandomSource
 ): number[] {
   const chars = ROLE_CHARACTERISTICS[role];
   
@@ -138,7 +139,7 @@ function applyMusicalIntelligence(
   pattern: number[], 
   role: InstrumentRole, 
   chars: RoleCharacteristics,
-  rng: RandomManager
+  rng: IRandomSource
 ): number[] {
   const steps = pattern.length;
   const result = [...pattern];
@@ -210,7 +211,7 @@ function generateAdvancedAccents(
   phase: number, 
   eccentricity: number,
   role: InstrumentRole,
-  rng: RandomManager
+  rng: IRandomSource
 ): number[] {
   const accents = new Array(steps.length).fill(0);
   const chars = ROLE_CHARACTERISTICS[role];
@@ -254,7 +255,7 @@ export function generateAdvancedPattern(
   params: PatternParameters,
   role: InstrumentRole,
   globalComplexity: number = 2,
-  rng: RandomManager = RandomManager.instance
+  rng: IRandomSource = RandomManager.instance
 ): GeneratedPattern {
   // 역할별 특성 가져오기
   const characteristics = ROLE_CHARACTERISTICS[role];

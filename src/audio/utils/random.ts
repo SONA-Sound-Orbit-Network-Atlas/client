@@ -2,11 +2,10 @@
 // 동일한 seed 를 설정하면 항상 동일한 패턴/노트 초기값을 재생산할 수 있도록 합니다.
 // 내부적으로 가벼운 PRNG (mulberry32 변형) 사용.
 
-export interface SeededRng {
-  nextFloat(): number; // 0 <= x < 1
-  nextInt(min: number, max: number): number; // [min, max]
-  choice<T>(arr: T[]): T;
-}
+import type { IRandomSource } from '../interfaces/IRandomSource';
+
+// SeededRng는 IRandomSource와 동일하지만 의미적으로 분리
+export type SeededRng = IRandomSource;
 
 function hashString(str: string): number {
   let h = 2166136261 >>> 0; // FNV 기반 간단 해시
@@ -41,7 +40,7 @@ class InternalSeededRng implements SeededRng {
   choice<T>(arr: T[]): T { return arr[this.nextInt(0, arr.length - 1)]; }
 }
 
-export class RandomManager {
+export class RandomManager implements IRandomSource {
   private static _instance: RandomManager | null = null;
   private baseSeed = 0xABCDEF01;
   private rng: SeededRng = new InternalSeededRng(this.baseSeed);

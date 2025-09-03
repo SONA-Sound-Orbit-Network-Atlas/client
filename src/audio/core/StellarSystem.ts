@@ -31,13 +31,13 @@ export class StellarSystem {
     this.star.setSeed(seed);
     console.log(`🌱 StellarSystem Seed 설정 (Star로 위임): ${seed}`);
     // 재생 중인 행성 패턴 재생성하여 동일 결과 보장
-    for (const planet of this.planets.values()) {
+    Array.from(this.planets.values()).forEach(planet => {
       if (planet.getIsPlaying()) {
         // 행성 내부 regeneratePattern 은 private 이므로 stop/start 방식 사용
         planet.stopPattern();
         planet.startPattern().catch(err => console.error('Seed 재적용 패턴 시작 실패', err));
       }
-    }
+    });
   }
 
   getSeed(): number | string | null { return this.star.getSeed(); }
@@ -180,9 +180,7 @@ export class StellarSystem {
   
   // 모든 행성 패턴 정지
   stopAllPatterns(): void {
-    for (const planet of this.planets.values()) {
-      planet.stopPattern();
-    }
+    Array.from(this.planets.values()).forEach(planet => planet.stopPattern());
     console.log('⏹️ 모든 행성 패턴 정지');
   }
   
@@ -235,9 +233,7 @@ export class StellarSystem {
   dispose(): void {
     this.stopAllPatterns();
     
-    for (const planet of this.planets.values()) {
-      planet.dispose();
-    }
+    Array.from(this.planets.values()).forEach(planet => planet.dispose());
     
     this.planets.clear();
     console.log('🌌 StellarSystem 정리됨');
@@ -254,8 +250,8 @@ export class StellarSystem {
     this.star.debug();
     
     console.log('🪐 행성 목록:');
-    for (const planet of this.planets.values()) {
+    Array.from(this.planets.values()).forEach(planet => {
       console.log(`  - ${planet.getName()} (${planet.getId()}): ${planet.getIsPlaying() ? '재생중' : '정지'}`);
-    }
+    });
   }
 }
