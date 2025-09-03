@@ -1,11 +1,12 @@
-import { useRef, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import Star from './Star';
 import Planet from './Planet';
 import { useThree, useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 import { useSceneStore } from '@/stores/useSceneStore';
 import OrbitLine from './OrbitLine';
-import type { TPlanet } from '@/types/cosmos';
+import type { TPlanet, TStellarSystem } from '@/types/cosmos';
+import { Html } from '@react-three/drei';
 //항성계 컴포넌트
 
 //mock data
@@ -22,7 +23,7 @@ const mockPlanets: TPlanet[] = [
     tilt: 0,
   },
   {
-    distanceFromStar: 4,
+    distanceFromStar: 8.5,
     orbitSpeed: 0.4,
     planetSize: 0.6,
     planetColor: '#96ceb4',
@@ -33,7 +34,7 @@ const mockPlanets: TPlanet[] = [
     tilt: 0,
   },
   {
-    distanceFromStar: 2,
+    distanceFromStar: 8,
     orbitSpeed: 0.2,
     planetSize: 0.6,
     planetColor: '#feca57',
@@ -44,17 +45,23 @@ const mockPlanets: TPlanet[] = [
     tilt: 0,
   },
   {
-    distanceFromStar: 5,
+    distanceFromStar: 10,
     orbitSpeed: 0.1,
-    planetSize: 0.9,
+    planetSize: 0.8,
     planetColor: '#ff9ff3',
     rotationSpeed: 0.1,
     inclination: 15,
-    planetBrightness: 1,
+    planetBrightness: 0.1,
     eccentricity: 0.1,
     tilt: 0,
   },
 ];
+
+const mockStellarSystem: TStellarSystem = {
+  id: 1,
+  name: 'Stellar System 1',
+  planets: mockPlanets,
+};
 
 export default function StellarSystem({
   stellarSystemPos,
@@ -68,6 +75,8 @@ export default function StellarSystem({
     selectedStellarSystemId,
     viewMode,
     setSelectedStellarSystemId,
+    setSelectedStellarSystem,
+    selectedStellarSystem,
   } = useSceneStore();
 
   const ref = useRef<THREE.Group>(null);
@@ -77,6 +86,16 @@ export default function StellarSystem({
   const systemPos = new THREE.Vector3(...stellarSystemPos);
   const LOW_DETAIL_SIZE = 0.5;
   const [planets] = useState<TPlanet[]>(mockPlanets);
+
+  const onStellarSystemClicked = () => {
+    // 선택된 항성계 업데이트
+    setSelectedStellarSystemId(id);
+    setSelectedStellarSystem(mockStellarSystem);
+  };
+
+  const isSelectedSystem = useMemo(() => {
+    return viewMode === 'StellarSystem' && selectedStellarSystemId === id;
+  }, [viewMode, selectedStellarSystemId, id]);
 
   useFrame(() => {
     // 항성계 LOD 처리
@@ -107,7 +126,7 @@ export default function StellarSystem({
     <group
       ref={ref}
       position={stellarSystemPos}
-      onClick={() => setSelectedStellarSystemId(id)}
+      onClick={onStellarSystemClicked}
     >
       <group ref={detailGroupRef}>
         <Star
@@ -119,33 +138,86 @@ export default function StellarSystem({
           }
         />
         {planets.map((planet, index) => {
-          // StellarSystem 뷰에서 선택된 항성계일 때 inclination을 0으로
-          const effectiveInclination = planet.inclination;
-          // viewMode === 'StellarSystem' && selectedStellarSystemId === id
-          //   ? 0 // 위에서 보는 시점 (모든 궤도가 수평)
-          //   : planet.inclination; // 원래 기울기 유지
-
           return (
             <>
-              {viewMode === 'StellarSystem' &&
-                selectedStellarSystemId === id && (
+              {isSelectedSystem && (
+                <>
                   <OrbitLine
-                    orbitRadius={planet.distanceFromStar}
-                    inclination={effectiveInclination}
-                    eccentricity={planet.eccentricity}
+                    orbitRadius={
+                      selectedStellarSystem?.planets[index].distanceFromStar ||
+                      planet.distanceFromStar
+                    }
+                    inclination={
+                      selectedStellarSystem?.planets[index].inclination ||
+                      planet.inclination
+                    }
+                    eccentricity={
+                      selectedStellarSystem?.planets[index].eccentricity ||
+                      planet.eccentricity
+                    }
                   />
-                )}
+                  <Html position={[-40, 1, 1]}>
+                    <button onClick={() => alert('클릭!')}>UI 버튼</button>
+                  </Html>
+                </>
+              )}
               <Planet
                 key={index}
-                distanceFromStar={planet.distanceFromStar}
-                orbitSpeed={planet.orbitSpeed}
-                planetSize={planet.planetSize}
-                planetColor={planet.planetColor}
-                planetBrightness={planet.planetBrightness}
-                eccentricity={planet.eccentricity}
-                tilt={planet.tilt}
-                rotationSpeed={planet.rotationSpeed}
-                inclination={effectiveInclination}
+                index={index}
+                distanceFromStar={
+                  isSelectedSystem
+                    ? selectedStellarSystem?.planets[index].distanceFromStar ||
+                      planet.distanceFromStar
+                    : planet.distanceFromStar
+                }
+                orbitSpeed={
+                  isSelectedSystem
+                    ? selectedStellarSystem?.planets[index].orbitSpeed ||
+                      planet.orbitSpeed
+                    : planet.orbitSpeed
+                }
+                planetSize={
+                  isSelectedSystem
+                    ? selectedStellarSystem?.planets[index].planetSize ||
+                      planet.planetSize
+                    : planet.planetSize
+                }
+                planetColor={
+                  isSelectedSystem
+                    ? selectedStellarSystem?.planets[index].planetColor ||
+                      planet.planetColor
+                    : planet.planetColor
+                }
+                planetBrightness={
+                  isSelectedSystem
+                    ? selectedStellarSystem?.planets[index].planetBrightness ||
+                      planet.planetBrightness
+                    : planet.planetBrightness
+                }
+                eccentricity={
+                  isSelectedSystem
+                    ? selectedStellarSystem?.planets[index].eccentricity ||
+                      planet.eccentricity
+                    : planet.eccentricity
+                }
+                tilt={
+                  isSelectedSystem
+                    ? selectedStellarSystem?.planets[index].tilt || planet.tilt
+                    : planet.tilt
+                }
+                rotationSpeed={
+                  isSelectedSystem
+                    ? selectedStellarSystem?.planets[index].rotationSpeed ||
+                      planet.rotationSpeed
+                    : planet.rotationSpeed
+                }
+                inclination={
+                  isSelectedSystem
+                    ? selectedStellarSystem?.planets[index].inclination ||
+                      planet.inclination
+                    : planet.inclination
+                }
+                isSelectable={isSelectedSystem}
               />
             </>
           );

@@ -5,6 +5,13 @@ import { useRef } from 'react';
 import * as THREE from 'three';
 import type { TPlanet } from '@/types/cosmos';
 import { calculateOrbitPosition } from '@/utils/orbitCalculations';
+import { useSceneStore } from '@/stores/useSceneStore';
+
+interface PlanetProps extends TPlanet {
+  index: number;
+  isSelected?: boolean;
+  isSelectable?: boolean;
+}
 
 export default function Planet({
   planetSize,
@@ -16,8 +23,18 @@ export default function Planet({
   inclination,
   eccentricity,
   tilt,
-}: TPlanet) {
+  index,
+  isSelected = false,
+  isSelectable = false,
+}: PlanetProps) {
   const meshRef = useRef<THREE.Mesh>(null);
+  const { setSelectedPlanetIndex } = useSceneStore();
+
+  const onPlanetClicked = () => {
+    if (isSelectable) {
+      setSelectedPlanetIndex(index);
+    }
+  };
 
   useFrame((state, deltaTime) => {
     if (meshRef.current) {
@@ -52,9 +69,13 @@ export default function Planet({
   });
 
   return (
-    <mesh ref={meshRef}>
+    <mesh ref={meshRef} onClick={onPlanetClicked}>
       <sphereGeometry args={[planetSize, 16, 16]} />
-      <meshStandardMaterial color={planetColor} />
+      <meshStandardMaterial
+        color={planetColor}
+        emissive={isSelected ? '#ff0000' : '#000000'}
+        emissiveIntensity={isSelected ? 0.5 : 0}
+      />
     </mesh>
   );
 }
