@@ -1,4 +1,7 @@
-export const galaxies = [
+import type { GalaxyListData } from '@/types/galaxy';
+
+// 더미 데이터 : 은하 리스트
+const galaxyDummy: GalaxyListData[] = [
   {
     rank: 1,
     galaxyName: 'Galaxy 1',
@@ -27,3 +30,9 @@ export const galaxies = [
     myFavorite: false,
   },
 ];
+const galaxies: GalaxyListData[] = [];
+for (let i = 0; i < 3; i++) {
+  galaxies.push(...galaxyDummy);
+}
+
+export default galaxies;

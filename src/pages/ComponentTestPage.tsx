@@ -446,7 +446,7 @@ const ComponentTestPage: React.FC = () => {
         </section>
 
         {/* Galaxy Systems 테스트 */}
-        <section className="mb-12 p-6 border rounded-lg">
+        <section className="mb-12 p-6 border rounded-lg h-[500px] overflow-y-auto">
           <h2 className="text-2xl font-semibold mb-4 text-foreground">
             Galaxy Systems 컴포넌트
           </h2>
