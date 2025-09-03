@@ -1,10 +1,10 @@
-import { Grid, Stars } from '@react-three/drei';
+import { Grid } from '@react-three/drei';
 import * as THREE from 'three';
 import Galaxy from './cosmos/Galaxy';
 import { useSceneStore } from '@/stores/useSceneStore';
 import { useEffect } from 'react';
 import MainCamera from './systems/MainCamera';
-import { EffectComposer, Bloom } from '@react-three/postprocessing';
+import BackgroundStars from './cosmos/BackgroundStars';
 
 // 화면 표시
 export default function Scene() {
@@ -30,17 +30,6 @@ export default function Scene() {
         <Galaxy />
       </group>
 
-      {/* 배경 */}
-      <Stars
-        radius={200}
-        depth={50}
-        count={1000}
-        factor={4}
-        saturation={0}
-        fade
-        speed={1}
-      />
-
       {/* 그리드 헬퍼 (공간감을 위해) */}
       <Grid args={[20, 20]} />
 
@@ -48,6 +37,9 @@ export default function Scene() {
       <primitive object={axesHelper} />
 
       <MainCamera />
+
+      {/* 배경 */}
+      <BackgroundStars />
     </>
   );
 }

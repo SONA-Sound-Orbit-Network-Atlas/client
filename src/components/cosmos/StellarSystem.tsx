@@ -13,7 +13,7 @@ const mockPlanets: TPlanet[] = [
   {
     distanceFromStar: 3,
     orbitSpeed: 0.3,
-    planetSize: 0.8,
+    planetSize: 0.4,
     planetColor: '#FFFFFF',
     rotationSpeed: 0.3,
     inclination: -180,
@@ -24,7 +24,7 @@ const mockPlanets: TPlanet[] = [
   {
     distanceFromStar: 4,
     orbitSpeed: 0.4,
-    planetSize: 1.2,
+    planetSize: 0.6,
     planetColor: '#96ceb4',
     rotationSpeed: 0.4,
     inclination: 120,
@@ -75,7 +75,7 @@ export default function StellarSystem({
   const lowDetailMesh = useRef<THREE.Mesh>(null);
   const { camera } = useThree();
   const systemPos = new THREE.Vector3(...stellarSystemPos);
-
+  const LOW_DETAIL_SIZE = 0.5;
   const [planets] = useState<TPlanet[]>(mockPlanets);
 
   useFrame(() => {
@@ -113,7 +113,7 @@ export default function StellarSystem({
         <Star
           position={[0, 0, 0]}
           color="#ff6b6b"
-          size={1.5}
+          size={1}
           onClick={() =>
             setFocusedPosition(new THREE.Vector3(...stellarSystemPos))
           }
@@ -157,7 +157,7 @@ export default function StellarSystem({
           setFocusedPosition(new THREE.Vector3(...stellarSystemPos))
         }
       >
-        <sphereGeometry args={[1.5, 16, 16]} />
+        <sphereGeometry args={[LOW_DETAIL_SIZE, 4, 4]} />
         <meshStandardMaterial
           color="#ff6b6b"
           emissive="#ffffff"
