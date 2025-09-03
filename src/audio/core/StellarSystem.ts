@@ -61,7 +61,7 @@ export class StellarSystem {
   
   // 새 행성 추가
   addPlanet(role: InstrumentRole, customId?: string): string {
-    const planet = new Planet(role, customId);
+    const planet = new Planet(role, this.star, customId); // Star 인스턴스 주입
     const planetId = planet.getId();
     
     this.planets.set(planetId, planet);

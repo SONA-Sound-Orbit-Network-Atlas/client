@@ -23,6 +23,9 @@ export class Planet {
   private role: InstrumentRole;
   private instrument: Instrument;
   private isPlaying = false;
+  
+  // === 의존성 주입: Star 인스턴스 ===
+  private star: Star;
 
   // === Star 클락 동기화 관련 ===
   private currentPattern: { steps: number[]; accents: number[] } | null = null;
@@ -43,10 +46,11 @@ export class Planet {
     phase: Math.random() * 360, // 0-360도
   };
 
-  constructor(role: InstrumentRole, customId?: string) {
+  constructor(role: InstrumentRole, star: Star, customId?: string) {
     this.id = customId || `planet-${role}-${Date.now()}`;
     this.name = `${role} Planet`;
     this.role = role;
+    this.star = star; // 의존성 주입
 
     // 역할에 따른 전용 악기 생성
     this.instrument = this.createInstrumentForRole(role);
@@ -366,23 +370,19 @@ export class Planet {
       return;
     }
 
-    const star = Star.instance;
-
     // 패턴 파라미터 계산 및 고급 패턴 생성
     this.patternParams = this.calculatePatternParams();
     const generatedPattern = generateAdvancedPattern(
-      this.patternParams,
-      this.role,
-      star.getGlobalState().complexity
-    );
-
-    this.currentPattern = {
+      this.patternParams, 
+      this.role, 
+      this.star.getGlobalState().complexity
+    );    this.currentPattern = {
       steps: generatedPattern.steps,
       accents: generatedPattern.accents,
     };
 
     // Star 클락 리스너 등록
-    star.addClockListener(
+    this.star.addClockListener(
       this.id,
       (beat: number, bar: number, sixteenth: number) => {
         this.onClockTick(beat, bar, sixteenth);
@@ -390,7 +390,7 @@ export class Planet {
     );
 
     // Star 클락 시작 (아직 시작되지 않았다면)
-    star.startClock();
+    this.star.startClock();
 
     this.isPlaying = true;
     this.lastPatternUpdate = 0; // 초기값으로 설정
@@ -452,11 +452,10 @@ export class Planet {
   private regeneratePattern(): void {
     if (!this.patternParams) return;
 
-    const star = Star.instance;
     const generatedPattern = generateAdvancedPattern(
       this.patternParams,
       this.role,
-      star.getGlobalState().complexity
+      this.star.getGlobalState().complexity
     );
 
     this.currentPattern = {
@@ -486,8 +485,7 @@ export class Planet {
       return;
     }
 
-    const star = Star.instance;
-    star.removeClockListener(this.id);
+    this.star.removeClockListener(this.id);
 
     this.isPlaying = false;
     this.currentPattern = null;
@@ -498,8 +496,7 @@ export class Planet {
 
   // 속성에서 패턴 파라미터 계산 (새로운 SONA 매핑 사용)
   private calculatePatternParams(): PatternParameters {
-    const star = Star.instance;
-    const globalState = star.getGlobalState();
+    const globalState = this.star.getGlobalState();
 
     // === 새로운 SONA 매핑 시스템 사용 ===
 
@@ -588,8 +585,7 @@ export class Planet {
 
   // 역할별 노트 생성 (새로운 노트 레인지 계산 규칙 적용)
   private generateNoteForStep(stepIdx: number): string {
-    const star = Star.instance;
-    const scaleNotes = star.getScaleNotes();
+    const scaleNotes = this.star.getScaleNotes();
 
     // === 새로운 노트 레인지 계산 규칙 ===
     // center = baseMidi(역할별) + 12*octave → range = center ± widthSemi/2 → 항성 Key/Scale 양자화 → 역할별 클램프
@@ -702,7 +698,7 @@ export class Planet {
     }
 
     // 항성 Key/Scale로 양자화
-    const quantizedMidi = star.quantizeNote(rawMidi);
+    const quantizedMidi = this.star.quantizeNote(rawMidi);
 
     // MIDI를 노트명으로 변환
     const finalNote = this.midiToNoteName(quantizedMidi);
@@ -758,9 +754,8 @@ export class Planet {
 
   // 노트 양자화 (항성 키/스케일 적용)
   private quantizeNote(note: string): string {
-    const star = Star.instance;
     const midiNote = this.noteNameToMidi(note);
-    const quantizedMidi = star.quantizeNote(midiNote);
+    const quantizedMidi = this.star.quantizeNote(midiNote);
     return this.midiToNoteName(quantizedMidi);
   }
 
