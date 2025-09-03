@@ -15,14 +15,14 @@ import PanelTitle from '../PanelTitle';
 
 interface GalaxySystemSortProps {
   sortOptions: SortLabel[];
-  setPosition: (position: SortLabel) => void;
-  position: SortLabel;
+  setSort: (sort: SortLabel) => void;
+  sort: SortLabel;
 }
 
 export default function GalaxySystemSort({
   sortOptions,
-  setPosition,
-  position,
+  setSort,
+  sort,
 }: GalaxySystemSortProps) {
   const [isOpen, setIsOpen] = useState(false);
 
@@ -32,7 +32,7 @@ export default function GalaxySystemSort({
       <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
         <DropdownMenuTrigger asChild>
           <Button color="tertiary" className="w-56" textAlign="left">
-            {position}
+            {sort}
             <IoMdArrowDropdown
               className={`ml-auto transition-transform duration-200 ${
                 isOpen ? 'rotate-180' : 'rotate-0'
@@ -42,8 +42,8 @@ export default function GalaxySystemSort({
         </DropdownMenuTrigger>
         <DropdownMenuContent className="w-56">
           <DropdownMenuRadioGroup
-            value={position}
-            onValueChange={(value) => setPosition(value as SortLabel)}
+            value={sort}
+            onValueChange={(value) => setSort(value as SortLabel)}
           >
             {sortOptions.map((option) => (
               <DropdownMenuRadioItem key={option} value={option}>
