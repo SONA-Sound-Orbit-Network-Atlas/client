@@ -23,9 +23,17 @@ export default function Planet({
       // 1. 공전 각도 계산
       const currentAngle = orbitSpeed * state.clock.elapsedTime;
 
-      // 2. 기본 원형 궤도 좌표
-      const baseX = distanceFromStar * Math.cos(currentAngle);
-      const baseZ = distanceFromStar * Math.sin(currentAngle);
+      // 2. 타원 궤도 계산 (이심률 적용)
+      const semiMajorAxis = distanceFromStar;
+      const semiMinorAxis =
+        distanceFromStar * Math.sqrt(1 - eccentricity * eccentricity);
+
+      // 타원 궤도 좌표 (semiMinorAxis 사용)
+      const baseX = semiMajorAxis * Math.cos(currentAngle);
+      const baseZ = semiMinorAxis * Math.sin(currentAngle);
+
+      // 이심률에 따른 Y축 높이 조정 (타원 궤도면의 기울기)
+      const yOffset = eccentricity * semiMajorAxis * Math.sin(currentAngle);
 
       // 3. 기울기 적용 (Y축 회전)
       const inclinationRad = (inclination * Math.PI) / 180;
@@ -34,7 +42,8 @@ export default function Planet({
       const z =
         baseX * Math.sin(inclinationRad) + baseZ * Math.cos(inclinationRad);
       const y =
-        distanceFromStar * Math.sin(inclinationRad) * Math.sin(currentAngle);
+        distanceFromStar * Math.sin(inclinationRad) * Math.sin(currentAngle) +
+        yOffset;
 
       // 4. 위치 업데이트
       meshRef.current.position.set(x, y, z);

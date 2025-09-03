@@ -18,7 +18,7 @@ const mockPlanets: TPlanet[] = [
     rotationSpeed: 0.3,
     inclination: -180,
     planetBrightness: 1,
-    eccentricity: 0.1,
+    eccentricity: 0.5,
     tilt: 0,
   },
   {
@@ -40,7 +40,7 @@ const mockPlanets: TPlanet[] = [
     rotationSpeed: 0.2,
     inclination: -35,
     planetBrightness: 1,
-    eccentricity: 0.1,
+    eccentricity: 0.5,
     tilt: 0,
   },
   {
@@ -120,10 +120,10 @@ export default function StellarSystem({
         />
         {planets.map((planet, index) => {
           // StellarSystem 뷰에서 선택된 항성계일 때 inclination을 0으로
-          const effectiveInclination =
-            viewMode === 'StellarSystem' && selectedStellarSystemId === id
-              ? 0 // 위에서 보는 시점 (모든 궤도가 수평)
-              : planet.inclination; // 원래 기울기 유지
+          const effectiveInclination = planet.inclination;
+          // viewMode === 'StellarSystem' && selectedStellarSystemId === id
+          //   ? 0 // 위에서 보는 시점 (모든 궤도가 수평)
+          //   : planet.inclination; // 원래 기울기 유지
 
           return (
             <>
@@ -132,6 +132,7 @@ export default function StellarSystem({
                   <OrbitLine
                     orbitRadius={planet.distanceFromStar}
                     inclination={effectiveInclination}
+                    eccentricity={planet.eccentricity}
                   />
                 )}
               <Planet
