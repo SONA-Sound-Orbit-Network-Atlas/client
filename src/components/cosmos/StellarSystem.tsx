@@ -156,9 +156,6 @@ export default function StellarSystem({
                       planet.eccentricity
                     }
                   />
-                  <Html position={[-40, 1, 1]}>
-                    <button onClick={() => alert('클릭!')}>UI 버튼</button>
-                  </Html>
                 </>
               )}
               <Planet
