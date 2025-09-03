@@ -5,6 +5,11 @@ import type { InstrumentRole, PatternParameters, GeneratedPattern } from '../../
 import { clamp } from './mapping';
 import { RandomManager } from './random';
 import type { IRandomSource } from '../interfaces/IRandomSource';
+import { 
+  enhancePatternMusically, 
+  generateMarkovPattern, 
+  calculateMusicalQuality 
+} from './musicalRules';
 
 // 역할별 패턴 특성 정의
 interface RoleCharacteristics {
@@ -125,84 +130,23 @@ function generateWeightedPattern(
     Math.min(chars.preferredPulses[1], steps)
   );
   
-  // 기본 Euclidean 패턴 생성
-  let pattern = advancedEuclideanRhythm(adjustedPulses, steps);
+  // Euclidean과 Markov 패턴을 혼합하여 더 음악적인 결과 생성
+  const targetDensity = adjustedPulses / steps;
   
-  // 역할별 음악적 조정
-  pattern = applyMusicalIntelligence(pattern, role, chars, rng);
-  
-  return pattern;
-}
-
-// 음악적 지능 적용 (각 역할에 맞는 음악적 특성 부여)
-function applyMusicalIntelligence(
-  pattern: number[], 
-  role: InstrumentRole, 
-  chars: RoleCharacteristics,
-  rng: IRandomSource
-): number[] {
-  const steps = pattern.length;
-  const result = [...pattern];
-  
-  switch (role) {
-  case 'BASS':
-      // 베이스: 1박과 3박 강조, 4분음표 기반
-      for (let i = 0; i < steps; i += 4) {
-    if (i < steps && rng.nextFloat() < 0.8) result[i] = 1; // 1박 강조
-    if (i + 2 < steps && rng.nextFloat() < 0.4) result[i + 2] = 1; // 3박 약간 강조
-      }
-      break;
-      
-  case 'DRUM':
-      // 드럼: 백비트 강조 (2, 4박)
-      for (let i = 1; i < steps; i += 4) {
-    if (i < steps && rng.nextFloat() < 0.9) result[i] = 1; // 2박 강조
-    if (i + 2 < steps && rng.nextFloat() < 0.9) result[i + 2] = 1; // 4박 강조
-      }
-      break;
-      
-  case 'MELODY':
-      // 멜로디: 싱코페이션과 다양한 리듬
-      for (let i = 0; i < steps; i++) {
-    if (rng.nextFloat() < chars.syncopationTendency) {
-          // 싱코페이션: 강박을 약박으로 이동
-          if (result[i] === 1 && i + 1 < steps) {
-            result[i] = 0;
-            result[i + 1] = 1;
-          }
-        }
-      }
-      break;
-      
-    case 'ARPEGGIO': {
-      // 아르페지오: 빠른 연속음, 균등한 분배
-      const arpPulses = Math.max(6, Math.min(16, pattern.filter(x => x === 1).length));
-      return advancedEuclideanRhythm(arpPulses, steps);
-    }
-      
-  case 'PAD':
-      // 패드: 긴 지속음, 적은 어택
-      for (let i = 0; i < steps; i++) {
-    if (result[i] === 1 && rng.nextFloat() < chars.restImportance) {
-          // 일부 노트를 제거해서 공간감 확보
-          if (i % 4 !== 0) result[i] = 0; // 강박 제외하고 제거
-        }
-      }
-      break;
-      
-  case 'CHORD':
-      // 코드: 화성적 리듬, 2박자 또는 4박자
-      for (let i = 0; i < steps; i++) {
-    if (i % 2 === 0 && rng.nextFloat() < 0.7) {
-          result[i] = 1; // 짝수 박자 강조
-    } else if (i % 2 === 1 && rng.nextFloat() < 0.2) {
-          result[i] = 0; // 홀수 박자 약화
-        }
-      }
-      break;
+  // 50% 확률로 Euclidean 또는 Markov 패턴 선택
+  let pattern: number[];
+  if (rng.nextFloat() < 0.5) {
+    // 기본 Euclidean 패턴 생성
+    pattern = advancedEuclideanRhythm(adjustedPulses, steps);
+  } else {
+    // Markov 체인 패턴 생성 (더 자연스러운 플로우)
+    pattern = generateMarkovPattern(steps, targetDensity, role, rng);
   }
   
-  return result;
+  // 음악적 규칙 적용으로 패턴 개선
+  pattern = enhancePatternMusically(pattern, role, rng);
+  
+  return pattern;
 }
 
 // 고급 액센트 패턴 생성 (Phase + Eccentricity 기반)
@@ -325,28 +269,29 @@ function applyRoleGuardrails(params: PatternParameters, role: InstrumentRole): P
 
 // 패턴 품질 평가 (음악적 품질 점수)
 export function evaluatePatternQuality(pattern: GeneratedPattern, role: InstrumentRole): number {
-  const { steps, accents } = pattern;
-  const characteristics = ROLE_CHARACTERISTICS[role];
+  const { steps } = pattern;
   
-  let score = 0;
+  // 새로운 음악적 품질 계산 사용
+  const musicalQuality = calculateMusicalQuality(steps, role);
+  
+  let score = musicalQuality; // 기본 점수는 음악적 품질
+  
+  // 기존 평가 요소들을 보조 점수로 활용
   
   // 1. 밀도 점수 (역할별 선호 밀도와의 일치도)
+  const characteristics = ROLE_CHARACTERISTICS[role];
   const density = steps.filter(x => x === 1).length / steps.length;
   const idealDensity = (characteristics.preferredPulses[0] + characteristics.preferredPulses[1]) / (2 * steps.length);
   const densityScore = 1 - Math.abs(density - idealDensity);
-  score += densityScore * 0.3;
+  score += densityScore * 0.1; // 보조 점수로 가중치 감소
   
   // 2. 리듬적 일관성 점수
   const rhythmScore = calculateRhythmConsistency(steps);
-  score += rhythmScore * 0.3;
+  score += rhythmScore * 0.1;
   
   // 3. 액센트 분포 점수
-  const accentScore = calculateAccentDistribution(accents);
-  score += accentScore * 0.2;
-  
-  // 4. 역할별 특성 점수
-  const roleScore = calculateRoleSpecificScore(steps, role);
-  score += roleScore * 0.2;
+  const accentScore = calculateAccentDistribution(pattern.accents);
+  score += accentScore * 0.1;
   
   return clamp(score, 0, 1);
 }
@@ -383,22 +328,4 @@ function calculateAccentDistribution(accents: number[]): number {
   const idealRatio = 0.2;
   
   return Math.max(0, 1 - Math.abs(accentRatio - idealRatio) / idealRatio);
-}
-
-// 역할별 특성 점수
-function calculateRoleSpecificScore(steps: number[], role: InstrumentRole): number {
-  switch (role) {
-    case 'BASS':
-      // 1박 강조 확인
-      return steps[0] === 1 ? 1 : 0.5;
-      
-    case 'DRUM': {
-      // 백비트 확인 (2, 4박)
-      const backbeatScore = ((steps[4] || 0) + (steps[12] || 0)) / 2;
-      return backbeatScore;
-    }
-      
-    default:
-      return 1; // 기본 점수
-  }
 }
