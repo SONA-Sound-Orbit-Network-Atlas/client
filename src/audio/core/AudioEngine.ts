@@ -1,5 +1,6 @@
-// AudioEngine - Tone.Transport 및 글로벌 파라미터 관리
-// 항성(Star) 상태와 패턴 루프들을 중앙에서 관리합니다.
+// AudioEngine - 저수준 Tone.js 제어 서비스
+// 상태를 갖지 않고, Star나 StellarSystem으로부터 값을 직접 전달받아 Tone.js를 제어합니다.
+// 단일 진실 공급원(Single Source of Truth): Star.ts가 모든 전역 상태를 관리
 
 import * as Tone from 'tone';
 import { generatePattern } from '../utils/pattern';
@@ -9,15 +10,6 @@ import type { PatternParameters, GeneratedPattern, StarGlobalState, KeyName, Sca
 export class AudioEngine {
   private static _instance: AudioEngine | null = null;
   private _initialized = false;
-  
-  // 항성(Star) 전역 상태
-  public star: StarGlobalState = {
-    bpm: 120,
-    volume: 70,
-    key: 'C',
-    scale: 'Major',
-    complexity: 2
-  };
   
   // 패턴 루프 관리
   private activeLoops: Tone.Loop[] = [];
@@ -46,14 +38,21 @@ export class AudioEngine {
   }
 
   // 오디오 엔진 초기화 (사용자 제스처 후 호출 필요)
-  async init(): Promise<void> {
+  async init(initialState?: StarGlobalState): Promise<void> {
     if (this._initialized) return;
     
     await Tone.start();
     
-    // Transport 설정
-    Tone.Transport.bpm.value = this.star.bpm;
-    Tone.Destination.volume.value = this.dbFromVolume(this.star.volume);
+    // Transport 설정 (초기 상태가 있다면 적용)
+    if (initialState) {
+      Tone.Transport.bpm.value = initialState.bpm;
+      Tone.Destination.volume.value = this.dbFromVolume(initialState.volume);
+    } else {
+      // 기본 설정
+      Tone.Transport.bpm.value = 120;
+      Tone.Destination.volume.value = this.dbFromVolume(70);
+    }
+    
     Tone.Transport.swing = 0; // 기본 스윙 0
     Tone.Transport.swingSubdivision = '16n';
     
@@ -74,26 +73,23 @@ export class AudioEngine {
     return this._initialized;
   }
 
-  // 항성 상태 업데이트
-  updateStar(partial: Partial<StarGlobalState>): void {
-    this.star = { ...this.star, ...partial };
+  // 전역 상태 적용 (Star에서 직접 호출)
+  applyGlobalState(state: StarGlobalState): void {
+    if (!this._initialized) return;
     
     // Transport에 즉시 반영
-    if (partial.bpm) {
-      Tone.Transport.bpm.rampTo(this.star.bpm, 0.2);
-    }
-    if (partial.volume !== undefined) {
-      Tone.Destination.volume.rampTo(this.dbFromVolume(this.star.volume), 0.3);
-    }
+    Tone.Transport.bpm.rampTo(state.bpm, 0.2);
+    Tone.Destination.volume.rampTo(this.dbFromVolume(state.volume), 0.3);
   }
 
-  // 패턴 루프 생성
+  // 패턴 루프 생성 (복잡도를 매개변수로 받음)
   createPatternLoop(
     params: PatternParameters, 
+    complexity: number,
     trigger: (stepIdx: number, accent: boolean, time: number) => void
   ): Tone.Loop {
     // 복잡도(Complexity)에 따른 pulses 가중
-    const complexityFactor = 1 + 0.25 * (this.star.complexity - 1); // 1, 1.25, 1.5
+    const complexityFactor = 1 + 0.25 * (complexity - 1); // 1, 1.25, 1.5
     const adjustedParams: PatternParameters = {
       ...params,
       pulses: Math.min(
@@ -218,9 +214,9 @@ export class AudioEngine {
     }
   }
 
-  // 노트 양자화 (항성 키/스케일 적용)
-  quantize(noteMidi: number): number {
-    return quantizeToScale(noteMidi, this.star.key as KeyName, this.star.scale as ScaleName);
+  // 노트 양자화 (키/스케일을 매개변수로 받음)
+  quantize(noteMidi: number, key: KeyName, scale: ScaleName): number {
+    return quantizeToScale(noteMidi, key, scale);
   }
 
   // 이펙트 노드 반환 (악기에서 사용)

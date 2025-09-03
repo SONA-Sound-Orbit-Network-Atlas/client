@@ -169,10 +169,10 @@ export class Star {
     this.properties[property] = value;
     this.updateGlobalState();
     
-    // AudioEngine과 Transport에 즉시 반영
+    // AudioEngine에 전역 상태 적용
     const audioEngine = AudioEngine.instance;
     if (audioEngine.isReady()) {
-      audioEngine.updateStar(this.globalState);
+      audioEngine.applyGlobalState(this.globalState);
       
       // BPM 변경 시 Transport 업데이트
       if (property === 'spin') {
@@ -190,7 +190,7 @@ export class Star {
     
     const audioEngine = AudioEngine.instance;
     if (audioEngine.isReady()) {
-      audioEngine.updateStar(this.globalState);
+      audioEngine.applyGlobalState(this.globalState);
       
       // BPM 변경이 포함된 경우 Transport 업데이트
       if ('spin' in props) {

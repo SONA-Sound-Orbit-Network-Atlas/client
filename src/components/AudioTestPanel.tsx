@@ -4,7 +4,7 @@ import type {
   PlanetPhysicalProperties, 
   StarGlobalState
 } from '../types/audio';
-import { SolarSystem } from '../audio/core/SolarSystem';
+import { StellarSystem } from '../audio/core/StellarSystem';
 
 // 간소화된 행성 인터페이스 (UI용)
 interface PlanetUI {
@@ -15,10 +15,10 @@ interface PlanetUI {
   isPlaying: boolean;
 }
 
-// 오디오 테스트 패널 컴포넌트 - 새로운 SolarSystem 아키텍처 사용
+// 오디오 테스트 패널 컴포넌트 - 새로운 StellarSystem 아키텍처 사용
 const AudioTestPanel: React.FC = () => {
-  // SolarSystem 인스턴스 가져오기 (싱글톤)
-  const solarSystem = SolarSystem.instance;
+  // StellarSystem 인스턴스 가져오기 (싱글톤)
+  const stellarSystem = StellarSystem.instance;
   
   // UI 상태 관리
   const [planets, setPlanets] = useState<PlanetUI[]>([]);
@@ -35,13 +35,13 @@ const AudioTestPanel: React.FC = () => {
   // 초기 상태 로딩
   useEffect(() => {
     const loadInitialState = () => {
-      const currentPlanets = solarSystem.getPlanets();
+      const currentPlanets = stellarSystem.getPlanets();
       setPlanets(currentPlanets);
       
-      const currentStarProperties = solarSystem.getStarProperties();
+      const currentStarProperties = stellarSystem.getStarProperties();
       setStarProperties(currentStarProperties);
       
-      const currentGlobalState = solarSystem.getStarGlobalState();
+      const currentGlobalState = stellarSystem.getStarGlobalState();
       setStarGlobalState(currentGlobalState);
     };
     
@@ -51,27 +51,27 @@ const AudioTestPanel: React.FC = () => {
     const interval = setInterval(loadInitialState, 1000);
     
     return () => clearInterval(interval);
-  }, [solarSystem]);
+  }, [stellarSystem]);
 
   // 오디오 시스템 초기화
   const initAudio = async () => {
     try {
-      console.log('🌌 SONA SolarSystem 초기화 시작...');
+      console.log('🌌 SONA StellarSystem 초기화 시작...');
       
-      await solarSystem.initialize();
+      await stellarSystem.initialize();
       setEngineReady(true);
       
       // 초기 상태 다시 로딩
-      const currentStarProperties = solarSystem.getStarProperties();
+      const currentStarProperties = stellarSystem.getStarProperties();
       setStarProperties(currentStarProperties);
       
-      const currentGlobalState = solarSystem.getStarGlobalState();
+      const currentGlobalState = stellarSystem.getStarGlobalState();
       setStarGlobalState(currentGlobalState);
       
-      console.log('🎉 SONA SolarSystem 초기화 완료!');
+      console.log('🎉 SONA StellarSystem 초기화 완료!');
     } catch (error) {
-      console.error('❌ SolarSystem 초기화 실패:', error);
-      alert(`SolarSystem 초기화에 실패했습니다: ${error}`);
+      console.error('❌ StellarSystem 초기화 실패:', error);
+      alert(`StellarSystem 초기화에 실패했습니다: ${error}`);
     }
   };
 
@@ -82,18 +82,18 @@ const AudioTestPanel: React.FC = () => {
       return;
     }
     
-    const planetId = solarSystem.addPlanet(role);
+  const planetId = stellarSystem.addPlanet(role);
     
-    // UI 상태 업데이트
-    const newPlanets = solarSystem.getPlanets();
-    setPlanets(newPlanets);
+  // UI 상태 업데이트
+  const newPlanets = stellarSystem.getPlanets();
+  setPlanets(newPlanets);
     
-    console.log(`🪐 ${role} 행성 추가됨 (ID: ${planetId})`);
+  console.log(`🪐 ${role} 행성 추가됨 (ID: ${planetId})`);
   };
 
   // 행성 속성 업데이트
   const updatePlanetProp = (id: string, key: keyof PlanetPhysicalProperties, value: number) => {
-    const success = solarSystem.updatePlanetProperty(id, key, value);
+  const success = stellarSystem.updatePlanetProperty(id, key, value);
     
     if (success) {
       // UI 상태 업데이트
@@ -109,7 +109,7 @@ const AudioTestPanel: React.FC = () => {
 
   // 행성 패턴 토글
   const togglePattern = async (id: string) => {
-    const isNowPlaying = await solarSystem.togglePlanetPattern(id);
+  const isNowPlaying = await stellarSystem.togglePlanetPattern(id);
     
     // UI 상태 업데이트
     setPlanets(prev => prev.map(planet => 
@@ -124,7 +124,7 @@ const AudioTestPanel: React.FC = () => {
 
   // 행성 삭제
   const removePlanet = (id: string) => {
-    const success = solarSystem.removePlanet(id);
+  const success = stellarSystem.removePlanet(id);
     
     if (success) {
       // UI 상태 업데이트
@@ -134,7 +134,7 @@ const AudioTestPanel: React.FC = () => {
 
   // 모든 패턴 정지
   const stopAllPatterns = () => {
-    solarSystem.stopAllPatterns();
+  stellarSystem.stopAllPatterns();
     
     // UI 상태 업데이트
     setPlanets(prev => prev.map(planet => ({ ...planet, isPlaying: false })));
@@ -142,13 +142,13 @@ const AudioTestPanel: React.FC = () => {
 
   // 항성 속성 업데이트
   const updateStarProperty = (property: 'spin' | 'brightness' | 'color' | 'size', value: number) => {
-    solarSystem.updateStarProperty(property, value);
+  stellarSystem.updateStarProperty(property, value);
     
     // UI 상태 업데이트
     setStarProperties(prev => ({ ...prev, [property]: value }));
     
     // 전역 상태도 업데이트
-    const newGlobalState = solarSystem.getStarGlobalState();
+  const newGlobalState = stellarSystem.getStarGlobalState();
     setStarGlobalState(newGlobalState);
     
     console.log(`⭐ 항성 ${property} → ${value} | 전역: ${JSON.stringify(newGlobalState)}`);
@@ -239,7 +239,7 @@ const AudioTestPanel: React.FC = () => {
   return (
     <div className="p-4 space-y-6 bg-gray-900 text-white rounded-lg">
       <h2 className="text-2xl font-bold text-center">🌌 SONA Audio Test Panel</h2>
-      <p className="text-center text-gray-400 text-sm">새로운 SolarSystem 아키텍처 기반 | Tri Hybrid + Dual 매핑</p>
+  <p className="text-center text-gray-400 text-sm">새로운 StellarSystem 아키텍처 기반 | Tri Hybrid + Dual 매핑</p>
       
       {/* 도메인 구분 안내 */}
       <div className="bg-gray-800 p-3 rounded-lg border border-gray-600">
@@ -286,7 +286,7 @@ const AudioTestPanel: React.FC = () => {
       <div className="text-center bg-gray-800 p-4 rounded-lg">
         <div className="mb-3">
           <p className="mb-2">
-            SolarSystem: 
+            StellarSystem: 
             <span className={`ml-2 px-2 py-1 rounded ${
               engineReady 
                 ? 'bg-green-600 text-white' 
@@ -303,7 +303,7 @@ const AudioTestPanel: React.FC = () => {
               onClick={initAudio}
               className="px-6 py-3 bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors font-semibold"
             >
-              🌌 SONA SolarSystem 시작
+              🌌 SONA StellarSystem 시작
             </button>
             <p className="text-sm text-gray-400">
               브라우저 정책상 사용자 클릭 후에만 오디오를 시작할 수 있습니다
@@ -313,7 +313,7 @@ const AudioTestPanel: React.FC = () => {
         
         {engineReady && (
           <div className="text-green-400">
-            ✅ SolarSystem이 준비되었습니다! 행성을 추가하고 패턴을 재생해보세요.
+            ✅ StellarSystem이 준비되었습니다! 행성을 추가하고 패턴을 재생해보세요.
           </div>
         )}
       </div>
