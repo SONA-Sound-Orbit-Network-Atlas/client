@@ -1,5 +1,4 @@
-import React from 'react';
-import { cn } from '@/lib/utils';
+import { mergeClassNames } from '@/utils/mergeClassNames';
 import { useSidebarStore } from '@/stores/sidebarStore';
 import SidebarItem from './SidebarItem';
 import { menuItems } from './constants';
@@ -12,7 +11,7 @@ export default function PrimarySidebar() {
 
   return (
     <div
-      className={cn(
+      className={mergeClassNames(
         'w-16 bg-gray-surface border-r border-gray-border',
         'p-3 flex flex-col justify-between'
       )}

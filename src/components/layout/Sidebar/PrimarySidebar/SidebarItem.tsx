@@ -1,5 +1,4 @@
-import React from 'react';
-import { cn } from '@/lib/utils';
+import { mergeClassNames } from '@/utils/mergeClassNames';
 import { sectionStyles } from './constants';
 
 interface SidebarItemProps {
@@ -23,7 +22,7 @@ export default function SidebarItem({
 
   return (
     <div
-      className={cn(
+      className={mergeClassNames(
         'w-12 h-12 rounded-lg cursor-pointer transition-all duration-200',
         'flex items-center justify-center',
         isSelected

@@ -1,5 +1,4 @@
-import React from 'react';
-import { cn } from '@/lib/utils';
+import { mergeClassNames } from '@/utils/mergeClassNames';
 import { useSidebarStore } from '@/stores/sidebarStore';
 import { FiX } from 'react-icons/fi';
 import MenuContent from './MenuContent';
@@ -16,7 +15,7 @@ export default function SecondarySidebar() {
 
   return (
     <div
-      className={cn(
+      className={mergeClassNames(
         'w-64 bg-gray-surface border-r border-gray-border',
         'p-4 flex flex-col gap-4'
       )}
