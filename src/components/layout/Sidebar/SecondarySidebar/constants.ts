@@ -3,8 +3,8 @@ export interface MenuContent {
 }
 
 export const menuContents: Record<string, MenuContent> = {
-  user: {
-    title: '사용자 관리',
+  profile: {
+    title: '프로필',
   },
   galaxy: {
     title: '은하 관리',
