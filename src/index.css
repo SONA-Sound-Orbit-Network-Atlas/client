@@ -48,6 +48,13 @@
   --color-text-white: #f3f3f3;
   --color-text-secondary: #a0aec0;
   --color-text-muted: #718096;
+
+  --color-planet-1: #fbbf24;
+  --color-planet-2: #22d3ee;
+  --color-planet-3: #8b5cf6;
+  --color-planet-4: #ec4899;
+  --color-planet-5: #10b981;
+  --color-planet-6: #f59e0b;
 }
 
 @theme inline {

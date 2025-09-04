@@ -8,23 +8,23 @@
 import { useState } from 'react';
 import { sortOptions } from '@/types/galaxy';
 import type { SortLabel } from '@/types/galaxy';
-import GalaxySystemSort from './GalaxySystemSort';
-import GalaxySystemList from './GalaxySystemList';
+import Sort from './Sort';
+import List from './List';
 import PanelTitle from '../PanelTitle';
 
-export default function GalaxySystemIndex() {
+export default function Index() {
   const [sort, setSort] = useState<SortLabel>(sortOptions[0].label);
 
   return (
     <div>
-      <GalaxySystemSort
+      <Sort
         sortOptions={sortOptions.map((option) => option.label)}
         setSort={setSort}
         sort={sort}
       />
       <section className="mb-6">
         <PanelTitle>GALAXY LIST</PanelTitle>
-        <GalaxySystemList sort={sort} />
+        <List sort={sort} />
       </section>
     </div>
   );

@@ -1,8 +1,10 @@
 import { createBrowserRouter } from 'react-router-dom';
 import Main from '@/pages/Main';
 import SpacePage from '@/pages/SpacePage';
-import ComponentTestPage from '@/pages/ComponentTestPage';
+import Panel from '@/pages/componentstest/Panel';
 import NotFoundPage from '@/pages/NotFoundPage';
+import Index from '@/pages/componentstest/Index';
+import Common from '@/pages/componentstest/Common';
 
 const router = createBrowserRouter([
   {
@@ -15,7 +17,17 @@ const router = createBrowserRouter([
   },
   {
     path: '/componentstest',
-    element: <ComponentTestPage />,
+    element: <Index />,
+    children: [
+      {
+        path: 'common',
+        element: <Common />,
+      },
+      {
+        path: 'panel',
+        element: <Panel />,
+      },
+    ],
   },
   {
     path: '*',
