@@ -35,6 +35,10 @@ const router = createBrowserRouter([
     element: <AudioTestPage />,
   },
   {
+    path: '/audio-test',
+    element: <AudioTestPage />,
+  },
+  {
     path: '*',
     element: <NotFoundPage />,
   },
