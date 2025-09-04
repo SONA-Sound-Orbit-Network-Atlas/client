@@ -31,6 +31,7 @@ const galaxyDummy: GalaxyListData[] = [
   },
 ];
 const galaxies: GalaxyListData[] = [];
+// 3 배로 증식
 for (let i = 0; i < 3; i++) {
   galaxies.push(...galaxyDummy);
 }

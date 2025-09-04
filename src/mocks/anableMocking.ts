@@ -1,6 +1,10 @@
 // MSW 구동
 export default async function enableMocking() {
-  if (!import.meta.env.DEV) return; // 개발 환경에서만 MSW 구동
+  /* import.meta.env.DEV
+    타입: boolean
+    개발 모드 (npm run dev): true
+    프로덕션 빌드 (npm run build): false */
+  if (!import.meta.env.DEV) return;
 
   const { worker } = await import('./browser');
 
@@ -8,7 +12,7 @@ export default async function enableMocking() {
     // onUnhandledRequest: 'bypass' | 'warn' | 'error' (간단한 옵션 지정)
 
     // 커스텀 필터링: 특정 유형만 경고
-    onUnhandledRequest(req, print) {
+    onUnhandledRequest(req) {
       // 문서/정적 리소스/HMR 같은 건 무시(조용히 통과)
       const ignorable = ['document', 'script', 'style', 'image', 'font'];
       if (ignorable.includes(req.destination)) return;
@@ -23,7 +27,7 @@ export default async function enableMocking() {
         return;
 
       // 그 외(정말 API 같은데 핸들러가 없다)만 경고
-      print.warning();
+      // print.warning();
     },
   });
 }
