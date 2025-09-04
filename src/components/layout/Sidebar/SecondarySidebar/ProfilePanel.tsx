@@ -1,8 +1,14 @@
 import { FiEdit3, FiUser, FiMail, FiCalendar } from 'react-icons/fi';
 import { useSidebarStore } from '@/stores/sidebarStore';
+import Iconframe from '@/components/common/Iconframe';
+import TextInput from '@/components/common/TextInput';
+import Button from '@/components/common/Button';
+import TextField from '@/components/common/textField';
+import SignUpPanel from './SignUpPanel';
 
 export default function ProfilePanel() {
-  const { isLoggedIn } = useSidebarStore();
+  const { isLoggedIn, profilePanelMode, setProfilePanelMode } =
+    useSidebarStore();
 
   // 임시 데이터
   const profile = {
@@ -12,7 +18,7 @@ export default function ProfilePanel() {
   };
 
   return (
-    <div className="space-y-4">
+    <div className={`space-y-4 ${profilePanelMode === 'signup' ? '' : 'p-4'}`}>
       {isLoggedIn ? (
         // 로그인된 상태 - 프로필 화면
         <>
@@ -80,25 +86,63 @@ export default function ProfilePanel() {
             </div>
           </div>
         </>
+      ) : // 로그인 안된 상태 - 로그인/회원가입 화면
+      profilePanelMode === 'signup' ? (
+        <SignUpPanel />
       ) : (
-        // 로그인 안된 상태 - 로그인/회원가입 화면
-        <div className="text-center py-8">
-          <div className="w-16 h-16 bg-gray-card rounded-full flex items-center justify-center mx-auto mb-4">
-            <FiUser className="w-8 h-8 text-text-muted" />
+        <div className="text-center">
+          <div className="flex flex-col items-center mb-[24px]">
+            <Iconframe color="primary" size="medium" className="mb-[16px]">
+              <FiUser />
+            </Iconframe>
+            <h3 className="text-white font-semibold text-base">WELCOME BACK</h3>
+            <p className="text-text-muted text-sm">
+              SIGN IN TO CREATE AND
+              <br />
+              MANAGE SYSTEMS
+            </p>
           </div>
-          <h3 className="text-white font-semibold text-lg mb-2">
-            로그인이 필요합니다
-          </h3>
-          <p className="text-text-muted text-sm mb-6">
-            계정에 로그인하여 프로필을 확인하세요
-          </p>
-          <div className="space-y-3">
-            <button className="w-full p-3 bg-tertiary-200 text-white rounded-lg hover:bg-tertiary-200-80 transition-colors">
-              로그인
-            </button>
-            <button className="w-full p-3 bg-gray-card text-text-white rounded-lg hover:bg-gray-border transition-colors">
-              회원가입
-            </button>
+          <div className="flex flex-col mt-[24px] text-left gap-[16px]">
+            <TextField label="Email" htmlFor="email">
+              <TextInput
+                type="email"
+                placeholder="Enter your email"
+                id="email"
+              />
+            </TextField>
+            <TextField label="Password" htmlFor="password">
+              <TextInput
+                type="password"
+                placeholder="Enter your password"
+                id="password"
+              />
+            </TextField>
+          </div>
+          <Button color="primary" size="lg" className="w-full mt-[24px]">
+            SIGN IN
+          </Button>
+          <div className="flex justify-center mt-[24px] mb-[24px]">
+            <a
+              href="#"
+              className="text-primary-300 text-xs hover:text-primary-200 transition-colors cursor-pointer"
+            >
+              FORGOT PASSWORD?
+            </a>
+          </div>
+          <div className="flex flex-col items-center border-t border-gray-border pt-[24px]">
+            <p className="text-text-muted text-xs mb-[8px]">
+              DON'T HAVE AN ACCOUNT?
+            </p>
+            <a
+              href="#"
+              onClick={(e) => {
+                e.preventDefault();
+                setProfilePanelMode('signup');
+              }}
+              className="text-primary-300 text-sm font-semibold hover:text-primary-200 transition-colors cursor-pointer"
+            >
+              SIGN UP
+            </a>
           </div>
         </div>
       )}

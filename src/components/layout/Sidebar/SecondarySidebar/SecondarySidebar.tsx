@@ -15,7 +15,7 @@ export default function SecondarySidebar() {
     <div
       className={mergeClassNames(
         'w-64 bg-gray-surface border-r border-gray-border',
-        'p-4 flex flex-col gap-4'
+        'flex flex-col gap-4'
       )}
     >
       {/* 메뉴 내용 */}
