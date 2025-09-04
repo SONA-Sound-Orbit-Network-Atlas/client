@@ -4,7 +4,7 @@ import type { STAR, PLANET } from '@/types/system';
 export const systemAPI = {
   // 별+행성 목록 조회
   getPlanetList: async (galaxyId: number): Promise<(STAR | PLANET)[]> => {
-    const response = await axiosInstance.get<STAR & PLANET[]>(
+    const response = await axiosInstance.get<(STAR | PLANET)[]>(
       `/systems/${galaxyId}/planets`
     );
     return response.data;
