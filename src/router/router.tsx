@@ -1,10 +1,11 @@
 import { createBrowserRouter } from 'react-router-dom';
 import Main from '@/pages/Main';
 import SpacePage from '@/pages/SpacePage';
-import Panel from '@/pages/componentstest/Panel';
+import PanelComponent from '@/pages/componentstest/Panel';
 import NotFoundPage from '@/pages/NotFoundPage';
-import Index from '@/pages/componentstest/Index';
-import Common from '@/pages/componentstest/Common';
+import ComponentTestPage from '@/pages/componentstest/Index';
+import CommonComponent from '@/pages/componentstest/Common';
+import AudioTestPage from '@/pages/AudioTestPage';
 
 const router = createBrowserRouter([
   {
@@ -17,17 +18,21 @@ const router = createBrowserRouter([
   },
   {
     path: '/componentstest',
-    element: <Index />,
+    element: <ComponentTestPage />,
     children: [
       {
         path: 'common',
-        element: <Common />,
+        element: <CommonComponent />,
       },
       {
         path: 'panel',
-        element: <Panel />,
+        element: <PanelComponent />,
       },
     ],
+  },
+  {
+    path: '/audio-test',
+    element: <AudioTestPage />,
   },
   {
     path: '*',
