@@ -3,14 +3,17 @@ import { create } from 'zustand';
 interface SidebarState {
   isSecondaryOpen: boolean;
   selectedMenu: string | null;
+  isLoggedIn: boolean;
   openSecondarySidebar: (menu: string) => void;
   closeSecondarySidebar: () => void;
   toggleSecondarySidebar: (menu: string) => void;
+  setLoginStatus: (status: boolean) => void;
 }
 
 export const useSidebarStore = create<SidebarState>((set, get) => ({
   isSecondaryOpen: false,
   selectedMenu: null,
+  isLoggedIn: false, // 기본값: 로그인 안됨
   openSecondarySidebar: (menu: string) =>
     set({
       isSecondaryOpen: true,
@@ -38,4 +41,8 @@ export const useSidebarStore = create<SidebarState>((set, get) => ({
       });
     }
   },
+  setLoginStatus: (status: boolean) =>
+    set({
+      isLoggedIn: status,
+    }),
 }));
