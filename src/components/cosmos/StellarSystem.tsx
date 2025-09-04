@@ -6,7 +6,6 @@ import * as THREE from 'three';
 import { useSceneStore } from '@/stores/useSceneStore';
 import OrbitLine from './OrbitLine';
 import type { TPlanet, TStellarSystem } from '@/types/cosmos';
-import { Html } from '@react-three/drei';
 //항성계 컴포넌트
 
 //mock data
@@ -88,6 +87,8 @@ export default function StellarSystem({
   const [planets] = useState<TPlanet[]>(mockPlanets);
 
   const onStellarSystemClicked = () => {
+    // 초점 위치 업데이트
+    setFocusedPosition(new THREE.Vector3(...stellarSystemPos));
     // 선택된 항성계 업데이트
     setSelectedStellarSystemId(id);
     setSelectedStellarSystem(mockStellarSystem);
@@ -133,9 +134,7 @@ export default function StellarSystem({
           position={[0, 0, 0]}
           color="#ff6b6b"
           size={1}
-          onClick={() =>
-            setFocusedPosition(new THREE.Vector3(...stellarSystemPos))
-          }
+          onClick={() => onStellarSystemClicked()}
         />
         {planets.map((planet, index) => {
           return (
