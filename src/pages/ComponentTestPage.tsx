@@ -31,6 +31,8 @@ import TextInput from '@/components/common/TextInput';
 import GalaxySystemIndex from '@/components/panel/galaxysystems/GalaxySystemIndex';
 import { FaHeart } from 'react-icons/fa6';
 import { FiGithub } from 'react-icons/fi';
+import { FaStar, FaHome, FaUser, FaCog, FaPlay, FaPause } from 'react-icons/fa';
+import Iconframe from '@/components/common/Iconframe';
 
 const ComponentTestPage: React.FC = () => {
   const [checkboxState, setCheckboxState] = useState(false);
@@ -443,6 +445,134 @@ const ComponentTestPage: React.FC = () => {
               Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam,
             </p>
           </Card>
+        </section>
+
+        {/* Iconframe 테스트 */}
+        <section className="mb-12 p-6 border rounded-lg">
+          <h2 className="text-2xl font-semibold mb-4 text-foreground">
+            Iconframe 컴포넌트
+          </h2>
+          <div className="space-y-6">
+            {/* Color 기준 */}
+            <div>
+              <h3 className="text-lg font-medium mb-3 text-foreground">
+                Color 기준
+              </h3>
+              <div className="flex gap-4 items-center flex-wrap">
+                <div className="flex flex-col items-center gap-2">
+                  <Iconframe color="primary">
+                    <FaStar />
+                  </Iconframe>
+                  <span className="text-xs text-muted-foreground">primary</span>
+                </div>
+                <div className="flex flex-col items-center gap-2">
+                  <Iconframe color="secondary">
+                    <FaHome />
+                  </Iconframe>
+                  <span className="text-xs text-muted-foreground">
+                    secondary
+                  </span>
+                </div>
+                <div className="flex flex-col items-center gap-2">
+                  <Iconframe color="tertiary">
+                    <FaUser />
+                  </Iconframe>
+                  <span className="text-xs text-muted-foreground">
+                    tertiary
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            {/* Size 기준 */}
+            <div>
+              <h3 className="text-lg font-medium mb-3 text-foreground">
+                Size 기준
+              </h3>
+              <div className="flex gap-4 items-center flex-wrap">
+                <div className="flex flex-col items-center gap-2">
+                  <Iconframe color="primary" size="small">
+                    <FaCog />
+                  </Iconframe>
+                  <span className="text-xs text-muted-foreground">small</span>
+                </div>
+                <div className="flex flex-col items-center gap-2">
+                  <Iconframe color="primary" size="medium">
+                    <FaCog />
+                  </Iconframe>
+                  <span className="text-xs text-muted-foreground">medium</span>
+                </div>
+                <div className="flex flex-col items-center gap-2">
+                  <Iconframe color="primary" size="large">
+                    <FaCog />
+                  </Iconframe>
+                  <span className="text-xs text-muted-foreground">large</span>
+                </div>
+              </div>
+            </div>
+
+            {/* 모든 조합 테스트 */}
+            <div>
+              <h3 className="text-lg font-medium mb-3 text-foreground">
+                모든 조합 테스트
+              </h3>
+              <div className="space-y-4">
+                {/* Primary 색상의 모든 크기 */}
+                <div>
+                  <h4 className="text-md font-medium mb-2 text-foreground">
+                    Primary 색상
+                  </h4>
+                  <div className="flex gap-4 items-center flex-wrap">
+                    <Iconframe color="primary" size="small">
+                      <FaPlay />
+                    </Iconframe>
+                    <Iconframe color="primary" size="medium">
+                      <FaPlay />
+                    </Iconframe>
+                    <Iconframe color="primary" size="large">
+                      <FaPlay />
+                    </Iconframe>
+                  </div>
+                </div>
+
+                {/* Secondary 색상의 모든 크기 */}
+                <div>
+                  <h4 className="text-md font-medium mb-2 text-foreground">
+                    Secondary 색상
+                  </h4>
+                  <div className="flex gap-4 items-center flex-wrap">
+                    <Iconframe color="secondary" size="small">
+                      <FaPause />
+                    </Iconframe>
+                    <Iconframe color="secondary" size="medium">
+                      <FaPause />
+                    </Iconframe>
+                    <Iconframe color="secondary" size="large">
+                      <FaPause />
+                    </Iconframe>
+                  </div>
+                </div>
+
+                {/* Tertiary 색상의 모든 크기 */}
+                <div>
+                  <h4 className="text-md font-medium mb-2 text-foreground">
+                    Tertiary 색상
+                  </h4>
+                  <div className="flex gap-4 items-center flex-wrap">
+                    <Iconframe color="tertiary" size="small">
+                      <FaHeart />
+                    </Iconframe>
+                    <Iconframe color="tertiary" size="medium">
+                      <FaHeart />
+                    </Iconframe>
+                    <Iconframe color="tertiary" size="large">
+                      <FaHeart />
+                    </Iconframe>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         </section>
 
         {/* Galaxy Systems 테스트 */}
