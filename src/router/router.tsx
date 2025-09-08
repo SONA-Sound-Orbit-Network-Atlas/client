@@ -1,4 +1,4 @@
-import { createBrowserRouter } from 'react-router-dom';
+import { createBrowserRouter, Navigate } from 'react-router-dom';
 import Main from '@/pages/Main';
 import SpacePage from '@/pages/SpacePage';
 import PanelComponent from '@/pages/componentstest/Panel';
@@ -20,6 +20,10 @@ const router = createBrowserRouter([
     path: '/componentstest',
     element: <ComponentTestPage />,
     children: [
+      {
+        index: true,
+        element: <Navigate to="common" replace />,
+      },
       {
         path: 'common',
         element: <CommonComponent />,
