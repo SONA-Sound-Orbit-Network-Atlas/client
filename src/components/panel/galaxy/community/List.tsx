@@ -1,6 +1,6 @@
 import { Suspense } from 'react';
 import { useGetGalaxyCommunityList } from '@/hooks/api/useGalaxy';
-import Item from './CardItem';
+import CardItem from './CardItem';
 import {
   type SortLabel,
   type GalaxyCommunityListData,
@@ -38,8 +38,8 @@ function ContentComp({ sort }: { sort: SortLabel }) {
     <div>
       {/* 은하 리스트 */}
       <div className="space-y-3">
-        {list.map((galaxySystem: GalaxyCommunityListData, index: number) => (
-          <Item key={index} {...galaxySystem} />
+        {list.map((galaxySystem: GalaxyCommunityListData) => (
+          <CardItem key={galaxySystem.galaxyName} {...galaxySystem} />
         ))}
       </div>
 
