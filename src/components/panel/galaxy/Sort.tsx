@@ -13,17 +13,13 @@ import { useState } from 'react';
 import { type SortLabel } from '@/types/galaxy';
 import PanelTitle from '../PanelTitle';
 
-interface GalaxySystemSortProps {
+interface SortProps {
   sortOptions: SortLabel[];
   setSort: (sort: SortLabel) => void;
   sort: SortLabel;
 }
 
-export default function GalaxySystemSort({
-  sortOptions,
-  setSort,
-  sort,
-}: GalaxySystemSortProps) {
+export default function Sort({ sortOptions, setSort, sort }: SortProps) {
   const [isOpen, setIsOpen] = useState(false);
 
   return (

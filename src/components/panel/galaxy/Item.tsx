@@ -5,7 +5,7 @@ import { IoPlanetOutline } from 'react-icons/io5';
 import { FaRegHeart } from 'react-icons/fa';
 import type { GalaxyListData } from '@/types/galaxy';
 
-export default function GalaxySystemCard({
+export default function Item({
   rank,
   galaxyName,
   makerName,

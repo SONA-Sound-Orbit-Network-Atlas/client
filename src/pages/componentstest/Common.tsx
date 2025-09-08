@@ -28,13 +28,13 @@ import Card from '@/components/common/Card';
 import TextField from '@/components/common/TextField';
 import Textarea from '@/components/common/Textarea';
 import TextInput from '@/components/common/TextInput';
-import GalaxySystemIndex from '@/components/panel/galaxysystems/GalaxySystemIndex';
 import { FaHeart } from 'react-icons/fa6';
 import { FiGithub } from 'react-icons/fi';
 import { FaStar, FaHome, FaUser, FaCog, FaPlay, FaPause } from 'react-icons/fa';
 import Iconframe from '@/components/common/Iconframe';
+import { SkeletonCard } from '@/components/common/SkeletonCard';
 
-const ComponentTestPage: React.FC = () => {
+const Common: React.FC = () => {
   const [checkboxState, setCheckboxState] = useState(false);
   const [sliderValue, setSliderValue] = useState([50]);
   const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -43,7 +43,7 @@ const ComponentTestPage: React.FC = () => {
     <div className="min-h-screen bg-background p-8">
       <div className="max-w-4xl mx-auto">
         <h1 className="text-3xl font-bold mb-8 text-foreground">
-          컴포넌트 테스트 페이지
+          Common 컴포넌트
         </h1>
 
         {/* Checkbox 테스트 */}
@@ -577,14 +577,16 @@ const ComponentTestPage: React.FC = () => {
 
         {/* Galaxy Systems 테스트 */}
         <section className="mb-12 p-6 border rounded-lg h-[500px] overflow-y-auto">
+        {/* SkeletonCard 테스트 */}
+        <section className="mb-12 p-6 border rounded-lg">
           <h2 className="text-2xl font-semibold mb-4 text-foreground">
-            Galaxy Systems 컴포넌트
+            SkeletonCard 컴포넌트
           </h2>
-          <GalaxySystemIndex />
+          <SkeletonCard />
         </section>
       </div>
     </div>
   );
 };
 
-export default ComponentTestPage;
+export default Common;

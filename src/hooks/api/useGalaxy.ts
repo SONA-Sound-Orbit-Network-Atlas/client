@@ -1,10 +1,10 @@
-import { useInfiniteQuery } from '@tanstack/react-query';
+import { useSuspenseInfiniteQuery } from '@tanstack/react-query';
 import { galaxyAPI } from '@/api/galaxy';
 import type { ParamsGetGalaxyList } from '@/types/galaxy';
 
 // 은하 목록 조회
 export function useGetGalaxyList(params: ParamsGetGalaxyList) {
-  return useInfiniteQuery({
+  return useSuspenseInfiniteQuery({
     queryKey: ['galaxyList', params],
     queryFn: ({ pageParam }) =>
       galaxyAPI.getGalaxyList({
