@@ -1,11 +1,9 @@
 import Card from '@/components/common/Card';
-// import { GoDotFill } from 'react-icons/go';
-import ButtonToggleHeart from '@/components/common/ButtonToggleHeart';
 import { IoPlanetOutline } from 'react-icons/io5';
 import { FaRegHeart } from 'react-icons/fa';
 import type { GalaxyMyListData } from '@/types/galaxyMy';
 
-export default function Item({
+export default function CardItem({
   galaxyName,
   updatedAt,
   planetCount,
@@ -24,7 +22,6 @@ export default function Item({
             <span>{updatedAt}</span>
           </div>
         </div>
-        <ButtonToggleHeart className="flex-shrink-0" active={false} />
       </div>
       <div className="mt-3 flex gap-4">
         <div>

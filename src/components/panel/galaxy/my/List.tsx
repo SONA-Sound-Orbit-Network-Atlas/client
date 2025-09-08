@@ -1,10 +1,11 @@
 import { Suspense } from 'react';
 import { useGetGalaxyMyList } from '@/hooks/api/useGalaxy';
-import Item from './CardItem';
+import CardItem from './CardItem';
 import { type GalaxyMyListData } from '@/types/galaxyMy';
 import Button from '@/components/common/Button';
 import { SkeletonCard } from '@/components/common/SkeletonCard';
 import { ErrorBoundary } from 'react-error-boundary';
+import LoadingIcon from '@/components/common/LoadingIcon';
 
 const GALAXY_LIST_LIMIT = 3;
 
@@ -32,22 +33,25 @@ function ContentComp() {
     <div>
       {/* 은하 리스트 */}
       <div className="space-y-3">
-        {list.map((galaxySystem: GalaxyMyListData, index: number) => (
-          <Item key={index} {...galaxySystem} />
+        {list.map((galaxySystem: GalaxyMyListData) => (
+          <CardItem key={galaxySystem.galaxyName} {...galaxySystem} />
         ))}
       </div>
       {isFetchingNextPage && <div>loading more...</div>}
 
       {/* 더보기 버튼 */}
-      {hasNextPage && (
-        <Button
-          className="mt-4 w-full"
-          color="tertiary"
-          onClick={() => fetchNextPage()}
-        >
-          LOAD MORE
-        </Button>
-      )}
+      {hasNextPage &&
+        (isFetchingNextPage ? (
+          <LoadingIcon />
+        ) : (
+          <Button
+            className="mt-4 w-full"
+            color="tertiary"
+            onClick={() => fetchNextPage()}
+          >
+            LOAD MORE
+          </Button>
+        ))}
     </div>
   );
 }

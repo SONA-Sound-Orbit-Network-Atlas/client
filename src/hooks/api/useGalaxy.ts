@@ -8,7 +8,10 @@ export function useGetGalaxyCommunityList(
   params: ParamsGetGalaxyCommunityList
 ) {
   return useSuspenseInfiniteQuery({
-    queryKey: ['galaxyCommunityList', params],
+    queryKey: [
+      'galaxyCommunityList',
+      { limit: params.limit, sort: params.sort },
+    ],
     queryFn: ({ pageParam }) =>
       galaxyAPI.getGalaxyCommunityList({
         page: pageParam,
@@ -24,7 +27,7 @@ export function useGetGalaxyCommunityList(
 // Galaxy My 리스트 조회
 export function useGetGalaxyMyList(params: ParamsGetGalaxyMyList) {
   return useSuspenseInfiniteQuery({
-    queryKey: ['galaxyMyList', params],
+    queryKey: ['galaxyMyList', { limit: params.limit }],
     queryFn: ({ pageParam }) =>
       galaxyAPI.getGalaxyMyList({ page: pageParam, limit: params.limit }),
     initialPageParam: 1,
