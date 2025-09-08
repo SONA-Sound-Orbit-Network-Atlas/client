@@ -1,6 +1,6 @@
 import { mergeClassNames } from '@/utils/mergeClassNames';
-import PrimarySidebar from './PrimarySidebar/PrimarySidebar';
-import SecondarySidebar from './SecondarySidebar/SecondarySidebar';
+import PrimarySidebar from './SidebarNav/SidebarNav';
+import SecondarySidebar from './SidebarPanel/SidebarPanel';
 import { useSidebarStore } from '@/stores/sidebarStore';
 
 interface SidebarProps {
