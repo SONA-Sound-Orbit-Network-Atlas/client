@@ -14,7 +14,7 @@ export default function Card({
 }: CardProps & React.HTMLAttributes<HTMLDivElement>) {
   return (
     <div
-      className={`w-full min-w-[223px] bg-gray-card rounded-[8px] p-[17px] border-solid 
+      className={`w-full bg-gray-card rounded-[8px] p-[17px] border-solid 
         border-[1px] border-gray-border text-text-secondary text-[14px]
          focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50 ${className}
          ${clicked ? 'border-secondary-300' : ''}`}

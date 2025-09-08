@@ -3,14 +3,20 @@ import { create } from 'zustand';
 interface SidebarState {
   isSecondaryOpen: boolean;
   selectedMenu: string | null;
+  isLoggedIn: boolean;
+  profilePanelMode: 'login' | 'signup';
   openSecondarySidebar: (menu: string) => void;
   closeSecondarySidebar: () => void;
   toggleSecondarySidebar: (menu: string) => void;
+  setLoginStatus: (status: boolean) => void;
+  setProfilePanelMode: (mode: 'login' | 'signup') => void;
 }
 
 export const useSidebarStore = create<SidebarState>((set, get) => ({
   isSecondaryOpen: false,
   selectedMenu: null,
+  isLoggedIn: true, // 기본값: 로그인됨 (테스트용)
+  profilePanelMode: 'login', // 기본값: 로그인 모드
   openSecondarySidebar: (menu: string) =>
     set({
       isSecondaryOpen: true,
@@ -38,4 +44,12 @@ export const useSidebarStore = create<SidebarState>((set, get) => ({
       });
     }
   },
+  setLoginStatus: (status: boolean) =>
+    set({
+      isLoggedIn: status,
+    }),
+  setProfilePanelMode: (mode: 'login' | 'signup') =>
+    set({
+      profilePanelMode: mode,
+    }),
 }));

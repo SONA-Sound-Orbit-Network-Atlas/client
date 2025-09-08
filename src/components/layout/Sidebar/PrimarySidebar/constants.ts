@@ -9,7 +9,7 @@ export interface MenuItem {
 
 export const menuItems: MenuItem[] = [
   // 상단 섹션
-  { id: 'user', label: '유저', icon: FiUser },
+  { id: 'profile', label: '프로필', icon: FiUser },
   { id: 'galaxy', label: '은하', icon: IoEarthSharp },
   { id: 'system', label: '시스템', icon: IoPlanetOutline },
 
