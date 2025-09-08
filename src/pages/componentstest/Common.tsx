@@ -576,7 +576,8 @@ const Common: React.FC = () => {
         </section>
 
         {/* Galaxy Systems 테스트 */}
-        <section className="mb-12 p-6 border rounded-lg h-[500px] overflow-y-auto">
+        <section className="mb-12 p-6 border rounded-lg h-[500px] overflow-y-auto"></section>
+
         {/* SkeletonCard 테스트 */}
         <section className="mb-12 p-6 border rounded-lg">
           <h2 className="text-2xl font-semibold mb-4 text-foreground">
