@@ -2,7 +2,6 @@ import { mergeClassNames } from '@/utils/mergeClassNames';
 import { useSidebarStore } from '@/stores/sidebarStore';
 import MenuContent from './MenuContent';
 import { menuContents } from './constants';
-import { ScrollArea } from '@/components/common/Scrollarea';
 
 export default function SecondarySidebar() {
   const { isSecondaryOpen, selectedMenu } = useSidebarStore();
@@ -20,11 +19,9 @@ export default function SecondarySidebar() {
       )}
     >
       {/* 메뉴 내용 */}
-      <ScrollArea className="flex-1 h-full">
-        <div>
-          <MenuContent content={content} menuId={selectedMenu} />
-        </div>
-      </ScrollArea>
+      <div className="flex-1 h-full">
+        <MenuContent content={content} menuId={selectedMenu} />
+      </div>
     </div>
   );
 }
