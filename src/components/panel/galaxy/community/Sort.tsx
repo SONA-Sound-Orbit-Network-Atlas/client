@@ -10,8 +10,8 @@ import {
   DropdownMenuRadioItem,
 } from '@/components/common/DropdownMenu';
 import { useState } from 'react';
-import { type SortLabel } from '@/types/galaxy';
-import PanelTitle from '../PanelTitle';
+import { type SortLabel } from '@/types/galaxyCommunity';
+import PanelTitle from '../../PanelTitle';
 
 interface SortProps {
   sortOptions: SortLabel[];
@@ -27,7 +27,7 @@ export default function Sort({ sortOptions, setSort, sort }: SortProps) {
       <PanelTitle>SORT BY</PanelTitle>
       <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
         <DropdownMenuTrigger asChild>
-          <Button color="tertiary" className="w-56" textAlign="left">
+          <Button color="tertiary" className="w-full" textAlign="left">
             {sort}
             <IoMdArrowDropdown
               className={`ml-auto transition-transform duration-200 ${
@@ -36,7 +36,7 @@ export default function Sort({ sortOptions, setSort, sort }: SortProps) {
             />
           </Button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent className="w-56">
+        <DropdownMenuContent className="w-[207px]">
           <DropdownMenuRadioGroup
             value={sort}
             onValueChange={(value) => setSort(value as SortLabel)}

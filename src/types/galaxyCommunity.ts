@@ -1,16 +1,16 @@
 // 은하 목록 데이터
-export interface GalaxyListData {
+export interface GalaxyCommunityListData {
   rank: number;
   galaxyName: string;
   makerName: string;
-  createdAt: string;
+  updatedAt: string;
   planetCount: number;
   favoriteCount: number;
   myFavorite: boolean;
 }
 
 // 은하 목록 조회 파라미터
-export interface ParamsGetGalaxyList {
+export interface ParamsGetGalaxyCommunityList {
   page: number;
   limit: number;
   sort: string;
