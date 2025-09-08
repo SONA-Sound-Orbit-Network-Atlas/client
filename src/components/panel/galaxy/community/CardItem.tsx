@@ -1,19 +1,19 @@
 import Card from '@/components/common/Card';
-import { GoDotFill } from 'react-icons/go';
+// import { GoDotFill } from 'react-icons/go';
 import ButtonToggleHeart from '@/components/common/ButtonToggleHeart';
 import { IoPlanetOutline } from 'react-icons/io5';
 import { FaRegHeart } from 'react-icons/fa';
-import type { GalaxyListData } from '@/types/galaxy';
+import type { GalaxyCommunityListData } from '@/types/galaxyCommunity';
 
 export default function Item({
   rank,
   galaxyName,
   makerName,
-  createdAt,
+  updatedAt,
   planetCount,
   favoriteCount,
   myFavorite,
-}: GalaxyListData) {
+}: GalaxyCommunityListData) {
   return (
     <Card>
       <div className="flex justify-between items-center">
@@ -26,12 +26,12 @@ export default function Item({
               {galaxyName}
             </strong>
           </div>
-          <div className="flex items-center gap-1 text-[12px] text-text-muted">
+          <div className="mt-3 flex flex-col items-start gap-1 text-[12px] text-text-muted">
             <span>
               BY <span className="text-primary-300">{makerName}</span>
             </span>
-            <GoDotFill />
-            <span>{createdAt}</span>
+            {/* <GoDotFill /> */}
+            <span>{updatedAt}</span>
           </div>
         </div>
         <ButtonToggleHeart className="flex-shrink-0" active={myFavorite} />

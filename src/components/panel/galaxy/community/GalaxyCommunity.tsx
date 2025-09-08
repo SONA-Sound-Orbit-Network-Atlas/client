@@ -1,18 +1,13 @@
-/* 
-  GALAXY - SYSTEMS 다른 사람 항성계 리스트
-  컴포넌트 구조
-  1. SORT
-  2. 은하 리스트
-*/
+// GALAXY > COMMUNITY (다른 사람 항성계 리스트)
 
 import { useState } from 'react';
-import { sortOptions } from '@/types/galaxy';
-import type { SortLabel } from '@/types/galaxy';
+import { sortOptions } from '@/types/galaxyCommunity';
+import type { SortLabel } from '@/types/galaxyCommunity';
 import Sort from './Sort';
 import List from './List';
-import PanelTitle from '../PanelTitle';
+import PanelTitle from '../../PanelTitle';
 
-export default function Index() {
+export default function GalaxyCommunity() {
   const [sort, setSort] = useState<SortLabel>(sortOptions[0].label);
 
   return (

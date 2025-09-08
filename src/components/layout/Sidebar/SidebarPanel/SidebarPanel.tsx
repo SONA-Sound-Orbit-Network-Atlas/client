@@ -19,7 +19,7 @@ export default function SecondarySidebar() {
       )}
     >
       {/* 메뉴 내용 */}
-      <div className="flex-1 h-full">
+      <div className="flex-1 h-full overflow-y-auto">
         <MenuContent content={content} menuId={selectedMenu} />
       </div>
     </div>

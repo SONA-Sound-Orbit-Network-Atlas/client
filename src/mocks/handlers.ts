@@ -1,11 +1,15 @@
 // 핸들러 : 요청을 가로채고 어떤 응답을 줄지 정의한다.
-import galaxies from './data/galaxies';
+import galaxiesCommunity from './data/galaxiesCommunity';
+import galaxiesMy from './data/galaxiesMy';
 import { planet, planets, star } from './data/system';
 import { mockFetch, mockFetchInfinite } from './utils';
 
 export const handlers = [
-  // galaxy 은하 목록 조회 (infinite)
-  mockFetchInfinite('/galaxies', galaxies, 2000),
+  // galaxy Community 리스트트 조회 (infinite)
+  mockFetchInfinite('/galaxies/community', galaxiesCommunity, 2000),
+
+  // galaxy My 리스트트 조회 (infinite)
+  mockFetchInfinite('/galaxies/my', galaxiesMy, 2000),
 
   // system 별 개별 정보 조회
   mockFetch('/systems/:galaxyId/star', star, 2000),
