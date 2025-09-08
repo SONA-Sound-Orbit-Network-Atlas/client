@@ -50,7 +50,7 @@ export default function OrbitViewControls({
   });
   useChangeViewModeOnOutOfDistance({
     distanceRef: distanceRef,
-    targetDistance: 60,
+    targetDistance: 20,
     movementLockRef: isMovingRef,
     onOutOfDistance: () => {
       //TODO : zomeout 되면서 카메라 변경시 화면을 그대로 이어가기위해 카메라 타겟 설정중입니다. 추후 리팩토링 필요

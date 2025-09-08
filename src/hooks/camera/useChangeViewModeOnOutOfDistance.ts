@@ -18,16 +18,24 @@ interface useChangeViewModeOnOutOfDistanceProps {
 
 export function useChangeViewModeOnOutOfDistance({
   distanceRef,
-  targetDistance = 100,
+  targetDistance = 20,
   onOutOfDistance,
   movementLockRef,
 }: useChangeViewModeOnOutOfDistanceProps) {
-  const { setViewMode } = useSceneStore();
+  const {
+    setViewMode,
+    setFocusedPosition,
+    setSelectedStellarSystemId,
+    setSelectedStellarSystem,
+  } = useSceneStore();
   useFrame(() => {
     // 줌 거리 체크 (항상 실행)
     if (movementLockRef.current) return;
     if (distanceRef.current > targetDistance) {
       setViewMode('Galaxy');
+      setFocusedPosition(null);
+      setSelectedStellarSystemId(null);
+      setSelectedStellarSystem(null);
       onOutOfDistance?.();
     }
   });

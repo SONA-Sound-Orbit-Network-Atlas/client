@@ -25,7 +25,7 @@ export function useSmoothCameraMove({
   const startTimeRef = useRef<number>(0);
   const { camera } = useThree();
   // 카메라 이동 오프셋
-  const offset = new THREE.Vector3(10, 10, 8);
+  const offset = new THREE.Vector3(5, 10, 6);
   const targetCameraPosRef = useRef<THREE.Vector3>(
     targetPosition.clone().add(offset)
   );

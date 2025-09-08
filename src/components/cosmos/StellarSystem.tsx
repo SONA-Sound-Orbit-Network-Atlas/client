@@ -106,7 +106,7 @@ export default function StellarSystem({
     const distance = camera.position.distanceTo(systemPos);
 
     //factor 값을 계산
-    const minDistance = 100; // 거리가 20 이하면 완전히 보임
+    const minDistance = 10; // 거리가 minDistance 이하면 완전히 보임
     const fadeRange = 10; // 20~30 거리에서 페이드 아웃
     const maxOpacity = 1; // 최대 투명도
     const minOpacity = 0; // 최소 투명도
@@ -120,7 +120,9 @@ export default function StellarSystem({
 
     //메시 스케일 조정정
     detailGroupRef.current.scale.set(factor, factor, factor);
-    lowDetailMesh.current.scale.set(1 - factor, 1 - factor, 1 - factor);
+    if (isSelectedSystem) {
+      lowDetailMesh.current.scale.set(1 - factor, 1 - factor, 1 - factor);
+    }
   });
 
   return (
@@ -129,7 +131,7 @@ export default function StellarSystem({
       position={stellarSystemPos}
       onClick={onStellarSystemClicked}
     >
-      <group ref={detailGroupRef}>
+      <group ref={detailGroupRef} visible={isSelectedSystem}>
         <Star
           position={[0, 0, 0]}
           color="#ff6b6b"
@@ -225,7 +227,7 @@ export default function StellarSystem({
           setFocusedPosition(new THREE.Vector3(...stellarSystemPos))
         }
       >
-        <sphereGeometry args={[LOW_DETAIL_SIZE, 4, 4]} />
+        <sphereGeometry args={[LOW_DETAIL_SIZE, 8, 8]} />
         <meshStandardMaterial
           color="#ff6b6b"
           emissive="#ffffff"
