@@ -1,5 +1,5 @@
 import type { MenuContent as MenuContentType } from './constants';
-import ProfilePanel from './ProfilePanel';
+import ProfilePanel from './Profile/ProfilePanel';
 
 interface MenuContentProps {
   content: MenuContentType;

@@ -4,7 +4,7 @@ import Iconframe from '@/components/common/Iconframe';
 import TextInput from '@/components/common/TextInput';
 import Button from '@/components/common/Button';
 import TextField from '@/components/common/textField';
-import PanelHeader from './PanelHeader';
+import PanelHeader from '../PanelHeader';
 
 export default function SignUpPanel() {
   const { setProfilePanelMode } = useSidebarStore();
