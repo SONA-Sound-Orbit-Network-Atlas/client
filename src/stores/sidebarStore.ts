@@ -15,7 +15,7 @@ interface SidebarState {
 export const useSidebarStore = create<SidebarState>((set, get) => ({
   isSecondaryOpen: false,
   selectedMenu: null,
-  isLoggedIn: false, // 기본값: 로그인 안됨
+  isLoggedIn: true, // 기본값: 로그인됨 (테스트용)
   profilePanelMode: 'login', // 기본값: 로그인 모드
   openSecondarySidebar: (menu: string) =>
     set({
