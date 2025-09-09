@@ -63,7 +63,7 @@ export default function OrbitViewControls({
       ref={controls}
       enableDamping={true}
       dampingFactor={0.05}
-      enableRotate={false}
+      enableRotate={true}
       enableZoom={!isMovingRef.current}
       enablePan={false}
     />
