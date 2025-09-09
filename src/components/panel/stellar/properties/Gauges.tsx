@@ -3,7 +3,7 @@ import Card from '@/components/common/Card';
 import { useStellarStore } from '@/stores/useStellarStore';
 import { useSelectedObjectStore } from '@/stores/useSelectedObjectStore';
 
-interface GuagesProps {
+interface GaugesProps {
   properties: {
     key: string;
     label: string;
@@ -13,7 +13,7 @@ interface GuagesProps {
   }[];
 }
 
-export default function Guages({ properties }: GuagesProps) {
+export default function Gauges({ properties }: GaugesProps) {
   const { stellarStore, setStellarStore } = useStellarStore();
   const { selectedObjectId } = useSelectedObjectStore();
 
@@ -24,15 +24,18 @@ export default function Guages({ properties }: GuagesProps) {
           key={property.key}
           value={[properties[index].value]}
           onValueChange={(value) => {
-            const newValue = { ...properties };
-            newValue[index].value = value[0];
+            console.log('value : ', value);
             setStellarStore({
               ...stellarStore,
-              objects: stellarStore.objects.map((object) =>
-                object.id === selectedObjectId
-                  ? { ...object, properties: newValue }
-                  : object
-              ),
+              objects: stellarStore.objects.map((object) => {
+                if (object.id !== selectedObjectId) return object;
+
+                const newProperties = object.properties.map(
+                  (prop, propIndex) =>
+                    propIndex === index ? { ...prop, value: value[0] } : prop
+                );
+                return { ...object, properties: newProperties };
+              }),
             });
           }}
           min={property.min}

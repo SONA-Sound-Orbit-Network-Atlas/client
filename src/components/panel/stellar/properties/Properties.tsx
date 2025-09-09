@@ -1,5 +1,5 @@
 import PanelTitle from '../../PanelTitle';
-import ControlPanel from './Guages';
+import ControlPanel from './Gauges';
 import Random from './Random';
 import { useStellarStore } from '@/stores/useStellarStore';
 import { useSelectedObjectStore } from '@/stores/useSelectedObjectStore';
