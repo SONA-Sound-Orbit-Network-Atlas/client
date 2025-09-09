@@ -37,8 +37,8 @@ export default function ProfileView() {
   };
 
   return (
-    <div className="h-full overflow-hidden">
-      <ScrollArea className="h-full">
+    <div className="flex flex-col h-full overflow-hidden">
+      <ScrollArea className="flex-1 min-h-0">
         <div className="flex flex-col">
           <div className="flex flex-col items-center border-b border-gray-border p-6">
             <div className="flex flex-col items-center mb-[24px]">
@@ -123,14 +123,14 @@ export default function ProfileView() {
               </div>
             </div>
           </div>
-          <div className="p-6 border-t border-gray-border">
-            <Button color="tertiary" size="lg" className="w-full">
-              <FiLogOut />
-              SIGN OUT
-            </Button>
-          </div>
         </div>
       </ScrollArea>
+      <div className="flex-shrink-0 p-6 border-t border-gray-border">
+        <Button color="tertiary" size="lg" className="w-full">
+          <FiLogOut />
+          SIGN OUT
+        </Button>
+      </div>
     </div>
   );
 }
