@@ -1,23 +1,23 @@
 import Card from '@/components/common/Card';
 
-interface PlanetCardProps {
+interface StellarCardProps {
   data: {
     name: string;
     type: string;
   };
   index: number;
   onClick: () => void;
-  clicked: boolean;
+  active: boolean;
 }
 
-export default function PlanetCard({
+export default function StellarCard({
   data,
   index,
   onClick,
-  clicked,
-}: PlanetCardProps) {
+  active,
+}: StellarCardProps) {
   return (
-    <Card onClick={onClick} className={clicked ? 'border-secondary-300' : ''}>
+    <Card onClick={onClick} className={active ? 'border-secondary-300' : ''}>
       <div className="flex gap-3 items-center">
         <div
           className={`w-[24px] h-[24px] rounded-full border-[2px] border-[rgba(255,255,255,0.2)]`}

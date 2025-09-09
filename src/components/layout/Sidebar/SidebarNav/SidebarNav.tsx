@@ -12,8 +12,8 @@ export default function PrimarySidebar() {
   return (
     <div
       className={mergeClassNames(
-        'w-16 bg-gray-surface border-r border-gray-border',
-        'p-3 flex flex-col justify-between'
+        'w-[64px] bg-gray-surface border-r border-gray-border',
+        'py-3 flex flex-col justify-between items-center'
       )}
     >
       {/* 상단 섹션 */}

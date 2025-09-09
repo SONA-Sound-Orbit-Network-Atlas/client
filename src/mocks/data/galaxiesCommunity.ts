@@ -9,7 +9,7 @@ const galaxyDummy: GalaxyCommunityListData[] = [
     updatedAt: '2021-01-01',
     planetCount: 10,
     favoriteCount: 10,
-    myFavorite: true,
+    myFavorite: null,
   },
   {
     rank: 2,
@@ -18,7 +18,7 @@ const galaxyDummy: GalaxyCommunityListData[] = [
     updatedAt: '2021-01-02',
     planetCount: 20,
     favoriteCount: 20,
-    myFavorite: false,
+    myFavorite: null,
   },
   {
     rank: 3,
@@ -27,7 +27,7 @@ const galaxyDummy: GalaxyCommunityListData[] = [
     updatedAt: '2021-01-03',
     planetCount: 30,
     favoriteCount: 30,
-    myFavorite: false,
+    myFavorite: null,
   },
 ];
 const galaxiesCommunity: GalaxyCommunityListData[] = [];

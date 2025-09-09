@@ -11,7 +11,7 @@ export const menuItems: MenuItem[] = [
   // 상단 섹션
   { id: 'profile', label: '프로필', icon: FiUser },
   { id: 'galaxy', label: '은하', icon: IoEarthSharp },
-  { id: 'system', label: '시스템', icon: IoPlanetOutline },
+  { id: 'stellar', label: '스텔라시스템', icon: IoPlanetOutline },
 
   // 하단 섹션
   { id: 'alarm', label: '알람', icon: FiBell },

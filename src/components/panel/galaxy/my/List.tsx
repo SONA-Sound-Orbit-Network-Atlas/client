@@ -37,7 +37,6 @@ function ContentComp() {
           <CardItem key={galaxySystem.galaxyName} {...galaxySystem} />
         ))}
       </div>
-      {isFetchingNextPage && <div>loading more...</div>}
 
       {/* 더보기 버튼 */}
       {hasNextPage &&

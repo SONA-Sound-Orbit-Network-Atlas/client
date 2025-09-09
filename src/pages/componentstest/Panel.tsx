@@ -1,8 +1,8 @@
 import React from 'react';
-import Info from '@/components/panel/system/info/Info';
+import Info from '@/components/panel/stellar/info/Info';
 import GalaxyIndex from '@/components/panel/galaxy/GalaxyIndex';
-import PlanetsIndex from '@/components/panel/system/planets/Index';
-import PropertiesIndex from '@/components/panel/system/properties/Index';
+import PlanetsIndex from '@/components/panel/stellar/objects/Objects';
+import PropertiesIndex from '@/components/panel/stellar/properties/Properties';
 
 const Panel: React.FC = () => {
   return (

@@ -1,6 +1,7 @@
 import type { MenuContent as MenuContentType } from './constants';
 import ProfilePanel from './Profile/ProfilePanel';
 import GalaxyIndex from '@/components/panel/galaxy/GalaxyIndex';
+import StellarIndex from '@/components/panel/stellar/stellarIndex';
 
 interface MenuContentProps {
   content: MenuContentType;
@@ -19,14 +20,10 @@ export default function MenuContent({ content, menuId }: MenuContentProps) {
             <GalaxyIndex />
           </div>
         );
-      case 'system':
+      case 'stellar':
         return (
-          <div className="space-y-3">
-            <div className="p-3 bg-gray-card rounded-lg">
-              <div className="text-text-white text-sm font-medium">
-                {content.title}
-              </div>
-            </div>
+          <div className="w-full">
+            <StellarIndex />
           </div>
         );
       case 'alarm':
