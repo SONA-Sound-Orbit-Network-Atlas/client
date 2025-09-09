@@ -1,12 +1,11 @@
-import { useMemo, useRef, useState, useEffect } from 'react';
+import { useMemo, useRef } from 'react';
 import Star from './Star';
 import Planet from './Planet';
 import { useThree, useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 import { useSceneStore } from '@/stores/useSceneStore';
 import OrbitLine from './OrbitLine';
-import type { TStellarSystem } from '@/types/cosmos';
-import { detailStellarSystemsMock } from '@/mocks/data/stellarSystems';
+import { useStellarSystem } from '@/hooks/useStellarSystem';
 //항성계 컴포넌트
 
 export default function StellarSystem({
@@ -20,10 +19,9 @@ export default function StellarSystem({
     setFocusedPosition,
     selectedStellarSystemId,
     viewMode,
-    setSelectedStellarSystemId,
-    setSelectedStellarSystem,
     selectedStellarSystem,
   } = useSceneStore();
+  const { enterStellarSystemView } = useStellarSystem();
 
   const ref = useRef<THREE.Group>(null);
   const detailGroupRef = useRef<THREE.Group>(null);
@@ -31,29 +29,13 @@ export default function StellarSystem({
   const { camera } = useThree();
   const systemPos = new THREE.Vector3(...stellarSystemPos);
   const LOW_DETAIL_SIZE = 0.5;
-  const [stellarSystem, setStellarSystem] = useState<TStellarSystem | null>(
-    null
-  );
 
   const isSelectedSystem = useMemo(() => {
     return viewMode === 'StellarSystem' && selectedStellarSystemId === id;
   }, [viewMode, selectedStellarSystemId, id]);
 
-  // 선택되었을 때 데이터 조회 (useEffect 사용)
-  useEffect(() => {
-    if (isSelectedSystem) {
-      setStellarSystem(detailStellarSystemsMock[id]);
-    } else {
-      setStellarSystem(null);
-    }
-  }, [isSelectedSystem, id]);
-
   const onStellarSystemClicked = () => {
-    // 초점 위치 업데이트
-    setFocusedPosition(new THREE.Vector3(...stellarSystemPos));
-    // 선택된 항성계 업데이트
-    setSelectedStellarSystemId(id);
-    setSelectedStellarSystem(stellarSystem);
+    enterStellarSystemView(id);
   };
   useFrame(() => {
     // 항성계 LOD 처리
@@ -95,80 +77,76 @@ export default function StellarSystem({
           size={1}
           onClick={() => onStellarSystemClicked()}
         />
-        {stellarSystem?.planets.map((planet, index) => {
+        {selectedStellarSystem?.planets.map((planet, index) => {
           return (
             <>
-              {isSelectedSystem && (
-                <>
-                  <OrbitLine
-                    orbitRadius={
-                      selectedStellarSystem?.planets[index].distanceFromStar ||
-                      planet.distanceFromStar
-                    }
-                    inclination={
-                      selectedStellarSystem?.planets[index].inclination ||
-                      planet.inclination
-                    }
-                    eccentricity={
-                      selectedStellarSystem?.planets[index].eccentricity ||
-                      planet.eccentricity
-                    }
-                  />
-                </>
-              )}
+              <OrbitLine
+                orbitRadius={
+                  selectedStellarSystem.planets[index].distanceFromStar ||
+                  planet.distanceFromStar
+                }
+                inclination={
+                  selectedStellarSystem.planets[index].inclination ||
+                  planet.inclination
+                }
+                eccentricity={
+                  selectedStellarSystem.planets[index].eccentricity ||
+                  planet.eccentricity
+                }
+              />
               <Planet
                 key={index}
                 index={index}
                 distanceFromStar={
                   isSelectedSystem
-                    ? selectedStellarSystem?.planets[index].distanceFromStar ||
+                    ? selectedStellarSystem.planets[index].distanceFromStar ||
                       planet.distanceFromStar
                     : planet.distanceFromStar
                 }
                 orbitSpeed={
                   isSelectedSystem
-                    ? selectedStellarSystem?.planets[index].orbitSpeed ||
+                    ? selectedStellarSystem.planets[index].orbitSpeed ||
                       planet.orbitSpeed
                     : planet.orbitSpeed
                 }
                 planetSize={
                   isSelectedSystem
-                    ? selectedStellarSystem?.planets[index].planetSize ||
+                    ? selectedStellarSystem.planets[index].planetSize ||
                       planet.planetSize
                     : planet.planetSize
                 }
                 planetColor={
                   isSelectedSystem
-                    ? selectedStellarSystem?.planets[index].planetColor ||
+                    ? selectedStellarSystem.planets[index].planetColor ||
                       planet.planetColor
                     : planet.planetColor
                 }
                 planetBrightness={
                   isSelectedSystem
-                    ? selectedStellarSystem?.planets[index].planetBrightness ||
+                    ? selectedStellarSystem.planets[index].planetBrightness ||
                       planet.planetBrightness
                     : planet.planetBrightness
                 }
                 eccentricity={
                   isSelectedSystem
-                    ? selectedStellarSystem?.planets[index].eccentricity ||
+                    ? selectedStellarSystem.planets[index].eccentricity ||
                       planet.eccentricity
                     : planet.eccentricity
                 }
                 tilt={
                   isSelectedSystem
-                    ? selectedStellarSystem?.planets[index].tilt || planet.tilt
+                    ? selectedStellarSystem.planets[index].tilt || planet.tilt
                     : planet.tilt
                 }
                 rotationSpeed={
                   isSelectedSystem
-                    ? selectedStellarSystem?.planets[index].rotationSpeed ||
+                    ? selectedStellarSystem.planets[index].rotationSpeed ||
                       planet.rotationSpeed
                     : planet.rotationSpeed
                 }
                 inclination={
                   isSelectedSystem
-                    ? selectedStellarSystem?.planets[index].inclination ||
+                    ? selectedStellarSystem.planets[index].inclination ||
                       planet.inclination
                     : planet.inclination
                 }
@@ -178,12 +156,7 @@ export default function StellarSystem({
           );
         })}
       </group>
-      <mesh
-        ref={lowDetailMesh}
-        onClick={() =>
-          setFocusedPosition(new THREE.Vector3(...stellarSystemPos))
-        }
-      >
+      <mesh ref={lowDetailMesh} onClick={() => enterStellarSystemView(id)}>
         <sphereGeometry args={[LOW_DETAIL_SIZE, 8, 8]} />
         <meshStandardMaterial
           color="#ff6b6b"
