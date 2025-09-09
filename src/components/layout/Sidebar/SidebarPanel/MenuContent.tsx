@@ -1,7 +1,7 @@
 import type { MenuContent as MenuContentType } from './constants';
 import ProfilePanel from './Profile/ProfilePanel';
 import GalaxyIndex from '@/components/panel/galaxy/GalaxyIndex';
-import StellarIndex from '@/components/panel/stellar/stellarIndex';
+import StellarIndex from '@/components/panel/stellar/StellarIndex';
 
 interface MenuContentProps {
   content: MenuContentType;

@@ -1,4 +1,5 @@
 import axiosInstance from '@/lib/axios';
+import axios from 'axios';
 import type { LoginData, SignupData } from '@/types/auth';
 import type { User } from '@/types/user';
 
@@ -26,8 +27,9 @@ export const authAPI = {
     try {
       const response = await axiosInstance.get('/api/auth/login-check');
       return response.data;
-    } catch (error: any) {
-      if (error?.response?.status === 401) return null; // 비로그인은 정상 흐름
+    } catch (error) {
+      if (axios.isAxiosError(error) && error.response?.status === 401)
+        return null; // 비로그인은 정상 흐름
       throw error; // 그 외는 진짜 에러
     }
   },

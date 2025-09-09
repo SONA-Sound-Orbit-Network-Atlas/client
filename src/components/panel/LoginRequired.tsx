@@ -1,3 +1,3 @@
 export default function LoginRequired() {
-  return <div>로그인이 필요합니다. 로그인 ㄱㄱ</div>;
+  return <div>로그인이 필요한 서비스입니다.</div>;
 }
