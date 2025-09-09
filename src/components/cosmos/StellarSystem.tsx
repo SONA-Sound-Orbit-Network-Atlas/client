@@ -1,66 +1,13 @@
-import { useMemo, useRef, useState } from 'react';
+import { useMemo, useRef, useState, useEffect } from 'react';
 import Star from './Star';
 import Planet from './Planet';
 import { useThree, useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 import { useSceneStore } from '@/stores/useSceneStore';
 import OrbitLine from './OrbitLine';
-import type { TPlanet, TStellarSystem } from '@/types/cosmos';
+import type { TStellarSystem } from '@/types/cosmos';
+import { detailStellarSystemsMock } from '@/mocks/data/stellarSystems';
 //항성계 컴포넌트
-
-//mock data
-const mockPlanets: TPlanet[] = [
-  {
-    distanceFromStar: 3,
-    orbitSpeed: 0.3,
-    planetSize: 0.4,
-    planetColor: '#FFFFFF',
-    rotationSpeed: 0.3,
-    inclination: -180,
-    planetBrightness: 1,
-    eccentricity: 0.5,
-    tilt: 0,
-  },
-  {
-    distanceFromStar: 8.5,
-    orbitSpeed: 0.4,
-    planetSize: 0.6,
-    planetColor: '#96ceb4',
-    rotationSpeed: 0.4,
-    inclination: 120,
-    planetBrightness: 1,
-    eccentricity: 0.1,
-    tilt: 0,
-  },
-  {
-    distanceFromStar: 8,
-    orbitSpeed: 0.2,
-    planetSize: 0.6,
-    planetColor: '#feca57',
-    rotationSpeed: 0.2,
-    inclination: -35,
-    planetBrightness: 1,
-    eccentricity: 0.5,
-    tilt: 0,
-  },
-  {
-    distanceFromStar: 10,
-    orbitSpeed: 0.1,
-    planetSize: 0.8,
-    planetColor: '#ff9ff3',
-    rotationSpeed: 0.1,
-    inclination: 15,
-    planetBrightness: 0.1,
-    eccentricity: 0.1,
-    tilt: 0,
-  },
-];
-
-const mockStellarSystem: TStellarSystem = {
-  id: 1,
-  name: 'Stellar System 1',
-  planets: mockPlanets,
-};
 
 export default function StellarSystem({
   stellarSystemPos,
@@ -84,20 +31,30 @@ export default function StellarSystem({
   const { camera } = useThree();
   const systemPos = new THREE.Vector3(...stellarSystemPos);
   const LOW_DETAIL_SIZE = 0.5;
-  const [planets] = useState<TPlanet[]>(mockPlanets);
+  const [stellarSystem, setStellarSystem] = useState<TStellarSystem | null>(
+    null
+  );
+
+  const isSelectedSystem = useMemo(() => {
+    return viewMode === 'StellarSystem' && selectedStellarSystemId === id;
+  }, [viewMode, selectedStellarSystemId, id]);
+
+  // 선택되었을 때 데이터 조회 (useEffect 사용)
+  useEffect(() => {
+    if (isSelectedSystem) {
+      setStellarSystem(detailStellarSystemsMock[id]);
+    } else {
+      setStellarSystem(null);
+    }
+  }, [isSelectedSystem, id]);
 
   const onStellarSystemClicked = () => {
     // 초점 위치 업데이트
     setFocusedPosition(new THREE.Vector3(...stellarSystemPos));
     // 선택된 항성계 업데이트
     setSelectedStellarSystemId(id);
-    setSelectedStellarSystem(mockStellarSystem);
+    setSelectedStellarSystem(stellarSystem);
   };
-
-  const isSelectedSystem = useMemo(() => {
-    return viewMode === 'StellarSystem' && selectedStellarSystemId === id;
-  }, [viewMode, selectedStellarSystemId, id]);
-
   useFrame(() => {
     // 항성계 LOD 처리
     if (!ref.current || !detailGroupRef.current || !lowDetailMesh.current)
@@ -138,7 +95,7 @@ export default function StellarSystem({
           size={1}
           onClick={() => onStellarSystemClicked()}
         />
-        {planets.map((planet, index) => {
+        {stellarSystem?.planets.map((planet, index) => {
           return (
             <>
               {isSelectedSystem && (

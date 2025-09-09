@@ -22,8 +22,16 @@ export type TPlanet = {
   tilt: number;
 };
 
+export type TStellarSystemOnGalaxy = {
+  id: number;
+  name: string;
+  starColor: string;
+  stellarSystemPos: [number, number, number];
+};
+
 export type TStellarSystem = {
   id: number;
   name: string;
   planets: TPlanet[];
+  stellarSystemPos: [number, number, number];
 };
