@@ -32,13 +32,14 @@ function ContentComp({ sort }: { sort: SortLabel }) {
       sort: toSortValue(sort),
     });
 
-  const list: GalaxyCommunityListData[] = data?.pages.flat() ?? [];
+  const galaxyCommunityList: GalaxyCommunityListData[] =
+    data?.pages.flat() ?? [];
 
   return (
     <div>
       {/* 은하 리스트 */}
       <div className="space-y-3">
-        {list.map((galaxySystem: GalaxyCommunityListData) => (
+        {galaxyCommunityList.map((galaxySystem: GalaxyCommunityListData) => (
           <CardItem key={galaxySystem.galaxyName} {...galaxySystem} />
         ))}
       </div>

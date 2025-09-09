@@ -9,8 +9,8 @@ export const menuContents: Record<string, MenuContent> = {
   galaxy: {
     title: '은하 관리',
   },
-  system: {
-    title: '시스템 관리',
+  stellar: {
+    title: '스텔라시스템 관리',
   },
   alarm: {
     title: '알림 설정',

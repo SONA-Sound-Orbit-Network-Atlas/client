@@ -6,7 +6,7 @@ export interface GalaxyCommunityListData {
   updatedAt: string;
   planetCount: number;
   favoriteCount: number;
-  myFavorite: boolean;
+  myFavorite: boolean | null; // 로그인 상태면 true/false, 비로그인 상태면 null
 }
 
 // 은하 목록 조회 파라미터

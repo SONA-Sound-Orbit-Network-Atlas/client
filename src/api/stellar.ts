@@ -1,0 +1,39 @@
+import axiosInstance from '@/lib/axios';
+import type { StellarType } from '@/types/stellar';
+
+// stellar API
+export const stellarAPI = {
+  // 생성
+  createStellar: async (stellarData: StellarType): Promise<StellarType> => {
+    const response = await axiosInstance.post<StellarType>(
+      '/stellarSystems',
+      stellarData
+    );
+    return response.data;
+  },
+
+  // 조회
+  getStellar: async (stellarId: string): Promise<StellarType> => {
+    const response = await axiosInstance.get<StellarType>(
+      `/stellarSystems/${stellarId}`
+    );
+    return response.data;
+  },
+
+  // 수정
+  updateStellar: async (
+    stellarId: string,
+    stellarData: StellarType
+  ): Promise<StellarType> => {
+    const response = await axiosInstance.put<StellarType>(
+      `/stellarSystems/${stellarId}`,
+      stellarData
+    );
+    return response.data;
+  },
+
+  // 삭제
+  deleteStellar: async (stellarId: string): Promise<void> => {
+    await axiosInstance.delete(`/stellarSystems/${stellarId}`);
+  },
+};

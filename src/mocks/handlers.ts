@@ -1,22 +1,29 @@
 // 핸들러 : 요청을 가로채고 어떤 응답을 줄지 정의한다.
+import { http, HttpResponse } from 'msw';
 import galaxiesCommunity from './data/galaxiesCommunity';
 import galaxiesMy from './data/galaxiesMy';
-import { planet, planets, star } from './data/system';
+import { stellar } from './data/stellar';
 import { mockFetch, mockFetchInfinite } from './utils';
 
+const isLoggedIn = true; // 로그인 여부 테스트용
+
 export const handlers = [
-  // galaxy Community 리스트트 조회 (infinite)
+  // 세션 확인
+  http.get('/api/auth/login-check', async () => {
+    if (!isLoggedIn) {
+      // 비로그인: 401
+      return new HttpResponse(null, { status: 401 });
+    }
+    // 로그인: 200 + 유저 정보
+    return HttpResponse.json({ userId: 'u_1', email: 'dev@example.com' });
+  }),
+
+  // galaxy Community 리스트 조회 (infinite)
   mockFetchInfinite('/galaxies/community', galaxiesCommunity, 2000),
 
-  // galaxy My 리스트트 조회 (infinite)
+  // galaxy My 리스트 조회 (infinite)
   mockFetchInfinite('/galaxies/my', galaxiesMy, 2000),
 
-  // system 별 개별 정보 조회
-  mockFetch('/systems/:galaxyId/star', star, 2000),
-
-  // system 행성 개별 정보 조회
-  mockFetch('/systems/:galaxyId/planets/:planetNo', planet, 2000),
-
-  // system 별+행성 목록 조회
-  mockFetch('/systems/:galaxyId/planets', planets, 2000),
+  // stellar 정보 조회
+  mockFetch('/stellarSystems/:stellarId', stellar, 2000),
 ];
