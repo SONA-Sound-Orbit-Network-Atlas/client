@@ -2,6 +2,7 @@ import { useSidebarStore } from '@/stores/sidebarStore';
 import LoginPanel from './LoginPanel';
 import SignUpPanel from './SignUpPanel';
 import ProfileView from './ProfileView';
+import EditProfilePanel from './EditProfilePanel';
 import LikesPanel from './LikesPanel';
 import FollowersPanel from './FollowersPanel';
 import FollowingsPanel from './FollowingsPanel';
@@ -22,6 +23,8 @@ export default function ProfilePanel() {
 
     // 로그인된 상태
     switch (profilePanelMode) {
+      case 'editProfile':
+        return <EditProfilePanel />;
       case 'likes':
         return <LikesPanel />;
       case 'followers':
