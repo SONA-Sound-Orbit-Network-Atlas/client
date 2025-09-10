@@ -15,12 +15,8 @@ export default function StellarSystem({
   stellarSystemPos: [number, number, number];
   id: number;
 }) {
-  const {
-    setFocusedPosition,
-    selectedStellarSystemId,
-    viewMode,
-    selectedStellarSystem,
-  } = useSceneStore();
+  const { selectedStellarSystemId, viewMode, selectedStellarSystem } =
+    useSceneStore();
   const { enterStellarSystemView } = useStellarSystem();
 
   const ref = useRef<THREE.Group>(null);
