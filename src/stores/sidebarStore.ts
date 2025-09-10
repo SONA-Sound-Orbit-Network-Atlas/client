@@ -8,6 +8,7 @@ interface SidebarState {
     | 'login'
     | 'signup'
     | 'profile'
+    | 'editProfile'
     | 'likes'
     | 'followers'
     | 'followings';
@@ -16,7 +17,14 @@ interface SidebarState {
   toggleSecondarySidebar: (menu: string) => void;
   setLoginStatus: (status: boolean) => void;
   setProfilePanelMode: (
-    mode: 'login' | 'signup' | 'profile' | 'likes' | 'followers' | 'followings'
+    mode:
+      | 'login'
+      | 'signup'
+      | 'profile'
+      | 'editProfile'
+      | 'likes'
+      | 'followers'
+      | 'followings'
   ) => void;
 }
 
@@ -57,7 +65,14 @@ export const useSidebarStore = create<SidebarState>((set, get) => ({
       isLoggedIn: status,
     }),
   setProfilePanelMode: (
-    mode: 'login' | 'signup' | 'profile' | 'likes' | 'followers' | 'followings'
+    mode:
+      | 'login'
+      | 'signup'
+      | 'profile'
+      | 'editProfile'
+      | 'likes'
+      | 'followers'
+      | 'followings'
   ) =>
     set({
       profilePanelMode: mode,

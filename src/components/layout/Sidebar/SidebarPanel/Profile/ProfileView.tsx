@@ -52,7 +52,12 @@ export default function ProfileView() {
                 {profile.about}
               </p>
             </div>
-            <Button color="secondary" size="lg" className="w-full">
+            <Button
+              color="secondary"
+              size="lg"
+              className="w-full"
+              onClick={() => setProfilePanelMode('editProfile')}
+            >
               <FiEdit3 />
               EDIT PROFILE
             </Button>
