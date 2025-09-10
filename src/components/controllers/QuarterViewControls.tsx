@@ -2,6 +2,8 @@ import { OrbitControls } from '@react-three/drei';
 import { useRef } from 'react';
 import * as THREE from 'three';
 import type { OrbitControls as OrbitControlsImpl } from 'three-stdlib';
+import { useThree } from '@react-three/fiber';
+import { useSceneStore } from '@/stores/useSceneStore';
 
 /**
  * X,Z축 이동
@@ -12,10 +14,14 @@ import type { OrbitControls as OrbitControlsImpl } from 'three-stdlib';
 
 export default function QuarterViewControls() {
   const controls = useRef<OrbitControlsImpl>(null);
+  const { viewMode } = useSceneStore();
+  const { camera } = useThree();
 
   return (
     <OrbitControls
       ref={controls}
+      enabled={viewMode === 'Galaxy'}
+      camera={camera}
       enableRotate={true}
       enablePan={true}
       screenSpacePanning={false}

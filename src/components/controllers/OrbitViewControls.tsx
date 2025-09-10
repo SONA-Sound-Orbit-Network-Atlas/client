@@ -21,7 +21,7 @@ export default function OrbitViewControls({
   targetPosition,
 }: OrbitViewControlsProps) {
   const controls = useRef<OrbitControlsImpl>(null);
-  const { cameraIsMoving } = useSceneStore();
+  const { cameraIsMoving, viewMode } = useSceneStore();
   const [controlsReady, setControlsReady] = useState(false);
 
   // OrbitControls ref 콜백
@@ -45,6 +45,7 @@ export default function OrbitViewControls({
   return (
     <OrbitControls
       ref={controlsRefCallback}
+      enabled={viewMode === 'StellarSystem'}
       enableDamping={!cameraIsMoving} // 카메라 이동 중에는 damping 비활성화
       dampingFactor={0.05}
       enableRotate={!cameraIsMoving} // 카메라 이동 중에는 회전 비활성화
