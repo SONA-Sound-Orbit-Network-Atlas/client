@@ -1,13 +1,13 @@
 // hooks/useSmoothCameraMove.ts
 import { useFrame, useThree } from '@react-three/fiber';
 import * as THREE from 'three';
-import { useRef, useEffect } from 'react';
+import { useRef, useEffect, useMemo } from 'react';
 import type { OrbitControls as OrbitControlsImpl } from 'three-stdlib';
 import { useSceneStore } from '@/stores/useSceneStore';
 
 interface UseSmoothCameraMoveProps {
-  targetPosition: THREE.Vector3; // 이동 목표 포지션션
-  controlsRef: OrbitControlsImpl | null;
+  targetPosition: THREE.Vector3; // 이동 목표 포지션
+  controlsRef: OrbitControlsImpl;
   duration?: number; // 카메라 이동 시간
   onMoveEnd?: () => void;
   onMoveStart?: () => void;
@@ -24,40 +24,60 @@ export function useSmoothCameraMove({
   const isMovingRef = useRef<boolean>(false);
   const startTimeRef = useRef<number>(0);
   const { camera } = useThree();
-  // 카메라 이동 오프셋
-  const offset = new THREE.Vector3(5, 10, 6);
+
+  // 콜백 함수들을 ref로 저장
+  const onMoveStartRef = useRef(onMoveStart);
+  const onMoveEndRef = useRef(onMoveEnd);
+
+  // ref 업데이트
+  onMoveStartRef.current = onMoveStart;
+  onMoveEndRef.current = onMoveEnd;
+
+  const offset = useMemo(() => new THREE.Vector3(5, 10, 6), []);
   const targetCameraPosRef = useRef<THREE.Vector3>(
     targetPosition.clone().add(offset)
   );
+  console.log('isMovingRef', isMovingRef.current);
 
   useEffect(() => {
     if (targetPosition) {
-      //카메라 이동 로직을 위한 타겟 포지션 설정
-      targetCameraPosRef.current = targetPosition.clone().add(offset);
-      //카메라 이동 로직 시작
-      isMovingRef.current = true;
-      startTimeRef.current = 0;
-      setCameraIsMoving(true);
-      onMoveStart?.();
-    }
-  }, [targetPosition, onMoveStart]); // setCameraIsMoving은 로깅용이기 때문에 의존성 배열에 포함X
+      // 이전 위치와 비교하여 실제로 변경되었을 때만 실행
+      const currentTarget = targetCameraPosRef.current.clone().sub(offset);
+      if (currentTarget.distanceTo(targetPosition) > 0.1) {
+        // 새로운 타겟 위치 업데이트
+        targetCameraPosRef.current.copy(targetPosition.clone().add(offset));
 
-  useFrame((state, deltaTime) => {
+        // 이미 이동 중이 아니라면 새 애니메이션 시작
+        if (!isMovingRef.current) {
+          isMovingRef.current = true;
+          startTimeRef.current = 0;
+          setCameraIsMoving(true);
+          onMoveStartRef.current?.();
+        }
+      }
+    }
+  }, [targetPosition, offset, controlsRef, setCameraIsMoving]);
+
+  useFrame((_, deltaTime) => {
     if (targetPosition && isMovingRef.current) {
-      //경과 시간 계산
       startTimeRef.current += deltaTime;
       const progress = Math.min(startTimeRef.current / duration, 1.0);
       const easedProgress = easeInOutCubic(progress);
-      // 부드러운 카메라 이동
-      camera.position.lerp(targetCameraPosRef.current, easedProgress);
-      controlsRef?.target.lerp(targetPosition, easedProgress);
 
-      // 카메라 이동 완료 체크
+      // 카메라 위치를 부드럽게 보간
+      camera.position.lerp(targetCameraPosRef.current, easedProgress * 0.1);
+
+      // 컨트롤 타겟도 부드럽게 보간
+      if (controlsRef?.target) {
+        controlsRef.target.lerp(targetPosition, easedProgress * 0.1);
+      }
+
+      // 애니메이션 완료 체크 (거리와 시간 모두 고려)
       const distance = camera.position.distanceTo(targetCameraPosRef.current);
-      if (distance < 0.1) {
+      if (distance < 0.1 || progress >= 1.0) {
         isMovingRef.current = false;
         setCameraIsMoving(false);
-        onMoveEnd?.();
+        onMoveEndRef.current?.(); // 종료 콜백 호출
       }
     }
   });

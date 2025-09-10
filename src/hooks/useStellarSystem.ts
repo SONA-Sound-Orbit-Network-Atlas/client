@@ -13,42 +13,37 @@ export function useStellarSystem() {
     setSelectedStellarSystemId,
     setSelectedStellarSystem,
     setViewMode,
-    setFocusedPosition,
+    setCameraTarget,
   } = useSceneStore();
 
   // 항성계 뷰 진입
   const enterStellarSystemView = useCallback(
     (stellarSystemId: number) => {
+      // 데이터 로딩
       const mockStellarSystem = getStellarSystemOnMock(stellarSystemId);
+      // 카메라 타겟 설정
+      setCameraTarget(new THREE.Vector3(...mockStellarSystem.stellarSystemPos));
+      // 뷰 모드 변경
       setViewMode('StellarSystem');
+      // 선택한 항성계 설정
       setSelectedStellarSystemId(stellarSystemId);
-      // TODO : ID로 항성계 조회 api 호출
       if (mockStellarSystem) {
         setSelectedStellarSystem(mockStellarSystem);
       }
-      setFocusedPosition(
-        new THREE.Vector3(...mockStellarSystem.stellarSystemPos)
-      );
     },
     [
       setSelectedStellarSystemId,
       setSelectedStellarSystem,
-      setFocusedPosition,
       setViewMode,
+      setCameraTarget,
     ]
   );
 
   const changeToGalaxyView = useCallback(() => {
     setViewMode('Galaxy');
-    setFocusedPosition(null);
     setSelectedStellarSystemId(null);
     setSelectedStellarSystem(null);
-  }, [
-    setViewMode,
-    setFocusedPosition,
-    setSelectedStellarSystemId,
-    setSelectedStellarSystem,
-  ]);
+  }, [setViewMode, setSelectedStellarSystemId, setSelectedStellarSystem]);
 
   return { enterStellarSystemView, changeToGalaxyView };
 }

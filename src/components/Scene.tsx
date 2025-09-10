@@ -1,23 +1,12 @@
 import { Grid } from '@react-three/drei';
 import * as THREE from 'three';
 import Galaxy from './cosmos/Galaxy';
-import { useSceneStore } from '@/stores/useSceneStore';
-import { useEffect } from 'react';
 import MainCamera from './systems/MainCamera';
 import BackgroundStars from './cosmos/BackgroundStars';
 
 // 화면 표시
 export default function Scene() {
-  const { focusedPosition, setViewMode } = useSceneStore();
   const axesHelper = new THREE.AxesHelper(5);
-
-  useEffect(() => {
-    if (focusedPosition) {
-      setViewMode('StellarSystem');
-    } else {
-      setViewMode('Galaxy');
-    }
-  }, [focusedPosition]);
 
   return (
     <>

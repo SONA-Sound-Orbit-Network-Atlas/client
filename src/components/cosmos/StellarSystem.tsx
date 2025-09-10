@@ -71,7 +71,7 @@ export default function StellarSystem({
           position={[0, 0, 0]}
           color="#ff6b6b"
           size={1}
-          onClick={() => onStellarSystemClicked()}
+          onClick={onStellarSystemClicked}
         />
         {selectedStellarSystem?.planets.map((planet, index) => {
           return (
@@ -152,7 +152,7 @@ export default function StellarSystem({
           );
         })}
       </group>
-      <mesh ref={lowDetailMesh} onClick={() => enterStellarSystemView(id)}>
+      <mesh ref={lowDetailMesh} onClick={onStellarSystemClicked}>
         <sphereGeometry args={[LOW_DETAIL_SIZE, 8, 8]} />
         <meshStandardMaterial
           color="#ff6b6b"

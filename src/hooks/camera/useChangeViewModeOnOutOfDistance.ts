@@ -1,5 +1,5 @@
 import { useFrame } from '@react-three/fiber';
-import { useSceneStore } from '@/stores/useSceneStore';
+import { useStellarSystem } from '../useStellarSystem';
 
 /**
  * 카메라 줌 거리 초과 시 카메라 모드 변경
@@ -22,20 +22,12 @@ export function useChangeViewModeOnOutOfDistance({
   onOutOfDistance,
   movementLockRef,
 }: useChangeViewModeOnOutOfDistanceProps) {
-  const {
-    setViewMode,
-    setFocusedPosition,
-    setSelectedStellarSystemId,
-    setSelectedStellarSystem,
-  } = useSceneStore();
+  const { changeToGalaxyView } = useStellarSystem();
   useFrame(() => {
     // 줌 거리 체크 (항상 실행)
     if (movementLockRef.current) return;
     if (distanceRef.current > targetDistance) {
-      setViewMode('Galaxy');
-      setFocusedPosition(null);
-      setSelectedStellarSystemId(null);
-      setSelectedStellarSystem(null);
+      changeToGalaxyView();
       onOutOfDistance?.();
     }
   });
