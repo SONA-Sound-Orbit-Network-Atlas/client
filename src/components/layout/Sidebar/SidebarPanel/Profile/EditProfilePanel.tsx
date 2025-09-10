@@ -48,7 +48,6 @@ export default function EditProfilePanel() {
                 </TextField>
                 <TextField label="ABOUT" htmlFor="about">
                   <Textarea
-                    type="text"
                     placeholder="Tell us about yourself..."
                     id="about"
                   />
