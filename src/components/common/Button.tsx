@@ -10,11 +10,11 @@ const buttonVariants = cva(
     variants: {
       color: {
         primary:
-          'bg-gradient-to-r from-secondary-300 to-primary-300 text-text-white border-secondary-300-20 hover:brightness-110 hover:border-secondary-300',
+          'bg-gradient-to-r from-secondary-300 to-primary-300 text-text-white border-secondary-300/20 hover:brightness-110 hover:border-secondary-300/50',
         secondary:
-          'bg-tertiary-200-10 text-tertiary-200 border-tertiary-200-20 hover:bg-tertiary-200-20 hover:border-tertiary-200-30',
+          'bg-tertiary-200/10 text-tertiary-200 border-tertiary-200/20 hover:brightness-110 hover:bg-tertiary-200/20 hover:border-tertiary-200/30',
         tertiary:
-          'text-text-white border-gray-border bg-gray-card hover:bg-gray-border hover:border-text-muted',
+          'text-text-white border-gray-border bg-gray-card hover:brightness-110 hover:bg-gray-border hover:border-primary-300/20',
         transparent: 'text-text-muted border-none bg-transparent',
       },
       size: {
