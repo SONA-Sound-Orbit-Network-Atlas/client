@@ -1,60 +1,12 @@
-import { useRef, useState } from 'react';
+import { useMemo, useRef } from 'react';
 import Star from './Star';
 import Planet from './Planet';
 import { useThree, useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 import { useSceneStore } from '@/stores/useSceneStore';
 import OrbitLine from './OrbitLine';
-import type { TPlanet } from '@/types/cosmos';
+import { useStellarSystem } from '@/hooks/useStellarSystem';
 //항성계 컴포넌트
-
-//mock data
-const mockPlanets: TPlanet[] = [
-  {
-    distanceFromStar: 3,
-    orbitSpeed: 0.3,
-    planetSize: 0.8,
-    planetColor: '#FFFFFF',
-    rotationSpeed: 0.3,
-    inclination: -180,
-    planetBrightness: 1,
-    eccentricity: 0.5,
-    tilt: 0,
-  },
-  {
-    distanceFromStar: 4,
-    orbitSpeed: 0.4,
-    planetSize: 1.2,
-    planetColor: '#96ceb4',
-    rotationSpeed: 0.4,
-    inclination: 120,
-    planetBrightness: 1,
-    eccentricity: 0.1,
-    tilt: 0,
-  },
-  {
-    distanceFromStar: 2,
-    orbitSpeed: 0.2,
-    planetSize: 0.6,
-    planetColor: '#feca57',
-    rotationSpeed: 0.2,
-    inclination: -35,
-    planetBrightness: 1,
-    eccentricity: 0.5,
-    tilt: 0,
-  },
-  {
-    distanceFromStar: 5,
-    orbitSpeed: 0.1,
-    planetSize: 0.9,
-    planetColor: '#ff9ff3',
-    rotationSpeed: 0.1,
-    inclination: 15,
-    planetBrightness: 1,
-    eccentricity: 0.1,
-    tilt: 0,
-  },
-];
 
 export default function StellarSystem({
   stellarSystemPos,
@@ -63,101 +15,128 @@ export default function StellarSystem({
   stellarSystemPos: [number, number, number];
   id: number;
 }) {
-  const {
-    setFocusedPosition,
-    selectedStellarSystemId,
-    viewMode,
-    setSelectedStellarSystemId,
-  } = useSceneStore();
+  const { selectedStellarSystemId, viewMode, selectedStellarSystem } =
+    useSceneStore();
+  const { enterStellarSystemView } = useStellarSystem();
 
   const ref = useRef<THREE.Group>(null);
   const detailGroupRef = useRef<THREE.Group>(null);
   const lowDetailMesh = useRef<THREE.Mesh>(null);
-  const { camera } = useThree();
-  const systemPos = new THREE.Vector3(...stellarSystemPos);
+  const LOW_DETAIL_SIZE = 0.5;
 
-  const [planets] = useState<TPlanet[]>(mockPlanets);
+  const isSelectedSystem = useMemo(() => {
+    return viewMode === 'StellarSystem' && selectedStellarSystemId === id;
+  }, [viewMode, selectedStellarSystemId, id]);
 
-  useFrame(() => {
-    // 항성계 LOD 처리
-    if (!ref.current || !detailGroupRef.current || !lowDetailMesh.current)
+  const onStellarSystemClicked = () => {
+    if (isSelectedSystem) {
       return;
+    }
+    enterStellarSystemView(id);
+  };
+  useFrame(() => {
+    // 선택된 시스템만 디테일 그룹 표시, 선택되지 않은 시스템은 로우 디테일 매쉬만 표시
+    if (!detailGroupRef.current || !lowDetailMesh.current) return;
 
-    const distance = camera.position.distanceTo(systemPos);
-
-    //factor 값을 계산
-    const minDistance = 100; // 거리가 20 이하면 완전히 보임
-    const fadeRange = 10; // 20~30 거리에서 페이드 아웃
-    const maxOpacity = 1; // 최대 투명도
-    const minOpacity = 0; // 최소 투명도
-
-    const factor =
-      maxOpacity -
-      Math.min(
-        Math.max((distance - minDistance) / fadeRange, minOpacity),
-        maxOpacity
-      );
-
-    //메시 스케일 조정정
-    detailGroupRef.current.scale.set(factor, factor, factor);
-    lowDetailMesh.current.scale.set(1 - factor, 1 - factor, 1 - factor);
+    // 선택된 시스템인지에 따라 표시/숨김 처리
+    detailGroupRef.current.visible = isSelectedSystem;
+    lowDetailMesh.current.visible = !isSelectedSystem;
   });
 
   return (
     <group
       ref={ref}
       position={stellarSystemPos}
-      onClick={() => setSelectedStellarSystemId(id)}
+      onClick={onStellarSystemClicked}
     >
       <group ref={detailGroupRef}>
         <Star
           position={[0, 0, 0]}
           color="#ff6b6b"
-          size={1.5}
-          onClick={() =>
-            setFocusedPosition(new THREE.Vector3(...stellarSystemPos))
-          }
+          size={1}
+          onClick={onStellarSystemClicked}
         />
-        {planets.map((planet, index) => {
-          // StellarSystem 뷰에서 선택된 항성계일 때 inclination을 0으로
-          const effectiveInclination = planet.inclination;
-          // viewMode === 'StellarSystem' && selectedStellarSystemId === id
-          //   ? 0 // 위에서 보는 시점 (모든 궤도가 수평)
-          //   : planet.inclination; // 원래 기울기 유지
-
+        {selectedStellarSystem?.planets.map((planet, index) => {
           return (
             <>
-              {viewMode === 'StellarSystem' &&
-                selectedStellarSystemId === id && (
-                  <OrbitLine
-                    orbitRadius={planet.distanceFromStar}
-                    inclination={effectiveInclination}
-                    eccentricity={planet.eccentricity}
-                  />
-                )}
+              <OrbitLine
+                orbitRadius={
+                  selectedStellarSystem.planets[index].distanceFromStar ||
+                  planet.distanceFromStar
+                }
+                inclination={
+                  selectedStellarSystem.planets[index].inclination ||
+                  planet.inclination
+                }
+                eccentricity={
+                  selectedStellarSystem.planets[index].eccentricity ||
+                  planet.eccentricity
+                }
+              />
               <Planet
                 key={index}
-                distanceFromStar={planet.distanceFromStar}
-                orbitSpeed={planet.orbitSpeed}
-                planetSize={planet.planetSize}
-                planetColor={planet.planetColor}
-                planetBrightness={planet.planetBrightness}
-                eccentricity={planet.eccentricity}
-                tilt={planet.tilt}
-                rotationSpeed={planet.rotationSpeed}
-                inclination={effectiveInclination}
+                index={index}
+                distanceFromStar={
+                  isSelectedSystem
+                    ? selectedStellarSystem.planets[index].distanceFromStar ||
+                      planet.distanceFromStar
+                    : planet.distanceFromStar
+                }
+                orbitSpeed={
+                  isSelectedSystem
+                    ? selectedStellarSystem.planets[index].orbitSpeed ||
+                      planet.orbitSpeed
+                    : planet.orbitSpeed
+                }
+                planetSize={
+                  isSelectedSystem
+                    ? selectedStellarSystem.planets[index].planetSize ||
+                      planet.planetSize
+                    : planet.planetSize
+                }
+                planetColor={
+                  isSelectedSystem
+                    ? selectedStellarSystem.planets[index].planetColor ||
+                      planet.planetColor
+                    : planet.planetColor
+                }
+                planetBrightness={
+                  isSelectedSystem
+                    ? selectedStellarSystem.planets[index].planetBrightness ||
+                      planet.planetBrightness
+                    : planet.planetBrightness
+                }
+                eccentricity={
+                  isSelectedSystem
+                    ? selectedStellarSystem.planets[index].eccentricity ||
+                      planet.eccentricity
+                    : planet.eccentricity
+                }
+                tilt={
+                  isSelectedSystem
+                    ? selectedStellarSystem.planets[index].tilt || planet.tilt
+                    : planet.tilt
+                }
+                rotationSpeed={
+                  isSelectedSystem
+                    ? selectedStellarSystem.planets[index].rotationSpeed ||
+                      planet.rotationSpeed
+                    : planet.rotationSpeed
+                }
+                inclination={
+                  isSelectedSystem
+                    ? selectedStellarSystem.planets[index].inclination ||
+                      planet.inclination
+                    : planet.inclination
+                }
+                isSelectable={isSelectedSystem}
               />
             </>
           );
         })}
       </group>
-      <mesh
-        ref={lowDetailMesh}
-        onClick={() =>
-          setFocusedPosition(new THREE.Vector3(...stellarSystemPos))
-        }
-      >
-        <sphereGeometry args={[1.5, 16, 16]} />
+      <mesh ref={lowDetailMesh} onClick={onStellarSystemClicked}>
+        <sphereGeometry args={[LOW_DETAIL_SIZE, 8, 8]} />
         <meshStandardMaterial
           color="#ff6b6b"
           emissive="#ffffff"
