@@ -1,18 +1,49 @@
-import { FiUserCheck } from 'react-icons/fi';
 import { useSidebarStore } from '@/stores/sidebarStore';
 import PanelHeader from '../PanelHeader';
-import Card from '@/components/common/Card';
-import Iconframe from '@/components/common/Iconframe';
+import UserCard from '@/components/common/UserCard';
+import { ScrollArea } from '@/components/common/Scrollarea';
 
 export default function FollowingsPanel() {
   const { setProfilePanelMode } = useSidebarStore();
 
   // 임시 데이터
   const followings = [
-    { id: 1, username: 'Following1', joinDate: '2024-01-10' },
-    { id: 2, username: 'Following2', joinDate: '2024-02-15' },
-    { id: 3, username: 'Following3', joinDate: '2024-03-05' },
+    {
+      id: 1,
+      username: 'Following1',
+      isFollowing: true,
+      isMutualFollow: true, // 서로 팔로우
+    },
+    {
+      id: 2,
+      username: 'Following2',
+      isFollowing: true,
+      isMutualFollow: false,
+    },
+    {
+      id: 3,
+      username: 'Following3',
+      isFollowing: true,
+      isMutualFollow: true, // 서로 팔로우
+    },
+    {
+      id: 4,
+      username: 'Following4',
+      isFollowing: true,
+      isMutualFollow: false,
+    },
+    {
+      id: 5,
+      username: 'Following5',
+      isFollowing: true,
+      isMutualFollow: true, // 서로 팔로우
+    },
   ];
+
+  const handleUnfollow = (userId: number) => {
+    console.log('Unfollow user:', userId);
+    // TODO: API 호출로 언팔로우 처리
+  };
 
   return (
     <>
@@ -21,7 +52,27 @@ export default function FollowingsPanel() {
         showBackButton={true}
         onBack={() => setProfilePanelMode('profile')}
       />
-      <div className="flex flex-col p-4 h-full overflow-hidden"></div>
+      <div className="flex flex-col h-full overflow-hidden">
+        <ScrollArea className="flex-1 min-h-0">
+          <div className="p-4">
+            <p className="text-text-muted text-sm font-semibold mb-[16px]">
+              FOLLOWINGS ({followings.length})
+            </p>
+            <div className="space-y-3">
+              {followings.map((following) => (
+                <UserCard
+                  key={following.id}
+                  id={following.id}
+                  username={following.username}
+                  isFollowing={following.isFollowing}
+                  isMutualFollow={following.isMutualFollow}
+                  onUnfollow={handleUnfollow}
+                />
+              ))}
+            </div>
+          </div>
+        </ScrollArea>
+      </div>
     </>
   );
 }
