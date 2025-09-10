@@ -39,33 +39,17 @@ export function useSmoothCameraMove({
   );
 
   useEffect(() => {
-    if (targetPosition) {
+    if (targetPosition && controlsRef) {
       // 새로운 타겟 위치 업데이트
       targetCameraPosRef.current.copy(targetPosition.clone().add(offset));
 
-      // controlsRef가 준비되었을 때만 애니메이션 시작
-      if (controlsRef) {
-        isMovingRef.current = true;
-        startTimeRef.current = 0;
-        setCameraIsMoving(true);
-        onMoveStartRef.current?.();
-      }
+      // 애니메이션 시작
+      isMovingRef.current = true;
+      startTimeRef.current = 0;
+      setCameraIsMoving(true);
+      onMoveStartRef.current?.();
     }
   }, [targetPosition, offset, controlsRef, setCameraIsMoving]);
-
-  // controlsRef가 준비된 후 대기 중인 애니메이션 시작
-  useEffect(() => {
-    if (controlsRef && targetPosition && !isMovingRef.current) {
-      // 타겟 위치가 이미 설정되어 있고 애니메이션이 시작되지 않았다면 시작
-      const currentTarget = targetCameraPosRef.current.clone().sub(offset);
-      if (currentTarget.distanceTo(targetPosition) > 0.1) {
-        isMovingRef.current = true;
-        startTimeRef.current = 0;
-        setCameraIsMoving(true);
-        onMoveStartRef.current?.();
-      }
-    }
-  }, [controlsRef, targetPosition, offset, setCameraIsMoving]);
 
   useFrame((_, deltaTime) => {
     if (targetPosition && isMovingRef.current && controlsRef) {
