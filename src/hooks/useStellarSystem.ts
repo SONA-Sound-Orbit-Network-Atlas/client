@@ -38,5 +38,17 @@ export function useStellarSystem() {
     ]
   );
 
-  return { enterStellarSystemView };
+  const changeToGalaxyView = useCallback(() => {
+    setViewMode('Galaxy');
+    setFocusedPosition(null);
+    setSelectedStellarSystemId(null);
+    setSelectedStellarSystem(null);
+  }, [
+    setViewMode,
+    setFocusedPosition,
+    setSelectedStellarSystemId,
+    setSelectedStellarSystem,
+  ]);
+
+  return { enterStellarSystemView, changeToGalaxyView };
 }

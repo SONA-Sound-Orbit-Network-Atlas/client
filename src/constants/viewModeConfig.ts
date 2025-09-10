@@ -1,18 +1,18 @@
 export const VIEW_MODE_CONFIG = {
   transition: {
     galaxyToStellar: {
-      duration: 2000,
+      duration: 2,
       cameraDistance: 15,
       easing: 'easeInOut',
     },
     stellarToGalaxy: {
-      duration: 1500,
+      duration: 1.5,
       cameraDistance: 20,
       easing: 'easeOut',
     },
   },
   thresholds: {
-    maxStellarZoomDistance: 20,
+    maxStellarZoomDistance: 15,
     minGalaxyZoomDistance: 2,
   },
 };

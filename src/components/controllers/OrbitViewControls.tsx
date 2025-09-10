@@ -6,6 +6,7 @@ import { useRef, useCallback } from 'react';
 import { useSceneStore } from '@/stores/useSceneStore';
 import { useSmoothCameraMove } from '@/hooks/camera/useSmoothCameraMove';
 import { useChangeViewModeOnOutOfDistance } from '@/hooks/camera/useChangeViewModeOnOutOfDistance';
+import { VIEW_MODE_CONFIG } from '@/constants/viewModeConfig';
 
 /**
  * X,Z축 이동
@@ -27,7 +28,6 @@ export default function OrbitViewControls({
   const isMovingRef = useRef<boolean>(false);
   const controls = useRef<OrbitControlsImpl>(null);
   const distanceRef = useRef<number>(0);
-  const duration = 2; // 카메라 이동 시간
 
   const handleMoveStart = useCallback(() => {
     isMovingRef.current = true;
@@ -39,7 +39,7 @@ export default function OrbitViewControls({
   useSmoothCameraMove({
     targetPosition,
     controlsRef: controls.current,
-    duration,
+    duration: VIEW_MODE_CONFIG.transition.galaxyToStellar.duration,
     onMoveStart: handleMoveStart,
     onMoveEnd: handleMoveEnd,
   });
@@ -47,15 +47,6 @@ export default function OrbitViewControls({
   // 거리 계산 로직
   useFrame(() => {
     distanceRef.current = controls.current?.getDistance() || 0;
-  });
-  useChangeViewModeOnOutOfDistance({
-    distanceRef: distanceRef,
-    targetDistance: 20,
-    movementLockRef: isMovingRef,
-    onOutOfDistance: () => {
-      //TODO : zomeout 되면서 카메라 변경시 화면을 그대로 이어가기위해 카메라 타겟 설정중입니다. 추후 리팩토링 필요
-      setCameraTarget(targetPosition);
-    },
   });
 
   return (
@@ -66,7 +57,7 @@ export default function OrbitViewControls({
       enableRotate={true}
       enableZoom={!isMovingRef.current}
       enablePan={false}
-      maxDistance={16}
+      maxDistance={VIEW_MODE_CONFIG.thresholds.maxStellarZoomDistance}
     />
   );
 }
