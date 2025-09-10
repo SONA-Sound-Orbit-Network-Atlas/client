@@ -41,8 +41,6 @@ function ObjectsContent() {
       <div className="space-y-3">
         {stellarStore.objects.length > 0 ? (
           stellarStore.objects.map((data, index) => {
-            console.log('data : ', data);
-            console.log('selectedObjectId : ', selectedObjectId);
             return (
               <StellarCard
                 key={index}

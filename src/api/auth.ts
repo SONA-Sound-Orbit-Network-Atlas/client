@@ -25,7 +25,7 @@ export const authAPI = {
   // 세션 조회: 200이면 User, 401이면 null을 반환
   getSession: async (): Promise<User | null> => {
     try {
-      const response = await axiosInstance.get('/api/auth/login-check');
+      const response = await axiosInstance.get('/api/auth/session');
       return response.data;
     } catch (error) {
       if (axios.isAxiosError(error) && error.response?.status === 401)

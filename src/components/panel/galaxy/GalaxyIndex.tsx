@@ -10,7 +10,10 @@ import GalaxyMy from './my/GalaxyMy';
 export default function GalaxyIndex() {
   return (
     <div>
-      <Tabs defaultValue="COMMUNITY" className="w-full gap-0">
+      <Tabs
+        defaultValue="COMMUNITY"
+        className="w-full h-full gap-0 overflow-hidden"
+      >
         <TabsList className="grid w-full grid-cols-2">
           <TabsTrigger value="COMMUNITY">COMMUNITY</TabsTrigger>
           <TabsTrigger value="MY">MY</TabsTrigger>

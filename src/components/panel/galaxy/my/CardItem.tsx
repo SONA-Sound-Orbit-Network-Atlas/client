@@ -3,14 +3,19 @@ import { IoPlanetOutline } from 'react-icons/io5';
 import { FaRegHeart } from 'react-icons/fa';
 import type { GalaxyMyListData } from '@/types/galaxyMy';
 
+interface CardItemProps extends GalaxyMyListData {
+  onClick: () => void;
+}
+
 export default function CardItem({
   galaxyName,
   updatedAt,
   planetCount,
   favoriteCount,
-}: GalaxyMyListData) {
+  onClick,
+}: CardItemProps) {
   return (
-    <Card>
+    <Card onClick={onClick}>
       <div className="flex justify-between items-center">
         <div className="flex-1 min-w-0">
           <div className="text-[14px] font-bold flex items-center">

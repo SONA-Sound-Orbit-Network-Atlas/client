@@ -3,6 +3,10 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { stellarAPI } from '@/api/stellar';
 import type { StellarType } from '@/types/stellar';
+import { useStellarStore } from '@/stores/useStellarStore';
+import { useEffect } from 'react';
+import { useSelectedStellarStore } from '@/stores/useSelectedStellarStore';
+import { useSidebarStore } from '@/stores/sidebarStore';
 
 // 생성
 export function useCreateStellar(stellarData: StellarType) {
@@ -12,11 +16,31 @@ export function useCreateStellar(stellarData: StellarType) {
 }
 
 // 조회
-export function useGetStellar(stellarId: string) {
-  return useQuery({
-    queryKey: ['stellar', stellarId],
-    queryFn: () => stellarAPI.getStellar(stellarId),
+// 갤럭시 id 값 변경 => 스텔라 정보 api 호출 및 갱신 후 => 스토어에 저장
+export function useGetStellar() {
+  const { selectedStellarId } = useSelectedStellarStore();
+  const { setStellarStore } = useStellarStore();
+  const { openSecondarySidebar } = useSidebarStore();
+
+  const query = useQuery<StellarType>({
+    queryKey: ['stellar', selectedStellarId],
+    queryFn: () => stellarAPI.getStellar(selectedStellarId),
+    enabled: !!selectedStellarId,
+    // v5: onSuccess 없음 => useEffect 사용 권장
   });
+
+  // 스텔라 정보 api 호출 및 갱신 후 => 스토어에 저장
+  useEffect(() => {
+    if (!query.data) return;
+    setStellarStore(query.data);
+
+    // 사이드바 stellar 패널 열기
+    if (selectedStellarId) {
+      openSecondarySidebar('stellar');
+    }
+  }, [query.data, setStellarStore, openSecondarySidebar, selectedStellarId]);
+
+  return query;
 }
 
 // 수정

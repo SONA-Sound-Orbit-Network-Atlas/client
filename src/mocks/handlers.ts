@@ -9,7 +9,7 @@ const isLoggedIn = true; // 로그인 여부 테스트용
 
 export const handlers = [
   // 세션 확인
-  http.get('/api/auth/login-check', async () => {
+  http.get('/api/auth/session', async () => {
     if (!isLoggedIn) {
       // 비로그인: 401
       return new HttpResponse(null, { status: 401 });
@@ -19,10 +19,10 @@ export const handlers = [
   }),
 
   // galaxy Community 리스트 조회 (infinite)
-  mockFetchInfinite('/galaxies/community', galaxiesCommunity, 2000),
+  mockFetchInfinite('/galaxies/community', galaxiesCommunity, 3, 2000),
 
   // galaxy My 리스트 조회 (infinite)
-  mockFetchInfinite('/galaxies/my', galaxiesMy, 2000),
+  mockFetchInfinite('/galaxies/my', galaxiesMy, 3, 2000),
 
   // stellar 정보 조회
   mockFetch('/stellarSystems/:stellarId', stellar, 2000),

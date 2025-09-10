@@ -6,6 +6,6 @@ interface SelectedStellarStore {
 }
 
 export const useSelectedStellarStore = create<SelectedStellarStore>((set) => ({
-  selectedStellarId: 'sys-001', // 초기 값
+  selectedStellarId: '', // 초기 값
   setSelectedStellarId: (no: string) => set({ selectedStellarId: no }),
 }));
