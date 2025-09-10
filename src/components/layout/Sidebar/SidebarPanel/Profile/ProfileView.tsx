@@ -10,7 +10,7 @@ import { IoPlanetOutline } from 'react-icons/io5';
 import { useSidebarStore } from '@/stores/sidebarStore';
 import Iconframe from '@/components/common/Iconframe';
 import Button from '@/components/common/Button';
-import Card from '@/components/common/Card';
+import Card from '@/components/common/Card/Card';
 import { ScrollArea } from '@/components/common/Scrollarea';
 
 export default function ProfileView() {

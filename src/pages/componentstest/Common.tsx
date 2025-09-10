@@ -24,7 +24,7 @@ import {
 } from '@/components/common/DropdownMenu';
 import { ChevronDown, Settings, User, CreditCard, LogOut } from 'lucide-react';
 import Button from '@/components/common/Button';
-import Card from '@/components/common/Card';
+import Card from '@/components/common/Card/Card';
 import TextField from '@/components/common/TextField';
 import Textarea from '@/components/common/Textarea';
 import TextInput from '@/components/common/TextInput';
@@ -32,7 +32,7 @@ import { FaHeart } from 'react-icons/fa6';
 import { FiGithub } from 'react-icons/fi';
 import { FaStar, FaHome, FaUser, FaCog, FaPlay, FaPause } from 'react-icons/fa';
 import Iconframe from '@/components/common/Iconframe';
-import { SkeletonCard } from '@/components/common/SkeletonCard';
+import { SkeletonCard } from '@/components/common/Card/SkeletonCard';
 
 const Common: React.FC = () => {
   const [checkboxState, setCheckboxState] = useState(false);

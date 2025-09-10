@@ -1,6 +1,6 @@
 import { FiUser, FiUsers } from 'react-icons/fi';
-import Iconframe from './Iconframe';
-import Button from './Button';
+import Iconframe from '../Iconframe';
+import Button from '../Button';
 
 interface UserCardProps {
   id: number;
