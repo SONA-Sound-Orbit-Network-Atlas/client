@@ -1,7 +1,7 @@
 import { OrbitControls } from '@react-three/drei';
 import type { OrbitControls as OrbitControlsImpl } from 'three-stdlib';
 import * as THREE from 'three';
-import { useRef } from 'react';
+import { useRef, useCallback, useState } from 'react';
 import { useSmoothCameraMove } from '@/hooks/camera/useSmoothCameraMove';
 import { VIEW_MODE_CONFIG } from '@/constants/viewModeConfig';
 import { useSceneStore } from '@/stores/useSceneStore';
@@ -22,17 +22,29 @@ export default function OrbitViewControls({
 }: OrbitViewControlsProps) {
   const controls = useRef<OrbitControlsImpl>(null);
   const { cameraIsMoving } = useSceneStore();
+  const [controlsReady, setControlsReady] = useState(false);
+
+  // OrbitControls ref 콜백
+  const controlsRefCallback = useCallback((node: OrbitControlsImpl | null) => {
+    if (node) {
+      controls.current = node;
+      setControlsReady(true);
+    }
+  }, []);
+
+  // controlsRef가 준비된 후에만 useSmoothCameraMove 실행
+  const shouldRunAnimation = controlsReady && controls.current;
 
   // 카메라 이동 로직
   useSmoothCameraMove({
     targetPosition,
-    controlsRef: controls.current!,
+    controlsRef: shouldRunAnimation ? controls.current : null,
     duration: VIEW_MODE_CONFIG.transition.galaxyToStellar.duration,
   });
 
   return (
     <OrbitControls
-      ref={controls}
+      ref={controlsRefCallback}
       enableDamping={!cameraIsMoving} // 카메라 이동 중에는 damping 비활성화
       dampingFactor={0.05}
       enableRotate={!cameraIsMoving} // 카메라 이동 중에는 회전 비활성화

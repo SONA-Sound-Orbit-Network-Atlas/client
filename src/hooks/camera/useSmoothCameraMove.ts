@@ -7,7 +7,7 @@ import { useSceneStore } from '@/stores/useSceneStore';
 
 interface UseSmoothCameraMoveProps {
   targetPosition: THREE.Vector3; // 이동 목표 포지션
-  controlsRef: OrbitControlsImpl;
+  controlsRef: OrbitControlsImpl | null | undefined;
   duration?: number; // 카메라 이동 시간
   onMoveEnd?: () => void;
   onMoveStart?: () => void;
@@ -37,29 +37,38 @@ export function useSmoothCameraMove({
   const targetCameraPosRef = useRef<THREE.Vector3>(
     targetPosition.clone().add(offset)
   );
-  console.log('isMovingRef', isMovingRef.current);
 
   useEffect(() => {
     if (targetPosition) {
-      // 이전 위치와 비교하여 실제로 변경되었을 때만 실행
-      const currentTarget = targetCameraPosRef.current.clone().sub(offset);
-      if (currentTarget.distanceTo(targetPosition) > 0.1) {
-        // 새로운 타겟 위치 업데이트
-        targetCameraPosRef.current.copy(targetPosition.clone().add(offset));
+      // 새로운 타겟 위치 업데이트
+      targetCameraPosRef.current.copy(targetPosition.clone().add(offset));
 
-        // 이미 이동 중이 아니라면 새 애니메이션 시작
-        if (!isMovingRef.current) {
-          isMovingRef.current = true;
-          startTimeRef.current = 0;
-          setCameraIsMoving(true);
-          onMoveStartRef.current?.();
-        }
+      // controlsRef가 준비되었을 때만 애니메이션 시작
+      if (controlsRef) {
+        isMovingRef.current = true;
+        startTimeRef.current = 0;
+        setCameraIsMoving(true);
+        onMoveStartRef.current?.();
       }
     }
   }, [targetPosition, offset, controlsRef, setCameraIsMoving]);
 
+  // controlsRef가 준비된 후 대기 중인 애니메이션 시작
+  useEffect(() => {
+    if (controlsRef && targetPosition && !isMovingRef.current) {
+      // 타겟 위치가 이미 설정되어 있고 애니메이션이 시작되지 않았다면 시작
+      const currentTarget = targetCameraPosRef.current.clone().sub(offset);
+      if (currentTarget.distanceTo(targetPosition) > 0.1) {
+        isMovingRef.current = true;
+        startTimeRef.current = 0;
+        setCameraIsMoving(true);
+        onMoveStartRef.current?.();
+      }
+    }
+  }, [controlsRef, targetPosition, offset, setCameraIsMoving]);
+
   useFrame((_, deltaTime) => {
-    if (targetPosition && isMovingRef.current) {
+    if (targetPosition && isMovingRef.current && controlsRef) {
       startTimeRef.current += deltaTime;
       const progress = Math.min(startTimeRef.current / duration, 1.0);
       const easedProgress = easeInOutCubic(progress);
@@ -68,7 +77,7 @@ export function useSmoothCameraMove({
       camera.position.lerp(targetCameraPosRef.current, easedProgress * 0.1);
 
       // 컨트롤 타겟도 부드럽게 보간
-      if (controlsRef?.target) {
+      if (controlsRef.target) {
         controlsRef.target.lerp(targetPosition, easedProgress * 0.1);
       }
 

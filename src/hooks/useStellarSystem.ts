@@ -21,15 +21,15 @@ export function useStellarSystem() {
     (stellarSystemId: number) => {
       // 데이터 로딩
       const mockStellarSystem = getStellarSystemOnMock(stellarSystemId);
-      // 카메라 타겟 설정
-      setCameraTarget(new THREE.Vector3(...mockStellarSystem.stellarSystemPos));
-      // 뷰 모드 변경
-      setViewMode('StellarSystem');
-      // 선택한 항성계 설정
+      const newCameraTarget = new THREE.Vector3(
+        ...mockStellarSystem.stellarSystemPos
+      );
+
+      // 모든 상태를 한 번에 업데이트
       setSelectedStellarSystemId(stellarSystemId);
-      if (mockStellarSystem) {
-        setSelectedStellarSystem(mockStellarSystem);
-      }
+      setSelectedStellarSystem(mockStellarSystem);
+      setCameraTarget(newCameraTarget);
+      setViewMode('StellarSystem');
     },
     [
       setSelectedStellarSystemId,
