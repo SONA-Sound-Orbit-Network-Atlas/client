@@ -66,6 +66,7 @@ export default function OrbitViewControls({
       enableRotate={true}
       enableZoom={!isMovingRef.current}
       enablePan={false}
+      maxDistance={16}
     />
   );
 }
