@@ -2,7 +2,7 @@ import Button from '@/components/common/Button';
 import PanelTitle from '../../PanelTitle';
 import StellarCard from './StellarCard';
 import { GoPlus } from 'react-icons/go';
-import { SkeletonCard } from '@/components/common/SkeletonCard';
+import { SkeletonCard } from '@/components/common/Card/SkeletonCard';
 import { Suspense } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
 import { useStellarStore } from '@/stores/useStellarStore';

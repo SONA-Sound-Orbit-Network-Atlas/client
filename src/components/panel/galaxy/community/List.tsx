@@ -7,7 +7,7 @@ import {
   toSortValue,
 } from '@/types/galaxyCommunity';
 import Button from '@/components/common/Button';
-import { SkeletonCard } from '@/components/common/SkeletonCard';
+import { SkeletonCard } from '@/components/common/Card/SkeletonCard';
 import { ErrorBoundary } from 'react-error-boundary';
 import LoadingIcon from '@/components/common/LoadingIcon';
 

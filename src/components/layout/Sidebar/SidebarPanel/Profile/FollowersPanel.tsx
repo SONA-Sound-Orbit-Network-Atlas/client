@@ -1,6 +1,6 @@
 import { useSidebarStore } from '@/stores/sidebarStore';
 import PanelHeader from '../PanelHeader';
-import UserCard from '@/components/common/UserCard';
+import UserCard from '@/components/common/Card/UserCard';
 import { ScrollArea } from '@/components/common/Scrollarea';
 
 export default function FollowersPanel() {

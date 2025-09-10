@@ -3,7 +3,7 @@ import { useGetGalaxyMyList } from '@/hooks/api/useGalaxy';
 import CardItem from './CardItem';
 import { type GalaxyMyListData } from '@/types/galaxyMy';
 import Button from '@/components/common/Button';
-import { SkeletonCard } from '@/components/common/SkeletonCard';
+import { SkeletonCard } from '@/components/common/Card/SkeletonCard';
 import { ErrorBoundary } from 'react-error-boundary';
 import LoadingIcon from '@/components/common/LoadingIcon';
 

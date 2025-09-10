@@ -1,4 +1,4 @@
-import Card from '@/components/common/Card';
+import Card from '@/components/common/Card/Card';
 import ButtonToggleHeart from '@/components/common/ButtonToggleHeart';
 import { IoPlanetOutline } from 'react-icons/io5';
 import { FaRegHeart } from 'react-icons/fa';
