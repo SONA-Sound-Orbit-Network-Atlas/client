@@ -22,8 +22,6 @@ export default function StellarSystem({
   const ref = useRef<THREE.Group>(null);
   const detailGroupRef = useRef<THREE.Group>(null);
   const lowDetailMesh = useRef<THREE.Mesh>(null);
-  const { camera } = useThree();
-  const systemPos = new THREE.Vector3(...stellarSystemPos);
   const LOW_DETAIL_SIZE = 0.5;
 
   const isSelectedSystem = useMemo(() => {
@@ -34,30 +32,12 @@ export default function StellarSystem({
     enterStellarSystemView(id);
   };
   useFrame(() => {
-    // 항성계 LOD 처리
-    if (!ref.current || !detailGroupRef.current || !lowDetailMesh.current)
-      return;
+    // 선택된 시스템만 디테일 그룹 표시, 선택되지 않은 시스템은 로우 디테일 매쉬만 표시
+    if (!detailGroupRef.current || !lowDetailMesh.current) return;
 
-    const distance = camera.position.distanceTo(systemPos);
-
-    //factor 값을 계산
-    const minDistance = 10; // 거리가 minDistance 이하면 완전히 보임
-    const fadeRange = 10; // 20~30 거리에서 페이드 아웃
-    const maxOpacity = 1; // 최대 투명도
-    const minOpacity = 0; // 최소 투명도
-
-    const factor =
-      maxOpacity -
-      Math.min(
-        Math.max((distance - minDistance) / fadeRange, minOpacity),
-        maxOpacity
-      );
-
-    //메시 스케일 조정정
-    detailGroupRef.current.scale.set(factor, factor, factor);
-    if (isSelectedSystem) {
-      lowDetailMesh.current.scale.set(1 - factor, 1 - factor, 1 - factor);
-    }
+    // 선택된 시스템인지에 따라 표시/숨김 처리
+    detailGroupRef.current.visible = isSelectedSystem;
+    lowDetailMesh.current.visible = !isSelectedSystem;
   });
 
   return (
@@ -66,7 +46,7 @@ export default function StellarSystem({
       position={stellarSystemPos}
       onClick={onStellarSystemClicked}
     >
-      <group ref={detailGroupRef} visible={isSelectedSystem}>
+      <group ref={detailGroupRef}>
         <Star
           position={[0, 0, 0]}
           color="#ff6b6b"

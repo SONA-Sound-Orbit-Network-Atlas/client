@@ -6,10 +6,13 @@ interface SceneStore {
   viewMode: 'Galaxy' | 'StellarSystem';
   cameraIsMoving: boolean;
   cameraTarget: THREE.Vector3;
+  cameraPosition: THREE.Vector3;
+  cameraRotation: THREE.Euler;
   selectedStellarSystemId: number | null;
   selectedStellarSystem: TStellarSystem | null;
   selectedPlanetIndex: number | null;
-
+  setCameraPosition: (cameraPosition: THREE.Vector3) => void;
+  setCameraRotation: (cameraRotation: THREE.Euler) => void;
   setCameraTarget: (cameraTarget: THREE.Vector3) => void;
   setViewMode: (viewMode: 'Galaxy' | 'StellarSystem') => void;
   setCameraIsMoving: (cameraIsMoving: boolean) => void;
@@ -33,9 +36,13 @@ export const useSceneStore = create<SceneStore>((set, get) => ({
   viewMode: 'Galaxy',
   cameraIsMoving: false,
   cameraTarget: new THREE.Vector3(0, 0, 0),
+  cameraPosition: new THREE.Vector3(0, 0, 0),
+  cameraRotation: new THREE.Euler(0, 0, 0),
   selectedStellarSystemId: null,
   selectedStellarSystem: null,
   selectedPlanetIndex: null,
+  setCameraPosition: (cameraPosition) => set({ cameraPosition }),
+  setCameraRotation: (cameraRotation) => set({ cameraRotation }),
   setCameraTarget: (cameraTarget) => set({ cameraTarget }),
   setViewMode: (viewMode) => set({ viewMode }),
   setCameraIsMoving: (cameraIsMoving) => set({ cameraIsMoving }),
