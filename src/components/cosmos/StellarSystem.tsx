@@ -29,6 +29,9 @@ export default function StellarSystem({
   }, [viewMode, selectedStellarSystemId, id]);
 
   const onStellarSystemClicked = () => {
+    if (isSelectedSystem) {
+      return;
+    }
     enterStellarSystemView(id);
   };
   useFrame(() => {
