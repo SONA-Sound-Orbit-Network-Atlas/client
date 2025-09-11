@@ -3,7 +3,7 @@ import ControlPanel from './Gauges';
 import Random from './Random';
 import { useStellarStore } from '@/stores/useStellarStore';
 import { useSelectedObjectStore } from '@/stores/useSelectedObjectStore';
-import Card from '@/components/common/Card';
+import Card from '@/components/common/Card/Card';
 import Button from '@/components/common/Button';
 import { useEffect, useMemo, useState } from 'react';
 import type { Planet, SoundType } from '@/types/stellar';
