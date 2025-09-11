@@ -6,7 +6,7 @@ import {
   FiUserCheck,
 } from 'react-icons/fi';
 import { IoPlanetOutline } from 'react-icons/io5';
-import { useSidebarStore } from '@/stores/sidebarStore';
+import { useProfileStore } from '@/stores/profileStore';
 import Iconframe from '@/components/common/Iconframe';
 import Button from '@/components/common/Button';
 import Card from '@/components/common/Card/Card';
@@ -14,7 +14,7 @@ import StatCard from '@/components/common/Card/StatCard';
 import { ScrollArea } from '@/components/common/Scrollarea';
 
 export default function ProfileView() {
-  const { setProfilePanelMode } = useSidebarStore();
+  const { setProfilePanelMode } = useProfileStore();
 
   // 임시 데이터
   const profile = {

@@ -1,15 +1,15 @@
-import { useSidebarStore } from '@/stores/sidebarStore';
+import { useProfileStore } from '@/stores/profileStore';
 import PanelHeader from '../PanelHeader';
 import Iconframe from '@/components/common/Iconframe';
 import { FiUser } from 'react-icons/fi';
-import TextField from '@/components/common/textField';
+import TextField from '@/components/common/TextField';
 import TextInput from '@/components/common/TextInput';
 import Button from '@/components/common/Button';
 import { ScrollArea } from '@/components/common/Scrollarea';
 import Textarea from '@/components/common/Textarea';
 
 export default function EditProfilePanel() {
-  const { setProfilePanelMode } = useSidebarStore();
+  const { setProfilePanelMode } = useProfileStore();
 
   return (
     <>
