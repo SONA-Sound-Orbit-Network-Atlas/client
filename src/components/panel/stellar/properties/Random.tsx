@@ -5,7 +5,6 @@ import { useStellarStore } from '@/stores/useStellarStore';
 
 interface RandomProps {
   properties: {
-    key: string;
     label: string;
     value: number;
     min: number;
@@ -35,7 +34,7 @@ export default function Random({ properties }: RandomProps) {
     setStellarStore({
       ...stellarStore,
       objects: stellarStore.objects.map((object) =>
-        object.id === selectedObjectId
+        object.planetId === selectedObjectId
           ? { ...object, properties: randomProperties }
           : object
       ),

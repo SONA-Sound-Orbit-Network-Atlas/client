@@ -5,7 +5,6 @@ import { useSelectedObjectStore } from '@/stores/useSelectedObjectStore';
 
 interface GaugesProps {
   properties: {
-    key: string;
     label: string;
     value: number;
     min: number;
@@ -21,14 +20,14 @@ export default function Gauges({ properties }: GaugesProps) {
     <Card>
       {properties.map((property, index) => (
         <Slider
-          key={property.key}
+          key={index}
           value={[properties[index].value]}
           onValueChange={(value) => {
             console.log('value : ', value);
             setStellarStore({
               ...stellarStore,
               objects: stellarStore.objects.map((object) => {
-                if (object.id !== selectedObjectId) return object;
+                if (object.planetId !== selectedObjectId) return object;
 
                 const newProperties = object.properties.map(
                   (prop, propIndex) =>
@@ -40,7 +39,7 @@ export default function Gauges({ properties }: GaugesProps) {
           }}
           min={property.min}
           label={property.label}
-          property={property.key}
+          property={property.label}
           max={property.max}
           step={1}
         />

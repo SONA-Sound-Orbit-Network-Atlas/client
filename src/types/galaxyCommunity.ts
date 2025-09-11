@@ -1,5 +1,13 @@
-// 은하 목록 데이터
+// Galaxy Community 데이터
+export interface GalaxyCommunityData {
+  totalCount: number;
+  list: GalaxyCommunityListData[];
+}
+
+// Galaxy Community - List 데이터
 export interface GalaxyCommunityListData {
+  id: string;
+  userId: string;
   rank: number;
   galaxyName: string;
   makerName: string;

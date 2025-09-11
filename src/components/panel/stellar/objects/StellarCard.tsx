@@ -1,13 +1,15 @@
 import Card from '@/components/common/Card/Card';
+import type { Object, Planet } from '@/types/stellar';
 
 interface StellarCardProps {
-  data: {
-    name: string;
-    type: string;
-  };
+  data: Object;
   index: number;
   onClick: () => void;
   active: boolean;
+}
+
+function isPlanet(obj: Object): obj is Planet {
+  return obj.planetType === 'PLANET';
 }
 
 export default function StellarCard({
@@ -25,7 +27,14 @@ export default function StellarCard({
         ></div>
         <div>
           <strong className="text-text-white">{data.name}</strong>
-          <p className="text-text-muted">{data.type}</p>
+          <p className="text-text-muted">
+            {data.planetType} • {isPlanet(data) ? data.soundType + ' •' : ''}{' '}
+            SIZE{' '}
+            {
+              data.properties.find((property) => property.label === 'size')
+                ?.value
+            }
+          </p>
         </div>
       </div>
     </Card>

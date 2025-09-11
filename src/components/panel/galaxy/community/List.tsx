@@ -10,6 +10,7 @@ import Button from '@/components/common/Button';
 import { SkeletonCard } from '@/components/common/Card/SkeletonCard';
 import { ErrorBoundary } from 'react-error-boundary';
 import LoadingIcon from '@/components/common/LoadingIcon';
+import { useSelectedStellarStore } from '@/stores/useSelectedStellarStore';
 
 const GALAXY_LIST_LIMIT = 3;
 
@@ -25,22 +26,31 @@ export default function List({ sort }: { sort: SortLabel }) {
 
 // 갤럭시 리스트 컨텐츠
 function ContentComp({ sort }: { sort: SortLabel }) {
+  const { setSelectedStellarId } = useSelectedStellarStore();
+
+  // 갤럭시 리스트 데이터
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage } =
     useGetGalaxyCommunityList({
-      page: 0,
+      page: 1,
       limit: GALAXY_LIST_LIMIT,
       sort: toSortValue(sort),
     });
-
-  const galaxyCommunityList: GalaxyCommunityListData[] =
-    data?.pages.flat() ?? [];
+  // 평탄화 된 list 데이터
+  const galaxyCommunityList = data?.list ?? [];
 
   return (
     <div>
       {/* 은하 리스트 */}
       <div className="space-y-3">
         {galaxyCommunityList.map((galaxySystem: GalaxyCommunityListData) => (
-          <CardItem key={galaxySystem.galaxyName} {...galaxySystem} />
+          <CardItem
+            key={galaxySystem.id}
+            {...galaxySystem}
+            onClick={() => {
+              // 갤럭시 id 값 변경 => 스텔라 정보 api 호출 및 갱신 후 => 스토어에 저장
+              setSelectedStellarId(galaxySystem.id);
+            }}
+          />
         ))}
       </div>
 

@@ -6,6 +6,8 @@ import Button from '@/components/common/Button';
 import { SkeletonCard } from '@/components/common/Card/SkeletonCard';
 import { ErrorBoundary } from 'react-error-boundary';
 import LoadingIcon from '@/components/common/LoadingIcon';
+import { useSidebarStore } from '@/stores/sidebarStore';
+import { useSelectedStellarStore } from '@/stores/useSelectedStellarStore';
 
 const GALAXY_LIST_LIMIT = 3;
 
@@ -19,22 +21,34 @@ export default function List() {
   );
 }
 
-// 갤럭시 리스트 컨텐츠
+// 내 갤럭시 리스트 컨텐츠
 function ContentComp() {
-  const { data, fetchNextPage, hasNextPage, isFetchingNextPage } =
-    useGetGalaxyMyList({
-      page: 0,
-      limit: GALAXY_LIST_LIMIT,
-    });
+  const { openSecondarySidebar } = useSidebarStore();
+  const { setSelectedStellarId } = useSelectedStellarStore();
 
-  const list: GalaxyMyListData[] = data?.pages.flat() ?? [];
+  const queryResult = useGetGalaxyMyList({
+    page: 1,
+    limit: GALAXY_LIST_LIMIT,
+  });
+
+  const { data, fetchNextPage, hasNextPage, isFetchingNextPage } = queryResult;
+
+  const myGalaxyList = data?.list ?? [];
 
   return (
     <div>
-      {/* 은하 리스트 */}
+      {/* 내 갤럭시 리스트 */}
       <div className="space-y-3">
-        {list.map((galaxySystem: GalaxyMyListData) => (
-          <CardItem key={galaxySystem.galaxyName} {...galaxySystem} />
+        {myGalaxyList.map((galaxySystem: GalaxyMyListData) => (
+          <CardItem
+            key={galaxySystem.id}
+            {...galaxySystem}
+            onClick={() => {
+              // 갤럭시 id 값 변경 => 스텔라 정보 api 호출 및 갱신 후 => 스토어에 저장
+              setSelectedStellarId(galaxySystem.id);
+              openSecondarySidebar('stellar');
+            }}
+          />
         ))}
       </div>
 

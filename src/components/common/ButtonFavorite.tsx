@@ -2,17 +2,17 @@ import Button from '@/components/common/Button';
 import { useState } from 'react';
 import { FaHeart, FaRegHeart } from 'react-icons/fa';
 
-interface ButtonToggleHeartProps {
+interface ButtonFavoriteProps {
   className?: string;
   active: boolean | null;
   onClick?: () => void;
 }
 
-export default function ButtonToggleHeart({
+export default function ButtonFavorite({
   className,
   active,
   onClick,
-}: ButtonToggleHeartProps) {
+}: ButtonFavoriteProps) {
   const [isActive, setIsActive] = useState<boolean | null>(active);
 
   const onClickHandle = () => {
