@@ -1,12 +1,11 @@
-import Button from '@/components/common/Button';
 import PanelTitle from '../../PanelTitle';
 import StellarCard from './StellarCard';
-import { GoPlus } from 'react-icons/go';
 import { SkeletonCard } from '@/components/common/SkeletonCard';
 import { Suspense } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
 import { useStellarStore } from '@/stores/useStellarStore';
 import { useSelectedObjectStore } from '@/stores/useSelectedObjectStore';
+import AddNewObjectBtn from './AddNewObjectBtn';
 
 export default function Objects() {
   return (
@@ -21,12 +20,9 @@ export default function Objects() {
 // API 결과 반영 완료
 function ObjectsContent() {
   const { selectedObjectId, setSelectedObjectId } = useSelectedObjectStore();
-  console.log('selectedObjectId : ', selectedObjectId);
-
   const { stellarStore } = useStellarStore();
-  console.log('stellarStore : ', stellarStore);
 
-  const onClickHandler = (id: string) => {
+  const clickObjectHandler = (id: number) => {
     setSelectedObjectId(id);
   };
 
@@ -46,8 +42,8 @@ function ObjectsContent() {
                 key={index}
                 index={index}
                 data={data}
-                onClick={() => onClickHandler(data.id)}
-                active={selectedObjectId === data.id}
+                onClick={() => clickObjectHandler(data.planetId)}
+                active={selectedObjectId === data.planetId}
               />
             );
           })
@@ -56,9 +52,8 @@ function ObjectsContent() {
         )}
       </div>
 
-      <Button color="tertiary" className="w-full mt-6 text-text-muted">
-        <GoPlus style={{ width: '14px', height: '14px' }} /> ADD NEW OBJECT
-      </Button>
+      {/* new OBJECT 추가 버튼 */}
+      <AddNewObjectBtn />
     </div>
   );
 }

@@ -2,6 +2,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import type { LoginData, SignupData } from '@/types/auth';
 import { authAPI } from '@/api/auth';
 import type { User } from '@/types/user';
+import { useUserStore } from '@/stores/useUserStore';
 
 // 회원가입
 export function useSignup(data: SignupData) {
@@ -13,15 +14,23 @@ export function useSignup(data: SignupData) {
 
 // 로그인
 export function useLogin(data: LoginData) {
+  const { setUserStore, setIsLoggedIn } = useUserStore();
+
   return useMutation({
-    mutationKey: ['auth', 'login'],
+    mutationKey: ['auth', 'login', data.email],
     mutationFn: () => authAPI.login(data),
+    onSuccess: (data) => {
+      const { userId, userName } = data;
+      setUserStore({ userId, userName, email: data.email });
+      setIsLoggedIn(true);
+    },
   });
 }
 
 // 로그아웃
 export function useLogout() {
   const queryClient = useQueryClient();
+  const { setIsLoggedIn } = useUserStore();
 
   return useMutation({
     mutationKey: ['auth', 'logout'],
@@ -29,6 +38,7 @@ export function useLogout() {
     onSuccess: async () => {
       queryClient.setQueryData(['session'], null); // 즉시 비로그인으로 반영
       await queryClient.invalidateQueries({ queryKey: ['galaxyMyList'] });
+      setIsLoggedIn(false);
     },
   });
 }

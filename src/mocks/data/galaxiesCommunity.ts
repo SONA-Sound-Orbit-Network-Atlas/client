@@ -6,6 +6,7 @@ const galaxyDummy: GalaxyCommunityData = {
   list: [
     {
       id: 'stellar-1',
+      userId: 'user-1',
       rank: 1,
       galaxyName: 'Galaxy 1',
       makerName: 'Maker 1',
@@ -16,6 +17,7 @@ const galaxyDummy: GalaxyCommunityData = {
     },
     {
       id: 'stellar-2',
+      userId: 'user-2',
       rank: 2,
       galaxyName: 'Galaxy 2',
       makerName: 'Maker 2',
@@ -26,6 +28,7 @@ const galaxyDummy: GalaxyCommunityData = {
     },
     {
       id: 'stellar-3',
+      userId: 'user-3',
       rank: 3,
       galaxyName: 'Galaxy 3',
       makerName: 'Maker 3',
@@ -36,6 +39,7 @@ const galaxyDummy: GalaxyCommunityData = {
     },
     {
       id: 'stellar-4',
+      userId: 'user-4',
       rank: 4,
       galaxyName: 'Galaxy 4',
       makerName: 'Maker 4',
@@ -46,6 +50,7 @@ const galaxyDummy: GalaxyCommunityData = {
     },
     {
       id: 'stellar-5',
+      userId: 'user-5',
       rank: 5,
       galaxyName: 'Galaxy 5',
       makerName: 'Maker 5',
@@ -56,6 +61,7 @@ const galaxyDummy: GalaxyCommunityData = {
     },
     {
       id: 'stellar-6',
+      userId: 'user-6',
       rank: 6,
       galaxyName: 'Galaxy 6',
       makerName: 'Maker 6',

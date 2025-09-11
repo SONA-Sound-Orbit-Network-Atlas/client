@@ -38,6 +38,8 @@ export function useGetStellar() {
     if (selectedStellarId) {
       openSecondarySidebar('stellar');
     }
+
+    console.log('query.data', query.data);
   }, [query.data, setStellarStore, openSecondarySidebar, selectedStellarId]);
 
   return query;

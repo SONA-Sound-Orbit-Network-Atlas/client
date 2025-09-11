@@ -2,13 +2,13 @@ import { Suspense } from 'react';
 import StellarInfo from './StellarInfo';
 import { ErrorBoundary } from 'react-error-boundary';
 
-export default function Info() {
+export default function Info({ isStellarOwner }: { isStellarOwner: boolean }) {
   return (
     <div>
       {/* 조건부 렌더링 with Suspense */}
       <ErrorBoundary FallbackComponent={InfoError}>
         <Suspense fallback={<InfoLoading />}>
-          <StellarInfo />
+          <StellarInfo isStellarOwner={isStellarOwner} />
         </Suspense>
       </ErrorBoundary>
     </div>

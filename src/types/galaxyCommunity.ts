@@ -7,6 +7,7 @@ export interface GalaxyCommunityData {
 // Galaxy Community - List 데이터
 export interface GalaxyCommunityListData {
   id: string;
+  userId: string;
   rank: number;
   galaxyName: string;
   makerName: string;
