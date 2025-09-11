@@ -11,6 +11,7 @@ import { SkeletonCard } from '@/components/common/Card/SkeletonCard';
 import { ErrorBoundary } from 'react-error-boundary';
 import LoadingIcon from '@/components/common/LoadingIcon';
 import { useSelectedStellarStore } from '@/stores/useSelectedStellarStore';
+import { useStellarTabStore } from '@/stores/useStellarTabStore';
 
 const GALAXY_LIST_LIMIT = 3;
 
@@ -27,6 +28,7 @@ export default function List({ sort }: { sort: SortLabel }) {
 // 갤럭시 리스트 컨텐츠
 function ContentComp({ sort }: { sort: SortLabel }) {
   const { setSelectedStellarId } = useSelectedStellarStore();
+  const { setTabValue } = useStellarTabStore();
 
   // 갤럭시 리스트 데이터
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage } =
@@ -49,6 +51,7 @@ function ContentComp({ sort }: { sort: SortLabel }) {
             onClick={() => {
               // 갤럭시 id 값 변경 => 스텔라 정보 api 호출 및 갱신 후 => 스토어에 저장
               setSelectedStellarId(galaxySystem.id);
+              setTabValue('INFO');
             }}
           />
         ))}
