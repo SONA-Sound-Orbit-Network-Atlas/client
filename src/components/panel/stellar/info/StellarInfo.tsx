@@ -1,5 +1,5 @@
 import PanelTitle from '../../PanelTitle';
-import Card from '@/components/common/Card';
+import Card from '@/components/common/Card/Card';
 import TextInput from '@/components/common/TextInput';
 import { useSelectedObjectStore } from '@/stores/useSelectedObjectStore';
 import { useStellarStore } from '@/stores/useStellarStore';

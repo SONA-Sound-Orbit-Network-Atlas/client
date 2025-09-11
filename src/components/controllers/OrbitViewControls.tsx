@@ -1,11 +1,10 @@
 import { OrbitControls } from '@react-three/drei';
-import { useFrame } from '@react-three/fiber';
 import type { OrbitControls as OrbitControlsImpl } from 'three-stdlib';
 import * as THREE from 'three';
-import { useRef, useCallback } from 'react';
-import { useSceneStore } from '@/stores/useSceneStore';
+import { useRef, useCallback, useState } from 'react';
 import { useSmoothCameraMove } from '@/hooks/camera/useSmoothCameraMove';
-import { useChangeViewModeOnOutOfDistance } from '@/hooks/camera/useChangeViewModeOnOutOfDistance';
+import { VIEW_MODE_CONFIG } from '@/constants/viewModeConfig';
+import { useSceneStore } from '@/stores/useSceneStore';
 
 /**
  * X,Z축 이동
@@ -21,51 +20,38 @@ interface OrbitViewControlsProps {
 export default function OrbitViewControls({
   targetPosition,
 }: OrbitViewControlsProps) {
-  //test code
-  const { setCameraTarget } = useSceneStore();
-
-  const isMovingRef = useRef<boolean>(false);
   const controls = useRef<OrbitControlsImpl>(null);
-  const distanceRef = useRef<number>(0);
-  const duration = 2; // 카메라 이동 시간
+  const { cameraIsMoving, viewMode } = useSceneStore();
+  const [controlsReady, setControlsReady] = useState(false);
 
-  const handleMoveStart = useCallback(() => {
-    isMovingRef.current = true;
+  // OrbitControls ref 콜백
+  const controlsRefCallback = useCallback((node: OrbitControlsImpl | null) => {
+    if (node) {
+      controls.current = node;
+      setControlsReady(true);
+    }
   }, []);
-  const handleMoveEnd = useCallback(() => {
-    isMovingRef.current = false;
-  }, []);
+
+  // controlsRef가 준비된 후에만 useSmoothCameraMove 실행
+  const shouldRunAnimation = controlsReady && controls.current;
+
   // 카메라 이동 로직
   useSmoothCameraMove({
     targetPosition,
-    controlsRef: controls.current,
-    duration,
-    onMoveStart: handleMoveStart,
-    onMoveEnd: handleMoveEnd,
-  });
-
-  // 거리 계산 로직
-  useFrame(() => {
-    distanceRef.current = controls.current?.getDistance() || 0;
-  });
-  useChangeViewModeOnOutOfDistance({
-    distanceRef: distanceRef,
-    targetDistance: 60,
-    movementLockRef: isMovingRef,
-    onOutOfDistance: () => {
-      //TODO : zomeout 되면서 카메라 변경시 화면을 그대로 이어가기위해 카메라 타겟 설정중입니다. 추후 리팩토링 필요
-      setCameraTarget(targetPosition);
-    },
+    controlsRef: shouldRunAnimation ? controls.current : null,
+    duration: VIEW_MODE_CONFIG.transition.galaxyToStellar.duration,
   });
 
   return (
     <OrbitControls
-      ref={controls}
-      enableDamping={true}
+      ref={controlsRefCallback}
+      enabled={viewMode === 'StellarSystem'}
+      enableDamping={!cameraIsMoving} // 카메라 이동 중에는 damping 비활성화
       dampingFactor={0.05}
-      enableRotate={false}
-      enableZoom={!isMovingRef.current}
+      enableRotate={!cameraIsMoving} // 카메라 이동 중에는 회전 비활성화
+      enableZoom={!cameraIsMoving} // 카메라 이동 중에는 줌 비활성화
       enablePan={false}
+      maxDistance={VIEW_MODE_CONFIG.thresholds.maxStellarZoomDistance}
     />
   );
 }

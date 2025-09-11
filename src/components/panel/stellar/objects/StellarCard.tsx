@@ -1,4 +1,4 @@
-import Card from '@/components/common/Card';
+import Card from '@/components/common/Card/Card';
 import type { Object, Planet } from '@/types/stellar';
 
 interface StellarCardProps {

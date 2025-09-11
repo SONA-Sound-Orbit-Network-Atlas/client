@@ -1,5 +1,5 @@
-import Card from '@/components/common/Card';
 import ButtonFavorite from '@/components/common/ButtonFavorite';
+import Card from '@/components/common/Card/Card';
 import { IoPlanetOutline } from 'react-icons/io5';
 import { FaRegHeart } from 'react-icons/fa';
 import type { GalaxyCommunityListData } from '@/types/galaxyCommunity';

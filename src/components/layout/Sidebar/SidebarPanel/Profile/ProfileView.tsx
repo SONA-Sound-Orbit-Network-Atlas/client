@@ -2,7 +2,6 @@ import {
   FiEdit3,
   FiUser,
   FiLogOut,
-  FiChevronRight,
   FiHeart,
   FiUserCheck,
 } from 'react-icons/fi';
@@ -10,7 +9,8 @@ import { IoPlanetOutline } from 'react-icons/io5';
 import { useSidebarStore } from '@/stores/sidebarStore';
 import Iconframe from '@/components/common/Iconframe';
 import Button from '@/components/common/Button';
-import Card from '@/components/common/Card';
+import Card from '@/components/common/Card/Card';
+import StatCard from '@/components/common/Card/StatCard';
 import { ScrollArea } from '@/components/common/Scrollarea';
 
 export default function ProfileView() {
@@ -52,7 +52,12 @@ export default function ProfileView() {
                 {profile.about}
               </p>
             </div>
-            <Button color="secondary" size="lg" className="w-full">
+            <Button
+              color="secondary"
+              size="lg"
+              className="w-full"
+              onClick={() => setProfilePanelMode('editProfile')}
+            >
               <FiEdit3 />
               EDIT PROFILE
             </Button>
@@ -77,49 +82,31 @@ export default function ProfileView() {
             </div>
             <div className="mb-[24px]">
               <p className="text-text-muted text-sm mb-[16px]">LIKES</p>
-              <Card onClick={handleLikesClick} className="cursor-pointer">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center">
-                    <FiHeart className="text-white text-lg mr-4" />
-                    <div className="flex flex-col">
-                      <p className="text-white text-lg font-semibold">85</p>
-                      <p className="text-text-muted text-sm">MY LIKES</p>
-                    </div>
-                  </div>
-                  <FiChevronRight className="text-text-muted text-lg" />
-                </div>
-              </Card>
+              <StatCard
+                icon={<FiHeart className="text-white" />}
+                value={85}
+                label="MY LIKES"
+                onClick={handleLikesClick}
+                className="w-full hover:brightness-110 hover:bg-text-white/20 border-white/20 hover:text-white hover:[&_p]:text-white hover:[&_svg]:text-white"
+              />
             </div>
             <div className="mb-[24px]">
               <p className="text-text-muted text-sm mb-[16px]">SOCIALS</p>
               <div className="flex flex-col gap-[12px] w-full">
-                <Card onClick={handleFollowersClick} className="cursor-pointer">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center">
-                      <FiUser className="text-primary-300 text-lg mr-4" />
-                      <div className="flex flex-col">
-                        <p className="text-white text-lg font-semibold">24</p>
-                        <p className="text-text-muted text-sm">FOLLOWERS</p>
-                      </div>
-                    </div>
-                    <FiChevronRight className="text-text-muted text-lg" />
-                  </div>
-                </Card>
-                <Card
+                <StatCard
+                  icon={<FiUser className="text-primary-300" />}
+                  value={24}
+                  label="FOLLOWERS"
+                  onClick={handleFollowersClick}
+                  className="hover:brightness-110 hover:bg-primary-300/20 border-primary-300/20 hover:text-primary-300 hover:[&_p]:text-primary-300 hover:[&_svg]:text-primary-300"
+                />
+                <StatCard
+                  icon={<FiUserCheck className="text-secondary-300" />}
+                  value={18}
+                  label="FOLLOWINGS"
                   onClick={handleFollowingsClick}
-                  className="cursor-pointer"
-                >
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center">
-                      <FiUserCheck className="text-secondary-300 text-lg mr-4" />
-                      <div className="flex flex-col">
-                        <p className="text-white text-lg font-semibold">18</p>
-                        <p className="text-text-muted text-sm">FOLLOWINGS</p>
-                      </div>
-                    </div>
-                    <FiChevronRight className="text-text-muted text-lg" />
-                  </div>
-                </Card>
+                  className="hover:brightness-110 hover:bg-secondary-300/20 border-secondary-300/20 hover:text-secondary-300 hover:[&_p]:text-secondary-300 hover:[&_svg]:text-secondary-300"
+                />
               </div>
             </div>
           </div>

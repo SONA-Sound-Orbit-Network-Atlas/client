@@ -4,6 +4,8 @@ import Scene from '../components/Scene';
 import DebugMessage from '@/components/DebugMessage';
 import Header from '@/components/layout/Header';
 import Sidebar from '@/components/layout/Sidebar/Sidebar';
+import TestSliders from '@/components/TestSliders';
+import TestButtons from '@/components/cosmos/TestButtons';
 
 export default function SpacePage() {
   const canvasStyle = {
@@ -20,12 +22,14 @@ export default function SpacePage() {
         <div className="flex-1 flex flex-col min-h-0">
           <h1 className="text-white p-4">Space</h1>
           <DebugMessage />
-          <div className="flex-1 min-h-0">
+          <TestButtons />
+          <div className="flex-1 min-h-0 relative">
             <Canvas style={canvasStyle} shadows>
               <Suspense fallback={null}>
                 <Scene />
               </Suspense>
             </Canvas>
+            <TestSliders />
           </div>
         </div>
       </div>

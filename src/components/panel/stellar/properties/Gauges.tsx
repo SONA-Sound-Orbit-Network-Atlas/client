@@ -1,5 +1,5 @@
 import { Slider } from '@/components/common/Slider';
-import Card from '@/components/common/Card';
+import Card from '@/components/common/Card/Card';
 import { useStellarStore } from '@/stores/useStellarStore';
 import { useSelectedObjectStore } from '@/stores/useSelectedObjectStore';
 
