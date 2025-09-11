@@ -35,7 +35,7 @@ export default function CardItem({
   };
 
   return (
-    <Card onClick={onClick}>
+    <Card onClick={onClick} role="button">
       {/* 카드 상단 : 타이틀 및 좋아요 버튼 */}
       <div className="flex justify-between items-center">
         <div className="flex-1 min-w-0">

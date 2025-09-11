@@ -49,6 +49,7 @@ function ContentComp({ sort }: { sort: SortLabel }) {
             key={galaxySystem.id}
             {...galaxySystem}
             onClick={() => {
+              console.log('은하리스트 카드 클릭');
               // 갤럭시 id 값 변경 => 스텔라 정보 api 호출 및 갱신 후 => 스토어에 저장
               setSelectedStellarId(galaxySystem.id);
               setTabValue('INFO');

@@ -20,6 +20,9 @@ export default function Card({
         `w-full bg-gray-card rounded-[8px] p-[17px] border-solid 
         border-[1px] border-gray-border text-text-secondary text-[14px]
          focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50`,
+        role === 'button'
+          ? 'hover:brightness-110 hover:bg-text-white/20 hover:text-white hover:[&_p]:text-white hover:[&_svg]:text-white'
+          : '',
         className,
         clicked ? 'border-secondary-300' : ''
       )}

@@ -28,7 +28,11 @@ export default function ButtonFavorite({
     <Button
       color="transparent"
       className={`w-[30px] h-[40px] ${className}`}
-      onClick={onClickHandle}
+      onClick={(e) => {
+        console.log('좋아요 버튼 클릭');
+        e.stopPropagation();
+        onClickHandle();
+      }}
     >
       {isActive ? <FaHeart /> : <FaRegHeart />}
     </Button>

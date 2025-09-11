@@ -23,6 +23,7 @@ export function useLogin(data: LoginData) {
       const { userId, userName } = data;
       setUserStore({ userId, userName, email: data.email });
       setIsLoggedIn(true);
+      console.log('로그인 성공 : ', data);
     },
   });
 }
@@ -39,6 +40,7 @@ export function useLogout() {
       queryClient.setQueryData(['session'], null); // 즉시 비로그인으로 반영
       await queryClient.invalidateQueries({ queryKey: ['galaxyMyList'] });
       setIsLoggedIn(false);
+      console.log('로그아웃 성공');
     },
   });
 }
