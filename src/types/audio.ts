@@ -11,18 +11,29 @@ export type KeyName = 'C' | 'C#' | 'D' | 'D#' | 'E' | 'F' | 'F#' | 'G' | 'G#' | 
 // 복잡도 레벨 (1~3)
 export type Complexity = 1 | 2 | 3;
 
-// 행성 물리 속성 (원본 단위 그대로 입력, 내부에서 정규화)
+// 행성 물리 속성 (확장된 파라미터 범위)
 export interface PlanetPhysicalProperties {
-  size: number;         // 0-100
-  brightness: number;   // 0-100
-  distance: number;     // 0-100
-  color: number;        // 0-360 (Hue)
-  tilt: number;         // -90 ~ 90 (deg)
-  elevation: number;    // -90 ~ 90 (deg)
-  speed: number;        // 0-100
-  spin: number;         // 0-100
-  eccentricity: number; // 0-100
-  phase: number;        // 0-360 (deg)
+  planetSize: number;         // 0.01 ~ 1.00 (행성의 크기)
+  planetColor: number;        // 0-360 (Hue, 행성의 색상)
+  planetBrightness: number;   // 0.3 ~ 5.0 (행성의 밝기/자체발광)
+  distanceFromStar: number;   // 1.0 ~ 20.0 (행성과 항성계의 거리)
+  orbitSpeed: number;         // 0.01 ~ 1.0 (행성의 공전 속도)
+  rotationSpeed: number;      // 0.01 ~ 1.0 (행성의 자전 속도)
+  inclination: number;        // -180 ~ 180 (행성의 기울기)
+  eccentricity: number;       // 0.0 ~ 0.9 (행성의 이심률)
+  tilt: number;              // 0.0 ~ 180.0 (행성의 기울기)
+  
+  // 새로운 음색/사운드 제어 파라미터
+  oscillatorType: number;     // 0-7 (오실레이터 타입)
+  filterResonance: number;    // 0.1 ~ 30.0 (필터 공명)
+  spatialDepth: number;       // 0 ~ 100 (공간감 깊이)
+  
+  // 새로운 패턴/리듬 제어 파라미터  
+  patternComplexity: number;  // 0 ~ 100 (패턴 복잡도)
+  rhythmDensity: number;      // 0 ~ 100 (리듬 밀도)
+  
+  // 새로운 피치/멜로디 제어 파라미터
+  melodicVariation: number;   // 0 ~ 100 (멜로디 변화)
 }
 
 // 패턴 파라미터 (리듬/그루브)
@@ -38,52 +49,67 @@ export interface PatternParameters {
   eccentricity?: number;  // 0..100 (Eccentricity 속성)
 }
 
-// 매핑된 저수준 오디오 파라미터 묶음 (Tri Hybrid + Dual)
+// 매핑된 저수준 오디오 파라미터 묶음 (확장된 시스템)
 export interface MappedAudioParameters {
-  // Color (Tri) → 음색
-  wtIndex: number;        // 0..1 (osc.wt_index)
-  toneTint: number;       // 0..1 (osc.tone_tint)
-  waveFold: number;       // 0..0.6 (osc.wavefold_amount)
+  // 오실레이터 타입 (새로운 핵심 파라미터)
+  oscType: number;        // 0-7 (오실레이터 타입: sine, saw, square, etc.)
+  harmonicity: number;    // 0.5-4.0 (FM/AM 하모니시티)
   
-  // Brightness (Tri) → 필터/음량
-  cutoffHz: number;       // 800..16000 (filter.cutoff_hz)
-  outGainDb: number;      // -6..0 (mix.out_gain_db)
-  resonanceQ: number;     // 0.2..0.7 (filter.resonance)
+  // Color → 음색 (개선된 Tri)
+  wtIndex: number;        // 0..1 (웨이브테이블 인덱스)
+  toneTint: number;       // 0..1 (음색 틴트)
+  waveFold: number;       // 0..0.8 (웨이브 폴딩)
+  detune: number;         // -25..25 (디튠 센트)
   
-  // Distance (Tri) → 공간감
-  reverbSend: number;     // 0..1 (fx.reverb_send, 역할별 클램프)
-  delayBeats: number;     // 0.25..1.5 (fx.delay_beats)
-  reverbSize: number;     // 0.2..0.9 (fx.reverb_size)
+  // Brightness → 필터/음량 (개선된 Tri)
+  cutoffHz: number;       // 150..22000 (필터 컷오프)
+  outGainDb: number;      // -8..0 (출력 게인)
+  resonanceQ: number;     // 0.5..15.5 (필터 공명)
+  filterResonance: number; // 0.5..15.5 (추가 공명 제어)
   
-  // Tilt (Tri) → 스테레오
-  pan: number;            // -0.6..0.6 (mix.pan)
-  msBlend: number;        // 0.3..0.7 (mix.ms_blend)
-  stereoWidth: number;    // 0.2..1.0 (mix.stereo_width, BASS ≤ 0.4)
+  // Distance → 공간감 (개선된 Tri)
+  reverbSend: number;     // 0..0.7 (리버브 센드)
+  delayTime: number;      // 0.1..1.6 (딜레이 타임)
+  delayFeedback: number;  // 0..0.6 (딜레이 피드백)
+  spatialWidth: number;   // 0.2..1.0 (공간 폭)
   
-  // Spin (Tri) → 모듈레이션
-  tremHz: number;         // 0.5..8 (mod.trem_hz)
-  tremDepth: number;      // 0.10..0.40 (mod.trem_depth)
-  chorusDepth: number;    // 0.05..0.5 (mod.chorus_depth)
+  // 새로운 3D 공간감 파라미터들
+  panSpread: number;      // -0.6..0.6 (팬 확산)
+  chorusDepth: number;    // 0..0.8 (코러스 깊이)
+  binaural: number;       // 0..0.3 (바이노럴 효과)
   
-  // Size (Dual) → 피치/범위
-  pitchSemitones: number; // -7..+7 (pitch.semitones)
-  rangeWidth: number;     // 5..19 (range.widthSemi)
+  // Size + MelodicVariation → 피치/멜로디 (결합된 Dual)
+  pitchSemitones: number; // -12..+12 (피치 반음)
+  rangeWidth: number;     // 5..25 (음역 폭)
+  intervalVariation: number; // 0..0.8 (인터벌 변화)
+  scaleDeviation: number; // 0..0.3 (스케일 이탈)
+  microtonality: number;  // 0..0.15 (미분음성)
   
-  // Speed (Dual) → 리듬
-  rate: string;           // Tone.js sync value (e.g. '4n')
-  pulses: number;         // 2..16 (seq.pulses)
+  // OrbitSpeed + RhythmDensity → 리듬 (결합된 Dual)
+  rate: string;           // Tone.js sync value
+  pulses: number;         // 2..16 (펄스 개수)
+  subdivision: number;    // 1-4 (세분화 레벨)
+  syncopation: number;    // 0..0.8 (싱코페이션)
+  ghostNotes: number;     // 0..0.4 (고스트 노트)
   
-  // Eccentricity (Dual) → 그루브
-  swingPct: number;       // 0..40 (groove.swing_pct)
-  accentDb: number;       // 0..2 (groove.accent_db)
+  // RotationSpeed + PatternComplexity → 모듈레이션 (결합된 Tri)
+  tremHz: number;         // 0.2..12.2 (트레몰로 주파수)
+  tremDepth: number;      // 0..0.7 (트레몰로 깊이)
+  vibratoRate: number;    // 2..10 (비브라토 속도)
+  polyrhythm: number;     // 1-4 (폴리리듬 팩터)
+  patternEvolution: number; // 0..0.9 (패턴 진화)
+  crossRhythm: number;    // 0..0.6 (크로스 리듬)
   
-  // Elevation (Dual) → 음높이/필터타입
-  octave: number;         // -1..+1 (pitch.octave)
-  filterMorph: number;    // 0..1 (filter.type_morph, LP→BP→HP)
+  // Eccentricity + Tilt → 그루브/공간 (개선된 Dual)
+  swingPct: number;       // 0..45 (스윙 퍼센트)
+  accentDb: number;       // 0..6 (액센트 dB)
+  timing: number;         // -0.05..0.05 (타이밍 오프셋 초)
+  pan: number;            // -0.8..0.8 (팬)
+  stereoWidth: number;    // 0.1..1.5 (스테레오 폭)
   
-  // Phase (Dual) → 시퀀스
-  rotation: number;       // 0..15 (seq.rotation)
-  accentGate: number[];   // accent_gate (@quarters)
+  // 기존 호환성 유지
+  reverbSize: number;     // 0.2..0.9 (리버브 크기)
+  msBlend: number;        // 0.3..0.7 (MS 블렌드)
 }
 
 // 생성된 패턴 구조

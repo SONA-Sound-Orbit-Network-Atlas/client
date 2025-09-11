@@ -1,6 +1,8 @@
-// AudioEngine - 저수준 Tone.js 제어 서비스
+// AudioEngine - 저수준 Tone.js 제어 서비스 (새로운 파라미터 시스템 적용)
 // 상태를 갖지 않고, Star나 StellarSystem으로부터 값을 직접 전달받아 Tone.js를 제어합니다.
 // 단일 진실 공급원(Single Source of Truth): Star.ts가 모든 전역 상태를 관리
+// 새로운 파라미터 범위: planetSize, planetColor, planetBrightness, distanceFromStar, 
+// orbitSpeed, rotationSpeed, inclination, eccentricity, tilt
 
 import * as Tone from 'tone';
 import { quantizeToScale } from '../utils/scale';

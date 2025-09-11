@@ -2,7 +2,7 @@
 // Euclidean + Weighted + Musical Intelligence 기반 패턴 생성
 
 import type { InstrumentRole, PatternParameters, GeneratedPattern } from '../../types/audio';
-import { clamp } from './mapping';
+import { clamp } from './parameterConfig';
 import { RandomManager } from './random';
 import type { IRandomSource } from '../interfaces/IRandomSource';
 import { 

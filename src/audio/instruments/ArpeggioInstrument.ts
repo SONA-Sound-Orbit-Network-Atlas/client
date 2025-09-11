@@ -237,59 +237,72 @@ export class ArpeggioInstrument implements Instrument {
     });
   }
 
-  // SONA 매핑된 파라미터 적용
+  // SONA 매핑된 파라미터 적용 (안전한 null 처리)
   private applyParams(params: MappedAudioParameters): void {
     if (this.disposed) return;
 
     // 필터 컷오프 조절 - 아르페지오는 밝은 톤 유지
-    if (this.arpFilter) {
+    if (this.arpFilter && typeof params.cutoffHz === 'number' && !isNaN(params.cutoffHz)) {
       const cutoff = Math.max(2000, Math.min(8000, params.cutoffHz));
       this.arpFilter.frequency.rampTo(cutoff, 0.04); // 40ms 스무딩
     }
     
     // 필터 레조넌스 조절
-    if (this.arpFilter) {
+    if (this.arpFilter && typeof params.resonanceQ === 'number' && !isNaN(params.resonanceQ)) {
       const resonance = 1.5 + (params.resonanceQ * 2); // 1.5-3.5 범위
       this.arpFilter.Q.rampTo(resonance, 0.04);
     }
     
     // 트레몰로 조절 (SONA 지침: trem_hz ≤ 6)
     if (this.tremolo) {
-      const tremoloRate = Math.min(6, 2 + (params.tremHz * 0.8)); // 최대 6Hz
-      this.tremolo.frequency.rampTo(tremoloRate, 0.02); // 20ms 스무딩
+      if (typeof params.tremHz === 'number' && !isNaN(params.tremHz)) {
+        const tremoloRate = Math.min(6, 2 + (params.tremHz * 0.8)); // 최대 6Hz
+        this.tremolo.frequency.rampTo(tremoloRate, 0.02); // 20ms 스무딩
+      }
       
-      const tremoloDepth = 0.1 + (params.tremDepth * 0.3); // 0.1-0.4 범위
-      this.tremolo.depth.rampTo(tremoloDepth, 0.02);
+      if (typeof params.tremDepth === 'number' && !isNaN(params.tremDepth)) {
+        const tremoloDepth = 0.1 + (params.tremDepth * 0.3); // 0.1-0.4 범위
+        this.tremolo.depth.rampTo(tremoloDepth, 0.02);
+      }
     }
     
-    // 핑퐁 딜레이 조절
+    // 핑퐁 딜레이 조절 (새 파라미터 시스템)
     if (this.pingPongDelay) {
-      const delayTime = Tone.Time((params.delayBeats * 2) + 'n').toSeconds(); // delayBeats 기반
-      this.pingPongDelay.delayTime.rampTo(Math.max(0.05, Math.min(0.5, delayTime)), 0.08);
+      if (typeof params.delayTime === 'number' && !isNaN(params.delayTime)) {
+        const delayTimeSeconds = Math.max(0.05, Math.min(0.5, params.delayTime));
+        this.pingPongDelay.delayTime.rampTo(delayTimeSeconds, 0.08);
+      }
       
-      const feedback = 0.2 + (params.reverbSend * 0.3);
-      this.pingPongDelay.feedback.rampTo(Math.max(0.1, Math.min(0.6, feedback)), 0.08);
+      // 딜레이 피드백 조절 (새 파라미터)
+      if (typeof params.delayFeedback === 'number' && !isNaN(params.delayFeedback)) {
+        const feedback = Math.max(0.1, Math.min(0.6, params.delayFeedback));
+        this.pingPongDelay.feedback.rampTo(feedback, 0.08);
+      }
     }
     
     // EQ 조절
     if (this.eq) {
       // 고음 조절 (brightness 매핑)
-      const highGain = 2 + (params.outGainDb * 0.3);
-      this.eq.high.rampTo(Math.max(0, Math.min(6, highGain)), 0.08);
+      if (typeof params.outGainDb === 'number' && !isNaN(params.outGainDb)) {
+        const highGain = 2 + (params.outGainDb * 0.3);
+        this.eq.high.rampTo(Math.max(0, Math.min(6, highGain)), 0.08);
+      }
       
       // 중음 조절
-      const midGain = 0 + (params.cutoffHz / 4000);
-      this.eq.mid.rampTo(Math.max(-3, Math.min(3, midGain)), 0.08);
+      if (typeof params.cutoffHz === 'number' && !isNaN(params.cutoffHz)) {
+        const midGain = 0 + (params.cutoffHz / 4000);
+        this.eq.mid.rampTo(Math.max(-3, Math.min(3, midGain)), 0.08);
+      }
     }
     
     // 어택 시간 조절 (빠른 패턴을 위해 매우 짧게 유지)
-    if (this.arpSynth) {
+    if (this.arpSynth && typeof params.tremDepth === 'number' && !isNaN(params.tremDepth)) {
       const attack = 0.003 + ((1 - params.tremDepth) * 0.007); // 0.003-0.01초
       this.arpSynth.envelope.attack = attack;
     }
     
     // 릴리즈 시간 조절
-    if (this.arpSynth) {
+    if (this.arpSynth && typeof params.reverbSend === 'number' && !isNaN(params.reverbSend)) {
       const release = 0.1 + (params.reverbSend * 0.2); // 0.1-0.3초
       this.arpSynth.envelope.release = release;
     }

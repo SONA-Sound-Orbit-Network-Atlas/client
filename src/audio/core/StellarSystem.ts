@@ -85,6 +85,16 @@ export class StellarSystem {
     console.log(`🪐 행성 추가됨: ${planet.getName()} (${planetId})`);
     return planetId;
   }
+
+  // 새 행성 생성 (addPlanet의 별칭)
+  createPlanet(role: InstrumentRole, customId?: string): string {
+    return this.addPlanet(role, customId);
+  }
+
+  // 항성 전역 상태 업데이트
+  updateStarGlobalState(globalState: Partial<import('../../types/audio').StarGlobalState>): void {
+    this.star.setGlobalState(globalState);
+  }
   
   // 행성 제거
   removePlanet(planetId: string): boolean {

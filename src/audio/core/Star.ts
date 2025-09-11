@@ -203,6 +203,23 @@ export class Star {
       }
     }
   }
+
+  // 전역 상태 직접 업데이트 (StellarSystem용)
+  setGlobalState(newState: Partial<StarGlobalState>): void {
+    Object.assign(this.globalState, newState);
+    
+    const audioEngine = AudioEngine.instance;
+    if (audioEngine.isReady()) {
+      audioEngine.applyGlobalState(this.globalState);
+      
+      // BPM 변경 시 Transport 업데이트
+      if ('bpm' in newState) {
+        Tone.Transport.bpm.rampTo(this.globalState.bpm, 0.5);
+      }
+    }
+    
+    console.log(`⭐ Star Global State 직접 업데이트:`, this.globalState);
+  }
   
   // SONA 매핑에 따른 전역 상태 계산
   private updateGlobalState(): void {
