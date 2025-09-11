@@ -1,34 +1,12 @@
 import { create } from 'zustand';
+import { SidebarStore } from '../types/sidebar';
+import { ProfilePanelStore } from '../types/profile';
+import { AuthStore } from '../types/auth';
 
-interface SidebarState {
-  isSecondaryOpen: boolean;
-  selectedMenu: string | null;
-  isLoggedIn: boolean;
-  profilePanelMode:
-    | 'login'
-    | 'signup'
-    | 'profile'
-    | 'editProfile'
-    | 'likes'
-    | 'followers'
-    | 'followings';
-  openSecondarySidebar: (menu: string) => void;
-  closeSecondarySidebar: () => void;
-  toggleSecondarySidebar: (menu: string) => void;
-  setLoginStatus: (status: boolean) => void;
-  setProfilePanelMode: (
-    mode:
-      | 'login'
-      | 'signup'
-      | 'profile'
-      | 'editProfile'
-      | 'likes'
-      | 'followers'
-      | 'followings'
-  ) => void;
-}
+// 통합 사이드바 스토어 타입
+type CombinedSidebarStore = SidebarStore & ProfilePanelStore & AuthStore;
 
-export const useSidebarStore = create<SidebarState>((set, get) => ({
+export const useSidebarStore = create<CombinedSidebarStore>((set, get) => ({
   isSecondaryOpen: false,
   selectedMenu: null,
   isLoggedIn: true, // 기본값: 로그인됨 (테스트용)
@@ -64,16 +42,7 @@ export const useSidebarStore = create<SidebarState>((set, get) => ({
     set({
       isLoggedIn: status,
     }),
-  setProfilePanelMode: (
-    mode:
-      | 'login'
-      | 'signup'
-      | 'profile'
-      | 'editProfile'
-      | 'likes'
-      | 'followers'
-      | 'followings'
-  ) =>
+  setProfilePanelMode: (mode) =>
     set({
       profilePanelMode: mode,
     }),
