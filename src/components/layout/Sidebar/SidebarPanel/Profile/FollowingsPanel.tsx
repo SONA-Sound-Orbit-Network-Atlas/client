@@ -1,10 +1,10 @@
-import { useSidebarStore } from '@/stores/sidebarStore';
+import { useProfileStore } from '@/stores/profileStore';
 import PanelHeader from '../PanelHeader';
 import UserCard from '@/components/common/Card/UserCard';
 import { ScrollArea } from '@/components/common/Scrollarea';
 
 export default function FollowingsPanel() {
-  const { setProfilePanelMode } = useSidebarStore();
+  const { setProfilePanelMode } = useProfileStore();
 
   // 임시 데이터
   const followings = [

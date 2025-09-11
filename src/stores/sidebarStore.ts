@@ -1,16 +1,9 @@
 import { create } from 'zustand';
-import { SidebarStore } from '../types/sidebar';
-import { ProfilePanelStore } from '../types/profile';
-import { AuthStore } from '../types/auth';
+import type { SidebarStore } from '../types/sidebar';
 
-// 통합 사이드바 스토어 타입
-type CombinedSidebarStore = SidebarStore & ProfilePanelStore & AuthStore;
-
-export const useSidebarStore = create<CombinedSidebarStore>((set, get) => ({
+export const useSidebarStore = create<SidebarStore>((set, get) => ({
   isSecondaryOpen: false,
   selectedMenu: null,
-  isLoggedIn: true, // 기본값: 로그인됨 (테스트용)
-  profilePanelMode: 'profile', // 기본값: 프로필 모드
   openSecondarySidebar: (menu: string) =>
     set({
       isSecondaryOpen: true,
@@ -38,12 +31,4 @@ export const useSidebarStore = create<CombinedSidebarStore>((set, get) => ({
       });
     }
   },
-  setLoginStatus: (status: boolean) =>
-    set({
-      isLoggedIn: status,
-    }),
-  setProfilePanelMode: (mode) =>
-    set({
-      profilePanelMode: mode,
-    }),
 }));
