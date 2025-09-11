@@ -36,7 +36,7 @@ export default function Sort({ sortOptions, setSort, sort }: SortProps) {
             />
           </Button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent className="w-[207px]">
+        <DropdownMenuContent className="w-[223px]">
           <DropdownMenuRadioGroup
             value={sort}
             onValueChange={(value) => setSort(value as SortLabel)}

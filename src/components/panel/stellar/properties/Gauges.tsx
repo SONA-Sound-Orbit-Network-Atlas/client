@@ -9,6 +9,7 @@ interface GaugesProps {
     value: number;
     min: number;
     max: number;
+    unit: number;
   }[];
 }
 
@@ -41,7 +42,7 @@ export default function Gauges({ properties }: GaugesProps) {
           label={property.label}
           property={property.label}
           max={property.max}
-          step={1}
+          step={property.unit}
         />
       ))}
     </Card>

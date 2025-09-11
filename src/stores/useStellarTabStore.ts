@@ -1,7 +1,7 @@
 // Stellar 패널 Tab value 스토어
 import { create } from 'zustand';
 
-type StellarTab = 'INFO' | 'OBJECTS' | 'PROPERTIES';
+type StellarTab = 'OBJECTS' | 'INFO' | 'PROPERTIES';
 
 interface TabState {
   tabValue: StellarTab;
@@ -9,6 +9,6 @@ interface TabState {
 }
 
 export const useStellarTabStore = create<TabState>()((set) => ({
-  tabValue: 'INFO', // 초기 탭
+  tabValue: 'OBJECTS', // 초기 탭
   setTabValue: (value) => set({ tabValue: value }),
 }));

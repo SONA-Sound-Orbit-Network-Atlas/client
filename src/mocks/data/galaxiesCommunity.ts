@@ -5,7 +5,7 @@ const galaxyDummy: GalaxyCommunityData = {
   totalCount: 6,
   list: [
     {
-      id: 'stellar-1',
+      id: 'sys-001',
       userId: 'user-1',
       rank: 1,
       galaxyName: 'Galaxy 1',
@@ -16,7 +16,7 @@ const galaxyDummy: GalaxyCommunityData = {
       myFavorite: true,
     },
     {
-      id: 'stellar-2',
+      id: 'sys-002',
       userId: 'user-2',
       rank: 2,
       galaxyName: 'Galaxy 2',
@@ -27,7 +27,7 @@ const galaxyDummy: GalaxyCommunityData = {
       myFavorite: false,
     },
     {
-      id: 'stellar-3',
+      id: 'sys-003',
       userId: 'user-3',
       rank: 3,
       galaxyName: 'Galaxy 3',
@@ -38,7 +38,7 @@ const galaxyDummy: GalaxyCommunityData = {
       myFavorite: false,
     },
     {
-      id: 'stellar-4',
+      id: 'sys-004',
       userId: 'user-4',
       rank: 4,
       galaxyName: 'Galaxy 4',
@@ -49,7 +49,7 @@ const galaxyDummy: GalaxyCommunityData = {
       myFavorite: true,
     },
     {
-      id: 'stellar-5',
+      id: 'sys-005',
       userId: 'user-5',
       rank: 5,
       galaxyName: 'Galaxy 5',
@@ -60,7 +60,7 @@ const galaxyDummy: GalaxyCommunityData = {
       myFavorite: true,
     },
     {
-      id: 'stellar-6',
+      id: 'sys-006',
       userId: 'user-6',
       rank: 6,
       galaxyName: 'Galaxy 6',
