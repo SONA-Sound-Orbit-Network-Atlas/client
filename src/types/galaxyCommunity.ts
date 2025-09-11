@@ -27,9 +27,10 @@ export interface ParamsGetGalaxyCommunityList {
 // 은하 목록 정렬 타입
 // 1) 옵션 정의 (드롭다운에서 보여주는 값: label / api에 전달하는 값: value)
 export const sortOptions = [
-  { label: 'Top Today', value: 'today' },
-  { label: 'Top All Time', value: 'alltime' },
-  { label: 'Recent', value: 'recent' },
+  { label: 'TOP WEEK', value: 'week' },
+  { label: 'TOP MONTH', value: 'month' },
+  { label: 'TOP YEAR', value: 'year' },
+  { label: 'RANDOM', value: 'random' },
 ] as const;
 
 // 2) 타입 추론

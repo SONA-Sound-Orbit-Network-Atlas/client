@@ -74,7 +74,7 @@ function LoadingComp() {
   return (
     <div className="space-y-3">
       {Array.from({ length: GALAXY_LIST_LIMIT }).map((_, index) => (
-        <SkeletonCard key={index} className="min-h-[110px]" />
+        <SkeletonCard key={index} className="min-h-[120px]" />
       ))}
     </div>
   );

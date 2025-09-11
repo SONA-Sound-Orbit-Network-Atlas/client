@@ -7,7 +7,7 @@ export interface Property {
   value: number; // 현재 값
   min: number;
   max: number;
-  unit?: string; // 선택: '°' 등
+  unit: number; // 선택: '°' 등
 }
 
 interface BaseObject {

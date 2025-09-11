@@ -33,13 +33,8 @@ export function useGetStellar() {
   useEffect(() => {
     if (!selectedStellarId) return;
     if (!query.data) return;
+
     setStellarStore(query.data);
-
-    // 사이드바 stellar 패널 열기
-    if (selectedStellarId) {
-      openSecondarySidebar('stellar');
-    }
-
     console.log('query.data', query.data);
   }, [query.data, setStellarStore, openSecondarySidebar, selectedStellarId]);
 
