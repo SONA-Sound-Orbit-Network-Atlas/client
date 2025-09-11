@@ -8,6 +8,7 @@ export interface GalaxyMyData {
 export interface GalaxyMyListData {
   id: string;
   galaxyName: string;
+  userId: string;
   updatedAt: string;
   planetCount: number;
   favoriteCount: number;

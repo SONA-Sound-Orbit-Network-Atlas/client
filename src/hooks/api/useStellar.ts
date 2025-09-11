@@ -31,6 +31,7 @@ export function useGetStellar() {
 
   // 스텔라 정보 api 호출 및 갱신 후 => 스토어에 저장
   useEffect(() => {
+    if (!selectedStellarId) return;
     if (!query.data) return;
     setStellarStore(query.data);
 

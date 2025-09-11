@@ -28,7 +28,7 @@ const initialUserStore: UserType = {
 
 export const useUserStore = create<UserStore>((set) => ({
   userStore: dummyUserStore,
-  isLoggedIn: false,
+  isLoggedIn: true,
   setUserStore: (userStore: UserType) => {
     set({ userStore });
   },

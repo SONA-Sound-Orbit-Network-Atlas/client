@@ -15,7 +15,7 @@ export default function CardItem({
   onClick,
 }: CardItemProps) {
   return (
-    <Card onClick={onClick}>
+    <Card onClick={onClick} role="button">
       <div className="flex justify-between items-center">
         <div className="flex-1 min-w-0">
           <div className="text-[14px] font-bold flex items-center">

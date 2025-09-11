@@ -15,17 +15,9 @@ export default function MenuContent({ content, menuId }: MenuContentProps) {
       case 'profile':
         return <ProfilePanel />;
       case 'galaxy':
-        return (
-          <div className="w-full">
-            <GalaxyIndex />
-          </div>
-        );
+        return <GalaxyIndex />;
       case 'stellar':
-        return (
-          <div className="w-full">
-            <StellarIndex />
-          </div>
-        );
+        return <StellarIndex />;
       case 'alarm':
         return (
           <div className="space-y-3">

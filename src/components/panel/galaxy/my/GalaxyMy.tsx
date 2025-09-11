@@ -3,14 +3,13 @@
 import List from './List';
 import PanelTitle from '../../PanelTitle';
 import CreateNewButton from './CreateNewButton';
-import { useGetSession } from '@/hooks/api/useAuth';
 import LoginRequired from '@/components/panel/LoginRequired';
+import { useUserStore } from '@/stores/useUserStore';
 
 export default function GalaxyMy() {
   // 로그인 여부 체크
-  const { data: session, status } = useGetSession();
-  if (session === null) return <LoginRequired />;
-  if (status === 'error') return <div>로그인 세션 조회 실패</div>;
+  const { isLoggedIn } = useUserStore();
+  if (!isLoggedIn) return <LoginRequired />;
 
   return (
     <div>
