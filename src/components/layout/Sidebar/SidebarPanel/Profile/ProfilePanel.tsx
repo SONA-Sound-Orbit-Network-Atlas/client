@@ -1,4 +1,5 @@
-import { useSidebarStore } from '@/stores/sidebarStore';
+import { useAuthStore } from '@/stores/AuthStore';
+import { useProfileStore } from '@/stores/profileStore';
 import LoginPanel from './LoginPanel';
 import SignUpPanel from './SignUpPanel';
 import ProfileView from './ProfileView';
@@ -8,7 +9,8 @@ import FollowersPanel from './FollowersPanel';
 import FollowingsPanel from './FollowingsPanel';
 
 export default function ProfilePanel() {
-  const { isLoggedIn, profilePanelMode } = useSidebarStore();
+  const { isLoggedIn } = useAuthStore();
+  const { profilePanelMode } = useProfileStore();
 
   const renderContent = () => {
     if (!isLoggedIn) {

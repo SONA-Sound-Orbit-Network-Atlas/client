@@ -1,12 +1,12 @@
 import { FiUser } from 'react-icons/fi';
-import { useSidebarStore } from '@/stores/sidebarStore';
+import { useProfileStore } from '@/stores/profileStore';
 import Iconframe from '@/components/common/Iconframe';
 import TextInput from '@/components/common/TextInput';
 import Button from '@/components/common/Button';
 import TextField from '@/components/common/textField';
 
 export default function LoginPanel() {
-  const { setProfilePanelMode } = useSidebarStore();
+  const { setProfilePanelMode } = useProfileStore();
 
   return (
     <div className="text-center p-4">

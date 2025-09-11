@@ -1,11 +1,11 @@
-import { useSidebarStore } from '@/stores/sidebarStore';
+import { useProfileStore } from '@/stores/profileStore';
 import PanelHeader from '../PanelHeader';
 import CardItem from '@/components/panel/galaxy/community/CardItem';
 import { ScrollArea } from '@/components/common/Scrollarea';
 import type { GalaxyCommunityListData } from '@/types/galaxyCommunity';
 
 export default function LikesPanel() {
-  const { setProfilePanelMode } = useSidebarStore();
+  const { setProfilePanelMode } = useProfileStore();
 
   // 임시 데이터 - GalaxyCommunityListData 타입에 맞게 수정
   const likedItems: GalaxyCommunityListData[] = [
