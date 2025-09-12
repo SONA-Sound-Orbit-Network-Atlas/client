@@ -30,7 +30,7 @@ function ObjectsContent() {
 
   return (
     <div>
-      <PanelTitle fontSize="text-xs">
+      <PanelTitle fontSize="large">
         SYSTEM OBJECTS ({stellarStore.objects.length})
       </PanelTitle>
 

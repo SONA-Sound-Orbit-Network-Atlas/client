@@ -8,6 +8,7 @@ interface SliderProps
   showMinMax?: boolean;
   label?: string;
   showCurrentValue?: boolean;
+  rangeColor?: string;
 }
 
 function Slider({
@@ -19,6 +20,7 @@ function Slider({
   showMinMax = true,
   label,
   showCurrentValue = true,
+  rangeColor,
   ...props
 }: SliderProps) {
   const _values = React.useMemo(
@@ -66,8 +68,10 @@ function Slider({
           <SliderPrimitive.Range
             data-slot="slider-range"
             className={mergeClassNames(
-              'bg-tertiary-200 absolute data-[orientation=horizontal]:h-full data-[orientation=vertical]:w-full'
+              rangeColor ?? 'bg-tertiary-200',
+              'absolute data-[orientation=horizontal]:h-full data-[orientation=vertical]:w-full'
             )}
+            style={rangeColor ? { backgroundColor: rangeColor } : undefined}
           />
         </SliderPrimitive.Track>
         {Array.from({ length: _values.length }, (_, index) => (

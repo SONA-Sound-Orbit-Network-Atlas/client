@@ -14,7 +14,7 @@ export default function CreateNewButton() {
 
   const handleCreateNewGalaxy = () => {
     // Stellar 스토어 초기화 -> 패널 모드 변경 -> 패널 화면 전환(Stellar 패널)
-    setInitialStellarStore(userStore.userName);
+    setInitialStellarStore(userStore.username);
     setCreate();
     setTabValue('OBJECTS');
     openSecondarySidebar('stellar');

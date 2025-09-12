@@ -5,7 +5,7 @@ import galaxiesMy from './data/galaxiesMy';
 import { stellar } from './data/stellar';
 import { mockFetch, mockFetchInfinite } from './utils';
 
-const isLoggedIn = false; // 로그인 여부 테스트용
+const isLoggedIn = true; // 로그인 여부 테스트용
 
 export const handlers = [
   // 세션 확인
@@ -20,7 +20,7 @@ export const handlers = [
 
   // 로그인
   http.post('/api/auth/login', async () => {
-    return HttpResponse.json({ email: 'bomin@example.com', userName: 'bomin' });
+    return HttpResponse.json({ email: 'bomin@example.com', username: 'bomin' });
   }),
 
   // galaxy Community 리스트 조회 (infinite)

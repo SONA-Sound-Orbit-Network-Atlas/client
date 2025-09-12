@@ -4,70 +4,31 @@ import type { Object, StellarType } from '@/types/stellar';
 interface StellarStore {
   stellarStore: StellarType;
   setStellarStore: (stellarStore: StellarType) => void;
-  setInitialStellarStore: (userName: string) => void;
+  setInitialStellarStore: (username: string) => void;
   addNewObjectAndReturnId: () => number;
 }
 
-// 더미 stellar 데이터
-const dummyStellarStore: StellarType = {
-  userId: 'testUser',
-  stellarId: 'sys-001',
-  stellarName: 'CENTRAL STAR SYSTEM',
-  updatedAt: '2021-01-03',
-  objects: [
-    {
-      name: 'CENTRAL STAR',
-      planetType: 'CENTRAL STAR',
-      planetId: 0,
-      status: 'ACTIVE',
-      bpm: 120,
-      creator: 'STANN',
-      author: 'STANN',
-      createSource: 'ORIGINAL COMPOSITION',
-      originalSource: 'SONA STUDIO',
-      properties: [
-        { label: 'size', value: 54, min: 0, max: 100 },
-        { label: '게이지 2', value: 10, min: 0, max: 360 },
-        { label: '게이지 3', value: 64, min: 0, max: 100 },
-      ],
-    },
-    {
-      name: 'BASS PLANET',
-      planetType: 'PLANET',
-      planetId: 1,
-      status: 'ACTIVE',
-      soundType: 'BASS',
-      created: '2021-01-01',
-      properties: [
-        { label: 'size', value: 13, min: 0, max: 100 },
-        { label: '게이지 2', value: 34, min: 0, max: 360 },
-        { label: '게이지 3', value: 100, min: 0, max: 100 },
-      ],
-    },
-  ],
-};
-
 // 초기 stellar 데이터
 const initialStellarStore: StellarType = {
-  userId: 'testUser',
-  stellarId: 'newStellarId', // 백엔드 자동 생성
-  stellarName: 'CENTRAL STAR SYSTEM', // 백엔드 자동 생성성
-  updatedAt: '2021-01-03', // 현재 시각 (초기값만 프론트에서 제공)
+  userId: '',
+  stellarId: '', // 백엔드 자동 생성
+  stellarName: 'CENTRAL STAR SYSTEM', // 백엔드 자동 생성
+  updatedAt: '', // 현재 시각 (초기값만 프론트에서 제공)
   objects: [
     {
       name: 'CENTRAL STAR', // 수정 가능
       planetType: 'CENTRAL STAR', // 수정 불가
       planetId: 0, // 수정 불가
-      status: 'ACTIVE', // 수정 불가
-      bpm: 120, // 수정 불가?
-      creator: 'testUser', // (초기값) 유저 api에서 가져오기
-      author: 'testUser', // (초기값) 유저 api에서 가져오기
+      status: '', // 수정 불가
+      bpm: 0, // 수정 불가?
+      creator: '', // (초기값) 유저 api에서 가져오기
+      author: '', // (초기값) 유저 api에서 가져오기
       createSource: 'ORIGINAL COMPOSITION',
       originalSource: 'SONA STUDIO',
       properties: [
-        { label: 'size', value: 0, min: 0, max: 100 },
-        { label: '게이지 2', value: 0, min: 0, max: 360 },
-        { label: '게이지 3', value: 0, min: 0, max: 100 },
+        { label: 'size', value: 0, min: 0, max: 100, unit: 1 },
+        { label: '게이지 2', value: 0, min: 0, max: 360, unit: 1 },
+        { label: '게이지 3', value: 0, min: 0, max: 100, unit: 1 },
       ],
     },
   ],
@@ -82,9 +43,9 @@ const newObjectTemplate: Object = {
   soundType: 'LEAD',
   created: '2021-01-02',
   properties: [
-    { label: 'size', value: 0, min: 0, max: 100 },
-    { label: '게이지 2', value: 0, min: 0, max: 360 },
-    { label: '게이지 3', value: 0, min: 0, max: 100 },
+    { label: 'size', value: 0, min: 0, max: 100, unit: 1 },
+    { label: '게이지 2', value: 0, min: 0, max: 360, unit: 1 },
+    { label: '게이지 3', value: 0, min: 0, max: 100, unit: 1 },
   ],
 };
 
@@ -99,16 +60,16 @@ function cloneNewObject(nextId: number, index: number): Object {
 }
 
 export const useStellarStore = create<StellarStore>((set) => ({
-  stellarStore: dummyStellarStore,
+  stellarStore: initialStellarStore,
 
   setStellarStore: (stellarStore) => set({ stellarStore }),
 
-  setInitialStellarStore: (userName) =>
+  setInitialStellarStore: (username) =>
     set(() => {
       const first = {
         ...initialStellarStore.objects[0],
-        creator: userName,
-        author: userName,
+        creator: username,
+        author: username,
       };
       return {
         stellarStore: {
