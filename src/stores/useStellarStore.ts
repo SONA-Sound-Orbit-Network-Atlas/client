@@ -51,7 +51,7 @@ const dummyStellarStore: StellarType = {
 const initialStellarStore: StellarType = {
   userId: '',
   stellarId: '', // 백엔드 자동 생성
-  stellarName: 'CENTRAL STAR SYSTEM', // 백엔드 자동 생성성
+  stellarName: 'CENTRAL STAR SYSTEM', // 백엔드 자동 생성
   updatedAt: '', // 현재 시각 (초기값만 프론트에서 제공)
   objects: [
     {

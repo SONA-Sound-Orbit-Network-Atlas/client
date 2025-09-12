@@ -5,7 +5,7 @@ import galaxiesMy from './data/galaxiesMy';
 import { stellar } from './data/stellar';
 import { mockFetch, mockFetchInfinite } from './utils';
 
-const isLoggedIn = false; // 로그인 여부 테스트용
+const isLoggedIn = true; // 로그인 여부 테스트용
 
 export const handlers = [
   // 세션 확인
