@@ -1,7 +1,7 @@
 import { FiUser } from 'react-icons/fi';
 import Iconframe from '@/components/common/Iconframe';
 import Button from '@/components/common/Button';
-import { useSidebarStore } from '@/stores/sidebarStore';
+import { useSidebarStore } from '@/stores/usesidebarStore';
 
 export default function LoginRequired() {
   const { setProfilePanelMode } = useSidebarStore();

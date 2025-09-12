@@ -6,7 +6,7 @@ import {
   FiUserCheck,
 } from 'react-icons/fi';
 import { IoPlanetOutline } from 'react-icons/io5';
-import { useProfileStore } from '@/stores/profileStore';
+import { useProfileStore } from '@/stores/useprofileStore';
 import Iconframe from '@/components/common/Iconframe';
 import Button from '@/components/common/Button';
 import Card from '@/components/common/Card/Card';

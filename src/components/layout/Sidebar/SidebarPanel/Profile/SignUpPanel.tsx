@@ -1,5 +1,5 @@
 import { FiUserPlus } from 'react-icons/fi';
-import { useProfileStore } from '@/stores/profileStore';
+import { useProfileStore } from '@/stores/useprofileStore';
 import Iconframe from '@/components/common/Iconframe';
 import TextInput from '@/components/common/TextInput';
 import Button from '@/components/common/Button';

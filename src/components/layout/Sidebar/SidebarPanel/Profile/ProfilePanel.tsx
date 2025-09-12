@@ -1,5 +1,5 @@
 import { useUserStore } from '@/stores/useUserStore';
-import { useProfileStore } from '@/stores/profileStore';
+import { useProfileStore } from '@/stores/useprofileStore';
 import LoginPanel from './LoginPanel';
 import SignUpPanel from './SignUpPanel';
 import ProfileView from './ProfileView';

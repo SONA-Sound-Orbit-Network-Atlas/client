@@ -12,7 +12,7 @@ import { ErrorBoundary } from 'react-error-boundary';
 import LoadingIcon from '@/components/common/LoadingIcon';
 import { useSelectedStellarStore } from '@/stores/useSelectedStellarStore';
 import { useStellarTabStore } from '@/stores/useStellarTabStore';
-import { useSidebarStore } from '@/stores/sidebarStore';
+import { useSidebarStore } from '@/stores/usesidebarStore';
 
 const GALAXY_LIST_LIMIT = 3;
 

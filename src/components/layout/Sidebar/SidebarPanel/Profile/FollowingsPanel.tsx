@@ -1,4 +1,4 @@
-import { useProfileStore } from '@/stores/profileStore';
+import { useProfileStore } from '@/stores/useprofileStore';
 import PanelHeader from '../PanelHeader';
 import UserCard from '@/components/common/Card/UserCard';
 import { ScrollArea } from '@/components/common/Scrollarea';

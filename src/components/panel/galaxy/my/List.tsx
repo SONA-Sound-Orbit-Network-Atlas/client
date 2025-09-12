@@ -6,7 +6,7 @@ import Button from '@/components/common/Button';
 import { SkeletonCard } from '@/components/common/Card/SkeletonCard';
 import { ErrorBoundary } from 'react-error-boundary';
 import LoadingIcon from '@/components/common/LoadingIcon';
-import { useSidebarStore } from '@/stores/sidebarStore';
+import { useSidebarStore } from '@/stores/usesidebarStore';
 import { useSelectedStellarStore } from '@/stores/useSelectedStellarStore';
 
 const GALAXY_LIST_LIMIT = 3;

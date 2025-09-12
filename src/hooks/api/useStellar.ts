@@ -6,7 +6,7 @@ import type { StellarType } from '@/types/stellar';
 import { useStellarStore } from '@/stores/useStellarStore';
 import { useEffect } from 'react';
 import { useSelectedStellarStore } from '@/stores/useSelectedStellarStore';
-import { useSidebarStore } from '@/stores/sidebarStore';
+import { useSidebarStore } from '@/stores/usesidebarStore';
 
 // 생성
 export function useCreateStellar(stellarData: StellarType) {
