@@ -10,8 +10,7 @@ import Button from '@/components/common/Button';
 import { SkeletonCard } from '@/components/common/Card/SkeletonCard';
 import { ErrorBoundary } from 'react-error-boundary';
 import LoadingIcon from '@/components/common/LoadingIcon';
-import { useSelectedStellarStore } from '@/stores/useSelectedStellarStore';
-import { useSidebarStore } from '@/stores/sidebarStore';
+import useStellarSystemSelection from '@/hooks/useStellarSystemSelection';
 
 const GALAXY_LIST_LIMIT = 3;
 
@@ -27,8 +26,7 @@ export default function List({ sort }: { sort: SortLabel }) {
 
 // 갤럭시 리스트 컨텐츠
 function ContentComp({ sort }: { sort: SortLabel }) {
-  const { selectedStellarId, setSelectedStellarId } = useSelectedStellarStore();
-  const { openSecondarySidebar } = useSidebarStore();
+  const { selectStellar } = useStellarSystemSelection();
 
   // 갤럭시 리스트 데이터
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage } =
@@ -49,14 +47,7 @@ function ContentComp({ sort }: { sort: SortLabel }) {
             key={galaxySystem.id}
             {...galaxySystem}
             onClick={() => {
-              console.log('은하리스트 카드 클릭');
-              // 갤럭시 id 값 변경 => 스텔라 정보 api 호출 및 갱신 후 => 스토어에 저장
-              console.log('갤럭시 id 값 변경 : ', galaxySystem.id);
-              if (galaxySystem.id === selectedStellarId) {
-                openSecondarySidebar('stellar');
-                return;
-              }
-              setSelectedStellarId(galaxySystem.id); // 스텔라 id 값 변경
+              selectStellar(galaxySystem.id);
             }}
           />
         ))}
