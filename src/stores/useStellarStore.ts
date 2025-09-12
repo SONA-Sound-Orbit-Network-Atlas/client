@@ -49,19 +49,19 @@ const dummyStellarStore: StellarType = {
 
 // 초기 stellar 데이터
 const initialStellarStore: StellarType = {
-  userId: 'testUser',
-  stellarId: 'newStellarId', // 백엔드 자동 생성
+  userId: '',
+  stellarId: '', // 백엔드 자동 생성
   stellarName: 'CENTRAL STAR SYSTEM', // 백엔드 자동 생성성
-  updatedAt: '2021-01-03', // 현재 시각 (초기값만 프론트에서 제공)
+  updatedAt: '', // 현재 시각 (초기값만 프론트에서 제공)
   objects: [
     {
       name: 'CENTRAL STAR', // 수정 가능
       planetType: 'CENTRAL STAR', // 수정 불가
       planetId: 0, // 수정 불가
-      status: 'ACTIVE', // 수정 불가
-      bpm: 120, // 수정 불가?
-      creator: 'testUser', // (초기값) 유저 api에서 가져오기
-      author: 'testUser', // (초기값) 유저 api에서 가져오기
+      status: '', // 수정 불가
+      bpm: 0, // 수정 불가?
+      creator: '', // (초기값) 유저 api에서 가져오기
+      author: '', // (초기값) 유저 api에서 가져오기
       createSource: 'ORIGINAL COMPOSITION',
       originalSource: 'SONA STUDIO',
       properties: [
@@ -99,7 +99,7 @@ function cloneNewObject(nextId: number, index: number): Object {
 }
 
 export const useStellarStore = create<StellarStore>((set) => ({
-  stellarStore: dummyStellarStore,
+  stellarStore: initialStellarStore,
 
   setStellarStore: (stellarStore) => set({ stellarStore }),
 
