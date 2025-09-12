@@ -19,11 +19,30 @@ export function useLogin(data: LoginData) {
   return useMutation({
     mutationKey: ['auth', 'login', data.email],
     mutationFn: () => authAPI.login(data),
-    onSuccess: (data) => {
-      const { userId, username } = data;
-      setUserStore({ userId, username: username, email: data.email });
+    onSuccess: (response) => {
+      const { access_token, user } = response;
+
+      // access_token을 localStorage에 저장
+      localStorage.setItem('accessToken', access_token);
+
+      // 사용자 정보를 스토어에 저장
+      setUserStore({
+        userId: user.id,
+        username: user.username,
+        email: user.email,
+      });
       setIsLoggedIn(true);
-      console.log('로그인 성공 : ', data);
+
+      console.log('로그인 성공:', { user, token: access_token });
+    },
+    onError: (error: any) => {
+      console.error('로그인 실패:', error);
+
+      // API 에러 응답 처리
+      if (error.response?.data?.error) {
+        const apiError = error.response.data.error;
+        console.error('API 에러:', apiError.message);
+      }
     },
   });
 }
@@ -37,6 +56,9 @@ export function useLogout() {
     mutationKey: ['auth', 'logout'],
     mutationFn: () => authAPI.logout(),
     onSuccess: async () => {
+      // localStorage에서 accessToken 제거
+      localStorage.removeItem('accessToken');
+
       queryClient.setQueryData(['session'], null); // 즉시 비로그인으로 반영
       await queryClient.invalidateQueries({ queryKey: ['galaxyMyList'] });
       setIsLoggedIn(false);

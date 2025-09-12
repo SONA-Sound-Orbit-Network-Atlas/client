@@ -15,6 +15,11 @@ export interface SignupFormData {
   confirmPassword: string;
 }
 
+export interface LoginFormData {
+  email: string;
+  password: string;
+}
+
 /**
  * 이메일 형식 검증
  */
@@ -109,7 +114,27 @@ export const validateSignupForm = (
 };
 
 /**
- * 특정 필드만 검증
+ * 로그인 폼 전체 검증
+ */
+export const validateLoginForm = (
+  formData: LoginFormData
+): Record<string, string> => {
+  const errors: Record<string, string> = {};
+
+  // 이메일 검증
+  const emailError = validateEmail(formData.email);
+  if (emailError) errors.email = emailError;
+
+  // 비밀번호 검증 (로그인에서는 길이 제한 없이 필수만 체크)
+  if (!formData.password) {
+    errors.password = VALIDATION_MESSAGES.PASSWORD.REQUIRED;
+  }
+
+  return errors;
+};
+
+/**
+ * 특정 필드만 검증 (회원가입용)
  */
 export const validateField = (
   field: keyof SignupFormData,
@@ -127,6 +152,23 @@ export const validateField = (
       return formData?.password
         ? validateConfirmPassword(formData.password, value)
         : null;
+    default:
+      return null;
+  }
+};
+
+/**
+ * 로그인 필드만 검증
+ */
+export const validateLoginField = (
+  field: keyof LoginFormData,
+  value: string
+): string | null => {
+  switch (field) {
+    case 'email':
+      return validateEmail(value);
+    case 'password':
+      return !value ? VALIDATION_MESSAGES.PASSWORD.REQUIRED : null;
     default:
       return null;
   }

@@ -1,6 +1,6 @@
 import axiosInstance from '@/lib/axios';
 import axios from 'axios';
-import type { LoginData, SignupData } from '@/types/auth';
+import type { LoginData, SignupData, LoginResponse } from '@/types/auth';
 import type { User } from '@/types/user';
 
 export const authAPI = {
@@ -11,8 +11,11 @@ export const authAPI = {
   },
 
   // 로그인 시도
-  login: async (data: LoginData) => {
-    const response = await axiosInstance.post('/auth/login', data);
+  login: async (data: LoginData): Promise<LoginResponse> => {
+    const response = await axiosInstance.post<LoginResponse>(
+      '/auth/login',
+      data
+    );
     return response.data;
   },
 

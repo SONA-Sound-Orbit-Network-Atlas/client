@@ -1,12 +1,29 @@
 import { FiUser } from 'react-icons/fi';
 import { useProfileStore } from '@/stores/useprofileStore';
+import { useLoginForm } from '@/hooks/useLoginForm';
 import Iconframe from '@/components/common/Iconframe';
-import TextInput from '@/components/common/TextInput';
-import Button from '@/components/common/Button';
-import TextField from '@/components/common/TextField';
+import LoginForm from '@/components/forms/LoginForm';
 
 export default function LoginPanel() {
   const { setProfilePanelMode } = useProfileStore();
+
+  const loginForm = useLoginForm({
+    onSuccess: () => {
+      alert('로그인이 완료되었습니다!');
+      setProfilePanelMode('profile');
+    },
+    onError: (error: any) => {
+      // API 에러 메시지 처리
+      if (error.response?.data?.error) {
+        const apiError = error.response.data.error;
+        alert(`로그인 실패: ${apiError.message}`);
+      } else if (error.response?.status === 401) {
+        alert('이메일 또는 비밀번호가 올바르지 않습니다.');
+      } else {
+        alert('로그인 중 오류가 발생했습니다. 다시 시도해주세요.');
+      }
+    },
+  });
 
   return (
     <div className="text-center p-4">
@@ -21,21 +38,14 @@ export default function LoginPanel() {
           MANAGE SYSTEMS
         </p>
       </div>
-      <div className="flex flex-col mt-[24px] text-left gap-[16px]">
-        <TextField label="Email" htmlFor="email">
-          <TextInput type="email" placeholder="Enter your email" id="email" />
-        </TextField>
-        <TextField label="Password" htmlFor="password">
-          <TextInput
-            type="password"
-            placeholder="Enter your password"
-            id="password"
-          />
-        </TextField>
-      </div>
-      <Button color="primary" size="lg" className="w-full mt-[24px]">
-        SIGN IN
-      </Button>
+
+      <LoginForm
+        formData={loginForm.formData}
+        errors={loginForm.errors}
+        isLoading={loginForm.isLoading}
+        onInputChange={loginForm.handleInputChange}
+        onSubmit={loginForm.handleSubmit}
+      />
       <div className="flex justify-center mt-[24px] mb-[24px]">
         <a
           href="#"
