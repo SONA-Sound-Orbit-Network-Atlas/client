@@ -23,6 +23,9 @@ export default function StellarIndex() {
   const { stellarStore } = useStellarStore();
   const { userStore } = useUserStore();
   const isStellarOwner = stellarStore.userId === userStore.userId;
+  console.log('stellarStore.userId : ', stellarStore.userId);
+  console.log('userStore.userId : ', userStore.userId);
+  console.log('isStellarOwner : ', isStellarOwner);
 
   // Stellar 패널 Tab value 스토어
   const { tabValue, setTabValue } = useStellarTabStore();
@@ -42,10 +45,16 @@ export default function StellarIndex() {
         >
           <TabsList className="grid w-full [grid-template-columns:repeat(3,minmax(max-content,1fr))] gap-0 shrink-0">
             <TabsTrigger value="INFO">INFO</TabsTrigger>
-            <TabsTrigger value="OBJECTS" disabled={!isStellarOwner}>
+            <TabsTrigger
+              value="OBJECTS"
+              disabled={!isStellarOwner && mode === 'view'}
+            >
               OBJECTS
             </TabsTrigger>
-            <TabsTrigger value="PROPERTIES" disabled={!isStellarOwner}>
+            <TabsTrigger
+              value="PROPERTIES"
+              disabled={!isStellarOwner && mode === 'view'}
+            >
               PROPERTIES
             </TabsTrigger>
           </TabsList>
