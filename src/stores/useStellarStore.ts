@@ -12,6 +12,7 @@ interface StellarStore {
 const dummyStellarStore: StellarType = {
   userId: 'testUser',
   stellarId: 'sys-001',
+  position: [0, 0, 0],
   stellarName: 'CENTRAL STAR SYSTEM',
   updatedAt: '2021-01-03',
   objects: [

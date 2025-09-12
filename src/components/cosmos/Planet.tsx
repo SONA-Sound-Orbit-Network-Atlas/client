@@ -6,9 +6,10 @@ import * as THREE from 'three';
 import type { TPlanet } from '@/types/cosmos';
 import { calculateOrbitPosition } from '@/utils/orbitCalculations';
 import { useSceneStore } from '@/stores/useSceneStore';
+import { useSelectedObjectStore } from '@/stores/useSelectedObjectStore';
 
 interface PlanetProps extends TPlanet {
-  index: number;
+  id: number;
   isSelected?: boolean;
   isSelectable?: boolean;
 }
@@ -23,16 +24,18 @@ export default function Planet({
   inclination,
   eccentricity,
   tilt,
-  index,
+  id,
   isSelected = false,
   isSelectable = false,
 }: PlanetProps) {
   const meshRef = useRef<THREE.Mesh>(null);
   const { setSelectedPlanetIndex } = useSceneStore();
+  const { setSelectedObjectId } = useSelectedObjectStore();
 
   const onPlanetClicked = () => {
     if (isSelectable) {
-      setSelectedPlanetIndex(index);
+      setSelectedPlanetIndex(id);
+      setSelectedObjectId(id);
     }
   };
 

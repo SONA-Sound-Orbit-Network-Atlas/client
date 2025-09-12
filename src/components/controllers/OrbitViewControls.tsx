@@ -5,6 +5,7 @@ import { useRef, useCallback, useState } from 'react';
 import { useSmoothCameraMove } from '@/hooks/camera/useSmoothCameraMove';
 import { VIEW_MODE_CONFIG } from '@/constants/viewModeConfig';
 import { useSceneStore } from '@/stores/useSceneStore';
+import { useSelectedStellarStore } from '@/stores/useSelectedStellarStore';
 
 /**
  * X,Z축 이동
@@ -21,7 +22,8 @@ export default function OrbitViewControls({
   targetPosition,
 }: OrbitViewControlsProps) {
   const controls = useRef<OrbitControlsImpl>(null);
-  const { cameraIsMoving, viewMode } = useSceneStore();
+  const { cameraIsMoving } = useSceneStore();
+  const { mode } = useSelectedStellarStore();
   const [controlsReady, setControlsReady] = useState(false);
 
   // OrbitControls ref 콜백
@@ -45,7 +47,7 @@ export default function OrbitViewControls({
   return (
     <OrbitControls
       ref={controlsRefCallback}
-      enabled={viewMode === 'StellarSystem'}
+      enabled={mode === 'view' || mode === 'create'}
       enableDamping={!cameraIsMoving} // 카메라 이동 중에는 damping 비활성화
       dampingFactor={0.05}
       enableRotate={!cameraIsMoving} // 카메라 이동 중에는 회전 비활성화
