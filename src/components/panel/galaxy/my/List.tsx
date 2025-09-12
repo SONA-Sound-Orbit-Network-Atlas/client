@@ -8,7 +8,6 @@ import { ErrorBoundary } from 'react-error-boundary';
 import LoadingIcon from '@/components/common/LoadingIcon';
 import { useSidebarStore } from '@/stores/sidebarStore';
 import { useSelectedStellarStore } from '@/stores/useSelectedStellarStore';
-import { useStellarTabStore } from '@/stores/useStellarTabStore';
 
 const GALAXY_LIST_LIMIT = 3;
 
@@ -25,8 +24,7 @@ export default function List() {
 // 내 갤럭시 리스트 컨텐츠
 function ContentComp() {
   const { openSecondarySidebar } = useSidebarStore();
-  const { setSelectedStellarId } = useSelectedStellarStore();
-  const { setTabValue } = useStellarTabStore();
+  const { selectedStellarId, setSelectedStellarId } = useSelectedStellarStore();
 
   const queryResult = useGetGalaxyMyList({
     page: 1,
@@ -47,9 +45,11 @@ function ContentComp() {
             {...galaxySystem}
             onClick={() => {
               // 갤럭시 id 값 변경 => 스텔라 정보 api 호출 및 갱신 후 => 스토어에 저장
+              if (galaxySystem.id === selectedStellarId) {
+                openSecondarySidebar('stellar');
+                return;
+              }
               setSelectedStellarId(galaxySystem.id); // 스텔라라 id 값 변경
-              setTabValue('OBJECTS'); // 스텔라 tab 정보 패널 열기
-              openSecondarySidebar('stellar'); // 사이드바 stellar 패널 열기
             }}
           />
         ))}
