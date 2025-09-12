@@ -7,6 +7,7 @@ import { useStellarStore } from '@/stores/useStellarStore';
 import { useEffect } from 'react';
 import { useSelectedStellarStore } from '@/stores/useSelectedStellarStore';
 import { useSidebarStore } from '@/stores/sidebarStore';
+import { useStellarTabStore } from '@/stores/useStellarTabStore';
 
 // 생성
 export function useCreateStellar(stellarData: StellarType) {
@@ -21,6 +22,7 @@ export function useGetStellar() {
   const { selectedStellarId } = useSelectedStellarStore();
   const { setStellarStore } = useStellarStore();
   const { openSecondarySidebar } = useSidebarStore();
+  const { setTabValue } = useStellarTabStore();
 
   const query = useQuery<StellarType>({
     queryKey: ['stellar', selectedStellarId],
@@ -36,7 +38,16 @@ export function useGetStellar() {
 
     setStellarStore(query.data);
     console.log('query.data', query.data);
-  }, [query.data, setStellarStore, openSecondarySidebar, selectedStellarId]);
+    // stellar 패널로 이동
+    setTabValue('INFO');
+    openSecondarySidebar('stellar');
+  }, [
+    query.data,
+    setStellarStore,
+    openSecondarySidebar,
+    selectedStellarId,
+    setTabValue,
+  ]);
 
   return query;
 }

@@ -20,7 +20,7 @@ export default function StellarInfo({
 
   return (
     <div>
-      <PanelTitle fontSize="text-md" textColor="text-primary-300">
+      <PanelTitle fontSize="large" textColor="text-primary-300">
         행성 INFO
       </PanelTitle>
 
@@ -36,9 +36,7 @@ export default function StellarInfo({
             case 'name':
               return (
                 <div key={key}>
-                  <PanelTitle fontSize="text-xs" className="font-normal mb-1">
-                    NAME
-                  </PanelTitle>
+                  <PanelTitle className="font-normal mb-1">NAME</PanelTitle>
                   {isStellarOwner ? (
                     <TextInput
                       className="text-sm bg"
@@ -64,16 +62,14 @@ export default function StellarInfo({
             case 'status':
               return (
                 <div key={key}>
-                  <PanelTitle fontSize="text-xs" className="font-normal mb-1">
-                    STATUS
-                  </PanelTitle>
+                  <PanelTitle className="font-normal mb-1">STATUS</PanelTitle>
                   <p className="text-success">{String(value).toUpperCase()}</p>
                 </div>
               );
             case 'soundType':
               return (
                 <div key={key}>
-                  <PanelTitle fontSize="text-xs" className="font-normal mb-1">
+                  <PanelTitle className="font-normal mb-1">
                     SOUND TYPE
                   </PanelTitle>
                   <p className="text-secondary-300">{String(value)}</p>
@@ -82,7 +78,7 @@ export default function StellarInfo({
             default: // properties 제외한 나머지 케이스
               return (
                 <div key={key}>
-                  <PanelTitle fontSize="text-xs" className="font-normal mb-1">
+                  <PanelTitle className="font-normal mb-1">
                     {key.toUpperCase().replace('_', ' ')}
                   </PanelTitle>
                   <p className="text-text-secondary">{String(value)}</p>

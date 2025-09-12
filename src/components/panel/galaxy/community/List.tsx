@@ -11,7 +11,6 @@ import { SkeletonCard } from '@/components/common/Card/SkeletonCard';
 import { ErrorBoundary } from 'react-error-boundary';
 import LoadingIcon from '@/components/common/LoadingIcon';
 import { useSelectedStellarStore } from '@/stores/useSelectedStellarStore';
-import { useStellarTabStore } from '@/stores/useStellarTabStore';
 import { useSidebarStore } from '@/stores/sidebarStore';
 
 const GALAXY_LIST_LIMIT = 3;
@@ -28,8 +27,7 @@ export default function List({ sort }: { sort: SortLabel }) {
 
 // 갤럭시 리스트 컨텐츠
 function ContentComp({ sort }: { sort: SortLabel }) {
-  const { setSelectedStellarId } = useSelectedStellarStore();
-  const { setTabValue } = useStellarTabStore();
+  const { selectedStellarId, setSelectedStellarId } = useSelectedStellarStore();
   const { openSecondarySidebar } = useSidebarStore();
 
   // 갤럭시 리스트 데이터
@@ -54,9 +52,11 @@ function ContentComp({ sort }: { sort: SortLabel }) {
               console.log('은하리스트 카드 클릭');
               // 갤럭시 id 값 변경 => 스텔라 정보 api 호출 및 갱신 후 => 스토어에 저장
               console.log('갤럭시 id 값 변경 : ', galaxySystem.id);
-              setSelectedStellarId(galaxySystem.id); // 스텔라라 id 값 변경
-              setTabValue('OBJECTS'); // 스텔라 tab 정보 패널 열기
-              openSecondarySidebar('stellar'); // 사이드바 stellar 패널 열기
+              if (galaxySystem.id === selectedStellarId) {
+                openSecondarySidebar('stellar');
+                return;
+              }
+              setSelectedStellarId(galaxySystem.id); // 스텔라 id 값 변경
             }}
           />
         ))}

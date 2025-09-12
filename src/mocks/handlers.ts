@@ -20,7 +20,7 @@ export const handlers = [
 
   // 로그인
   http.post('/api/auth/login', async () => {
-    return HttpResponse.json({ email: 'bomin@example.com', userName: 'bomin' });
+    return HttpResponse.json({ email: 'bomin@example.com', username: 'bomin' });
   }),
 
   // galaxy Community 리스트 조회 (infinite)

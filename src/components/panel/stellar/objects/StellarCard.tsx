@@ -31,8 +31,9 @@ export default function StellarCard({
             {data.planetType} • {isPlanet(data) ? data.soundType + ' •' : ''}{' '}
             SIZE{' '}
             {
-              data.properties.find((property) => property.label === 'size')
-                ?.value
+              data.properties.find(
+                (property) => property.label === 'planetSize'
+              )?.value
             }
           </p>
         </div>

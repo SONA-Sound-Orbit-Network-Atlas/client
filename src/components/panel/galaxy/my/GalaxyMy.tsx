@@ -18,7 +18,7 @@ export default function GalaxyMy() {
 
       {/* 내 항성계 리스트 */}
       <section className="mt-6">
-        <PanelTitle>MY SYSTEMS</PanelTitle>
+        <PanelTitle>MY STELLARS</PanelTitle>
         <List />
       </section>
     </div>
