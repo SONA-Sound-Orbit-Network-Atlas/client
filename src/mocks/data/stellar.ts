@@ -17,7 +17,7 @@ export const stellar: StellarType = {
       createSource: 'ORIGINAL COMPOSITION',
       originalSource: 'SONA STUDIO',
       properties: [
-        { label: 'planetSize', value: 54, min: 0, max: 100, unit: 0.01 },
+        { label: 'planetSize', value: 54, min: 0, max: 360, unit: 1 },
         { label: 'planetColor', value: 10, min: 0, max: 360, unit: 1 },
         { label: 'planetBrightness', value: 64, min: 0, max: 100, unit: 0.1 },
         { label: 'distanceFromStar', value: 10, min: 1, max: 20, unit: 0.1 },

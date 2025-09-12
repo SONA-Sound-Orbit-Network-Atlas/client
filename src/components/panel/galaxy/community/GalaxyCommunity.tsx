@@ -18,7 +18,7 @@ export default function GalaxyCommunity() {
         sort={sort}
       />
       <section className="mb-6">
-        <PanelTitle>GALAXY LIST</PanelTitle>
+        <PanelTitle>STELLAR LIST</PanelTitle>
         <List sort={sort} />
       </section>
     </div>

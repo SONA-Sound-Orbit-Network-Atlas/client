@@ -28,9 +28,9 @@ export default function StellarIndex() {
   const { tabValue, setTabValue } = useStellarTabStore();
 
   return (
-    <div>
+    <>
       {mode === 'idle' ? (
-        <div className="w-full h-full flex justify-center pt-[48px]">
+        <div className="w-full h-full flex justify-center pt-[64px]">
           <SelectRequired />
         </div>
       ) : (
@@ -64,6 +64,6 @@ export default function StellarIndex() {
           </div>
         </Tabs>
       )}
-    </div>
+    </>
   );
 }

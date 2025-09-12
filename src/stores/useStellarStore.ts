@@ -4,7 +4,7 @@ import type { Object, StellarType } from '@/types/stellar';
 interface StellarStore {
   stellarStore: StellarType;
   setStellarStore: (stellarStore: StellarType) => void;
-  setInitialStellarStore: (userName: string) => void;
+  setInitialStellarStore: (username: string) => void;
   addNewObjectAndReturnId: () => number;
 }
 
@@ -27,9 +27,9 @@ const dummyStellarStore: StellarType = {
       createSource: 'ORIGINAL COMPOSITION',
       originalSource: 'SONA STUDIO',
       properties: [
-        { label: 'size', value: 54, min: 0, max: 100 },
-        { label: '게이지 2', value: 10, min: 0, max: 360 },
-        { label: '게이지 3', value: 64, min: 0, max: 100 },
+        { label: 'size', value: 54, min: 0, max: 100, unit: 1 },
+        { label: '게이지 2', value: 10, min: 0, max: 360, unit: 1 },
+        { label: '게이지 3', value: 64, min: 0, max: 100, unit: 1 },
       ],
     },
     {
@@ -40,9 +40,9 @@ const dummyStellarStore: StellarType = {
       soundType: 'BASS',
       created: '2021-01-01',
       properties: [
-        { label: 'size', value: 13, min: 0, max: 100 },
-        { label: '게이지 2', value: 34, min: 0, max: 360 },
-        { label: '게이지 3', value: 100, min: 0, max: 100 },
+        { label: 'size', value: 13, min: 0, max: 100, unit: 1 },
+        { label: '게이지 2', value: 34, min: 0, max: 360, unit: 1 },
+        { label: '게이지 3', value: 100, min: 0, max: 100, unit: 1 },
       ],
     },
   ],
@@ -66,9 +66,9 @@ const initialStellarStore: StellarType = {
       createSource: 'ORIGINAL COMPOSITION',
       originalSource: 'SONA STUDIO',
       properties: [
-        { label: 'size', value: 0, min: 0, max: 100 },
-        { label: '게이지 2', value: 0, min: 0, max: 360 },
-        { label: '게이지 3', value: 0, min: 0, max: 100 },
+        { label: 'size', value: 0, min: 0, max: 100, unit: 1 },
+        { label: '게이지 2', value: 0, min: 0, max: 360, unit: 1 },
+        { label: '게이지 3', value: 0, min: 0, max: 100, unit: 1 },
       ],
     },
   ],
@@ -83,9 +83,9 @@ const newObjectTemplate: Object = {
   soundType: 'LEAD',
   created: '2021-01-02',
   properties: [
-    { label: 'size', value: 0, min: 0, max: 100 },
-    { label: '게이지 2', value: 0, min: 0, max: 360 },
-    { label: '게이지 3', value: 0, min: 0, max: 100 },
+    { label: 'size', value: 0, min: 0, max: 100, unit: 1 },
+    { label: '게이지 2', value: 0, min: 0, max: 360, unit: 1 },
+    { label: '게이지 3', value: 0, min: 0, max: 100, unit: 1 },
   ],
 };
 
@@ -104,12 +104,12 @@ export const useStellarStore = create<StellarStore>((set) => ({
 
   setStellarStore: (stellarStore) => set({ stellarStore }),
 
-  setInitialStellarStore: (userName) =>
+  setInitialStellarStore: (username) =>
     set(() => {
       const first = {
         ...initialStellarStore.objects[0],
-        creator: userName,
-        author: userName,
+        creator: username,
+        author: username,
       };
       return {
         stellarStore: {
