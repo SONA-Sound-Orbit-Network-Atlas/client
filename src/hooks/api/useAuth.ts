@@ -20,8 +20,8 @@ export function useLogin(data: LoginData) {
     mutationKey: ['auth', 'login', data.email],
     mutationFn: () => authAPI.login(data),
     onSuccess: (data) => {
-      const { userId, userName } = data;
-      setUserStore({ userId, userName, email: data.email });
+      const { userId, username } = data;
+      setUserStore({ userId, username: username, email: data.email });
       setIsLoggedIn(true);
       console.log('로그인 성공 : ', data);
     },

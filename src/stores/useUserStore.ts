@@ -4,7 +4,7 @@ import { create } from 'zustand';
 interface UserType {
   userId: string;
   email: string;
-  userName: string;
+  username: string;
 }
 
 interface UserStore {
@@ -17,18 +17,18 @@ interface UserStore {
 const dummyUserStore: UserType = {
   userId: 'testUser',
   email: 'test@example.com',
-  userName: 'testUser',
+  username: 'testUser',
 };
 
 const initialUserStore: UserType = {
   userId: '',
   email: '',
-  userName: '',
+  username: '',
 };
 
 export const useUserStore = create<UserStore>((set) => ({
   userStore: dummyUserStore,
-  isLoggedIn: true,
+  isLoggedIn: false,
   setUserStore: (userStore: UserType) => {
     set({ userStore });
   },
