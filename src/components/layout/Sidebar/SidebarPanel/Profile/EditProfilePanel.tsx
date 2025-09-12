@@ -1,4 +1,4 @@
-import { useProfileStore } from '@/stores/useprofileStore';
+import { useProfileStore } from '@/stores/useProfileStore';
 import PanelHeader from '../PanelHeader';
 import Iconframe from '@/components/common/Iconframe';
 import { FiUser } from 'react-icons/fi';

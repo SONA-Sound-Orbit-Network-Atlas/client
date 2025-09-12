@@ -1,6 +1,6 @@
 import { FiUserPlus } from 'react-icons/fi';
 import { useState } from 'react';
-import { useProfileStore } from '@/stores/useprofileStore';
+import { useProfileStore } from '@/stores/useProfileStore';
 import { useSignup } from '@/hooks/api/useAuth';
 import { useSignupValidation } from '@/hooks/useSignupValidation';
 import Iconframe from '@/components/common/Iconframe';

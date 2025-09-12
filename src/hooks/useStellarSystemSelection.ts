@@ -1,6 +1,6 @@
 // useStellarSystemSelection.ts
 import { useCallback, useEffect, useState } from 'react';
-import { useSidebarStore } from '@/stores/sidebarStore';
+import { useSidebarStore } from '@/stores/useSidebarStore';
 import { useSelectedStellarStore } from '@/stores/useSelectedStellarStore';
 import { useStellarTabStore } from '@/stores/useStellarTabStore';
 import { useStellarStore } from '@/stores/useStellarStore';

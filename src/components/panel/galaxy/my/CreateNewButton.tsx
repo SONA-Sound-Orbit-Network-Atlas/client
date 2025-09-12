@@ -1,6 +1,6 @@
 import Button from '@/components/common/Button';
 import { useStellarStore } from '@/stores/useStellarStore';
-import { useSidebarStore } from '@/stores/usesidebarStore';
+import { useSidebarStore } from '@/stores/useSidebarStore';
 import { useUserStore } from '@/stores/useUserStore';
 import { useSelectedStellarStore } from '@/stores/useSelectedStellarStore';
 import { useStellarTabStore } from '@/stores/useStellarTabStore';

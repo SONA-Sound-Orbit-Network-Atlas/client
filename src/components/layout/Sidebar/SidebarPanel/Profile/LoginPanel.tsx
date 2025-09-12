@@ -1,5 +1,5 @@
 import { FiUser } from 'react-icons/fi';
-import { useProfileStore } from '@/stores/useprofileStore';
+import { useProfileStore } from '@/stores/useProfileStore';
 import { useLoginForm } from '@/hooks/useLoginForm';
 import Iconframe from '@/components/common/Iconframe';
 import LoginForm from '@/components/forms/LoginForm';
