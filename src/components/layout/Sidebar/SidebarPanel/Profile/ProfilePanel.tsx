@@ -1,4 +1,4 @@
-import { useAuthStore } from '@/stores/AuthStore';
+import { useUserStore } from '@/stores/useUserStore';
 import { useProfileStore } from '@/stores/profileStore';
 import LoginPanel from './LoginPanel';
 import SignUpPanel from './SignUpPanel';
@@ -9,7 +9,7 @@ import FollowersPanel from './FollowersPanel';
 import FollowingsPanel from './FollowingsPanel';
 
 export default function ProfilePanel() {
-  const { isLoggedIn } = useAuthStore();
+  const { isLoggedIn } = useUserStore();
   const { profilePanelMode } = useProfileStore();
 
   const renderContent = () => {
