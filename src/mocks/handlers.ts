@@ -23,6 +23,11 @@ export const handlers = [
     return HttpResponse.json({ email: 'bomin@example.com', userName: 'bomin' });
   }),
 
+  // 회원가입
+  http.post('/api/auth/signup', async () => {
+    return new HttpResponse(null, { status: 201 });
+  }),
+
   // galaxy Community 리스트 조회 (infinite)
   mockFetchInfinite('/galaxies/community', galaxiesCommunity, 3, 2000),
 
