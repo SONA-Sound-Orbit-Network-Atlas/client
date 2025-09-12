@@ -1,6 +1,7 @@
 import { useSceneStore } from '@/stores/useSceneStore';
 import { useSelectedObjectStore } from '@/stores/useSelectedObjectStore';
 import { useSelectedStellarStore } from '@/stores/useSelectedStellarStore';
+import { useStellarStore } from '@/stores/useStellarStore';
 
 export default function DebugMessage() {
   const { cameraIsMoving, cameraTarget, selectedStellarSystemId } =
@@ -8,6 +9,7 @@ export default function DebugMessage() {
   const { mode } = useSelectedStellarStore();
   const { selectedStellarId } = useSelectedStellarStore();
   const { selectedObjectId } = useSelectedObjectStore();
+  const { stellarStore } = useStellarStore();
 
   return (
     <div>
@@ -30,6 +32,10 @@ export default function DebugMessage() {
         </p>
         <p>
           <strong>Camera Is Moving:</strong> {cameraIsMoving ? 'true' : 'false'}
+        </p>
+        <p>
+          <strong>Stellar position:</strong>{' '}
+          {JSON.stringify(stellarStore.position)}
         </p>
       </div>
     </div>

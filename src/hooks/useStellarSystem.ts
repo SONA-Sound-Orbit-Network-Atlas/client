@@ -1,15 +1,9 @@
-import { detailStellarSystemsMock } from '@/mocks/data/stellarSystems';
 import { useSceneStore } from '@/stores/useSceneStore';
 import { useSelectedStellarStore } from '@/stores/useSelectedStellarStore';
 import { useStellarStore } from '@/stores/useStellarStore';
 import { useCallback } from 'react';
-import { useGetStellar } from '@/hooks/api/useStellar';
 
 import * as THREE from 'three';
-
-const getStellarSystemOnMock = (stellarSystemId: number) => {
-  return detailStellarSystemsMock[stellarSystemId];
-};
 
 export function useStellarSystem() {
   // 선택한 항성계 변경
@@ -24,6 +18,7 @@ export function useStellarSystem() {
   // 항성계 뷰 진입
   const enterStellarSystemView = useCallback(
     (stellarSystemId: string) => {
+      console.log('enterStellarSystem', stellarSystemId);
       // // 데이터 로딩
       // const mockStellarSystem = getStellarSystemOnMock(stellarSystemId);
       // const newCameraTarget = new THREE.Vector3(
