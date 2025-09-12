@@ -6,8 +6,7 @@ import Button from '@/components/common/Button';
 import { SkeletonCard } from '@/components/common/Card/SkeletonCard';
 import { ErrorBoundary } from 'react-error-boundary';
 import LoadingIcon from '@/components/common/LoadingIcon';
-import { useSidebarStore } from '@/stores/sidebarStore';
-import { useSelectedStellarStore } from '@/stores/useSelectedStellarStore';
+import useStellarSystemSelection from '@/hooks/useStellarSystemSelection';
 
 const GALAXY_LIST_LIMIT = 3;
 
@@ -23,8 +22,7 @@ export default function List() {
 
 // 내 갤럭시 리스트 컨텐츠
 function ContentComp() {
-  const { openSecondarySidebar } = useSidebarStore();
-  const { selectedStellarId, setSelectedStellarId } = useSelectedStellarStore();
+  const { selectStellar } = useStellarSystemSelection();
 
   const queryResult = useGetGalaxyMyList({
     page: 1,
@@ -44,12 +42,7 @@ function ContentComp() {
             key={galaxySystem.id}
             {...galaxySystem}
             onClick={() => {
-              // 갤럭시 id 값 변경 => 스텔라 정보 api 호출 및 갱신 후 => 스토어에 저장
-              if (galaxySystem.id === selectedStellarId) {
-                openSecondarySidebar('stellar');
-                return;
-              }
-              setSelectedStellarId(galaxySystem.id); // 스텔라라 id 값 변경
+              selectStellar(galaxySystem.id);
             }}
           />
         ))}

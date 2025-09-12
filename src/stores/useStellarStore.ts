@@ -8,45 +8,6 @@ interface StellarStore {
   addNewObjectAndReturnId: () => number;
 }
 
-// 더미 stellar 데이터
-const dummyStellarStore: StellarType = {
-  userId: 'testUser',
-  stellarId: 'sys-001',
-  stellarName: 'CENTRAL STAR SYSTEM',
-  updatedAt: '2021-01-03',
-  objects: [
-    {
-      name: 'CENTRAL STAR',
-      planetType: 'CENTRAL STAR',
-      planetId: 0,
-      status: 'ACTIVE',
-      bpm: 120,
-      creator: 'STANN',
-      author: 'STANN',
-      createSource: 'ORIGINAL COMPOSITION',
-      originalSource: 'SONA STUDIO',
-      properties: [
-        { label: 'size', value: 54, min: 0, max: 100, unit: 1 },
-        { label: '게이지 2', value: 10, min: 0, max: 360, unit: 1 },
-        { label: '게이지 3', value: 64, min: 0, max: 100, unit: 1 },
-      ],
-    },
-    {
-      name: 'BASS PLANET',
-      planetType: 'PLANET',
-      planetId: 1,
-      status: 'ACTIVE',
-      soundType: 'BASS',
-      created: '2021-01-01',
-      properties: [
-        { label: 'size', value: 13, min: 0, max: 100, unit: 1 },
-        { label: '게이지 2', value: 34, min: 0, max: 360, unit: 1 },
-        { label: '게이지 3', value: 100, min: 0, max: 100, unit: 1 },
-      ],
-    },
-  ],
-};
-
 // 초기 stellar 데이터
 const initialStellarStore: StellarType = {
   userId: '',
