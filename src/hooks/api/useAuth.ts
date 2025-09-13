@@ -1,4 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { AxiosError } from 'axios';
 import type { LoginData, SignupData } from '@/types/auth';
 import { authAPI } from '@/api/auth';
 import type { User } from '@/types/user';
@@ -35,12 +36,16 @@ export function useLogin(data: LoginData) {
 
       console.log('로그인 성공:', { user, token: access_token });
     },
-    onError: (error: any) => {
+    onError: (error: AxiosError) => {
       console.error('로그인 실패:', error);
 
       // API 에러 응답 처리
-      if (error.response?.data?.error) {
-        const apiError = error.response.data.error;
+      if (
+        error.response?.data &&
+        typeof error.response.data === 'object' &&
+        'error' in error.response.data
+      ) {
+        const apiError = (error.response.data as any).error;
         console.error('API 에러:', apiError.message);
       }
     },

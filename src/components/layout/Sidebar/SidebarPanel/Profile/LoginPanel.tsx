@@ -1,4 +1,5 @@
 import { FiUser } from 'react-icons/fi';
+import { AxiosError } from 'axios';
 import { useProfileStore } from '@/stores/useProfileStore';
 import { useLoginForm } from '@/hooks/useLoginForm';
 import Iconframe from '@/components/common/Iconframe';
@@ -12,10 +13,14 @@ export default function LoginPanel() {
       alert('로그인이 완료되었습니다!');
       setProfilePanelMode('profile');
     },
-    onError: (error: any) => {
+    onError: (error: AxiosError) => {
       // API 에러 메시지 처리
-      if (error.response?.data?.error) {
-        const apiError = error.response.data.error;
+      if (
+        error.response?.data &&
+        typeof error.response.data === 'object' &&
+        'error' in error.response.data
+      ) {
+        const apiError = (error.response.data as any).error;
         alert(`로그인 실패: ${apiError.message}`);
       } else if (error.response?.status === 401) {
         alert('이메일 또는 비밀번호가 올바르지 않습니다.');

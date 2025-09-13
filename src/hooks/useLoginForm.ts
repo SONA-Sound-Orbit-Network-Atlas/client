@@ -1,11 +1,12 @@
 import { useState } from 'react';
+import { AxiosError } from 'axios';
 import { useLogin } from '@/hooks/api/useAuth';
 import { useLoginValidation } from '@/hooks/useLoginValidation';
 import type { LoginFormData } from '@/utils/validation';
 
 export interface UseLoginFormOptions {
   onSuccess?: () => void;
-  onError?: (error: any) => void;
+  onError?: (error: AxiosError) => void;
 }
 
 export interface UseLoginFormReturn {
@@ -50,7 +51,7 @@ export const useLoginForm = (
     try {
       await loginMutation.mutateAsync();
       options?.onSuccess?.();
-    } catch (error: any) {
+    } catch (error: AxiosError) {
       console.error('로그인 실패:', error);
       options?.onError?.(error);
     }
