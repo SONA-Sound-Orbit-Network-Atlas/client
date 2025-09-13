@@ -27,7 +27,7 @@ export function useLogin(data: LoginData) {
 
       // 사용자 정보를 스토어에 저장
       setUserStore({
-        userId: user.id,
+        id: user.id,
         username: user.username,
         email: user.email,
       });

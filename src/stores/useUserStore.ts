@@ -10,7 +10,7 @@ interface UserStore {
 }
 
 const initialUserStore: User = {
-  userId: '',
+  id: '',
   email: '',
   username: '',
 };
