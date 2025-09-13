@@ -1,16 +1,19 @@
 import { FiUser } from 'react-icons/fi';
+import { useState } from 'react';
 import { AxiosError } from 'axios';
 import { useProfileStore } from '@/stores/useProfileStore';
 import { useLoginForm } from '@/hooks/useLoginForm';
 import Iconframe from '@/components/common/Iconframe';
 import LoginForm from '@/components/forms/LoginForm';
+import ErrorMessage from '@/components/common/ErrorMessage';
 
 export default function LoginPanel() {
   const { setProfilePanelMode } = useProfileStore();
+  const [errorMessage, setErrorMessage] = useState<string>('');
 
   const loginForm = useLoginForm({
     onSuccess: () => {
-      alert('로그인이 완료되었습니다!');
+      console.log('로그인이 완료되었습니다!');
       setProfilePanelMode('profile');
     },
     onError: (error: AxiosError) => {
@@ -21,11 +24,11 @@ export default function LoginPanel() {
         'error' in error.response.data
       ) {
         const apiError = (error.response.data as any).error;
-        alert(`로그인 실패: ${apiError.message}`);
+        setErrorMessage(`로그인 실패: ${apiError.message}`);
       } else if (error.response?.status === 401) {
-        alert('이메일 또는 비밀번호가 올바르지 않습니다.');
+        setErrorMessage('이메일 또는 비밀번호가 올바르지 않습니다.');
       } else {
-        alert('로그인 중 오류가 발생했습니다. 다시 시도해주세요.');
+        setErrorMessage('로그인 중 오류가 발생했습니다. 다시 시도해주세요.');
       }
     },
   });
@@ -43,6 +46,12 @@ export default function LoginPanel() {
           MANAGE SYSTEMS
         </p>
       </div>
+      {errorMessage && (
+        <ErrorMessage
+          message={errorMessage}
+          onClose={() => setErrorMessage('')}
+        />
+      )}
 
       <LoginForm
         formData={loginForm.formData}
