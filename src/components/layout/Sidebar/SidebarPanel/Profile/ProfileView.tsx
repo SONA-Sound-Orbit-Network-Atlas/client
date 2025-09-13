@@ -8,23 +8,29 @@ import {
 import { IoPlanetOutline } from 'react-icons/io5';
 import { useProfileStore } from '@/stores/useProfileStore';
 import { useLogout } from '@/hooks/api/useAuth';
+import { useGetUserProfile } from '@/hooks/api/useUser';
+import { useUserStore } from '@/stores/useUserStore';
 import Iconframe from '@/components/common/Iconframe';
 import Button from '@/components/common/Button';
 import Card from '@/components/common/Card/Card';
 import StatCard from '@/components/common/Card/StatCard';
 import { ScrollArea } from '@/components/common/Scrollarea';
+import LoadingIcon from '@/components/common/LoadingIcon';
 
 export default function ProfileView() {
   const { setProfilePanelMode } = useProfileStore();
   const logoutMutation = useLogout();
+  const { userStore } = useUserStore();
 
-  // 임시 데이터
-  const profile = {
-    username: '테스터',
-    email: 'tester@example.com',
-    joinDate: '2024-01-01',
-    about: 'aboutaboutabout',
-  };
+  // 사용자 프로필 데이터 조회
+  const { data: profile, isLoading, error } = useGetUserProfile(userStore.id);
+
+  // 디버깅 로그
+  console.log('🔍 ProfileView 디버깅 정보:');
+  console.log('- userStore.id:', userStore.id);
+  console.log('- isLoading:', isLoading);
+  console.log('- error:', error);
+  console.log('- profile data:', profile);
 
   const handleLikesClick = () => {
     setProfilePanelMode('likes');
@@ -42,20 +48,80 @@ export default function ProfileView() {
     logoutMutation.mutate();
   };
 
+  // 로딩 상태
+  if (isLoading) {
+    return (
+      <div className="flex flex-col h-full overflow-hidden">
+        <ScrollArea className="flex-1 min-h-0">
+          <div className="flex flex-col items-center justify-center p-6 h-full">
+            <LoadingIcon />
+            <p className="text-text-muted text-sm mt-4">
+              프로필을 불러오는 중...
+            </p>
+          </div>
+        </ScrollArea>
+      </div>
+    );
+  }
+
+  // 에러 상태
+  if (error) {
+    return (
+      <div className="flex flex-col h-full overflow-hidden">
+        <ScrollArea className="flex-1 min-h-0">
+          <div className="flex flex-col items-center justify-center p-6 h-full">
+            <p className="text-red-400 text-sm text-center">
+              프로필을 불러올 수 없습니다.
+            </p>
+            <p className="text-text-muted text-xs text-center mt-2">
+              잠시 후 다시 시도해주세요.
+            </p>
+          </div>
+        </ScrollArea>
+      </div>
+    );
+  }
+
+  // 프로필 데이터가 없는 경우
+  if (!profile) {
+    return (
+      <div className="flex flex-col h-full overflow-hidden">
+        <ScrollArea className="flex-1 min-h-0">
+          <div className="flex flex-col items-center justify-center p-6 h-full">
+            <p className="text-text-muted text-sm text-center">
+              프로필 정보를 찾을 수 없습니다.
+            </p>
+          </div>
+        </ScrollArea>
+      </div>
+    );
+  }
+
   return (
     <div className="flex flex-col h-full overflow-hidden">
       <ScrollArea className="flex-1 min-h-0">
         <div className="flex flex-col">
           <div className="flex flex-col items-center border-b border-gray-border p-6">
             <div className="flex flex-col items-center mb-[24px]">
-              <Iconframe color="tertiary" size="large" className="mb-[16px]">
-                <FiUser />
-              </Iconframe>
+              {profile.image &&
+              !profile.image.includes('defaults/avatar.png') ? (
+                <div className="w-16 h-16 rounded-full overflow-hidden mb-[16px] border-2 border-tertiary-300">
+                  <img
+                    src={profile.image}
+                    alt={`${profile.username}의 프로필 이미지`}
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+              ) : (
+                <Iconframe color="tertiary" size="large" className="mb-[16px]">
+                  <FiUser />
+                </Iconframe>
+              )}
               <h3 className="text-white font-semibold text-base">
                 {profile.username}
               </h3>
               <p className="text-text-muted text-sm text-center">
-                {profile.about}
+                {profile.about || '소개가 없습니다.'}
               </p>
             </div>
             <Button
