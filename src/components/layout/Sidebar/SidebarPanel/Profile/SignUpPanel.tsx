@@ -1,5 +1,6 @@
 import { FiUserPlus } from 'react-icons/fi';
 import { useState } from 'react';
+import { AxiosError } from 'axios';
 import { useProfileStore } from '@/stores/useProfileStore';
 import { useSignup } from '@/hooks/api/useAuth';
 import { useSignupValidation } from '@/hooks/useSignupValidation';
@@ -7,6 +8,7 @@ import Iconframe from '@/components/common/Iconframe';
 import TextInput from '@/components/common/TextInput';
 import Button from '@/components/common/Button';
 import TextField from '@/components/common/TextField';
+import ErrorMessage from '@/components/common/ErrorMessage';
 import PanelHeader from '../PanelHeader';
 import type { SignupData } from '@/types/auth';
 
@@ -20,6 +22,7 @@ export default function SignUpPanel() {
     password: '',
     confirmPassword: '',
   });
+  const [errorMessage, setErrorMessage] = useState<string>('');
 
   const { errors, validateForm, handleInputChange } = useSignupValidation();
 
@@ -43,18 +46,28 @@ export default function SignUpPanel() {
 
     try {
       await signupMutation.mutateAsync();
-      alert('회원가입이 완료되었습니다!');
+      console.log('회원가입이 완료되었습니다!');
       setProfilePanelMode('login');
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('회원가입 실패:', error);
 
-      // 에러 메시지 처리
-      if (error.response?.status === 409) {
-        alert('이미 사용 중인 이메일 또는 사용자명입니다.');
-      } else if (error.response?.status === 400) {
-        alert('입력 정보를 다시 확인해주세요.');
+      // AxiosError인지 확인하는 타입 가드
+      if (error && typeof error === 'object' && 'response' in error) {
+        const axiosError = error as AxiosError;
+
+        // 에러 메시지 처리
+        if (axiosError.response?.status === 409) {
+          setErrorMessage('이미 사용 중인 이메일 또는 사용자명입니다.');
+        } else if (axiosError.response?.status === 400) {
+          setErrorMessage('입력 정보를 다시 확인해주세요.');
+        } else {
+          setErrorMessage(
+            '회원가입 중 오류가 발생했습니다. 다시 시도해주세요.'
+          );
+        }
       } else {
-        alert('회원가입 중 오류가 발생했습니다. 다시 시도해주세요.');
+        // AxiosError가 아닌 경우
+        setErrorMessage('회원가입 중 오류가 발생했습니다. 다시 시도해주세요.');
       }
     }
   };
@@ -78,6 +91,14 @@ export default function SignUpPanel() {
             START COMPOSING
           </p>
         </div>
+
+        {/* 에러 메시지 표시 */}
+        {errorMessage && (
+          <ErrorMessage
+            message={errorMessage}
+            onClose={() => setErrorMessage('')}
+          />
+        )}
 
         <form onSubmit={handleSubmit}>
           <div className="flex flex-col mt-[24px] text-left gap-[16px]">
