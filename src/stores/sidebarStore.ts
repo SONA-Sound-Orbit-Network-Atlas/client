@@ -1,14 +1,7 @@
 import { create } from 'zustand';
+import type { SidebarStore } from '../types/sidebar';
 
-interface SidebarState {
-  isSecondaryOpen: boolean;
-  selectedMenu: string | null;
-  openSecondarySidebar: (menu: string) => void;
-  closeSecondarySidebar: () => void;
-  toggleSecondarySidebar: (menu: string) => void;
-}
-
-export const useSidebarStore = create<SidebarState>((set, get) => ({
+export const useSidebarStore = create<SidebarStore>((set, get) => ({
   isSecondaryOpen: false,
   selectedMenu: null,
   openSecondarySidebar: (menu: string) =>

@@ -1,0 +1,76 @@
+import type { GalaxyCommunityData } from '@/types/galaxyCommunity';
+
+// 더미 데이터 : Galaxy Community 리스트
+const galaxyDummy: GalaxyCommunityData = {
+  totalCount: 6,
+  list: [
+    {
+      id: 'sys-001',
+      userId: 'user-1',
+      rank: 1,
+      galaxyName: 'Galaxy 1',
+      makerName: 'Maker 1',
+      updatedAt: '2021-01-01',
+      planetCount: 10,
+      favoriteCount: 10,
+      myFavorite: true,
+    },
+    {
+      id: 'sys-002',
+      userId: 'user-2',
+      rank: 2,
+      galaxyName: 'Galaxy 2',
+      makerName: 'Maker 2',
+      updatedAt: '2021-01-02',
+      planetCount: 20,
+      favoriteCount: 20,
+      myFavorite: false,
+    },
+    {
+      id: 'sys-003',
+      userId: 'user-3',
+      rank: 3,
+      galaxyName: 'Galaxy 3',
+      makerName: 'Maker 3',
+      updatedAt: '2021-01-03',
+      planetCount: 30,
+      favoriteCount: 30,
+      myFavorite: false,
+    },
+    {
+      id: 'sys-004',
+      userId: 'user-4',
+      rank: 4,
+      galaxyName: 'Galaxy 4',
+      makerName: 'Maker 4',
+      updatedAt: '2021-01-04',
+      planetCount: 40,
+      favoriteCount: 40,
+      myFavorite: true,
+    },
+    {
+      id: 'sys-005',
+      userId: 'user-5',
+      rank: 5,
+      galaxyName: 'Galaxy 5',
+      makerName: 'Maker 5',
+      updatedAt: '2021-01-05',
+      planetCount: 50,
+      favoriteCount: 50,
+      myFavorite: true,
+    },
+    {
+      id: 'sys-006',
+      userId: 'user-6',
+      rank: 6,
+      galaxyName: 'Galaxy 6',
+      makerName: 'Maker 6',
+      updatedAt: '2021-01-06',
+      planetCount: 60,
+      favoriteCount: 60,
+      myFavorite: true,
+    },
+  ],
+};
+
+export default galaxyDummy;
