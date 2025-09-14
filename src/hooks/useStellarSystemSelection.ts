@@ -11,6 +11,7 @@ export default function useStellarSystemSelection() {
   const { setStellarStore } = useStellarStore();
   const { setTabValue } = useStellarTabStore();
   const { openSecondarySidebar } = useSidebarStore();
+  //test용
 
   // 클릭으로 트리거할 내부 id
   const [targetId, setTargetId] = useState<string>('');
@@ -27,6 +28,7 @@ export default function useStellarSystemSelection() {
         openSecondarySidebar('stellar');
         return;
       }
+      console.log('selectStellar', id);
       setTargetId(id); // 여기서부터 useGetStellar 활성화
     },
     [selectedStellarId, setTabValue, openSecondarySidebar]
@@ -39,6 +41,7 @@ export default function useStellarSystemSelection() {
       setSelectedStellarId(targetId);
       setTabValue('INFO');
       openSecondarySidebar('stellar');
+      setTargetId('');
       // 필요 시: setTargetId(''); // 다음 클릭 전까지 비활성화 하고 싶다면
     }
   }, [
