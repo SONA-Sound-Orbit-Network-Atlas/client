@@ -1,7 +1,6 @@
-import { useMemo, useRef } from 'react';
+import { useMemo, useRef, useEffect } from 'react';
 import Star from './Star';
 import Planet from './Planet';
-import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 import { useSelectedStellarStore } from '@/stores/useSelectedStellarStore';
 import OrbitLine from './OrbitLine';
@@ -33,17 +32,35 @@ export default function StellarSystem({
     console.log('onStellarSystemClicked', id);
     selectStellar(id);
   };
-  useFrame(() => {
-    // 선택된 시스템만 디테일 그룹 표시, 선택되지 않은 시스템은 로우 디테일 매쉬만 표시
-    if (!detailGroupRef.current || !lowDetailMesh.current) return;
-
-    // 선택된 시스템인지에 따라 표시/숨김 처리
-    detailGroupRef.current.visible = isSelectedSystem;
-    lowDetailMesh.current.visible = !isSelectedSystem;
-  });
+  useEffect(() => {
+    if (isSelectedSystem && detailGroupRef.current && lowDetailMesh.current) {
+      detailGroupRef.current.visible = isSelectedSystem;
+      lowDetailMesh.current.visible = !isSelectedSystem;
+    } else if (
+      !isSelectedSystem &&
+      detailGroupRef.current &&
+      lowDetailMesh.current
+    ) {
+      detailGroupRef.current.visible = isSelectedSystem;
+      lowDetailMesh.current.visible = !isSelectedSystem;
+    }
+  }, [isSelectedSystem]);
 
   return (
     <group ref={ref} position={stellarSystemPos}>
+      <mesh
+        ref={lowDetailMesh}
+        onClick={onStellarSystemClicked}
+        renderOrder={1}
+      >
+        <sphereGeometry args={[LOW_DETAIL_SIZE, 8, 8]} />
+        <meshStandardMaterial
+          color="#ff6b6b"
+          emissive="#ffffff"
+          emissiveIntensity={0.5}
+          toneMapped={false}
+        />
+      </mesh>
       <group ref={detailGroupRef}>
         <Star position={[0, 0, 0]} color="#ff6b6b" size={1} />
         {stellarStore.objects.map((object) => {
@@ -121,19 +138,6 @@ export default function StellarSystem({
           );
         })}
       </group>
-      <mesh
-        ref={lowDetailMesh}
-        onClick={onStellarSystemClicked}
-        renderOrder={1}
-      >
-        <sphereGeometry args={[LOW_DETAIL_SIZE, 8, 8]} />
-        <meshStandardMaterial
-          color="#ff6b6b"
-          emissive="#ffffff"
-          emissiveIntensity={0.5}
-          toneMapped={false}
-        />
-      </mesh>
     </group>
   );
 }

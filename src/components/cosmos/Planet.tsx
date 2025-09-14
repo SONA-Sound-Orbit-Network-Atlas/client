@@ -1,17 +1,17 @@
 // 행성들 ( 악기들)
 
 import { useFrame } from '@react-three/fiber';
-import { useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import * as THREE from 'three';
 import type { TPlanet } from '@/types/cosmos';
 import { calculateOrbitPosition } from '@/utils/orbitCalculations';
 import { useSceneStore } from '@/stores/useSceneStore';
 import { useSelectedObjectStore } from '@/stores/useSelectedObjectStore';
 import { valueToColor } from '@/utils/valueToColor';
+import { Outlines } from '@react-three/drei';
 
 interface PlanetProps extends TPlanet {
   id: number;
-  isSelected?: boolean;
   isSelectable?: boolean;
 }
 
@@ -26,18 +26,30 @@ export default function Planet({
   eccentricity,
   tilt,
   id,
-  isSelected = false,
   isSelectable = false,
 }: PlanetProps) {
   const meshRef = useRef<THREE.Mesh>(null);
   const { setSelectedPlanetIndex } = useSceneStore();
   const { setSelectedObjectId } = useSelectedObjectStore();
+  const [isHovered, setIsHovered] = useState(false);
+  const [isSelected, setIsSelected] = useState(false);
+  const { selectedObjectId } = useSelectedObjectStore();
+
+  useEffect(() => {
+    setIsSelected(selectedObjectId === id);
+  }, [selectedObjectId, id]);
 
   const onPlanetClicked = () => {
     if (isSelectable) {
       setSelectedPlanetIndex(id);
       setSelectedObjectId(id);
     }
+  };
+  const onPlanetPointerOver = () => {
+    setIsHovered(true);
+  };
+  const onPlanetPointerOut = () => {
+    setIsHovered(false);
   };
 
   useFrame((state, deltaTime) => {
@@ -63,7 +75,17 @@ export default function Planet({
   });
 
   return (
-    <mesh ref={meshRef} onClick={onPlanetClicked}>
+    <mesh
+      ref={meshRef}
+      onClick={onPlanetClicked}
+      onPointerOver={onPlanetPointerOver}
+      onPointerOut={onPlanetPointerOut}
+    >
+      <Outlines
+        thickness={1}
+        color={isHovered ? 'white' : 'yellow'}
+        visible={isHovered || isSelected}
+      />
       <sphereGeometry args={[planetSize, 16, 16]} />
       <meshStandardMaterial
         color={valueToColor(planetColor, 0, 360)}
