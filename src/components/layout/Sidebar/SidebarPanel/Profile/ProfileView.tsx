@@ -23,14 +23,29 @@ export default function ProfileView() {
   const { userStore } = useUserStore();
 
   // 사용자 프로필 데이터 조회
-  const { data: profile, isLoading, error } = useGetUserProfile(userStore.id);
+  const {
+    data: serverProfile,
+    isLoading,
+    error,
+  } = useGetUserProfile(userStore.id);
 
-  // 디버깅 로그
-  console.log('🔍 ProfileView 디버깅 정보:');
-  console.log('- userStore.id:', userStore.id);
-  console.log('- isLoading:', isLoading);
-  console.log('- error:', error);
-  console.log('- profile data:', profile);
+  // userStore 데이터를 우선적으로 사용하고, 서버 데이터가 있으면 병합
+  const profile = userStore.id
+    ? {
+        ...serverProfile,
+        username: userStore.username,
+        about: userStore.about,
+        email: userStore.email,
+        // 서버에서 가져온 추가 데이터가 있으면 유지
+        ...(serverProfile && {
+          image: serverProfile.image,
+          created_at: serverProfile.created_at,
+          updated_at: serverProfile.updated_at,
+        }),
+      }
+    : serverProfile;
+
+  console.log('- profile:', profile);
 
   const handleLikesClick = () => {
     setProfilePanelMode('likes');
