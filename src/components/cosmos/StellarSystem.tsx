@@ -3,7 +3,6 @@ import Star from './Star';
 import Planet from './Planet';
 import * as THREE from 'three';
 import { useSelectedStellarStore } from '@/stores/useSelectedStellarStore';
-import OrbitLine from './OrbitLine';
 import { useStellarStore } from '@/stores/useStellarStore';
 import useStellarSystemSelection from '@/hooks/useStellarSystemSelection';
 import type {
@@ -78,30 +77,11 @@ export default function StellarSystem({
             if (!planetObject || !planetObject.properties) return null;
 
             return (
-              <>
-                <OrbitLine
-                  orbitRadius={
-                    planetObject.properties.find(
-                      (prop) => prop.label === 'distanceFromStar'
-                    )?.value || object.planetId + 1
-                  }
-                  inclination={
-                    planetObject.properties.find(
-                      (prop) => prop.label === 'inclination'
-                    )?.value || 0
-                  }
-                  eccentricity={
-                    planetObject.properties.find(
-                      (prop) => prop.label === 'eccentricity'
-                    )?.value || 0
-                  }
-                />
-                <Planet
-                  key={object.planetId}
-                  planet={planetObject as PlanetType}
-                  isSelectable={isSelectedSystem}
-                />
-              </>
+              <Planet
+                key={object.planetId}
+                planet={planetObject as PlanetType}
+                isSelectable={isSelectedSystem}
+              />
             );
           })}
       </group>

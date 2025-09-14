@@ -1,7 +1,7 @@
 // 행성들 ( 악기들)
 
 import { useFrame } from '@react-three/fiber';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, useMemo } from 'react';
 import * as THREE from 'three';
 import type { Planet } from '@/types/stellar';
 import { calculateOrbitPosition } from '@/utils/orbitCalculations';
@@ -46,6 +46,29 @@ export default function Planet({ planet, isSelectable = false }: PlanetProps) {
   const eccentricity = getPropertyValue('eccentricity', 0);
   const tilt = getPropertyValue('tilt', 0);
 
+  // OrbitLine을 위한 점들 계산
+  const orbitPoints = useMemo(() => {
+    const defaultSegments = 128;
+    const curvePoints = [];
+
+    for (let i = 0; i <= defaultSegments; i++) {
+      const angle = (i / defaultSegments) * 2 * Math.PI;
+      const { x, y, z } = calculateOrbitPosition(
+        distanceFromStar,
+        inclination,
+        eccentricity,
+        angle
+      );
+      curvePoints.push(new THREE.Vector3(x, y, z));
+    }
+
+    return curvePoints;
+  }, [distanceFromStar, inclination, eccentricity]);
+
+  const orbitGeometry = useMemo(() => {
+    return new THREE.BufferGeometry().setFromPoints(orbitPoints);
+  }, [orbitPoints]);
+
   useEffect(() => {
     setIsSelected(selectedObjectId === planet.planetId);
   }, [selectedObjectId, planet.planetId]);
@@ -86,23 +109,31 @@ export default function Planet({ planet, isSelectable = false }: PlanetProps) {
   });
 
   return (
-    <mesh
-      ref={meshRef}
-      onClick={onPlanetClicked}
-      onPointerOver={onPlanetPointerOver}
-      onPointerOut={onPlanetPointerOut}
-    >
-      <Outlines
-        thickness={1}
-        color={isHovered ? 'white' : 'yellow'}
-        visible={isHovered || isSelected}
-      />
-      <sphereGeometry args={[planetSize, 16, 16]} />
-      <meshStandardMaterial
-        color={valueToColor(planetColor, 0, 360)}
-        emissive={isSelected ? '#ff0000' : '#000000'}
-        emissiveIntensity={planetBrightness}
-      />
-    </mesh>
+    <>
+      {/* OrbitLine 렌더링 */}
+      <lineLoop geometry={orbitGeometry}>
+        <lineBasicMaterial color="white" />
+      </lineLoop>
+
+      {/* Planet 렌더링 */}
+      <mesh
+        ref={meshRef}
+        onClick={onPlanetClicked}
+        onPointerOver={onPlanetPointerOver}
+        onPointerOut={onPlanetPointerOut}
+      >
+        <Outlines
+          thickness={1}
+          color={isHovered ? 'white' : 'yellow'}
+          visible={isHovered || isSelected}
+        />
+        <sphereGeometry args={[planetSize, 16, 16]} />
+        <meshStandardMaterial
+          color={valueToColor(planetColor, 0, 360)}
+          emissive={isSelected ? '#ff0000' : '#000000'}
+          emissiveIntensity={planetBrightness}
+        />
+      </mesh>
+    </>
   );
 }
