@@ -6,6 +6,10 @@ import { useSelectedStellarStore } from '@/stores/useSelectedStellarStore';
 import OrbitLine from './OrbitLine';
 import { useStellarStore } from '@/stores/useStellarStore';
 import useStellarSystemSelection from '@/hooks/useStellarSystemSelection';
+import type {
+  Planet as PlanetType,
+  CentralStar as CentralStarType,
+} from '@/types/stellar';
 //항성계 컴포넌트
 
 export default function StellarSystem({
@@ -28,8 +32,17 @@ export default function StellarSystem({
     return (mode === 'view' && selectedStellarId === id) || mode === 'create';
   }, [mode, selectedStellarId, id]);
 
+  // 중앙별 찾기 (planetId가 0인 객체)
+  const centralStar = useMemo(() => {
+    if (!stellarStore.objects || !Array.isArray(stellarStore.objects)) {
+      return undefined;
+    }
+    return stellarStore.objects.find(
+      (obj) => obj.planetId === 0 && obj.planetType === 'CENTRAL STAR'
+    ) as CentralStarType | undefined;
+  }, [stellarStore.objects]);
+
   const onStellarSystemClicked = () => {
-    console.log('onStellarSystemClicked', id);
     selectStellar(id);
   };
   useEffect(() => {
@@ -56,81 +69,41 @@ export default function StellarSystem({
         />
       </mesh>
       <group ref={detailGroupRef}>
-        <Star position={[0, 0, 0]} color="#ff6b6b" size={1} />
-        {stellarStore.objects.map((object) => {
-          if (object.planetId === 0) return null;
-          return (
-            <>
-              <OrbitLine
-                orbitRadius={
-                  stellarStore.objects[object.planetId].properties.find(
-                    (prop) => prop.label === 'distanceFromStar'
-                  )?.value || object.planetId + 1
-                }
-                inclination={
-                  stellarStore.objects[object.planetId].properties.find(
-                    (prop) => prop.label === 'inclination'
-                  )?.value || 0
-                }
-                eccentricity={
-                  stellarStore.objects[object.planetId].properties.find(
-                    (prop) => prop.label === 'eccentricity'
-                  )?.value || 0
-                }
-              />
-              <Planet
-                key={object.planetId}
-                id={object.planetId}
-                distanceFromStar={
-                  stellarStore.objects[object.planetId].properties.find(
-                    (prop) => prop.label === 'distanceFromStar'
-                  )?.value || object.planetId + 1
-                }
-                orbitSpeed={
-                  stellarStore.objects[object.planetId].properties.find(
-                    (prop) => prop.label === 'orbitSpeed'
-                  )?.value || 0.5
-                }
-                planetSize={
-                  stellarStore.objects[object.planetId].properties.find(
-                    (prop) => prop.label === 'planetSize'
-                  )?.value || 0.3
-                }
-                planetColor={
-                  stellarStore.objects[object.planetId].properties.find(
-                    (prop) => prop.label === 'planetColor'
-                  )?.value || 100
-                }
-                planetBrightness={
-                  stellarStore.objects[object.planetId].properties.find(
-                    (prop) => prop.label === 'planetBrightness'
-                  )?.value || 0.3
-                }
-                eccentricity={
-                  stellarStore.objects[object.planetId].properties.find(
-                    (prop) => prop.label === 'eccentricity'
-                  )?.value || 0
-                }
-                tilt={
-                  stellarStore.objects[object.planetId].properties.find(
-                    (prop) => prop.label === 'tilt'
-                  )?.value || 0
-                }
-                rotationSpeed={
-                  stellarStore.objects[object.planetId].properties.find(
-                    (prop) => prop.label === 'rotationSpeed'
-                  )?.value || 0.01
-                }
-                inclination={
-                  stellarStore.objects[object.planetId].properties.find(
-                    (prop) => prop.label === 'inclination'
-                  )?.value || 0
-                }
-                isSelectable={isSelectedSystem}
-              />
-            </>
-          );
-        })}
+        {centralStar && <Star centralStar={centralStar} position={[0, 0, 0]} />}
+        {stellarStore.objects &&
+          Array.isArray(stellarStore.objects) &&
+          stellarStore.objects.map((object) => {
+            if (object.planetId === 0) return null;
+            const planetObject = stellarStore.objects[object.planetId];
+            if (!planetObject || !planetObject.properties) return null;
+
+            return (
+              <>
+                <OrbitLine
+                  orbitRadius={
+                    planetObject.properties.find(
+                      (prop) => prop.label === 'distanceFromStar'
+                    )?.value || object.planetId + 1
+                  }
+                  inclination={
+                    planetObject.properties.find(
+                      (prop) => prop.label === 'inclination'
+                    )?.value || 0
+                  }
+                  eccentricity={
+                    planetObject.properties.find(
+                      (prop) => prop.label === 'eccentricity'
+                    )?.value || 0
+                  }
+                />
+                <Planet
+                  key={object.planetId}
+                  planet={planetObject as PlanetType}
+                  isSelectable={isSelectedSystem}
+                />
+              </>
+            );
+          })}
       </group>
     </group>
   );

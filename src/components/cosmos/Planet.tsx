@@ -3,31 +3,19 @@
 import { useFrame } from '@react-three/fiber';
 import { useEffect, useRef, useState } from 'react';
 import * as THREE from 'three';
-import type { TPlanet } from '@/types/cosmos';
+import type { Planet } from '@/types/stellar';
 import { calculateOrbitPosition } from '@/utils/orbitCalculations';
 import { useSceneStore } from '@/stores/useSceneStore';
 import { useSelectedObjectStore } from '@/stores/useSelectedObjectStore';
 import { valueToColor } from '@/utils/valueToColor';
 import { Outlines } from '@react-three/drei';
 
-interface PlanetProps extends TPlanet {
-  id: number;
+interface PlanetProps {
+  planet: Planet;
   isSelectable?: boolean;
 }
 
-export default function Planet({
-  planetSize,
-  planetColor,
-  planetBrightness,
-  distanceFromStar,
-  orbitSpeed,
-  rotationSpeed,
-  inclination,
-  eccentricity,
-  tilt,
-  id,
-  isSelectable = false,
-}: PlanetProps) {
+export default function Planet({ planet, isSelectable = false }: PlanetProps) {
   const meshRef = useRef<THREE.Mesh>(null);
   const { setSelectedPlanetIndex } = useSceneStore();
   const { setSelectedObjectId } = useSelectedObjectStore();
@@ -35,14 +23,37 @@ export default function Planet({
   const [isSelected, setIsSelected] = useState(false);
   const { selectedObjectId } = useSelectedObjectStore();
 
+  // Planet의 properties에서 필요한 값들을 추출하는 헬퍼 함수들
+  const getPropertyValue = (
+    label: string,
+    defaultValue: number = 0
+  ): number => {
+    const property = planet.properties.find((prop) => prop.label === label);
+    return property?.value ?? defaultValue;
+  };
+
+  // 필요한 속성들 추출
+  const planetSize = getPropertyValue('planetSize', 0.3);
+  const planetColor = getPropertyValue('planetColor', 100);
+  const planetBrightness = getPropertyValue('planetBrightness', 0.3);
+  const distanceFromStar = getPropertyValue(
+    'distanceFromStar',
+    planet.planetId + 1
+  );
+  const orbitSpeed = getPropertyValue('orbitSpeed', 0.5);
+  const rotationSpeed = getPropertyValue('rotationSpeed', 0.01);
+  const inclination = getPropertyValue('inclination', 0);
+  const eccentricity = getPropertyValue('eccentricity', 0);
+  const tilt = getPropertyValue('tilt', 0);
+
   useEffect(() => {
-    setIsSelected(selectedObjectId === id);
-  }, [selectedObjectId, id]);
+    setIsSelected(selectedObjectId === planet.planetId);
+  }, [selectedObjectId, planet.planetId]);
 
   const onPlanetClicked = () => {
     if (isSelectable) {
-      setSelectedPlanetIndex(id);
-      setSelectedObjectId(id);
+      setSelectedPlanetIndex(planet.planetId);
+      setSelectedObjectId(planet.planetId);
     }
   };
   const onPlanetPointerOver = () => {
