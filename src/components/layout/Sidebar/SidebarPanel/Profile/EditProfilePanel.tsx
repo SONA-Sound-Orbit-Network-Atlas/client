@@ -1,4 +1,5 @@
 import { useProfileStore } from '@/stores/useProfileStore';
+import { useEditProfile } from '@/hooks/useEditProfile';
 import PanelHeader from '../PanelHeader';
 import Iconframe from '@/components/common/Iconframe';
 import { FiUser } from 'react-icons/fi';
@@ -7,9 +8,20 @@ import TextInput from '@/components/common/TextInput';
 import Button from '@/components/common/Button';
 import { ScrollArea } from '@/components/common/Scrollarea';
 import Textarea from '@/components/common/Textarea';
+import ErrorMessage from '@/components/common/ErrorMessage';
 
 export default function EditProfilePanel() {
   const { setProfilePanelMode } = useProfileStore();
+  const { formData, setFormData, error, isLoading, handleSaveChanges } =
+    useEditProfile();
+
+  // 프로필 수정 핸들러
+  const handleSubmit = async () => {
+    const success = await handleSaveChanges();
+    if (success) {
+      setProfilePanelMode('profile');
+    }
+  };
 
   return (
     <>
@@ -32,30 +44,51 @@ export default function EditProfilePanel() {
             {/* EDIT PROFILE */}
             <div className="w-full border-b border-gray-border pb-[24px]">
               <div className="w-full mt-[24px] gap-[20px] flex flex-col">
-                <TextField label="DISPLAY NAME" htmlFor="display-name">
+                <TextField label="USERNAME" htmlFor="username">
                   <TextInput
                     type="text"
-                    placeholder="Enter your display name"
-                    id="display-name"
-                  />
-                </TextField>
-                <TextField label="EMAIL" htmlFor="email">
-                  <TextInput
-                    type="text"
-                    placeholder="Enter your email"
-                    id="email"
+                    placeholder="Enter your username"
+                    id="username"
+                    value={formData.username}
+                    onChange={(e) =>
+                      setFormData((prev) => ({
+                        ...prev,
+                        username: e.target.value,
+                      }))
+                    }
                   />
                 </TextField>
                 <TextField label="ABOUT" htmlFor="about">
                   <Textarea
                     placeholder="Tell us about yourself..."
                     id="about"
+                    value={formData.about}
+                    onChange={(e) =>
+                      setFormData((prev) => ({
+                        ...prev,
+                        about: e.target.value,
+                      }))
+                    }
                   />
                 </TextField>
               </div>
+
+              {/* 에러 메시지 */}
+              {error && (
+                <div className="mt-4">
+                  <ErrorMessage message={error} />
+                </div>
+              )}
+
               <div className="w-full">
-                <Button color="primary" size="lg" className="w-full mt-[24px]">
-                  SAVE CHANGES
+                <Button
+                  color="primary"
+                  size="lg"
+                  className="w-full mt-[24px]"
+                  onClick={handleSubmit}
+                  disabled={isLoading}
+                >
+                  {isLoading ? 'SAVING...' : 'SAVE CHANGES'}
                 </Button>
               </div>
             </div>
