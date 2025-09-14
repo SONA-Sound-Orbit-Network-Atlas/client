@@ -33,14 +33,8 @@ export default function StellarSystem({
     selectStellar(id);
   };
   useEffect(() => {
-    if (isSelectedSystem && detailGroupRef.current && lowDetailMesh.current) {
-      detailGroupRef.current.visible = isSelectedSystem;
-      lowDetailMesh.current.visible = !isSelectedSystem;
-    } else if (
-      !isSelectedSystem &&
-      detailGroupRef.current &&
-      lowDetailMesh.current
-    ) {
+    if (detailGroupRef.current && lowDetailMesh.current) {
+      // isSelectedSystem 값에 따라 두 요소의 visible 속성을 간단하게 할당
       detailGroupRef.current.visible = isSelectedSystem;
       lowDetailMesh.current.visible = !isSelectedSystem;
     }
