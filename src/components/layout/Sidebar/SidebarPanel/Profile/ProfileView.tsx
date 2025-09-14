@@ -45,8 +45,6 @@ export default function ProfileView() {
       }
     : serverProfile;
 
-  console.log('- profile:', profile);
-
   const handleLikesClick = () => {
     setProfilePanelMode('likes');
   };

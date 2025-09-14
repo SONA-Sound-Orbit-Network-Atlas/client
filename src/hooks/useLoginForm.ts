@@ -51,9 +51,17 @@ export const useLoginForm = (
     try {
       await loginMutation.mutateAsync();
       options?.onSuccess?.();
-    } catch (error: AxiosError) {
+    } catch (error: unknown) {
       console.error('로그인 실패:', error);
-      options?.onError?.(error);
+
+      // AxiosError인지 확인하는 타입 가드
+      if (error && typeof error === 'object' && 'response' in error) {
+        const axiosError = error as AxiosError;
+        options?.onError?.(axiosError);
+      } else {
+        // AxiosError가 아닌 경우 기본 에러 처리
+        console.error('예상치 못한 에러:', error);
+      }
     }
   };
 

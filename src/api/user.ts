@@ -11,6 +11,11 @@ export interface UpdateProfileResponse {
   user: User;
 }
 
+export interface UpdatePasswordRequest {
+  oldPassword: string;
+  newPassword: string;
+}
+
 export const userAPI = {
   // 사용자 프로필 조회
   getUserProfile: async (userId: string): Promise<User> => {
@@ -23,6 +28,12 @@ export const userAPI = {
     data: UpdateProfileRequest
   ): Promise<UpdateProfileResponse> => {
     const response = await axiosInstance.put('/users/profile', data);
+    return response.data;
+  },
+
+  // 사용자 비밀번호 변경
+  updatePassword: async (data: UpdatePasswordRequest): Promise<any> => {
+    const response = await axiosInstance.patch('/users/password', data);
     return response.data;
   },
 };

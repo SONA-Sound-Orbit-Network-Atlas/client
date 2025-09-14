@@ -1,5 +1,6 @@
 import { useProfileStore } from '@/stores/useProfileStore';
 import { useEditProfile } from '@/hooks/useEditProfile';
+import { useChangePassword } from '@/hooks/useChangePassword';
 import PanelHeader from '../PanelHeader';
 import Iconframe from '@/components/common/Iconframe';
 import { FiUser } from 'react-icons/fi';
@@ -14,6 +15,17 @@ export default function EditProfilePanel() {
   const { setProfilePanelMode } = useProfileStore();
   const { formData, setFormData, error, isLoading, handleSaveChanges } =
     useEditProfile();
+  const {
+    formData: passwordFormData,
+    setFormData: setPasswordFormData,
+    error: passwordError,
+    isLoading: isPasswordLoading,
+    handleChangePassword,
+  } = useChangePassword({
+    onSuccess: () => {
+      setProfilePanelMode('profile');
+    },
+  });
 
   // 프로필 수정 핸들러
   const handleSubmit = async () => {
@@ -21,6 +33,11 @@ export default function EditProfilePanel() {
     if (success) {
       setProfilePanelMode('profile');
     }
+  };
+
+  // 비밀번호 변경 핸들러
+  const handlePasswordSubmit = async () => {
+    await handleChangePassword();
   };
 
   return (
@@ -103,6 +120,13 @@ export default function EditProfilePanel() {
                     type="password"
                     placeholder="Enter current password"
                     id="current-password"
+                    value={passwordFormData.currentPassword}
+                    onChange={(e) =>
+                      setPasswordFormData((prev) => ({
+                        ...prev,
+                        currentPassword: e.target.value,
+                      }))
+                    }
                   />
                 </TextField>
                 <TextField label="NEW PASSWORD" htmlFor="new-password">
@@ -110,6 +134,13 @@ export default function EditProfilePanel() {
                     type="password"
                     placeholder="Enter new password"
                     id="new-password"
+                    value={passwordFormData.newPassword}
+                    onChange={(e) =>
+                      setPasswordFormData((prev) => ({
+                        ...prev,
+                        newPassword: e.target.value,
+                      }))
+                    }
                   />
                 </TextField>
                 <TextField
@@ -120,12 +151,33 @@ export default function EditProfilePanel() {
                     type="password"
                     placeholder="Confirm new password"
                     id="confirm-new-password"
+                    value={passwordFormData.confirmPassword}
+                    onChange={(e) =>
+                      setPasswordFormData((prev) => ({
+                        ...prev,
+                        confirmPassword: e.target.value,
+                      }))
+                    }
                   />
                 </TextField>
               </div>
+
+              {/* 비밀번호 변경 에러 메시지 */}
+              {passwordError && (
+                <div className="mt-4">
+                  <ErrorMessage message={passwordError} />
+                </div>
+              )}
+
               <div className="w-full">
-                <Button color="primary" size="lg" className="w-full mt-[24px]">
-                  SAVE CHANGES
+                <Button
+                  color="primary"
+                  size="lg"
+                  className="w-full mt-[24px]"
+                  onClick={handlePasswordSubmit}
+                  disabled={isPasswordLoading}
+                >
+                  {isPasswordLoading ? 'CHANGING...' : 'SAVE CHANGES'}
                 </Button>
               </div>
             </div>
