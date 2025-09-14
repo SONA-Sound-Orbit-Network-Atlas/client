@@ -36,9 +36,9 @@ export default function StellarSystem({
     if (detailGroupRef.current && lowDetailMesh.current) {
       // isSelectedSystem 값에 따라 두 요소의 visible 속성을 간단하게 할당
       detailGroupRef.current.visible = isSelectedSystem;
-      lowDetailMesh.current.visible = !isSelectedSystem;
+      lowDetailMesh.current.visible = !isSelectedSystem && mode === 'idle';
     }
-  }, [isSelectedSystem]);
+  }, [isSelectedSystem, mode]);
 
   return (
     <group ref={ref} position={stellarSystemPos}>
