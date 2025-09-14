@@ -1,6 +1,5 @@
 import { OrbitControls } from '@react-three/drei';
 import type { OrbitControls as OrbitControlsImpl } from 'three-stdlib';
-import * as THREE from 'three';
 import { useRef, useCallback, useState } from 'react';
 import { useSmoothCameraMove } from '@/hooks/camera/useSmoothCameraMove';
 import { VIEW_MODE_CONFIG } from '@/constants/viewModeConfig';
@@ -14,13 +13,7 @@ import { useSelectedStellarStore } from '@/stores/useSelectedStellarStore';
  * @returns 카메라 및 이동 제어 컴포넌트
  */
 
-interface OrbitViewControlsProps {
-  targetPosition: THREE.Vector3;
-}
-
-export default function OrbitViewControls({
-  targetPosition,
-}: OrbitViewControlsProps) {
+export default function OrbitViewControls() {
   const controls = useRef<OrbitControlsImpl>(null);
   const { cameraIsMoving } = useSceneStore();
   const { mode } = useSelectedStellarStore();
@@ -39,7 +32,6 @@ export default function OrbitViewControls({
 
   // 카메라 이동 로직
   useSmoothCameraMove({
-    targetPosition,
     controlsRef: shouldRunAnimation ? controls.current : null,
     duration: VIEW_MODE_CONFIG.transition.galaxyToStellar.duration,
   });

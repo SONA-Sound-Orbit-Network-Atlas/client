@@ -12,7 +12,7 @@
 
 export type TPlanet = {
   planetSize: number; // 0.1
-  planetColor: string;
+  planetColor: number;
   planetBrightness: number;
   distanceFromStar: number;
   orbitSpeed: number;

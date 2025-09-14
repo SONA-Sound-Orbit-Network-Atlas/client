@@ -1,5 +1,6 @@
 import axiosInstance from '@/lib/axios';
 import type { StellarType } from '@/types/stellar';
+import { getStellarSystemMock } from '@/mocks/data/stellarSystems';
 
 // stellar API
 export const stellarAPI = {
@@ -17,7 +18,8 @@ export const stellarAPI = {
     const response = await axiosInstance.get<StellarType>(
       `/stellarSystems/${stellarId}`
     );
-    return response.data;
+    return getStellarSystemMock(stellarId) as StellarType;
+    // return response.data;
   },
 
   // 수정

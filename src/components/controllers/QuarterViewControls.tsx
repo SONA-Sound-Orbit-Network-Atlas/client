@@ -3,7 +3,6 @@ import { useRef } from 'react';
 import * as THREE from 'three';
 import type { OrbitControls as OrbitControlsImpl } from 'three-stdlib';
 import { useThree } from '@react-three/fiber';
-import { useSceneStore } from '@/stores/useSceneStore';
 import { useSmoothCameraMove } from '@/hooks/camera/useSmoothCameraMove';
 import { VIEW_MODE_CONFIG } from '@/constants/viewModeConfig';
 import { useSelectedStellarStore } from '@/stores/useSelectedStellarStore';
@@ -17,12 +16,10 @@ import { useSelectedStellarStore } from '@/stores/useSelectedStellarStore';
 
 export default function QuarterViewControls() {
   const controls = useRef<OrbitControlsImpl>(null);
-  const { cameraTarget } = useSceneStore();
   const { mode } = useSelectedStellarStore();
   const { camera } = useThree();
 
   useSmoothCameraMove({
-    targetPosition: cameraTarget,
     controlsRef: controls.current,
     duration: VIEW_MODE_CONFIG.transition.galaxyToStellar.duration,
   });

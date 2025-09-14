@@ -4,8 +4,7 @@ import { useSelectedStellarStore } from '@/stores/useSelectedStellarStore';
 import { useStellarStore } from '@/stores/useStellarStore';
 
 export default function DebugMessage() {
-  const { cameraIsMoving, cameraTarget, selectedStellarSystemId } =
-    useSceneStore();
+  const { cameraIsMoving, cameraTarget } = useSceneStore();
   const { mode } = useSelectedStellarStore();
   const { selectedStellarId } = useSelectedStellarStore();
   const { selectedObjectId } = useSelectedObjectStore();
@@ -20,9 +19,6 @@ export default function DebugMessage() {
         <p>
           <strong>Target Position:</strong> {cameraTarget?.x?.toFixed(2)},{' '}
           {cameraTarget?.y?.toFixed(2)}, {cameraTarget?.z?.toFixed(2)}
-        </p>
-        <p>
-          <strong>Selected Stellar System ID:</strong> {selectedStellarSystemId}
         </p>
         <p>
           <strong>Selected Stellar ID:</strong> {selectedStellarId}

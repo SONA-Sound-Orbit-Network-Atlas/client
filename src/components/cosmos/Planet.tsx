@@ -7,6 +7,7 @@ import type { TPlanet } from '@/types/cosmos';
 import { calculateOrbitPosition } from '@/utils/orbitCalculations';
 import { useSceneStore } from '@/stores/useSceneStore';
 import { useSelectedObjectStore } from '@/stores/useSelectedObjectStore';
+import { valueToColor } from '@/utils/valueToColor';
 
 interface PlanetProps extends TPlanet {
   id: number;
@@ -65,7 +66,7 @@ export default function Planet({
     <mesh ref={meshRef} onClick={onPlanetClicked}>
       <sphereGeometry args={[planetSize, 16, 16]} />
       <meshStandardMaterial
-        color={planetColor}
+        color={valueToColor(planetColor, 0, 360)}
         emissive={isSelected ? '#ff0000' : '#000000'}
         emissiveIntensity={planetBrightness}
       />

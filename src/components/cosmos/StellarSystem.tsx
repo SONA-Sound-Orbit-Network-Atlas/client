@@ -5,8 +5,8 @@ import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 import { useSelectedStellarStore } from '@/stores/useSelectedStellarStore';
 import OrbitLine from './OrbitLine';
-import { useStellarSystem } from '@/hooks/useStellarSystem';
 import { useStellarStore } from '@/stores/useStellarStore';
+import useStellarSystemSelection from '@/hooks/useStellarSystemSelection';
 //항성계 컴포넌트
 
 export default function StellarSystem({
@@ -16,9 +16,9 @@ export default function StellarSystem({
   stellarSystemPos: [number, number, number];
   id: string;
 }) {
-  const { enterStellarSystemView } = useStellarSystem();
   const { stellarStore } = useStellarStore();
   const { mode, selectedStellarId } = useSelectedStellarStore();
+  const { selectStellar } = useStellarSystemSelection();
 
   const ref = useRef<THREE.Group>(null);
   const detailGroupRef = useRef<THREE.Group>(null);
@@ -30,10 +30,8 @@ export default function StellarSystem({
   }, [mode, selectedStellarId, id]);
 
   const onStellarSystemClicked = () => {
-    if (isSelectedSystem) {
-      return;
-    }
-    enterStellarSystemView(selectedStellarId);
+    console.log('onStellarSystemClicked', id);
+    selectStellar(id);
   };
   useFrame(() => {
     // 선택된 시스템만 디테일 그룹 표시, 선택되지 않은 시스템은 로우 디테일 매쉬만 표시
@@ -45,11 +43,7 @@ export default function StellarSystem({
   });
 
   return (
-    <group
-      ref={ref}
-      position={stellarSystemPos}
-      onClick={onStellarSystemClicked}
-    >
+    <group ref={ref} position={stellarSystemPos}>
       <group ref={detailGroupRef}>
         <Star position={[0, 0, 0]} color="#ff6b6b" size={1} />
         {stellarStore.objects.map((object) => {
@@ -91,12 +85,11 @@ export default function StellarSystem({
                     (prop) => prop.label === 'planetSize'
                   )?.value || 0.3
                 }
-                // planetColor={
-                //   stellarStore.objects[index].properties.find(
-                //     (prop) => prop.label === 'planetColor'
-                //   )?.value || '#FFFFFF'
-                // }
-                planetColor={'#FFFFFF'}
+                planetColor={
+                  stellarStore.objects[object.planetId].properties.find(
+                    (prop) => prop.label === 'planetColor'
+                  )?.value || 100
+                }
                 planetBrightness={
                   stellarStore.objects[object.planetId].properties.find(
                     (prop) => prop.label === 'planetBrightness'
@@ -128,7 +121,11 @@ export default function StellarSystem({
           );
         })}
       </group>
-      <mesh ref={lowDetailMesh} onClick={onStellarSystemClicked}>
+      <mesh
+        ref={lowDetailMesh}
+        onClick={onStellarSystemClicked}
+        renderOrder={1}
+      >
         <sphereGeometry args={[LOW_DETAIL_SIZE, 8, 8]} />
         <meshStandardMaterial
           color="#ff6b6b"
