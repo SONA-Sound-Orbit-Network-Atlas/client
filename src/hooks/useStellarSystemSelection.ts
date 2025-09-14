@@ -28,7 +28,6 @@ export default function useStellarSystemSelection() {
         openSecondarySidebar('stellar');
         return;
       }
-      console.log('selectStellar', id);
       setTargetId(id); // 여기서부터 useGetStellar 활성화
     },
     [selectedStellarId, setTabValue, openSecondarySidebar]
