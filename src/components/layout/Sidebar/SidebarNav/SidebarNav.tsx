@@ -1,5 +1,5 @@
 import { mergeClassNames } from '@/utils/mergeClassNames';
-import { useSidebarStore } from '@/stores/sidebarStore';
+import { useSidebarStore } from '@/stores/useSidebarStore';
 import SidebarItem from './SidebarItem';
 import { menuItems } from './constants';
 
