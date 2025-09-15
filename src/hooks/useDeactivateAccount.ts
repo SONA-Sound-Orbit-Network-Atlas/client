@@ -1,5 +1,6 @@
 import { useState, useCallback } from 'react';
 import { useDeactivateAccount as useDeactivateAccountAPI } from '@/hooks/api/useUser';
+import { AxiosError } from 'axios';
 
 export interface UseDeactivateAccountReturn {
   // 상태
@@ -87,7 +88,7 @@ export const useDeactivateAccount = (): UseDeactivateAccountReturn => {
           console.log('회원탈퇴가 완료되었습니다.');
           // 성공 시 자동으로 로그아웃 처리됨 (useDeactivateAccount에서 처리)
         },
-        onError: (error: any) => {
+        onError: (error: AxiosError) => {
           console.error('회원탈퇴 실패:', error);
           if (error.response?.status === 409) {
             setDeactivateError('비밀번호가 일치하지 않습니다.');
