@@ -26,7 +26,6 @@ export interface PropertyDefinition {
   max: number;
   step: number;
   defaultValue: number;
-  unit?: string; // 표시용 단위 ('°', '%', 'Hz' 등)
   
   // UI 컨트롤
   controlType: ControlType;
@@ -109,8 +108,7 @@ export const PLANET_PROPERTIES: Record<string, PropertyDefinition> = {
     max: 360,
     step: 1,
     defaultValue: 180,
-    unit: '°',
-    controlType: 'color',
+    controlType: 'slider',
     audioTargets: [
       { name: 'toneTint', weight: 1.0, transform: (n) => curve(n, 'sigmoid') },
       { name: 'wavefoldAmount', weight: 1.0, transform: (n) => n * 0.8 },
@@ -153,7 +151,6 @@ export const PLANET_PROPERTIES: Record<string, PropertyDefinition> = {
     max: 20.0,
     step: 0.1,
     defaultValue: 10.5,
-    unit: 'AU',
     controlType: 'slider',
     precision: 1,
     audioTargets: [
@@ -207,7 +204,6 @@ export const PLANET_PROPERTIES: Record<string, PropertyDefinition> = {
     max: 180,
     step: 1,
     defaultValue: 0,
-    unit: '°',
     controlType: 'slider',
     audioTargets: [
       { name: 'pitchOffset', weight: 0.5, transform: (n) => (n - 0.5) * 12 }
@@ -241,7 +237,6 @@ export const PLANET_PROPERTIES: Record<string, PropertyDefinition> = {
     max: 180.0,
     step: 1.0,
     defaultValue: 90.0,
-    unit: '°',
     controlType: 'slider',
     audioTargets: [
       { name: 'pan', weight: 1.0, transform: (n) => (n - 0.5) * 1.6 },
@@ -293,7 +288,6 @@ export const PLANET_PROPERTIES: Record<string, PropertyDefinition> = {
     max: 100,
     step: 1,
     defaultValue: 50,
-    unit: '%',
     controlType: 'slider',
     audioTargets: [
       { name: 'delayTime', weight: 1.0, transform: (n) => 0.1 + n * 1.5 },
@@ -311,7 +305,6 @@ export const PLANET_PROPERTIES: Record<string, PropertyDefinition> = {
     max: 100,
     step: 1,
     defaultValue: 50,
-    unit: '%',
     controlType: 'slider',
     audioTargets: [
       { name: 'polyrhythm', weight: 1.0, transform: (n) => 1 + Math.floor(n * 3) },
@@ -329,7 +322,6 @@ export const PLANET_PROPERTIES: Record<string, PropertyDefinition> = {
     max: 100,
     step: 1,
     defaultValue: 50,
-    unit: '%',
     controlType: 'slider',
     audioTargets: [
       { name: 'subdivision', weight: 1.0, transform: (n) => Math.floor(1 + n * 3) },
@@ -347,7 +339,6 @@ export const PLANET_PROPERTIES: Record<string, PropertyDefinition> = {
     max: 100,
     step: 1,
     defaultValue: 50,
-    unit: '%',
     controlType: 'slider',
     audioTargets: [
       { name: 'intervalVariation', weight: 1.0, transform: (n) => n * 0.8 },

@@ -23,7 +23,6 @@ export const STAR_PROPERTIES: Record<string, PropertyDefinition> = {
     max: 100,
     step: 1,
     defaultValue: 50,
-    unit: '%',
     controlType: 'slider',
     audioTargets: [
       { name: 'bpm', weight: 1.0, transform: (n) => 60 + n * 120 } // 60-180 BPM
@@ -39,7 +38,6 @@ export const STAR_PROPERTIES: Record<string, PropertyDefinition> = {
     max: 100,
     step: 1,
     defaultValue: 75,
-    unit: '%',
     controlType: 'slider',
     audioTargets: [
       { name: 'toneCharacter', weight: 1.0, transform: (n) => n } // 0-100 Tone Character
@@ -55,8 +53,7 @@ export const STAR_PROPERTIES: Record<string, PropertyDefinition> = {
     max: 360,
     step: 1,
     defaultValue: 60,
-    unit: '°',
-    controlType: 'color',
+    controlType: 'slider',
     audioTargets: [
       { name: 'key', weight: 1.0, transform: (n) => Math.floor(n / 30) }, // 0-11 (12 keys)
       { name: 'scale', weight: 1.0, transform: (n) => Math.floor((n % 60) / 8.57) } // 0-6 (7 scales)
@@ -72,7 +69,6 @@ export const STAR_PROPERTIES: Record<string, PropertyDefinition> = {
     max: 100,
     step: 1,
     defaultValue: 50,
-    unit: '%',
     controlType: 'slider',
     audioTargets: [
       { name: 'complexity', weight: 1.0, transform: (n) => Math.floor(n / 33.33) + 1 } // 1-3 Complexity
