@@ -1,8 +1,8 @@
 import { mergeClassNames } from '@/utils/mergeClassNames';
 import PrimarySidebar from './SidebarNav/SidebarNav';
 import SecondarySidebar from './SidebarPanel/SidebarPanel';
-import { useSidebarStore } from '@/stores/sidebarStore';
-// import StellarDataBinder from '@/components/stellarDataBinder/StellarDataBinder';
+import { useSidebarStore } from '@/stores/useSidebarStore';
+import StellarDataBinder from '@/components/stellarDataBinder/StellarDataBinder';
 
 interface SidebarProps {
   className?: string;

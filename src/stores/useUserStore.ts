@@ -9,13 +9,6 @@ interface UserStore {
   setIsLoggedIn: (isLoggedIn: boolean) => void;
 }
 
-const dummyUserStore: User = {
-  // 테스트 이후 삭제 필요
-  userId: 'testUser',
-  email: 'test@example.com',
-  username: 'testUser',
-};
-
 const initialUserStore: User = {
   userId: '',
   email: '',
@@ -23,11 +16,11 @@ const initialUserStore: User = {
 };
 
 export const useUserStore = create<UserStore>((set) => ({
-  userStore: dummyUserStore,
+  userStore: initialUserStore,
   setUserStore: (userStore: User) => {
     set({ userStore });
   },
-  isLoggedIn: true,
+  isLoggedIn: false,
   setIsLoggedIn: (isLoggedIn: boolean) => {
     set({ isLoggedIn });
   },

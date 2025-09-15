@@ -1,4 +1,4 @@
-import { useProfileStore } from '@/stores/profileStore';
+import { useProfileStore } from '@/stores/useProfileStore';
 import PanelHeader from '../PanelHeader';
 import CardItem from '@/components/panel/galaxy/community/CardItem';
 import { ScrollArea } from '@/components/common/Scrollarea';
