@@ -1,4 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useEffect } from 'react';
 import {
   userAPI,
   type UpdateProfileRequest,
@@ -12,18 +13,28 @@ import type { AxiosError } from 'axios';
 
 // 사용자 프로필 조회
 export function useGetUserProfile(userId: string) {
-  return useQuery<User>({
+  const { setUserStore } = useUserStore();
+
+  const query = useQuery<User>({
     queryKey: ['userProfile', userId],
     queryFn: () => userAPI.getUserProfile(userId),
     enabled: !!userId, // userId가 있을 때만 실행
     staleTime: 5 * 60 * 1000, // 5분간 캐시 유지
   });
+
+  // 프로필 조회 성공 시 자동으로 스토어 업데이트
+  useEffect(() => {
+    if (query.data) {
+      setUserStore(query.data);
+    }
+  }, [query.data, setUserStore]);
+
+  return query;
 }
 
 // 사용자 프로필 수정
 export function useUpdateUserProfile() {
   const queryClient = useQueryClient();
-  const { setUserStore } = useUserStore();
 
   return useMutation<UpdateProfileResponse, AxiosError, UpdateProfileRequest>({
     mutationFn: (data: UpdateProfileRequest) => userAPI.updateUserProfile(data),
@@ -37,8 +48,6 @@ export function useUpdateUserProfile() {
         email: updatedUser.email,
         updated_at: updatedUser.updated_at,
       });
-
-      setUserStore(updatedUser);
 
       // 캐시 업데이트 (서버에서 받은 최신 데이터로)
       queryClient.setQueryData(['userProfile', updatedUser.id], updatedUser);
@@ -57,32 +66,17 @@ export function useUpdateUserProfile() {
 // 사용자 비밀번호 변경
 export function useUpdatePassword() {
   const queryClient = useQueryClient();
-  const { setUserStore, userStore } = useUserStore();
+  const { userStore } = useUserStore();
 
   return useMutation<any, AxiosError, UpdatePasswordRequest>({
     mutationFn: (data: UpdatePasswordRequest) => userAPI.updatePassword(data),
-    onSuccess: async () => {
+    onSuccess: () => {
       console.log('✅ 비밀번호가 변경되었습니다!');
 
-      // 비밀번호 변경 API는 사용자 데이터를 반환하지 않으므로, 프로필 조회 API를 호출
-      try {
-        const updatedUser = await userAPI.getUserProfile(userStore.id);
-
-        console.log('📋 업데이트된 사용자 데이터:', {
-          id: updatedUser.id,
-          username: updatedUser.username,
-          email: updatedUser.email,
-          updated_at: updatedUser.updated_at,
-        });
-
-        // 사용자 스토어 업데이트
-        setUserStore(updatedUser);
-
-        // 캐시 업데이트 (서버에서 받은 최신 데이터로)
-        queryClient.setQueryData(['userProfile', updatedUser.id], updatedUser);
-      } catch (error) {
-        console.error('프로필 재조회 실패:', error);
-      }
+      // 비밀번호 변경 성공 시 userProfile 쿼리를 무효화하여 자동 리페치 유도
+      queryClient.invalidateQueries({
+        queryKey: ['userProfile', userStore.id],
+      });
     },
     onError: (error: AxiosError) => {
       console.error('비밀번호 변경 실패:', error);
