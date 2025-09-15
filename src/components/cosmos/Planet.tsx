@@ -8,7 +8,8 @@ import { calculateOrbitPosition } from '@/utils/orbitCalculations';
 import { useSceneStore } from '@/stores/useSceneStore';
 import { useSelectedObjectStore } from '@/stores/useSelectedObjectStore';
 import { valueToColor } from '@/utils/valueToColor';
-import { Outlines } from '@react-three/drei';
+import { Outlines, Sphere } from '@react-three/drei';
+import { FakeGlowMaterial } from './materials/FakeGlowMaterial';
 
 interface PlanetProps {
   planet: Planet;
@@ -18,10 +19,9 @@ interface PlanetProps {
 export default function Planet({ planet, isSelectable = false }: PlanetProps) {
   const meshRef = useRef<THREE.Mesh>(null);
   const { setSelectedPlanetIndex } = useSceneStore();
-  const { setSelectedObjectId } = useSelectedObjectStore();
+  const { setSelectedObjectId, selectedObjectId } = useSelectedObjectStore();
   const [isHovered, setIsHovered] = useState(false);
   const [isSelected, setIsSelected] = useState(false);
-  const { selectedObjectId } = useSelectedObjectStore();
 
   // Planet의 properties에서 필요한 값들을 추출하는 헬퍼 함수들
   const getPropertyValue = (
@@ -112,28 +112,40 @@ export default function Planet({ planet, isSelectable = false }: PlanetProps) {
     <>
       {/* OrbitLine 렌더링 */}
       <lineLoop geometry={orbitGeometry}>
-        <lineBasicMaterial color="white" />
+        <lineBasicMaterial color={isSelected ? 'green' : 'white'} />
       </lineLoop>
 
       {/* Planet 렌더링 */}
-      <mesh
-        ref={meshRef}
-        onClick={onPlanetClicked}
-        onPointerOver={onPlanetPointerOver}
-        onPointerOut={onPlanetPointerOut}
-      >
-        <Outlines
-          thickness={1}
-          color={isHovered ? 'white' : 'yellow'}
-          visible={isHovered || isSelected}
-        />
-        <sphereGeometry args={[planetSize, 16, 16]} />
-        <meshStandardMaterial
-          color={valueToColor(planetColor, 0, 360)}
-          emissive={isSelected ? '#ff0000' : '#000000'}
-          emissiveIntensity={planetBrightness}
-        />
-      </mesh>
+      <group ref={meshRef}>
+        <mesh
+          onClick={onPlanetClicked}
+          onPointerOver={onPlanetPointerOver}
+          onPointerOut={onPlanetPointerOut}
+          renderOrder={2}
+        >
+          <Outlines
+            thickness={1}
+            color={isHovered ? 'white' : 'yellow'}
+            visible={isHovered || isSelected}
+          />
+          <sphereGeometry args={[planetSize, 16, 16]} />
+          <meshStandardMaterial
+            color={valueToColor(planetColor, 0, 360)}
+            emissiveIntensity={0}
+          />
+        </mesh>
+        <Sphere args={[planetSize * 1.5, 16, 16]} renderOrder={1}>
+          <FakeGlowMaterial
+            falloff={0.4}
+            glowInternalRadius={5}
+            glowColor={valueToColor(planetColor, 0, 360)}
+            glowSharpness={10}
+            side={THREE.DoubleSide}
+            depthTest={true}
+            depthWrite={false}
+          />
+        </Sphere>
+      </group>
     </>
   );
 }

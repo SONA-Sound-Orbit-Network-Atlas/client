@@ -2,18 +2,22 @@
 
 import type { CentralStar } from '@/types/stellar';
 import { valueToColor } from '@/utils/valueToColor';
+import { FakeGlowMaterial } from './materials/FakeGlowMaterial';
+import { Outlines, Sphere } from '@react-three/drei';
+import * as THREE from 'three';
+import { useEffect, useState } from 'react';
+import { useSelectedObjectStore } from '@/stores/useSelectedObjectStore';
 
 interface StarProps {
   centralStar: CentralStar;
   position?: [number, number, number];
-  onClick?: () => void;
 }
 
-export default function Star({
-  centralStar,
-  position = [0, 0, 0],
-  onClick,
-}: StarProps) {
+export default function Star({ centralStar, position = [0, 0, 0] }: StarProps) {
+  const [isHovered, setIsHovered] = useState(false);
+  const [isSelected, setIsSelected] = useState(false);
+  const { setSelectedObjectId, selectedObjectId } = useSelectedObjectStore();
+
   // CentralStar의 properties에서 필요한 값들을 추출하는 헬퍼 함수
   const getPropertyValue = (
     label: string,
@@ -33,14 +37,52 @@ export default function Star({
   // 색상 변환 (숫자 값을 색상으로)
   const color = valueToColor(colorValue, 0, 360);
 
+  const onStarPointerOver = () => {
+    setIsHovered(true);
+  };
+  const onStarPointerOut = () => {
+    setIsHovered(false);
+  };
+  const onClick = () => {
+    setSelectedObjectId(centralStar.planetId);
+  };
+  useEffect(() => {
+    setIsSelected(selectedObjectId === centralStar.planetId);
+  }, [selectedObjectId, centralStar.planetId]);
+
   return (
-    <mesh position={position} onClick={onClick} receiveShadow={false}>
-      <sphereGeometry args={[size, 32, 32]} />
-      <meshStandardMaterial
-        color={color}
-        emissive={color}
-        emissiveIntensity={brightness}
-      />
-    </mesh>
+    <group>
+      <Sphere
+        args={[size, 32, 32]}
+        renderOrder={1}
+        position={position}
+        onClick={onClick}
+        onPointerOver={onStarPointerOver}
+        onPointerOut={onStarPointerOut}
+        receiveShadow={false}
+      >
+        <Outlines
+          thickness={1}
+          color={isHovered ? 'white' : 'yellow'}
+          visible={isHovered || isSelected}
+        />
+        <meshStandardMaterial
+          color={color}
+          emissive={color}
+          emissiveIntensity={brightness}
+        />
+        <Sphere args={[size * 1.5, 32, 32]} renderOrder={1}>
+          <FakeGlowMaterial
+            falloff={0.2}
+            glowInternalRadius={3}
+            glowColor={color}
+            glowSharpness={1}
+            side={THREE.DoubleSide}
+            depthTest={true}
+            depthWrite={false}
+          />
+        </Sphere>
+      </Sphere>
+    </group>
   );
 }
