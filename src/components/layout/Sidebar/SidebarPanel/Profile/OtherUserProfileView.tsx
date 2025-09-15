@@ -1,4 +1,4 @@
-import { FiUser, FiHeart, FiUserCheck } from 'react-icons/fi';
+import { FiUser, FiUserCheck } from 'react-icons/fi';
 import { IoPlanetOutline } from 'react-icons/io5';
 import { useProfileStore } from '@/stores/useProfileStore';
 import { useGetUserProfile } from '@/hooks/api/useUser';
@@ -24,16 +24,12 @@ export default function OtherUserProfileView({
     error,
   } = useGetUserProfile(userId.toString());
 
-  const handleLikesClick = () => {
-    setProfilePanelMode('likes');
-  };
-
   const handleFollowersClick = () => {
-    setProfilePanelMode('followers');
+    setProfilePanelMode('otherUserFollowers');
   };
 
   const handleFollowingsClick = () => {
-    setProfilePanelMode('followings');
+    setProfilePanelMode('otherUserFollowings');
   };
 
   // 로딩 상태
@@ -131,16 +127,7 @@ export default function OtherUserProfileView({
                 </p>
               </Card>
             </div>
-            <div className="mb-[24px]">
-              <p className="text-text-muted text-sm mb-[16px]">LIKES</p>
-              <StatCard
-                icon={<FiHeart className="text-white" />}
-                value={85}
-                label="LIKES"
-                onClick={handleLikesClick}
-                className="w-full hover:brightness-110 hover:bg-text-white/20 border-white/20 hover:text-white hover:[&_p]:text-white hover:[&_svg]:text-white"
-              />
-            </div>
+            {/* 다른 유저 프로필에서는 Likes 섹션을 숨김 */}
             <div className="mb-[24px]">
               <p className="text-text-muted text-sm mb-[16px]">SOCIALS</p>
               <div className="flex flex-col gap-[12px] w-full">

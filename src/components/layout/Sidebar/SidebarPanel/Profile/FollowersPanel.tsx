@@ -4,7 +4,10 @@ import UserCard from '@/components/common/Card/UserCard';
 import { ScrollArea } from '@/components/common/Scrollarea';
 
 export default function FollowersPanel() {
-  const { setProfilePanelMode } = useProfileStore();
+  const { setProfilePanelMode, viewingUserId } = useProfileStore();
+
+  // 현재 다른 유저의 프로필을 보고 있는지 확인
+  const isViewingOtherUser = !!viewingUserId;
 
   // 임시 데이터
   const followers = [
@@ -55,7 +58,11 @@ export default function FollowersPanel() {
       <PanelHeader
         title="FOLLOWERS"
         showBackButton={true}
-        onBack={() => setProfilePanelMode('profile')}
+        onBack={() =>
+          setProfilePanelMode(
+            isViewingOtherUser ? 'otherUserProfile' : 'profile'
+          )
+        }
       />
       <div className="flex flex-col h-full overflow-hidden">
         <ScrollArea className="flex-1 min-h-0">

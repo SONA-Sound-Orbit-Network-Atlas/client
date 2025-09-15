@@ -32,6 +32,10 @@ export default function ProfilePanel() {
         ) : (
           <ProfileView />
         );
+      case 'otherUserFollowers':
+        return <FollowersPanel />;
+      case 'otherUserFollowings':
+        return <FollowingsPanel />;
       case 'editProfile':
         return <EditProfilePanel />;
       case 'likes':

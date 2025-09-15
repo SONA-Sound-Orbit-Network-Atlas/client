@@ -7,7 +7,9 @@ export type ProfilePanelMode =
   | 'likes'
   | 'followers'
   | 'followings'
-  | 'otherUserProfile';
+  | 'otherUserProfile'
+  | 'otherUserFollowers'
+  | 'otherUserFollowings';
 
 // 프로필 패널 상태 관련 타입
 export interface ProfilePanelState {
