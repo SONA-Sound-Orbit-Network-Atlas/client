@@ -8,7 +8,11 @@ export interface EditProfileFormData {
   about: string;
 }
 
-export function useEditProfile() {
+export interface UseEditProfileOptions {
+  onSuccess?: () => void;
+}
+
+export function useEditProfile(options?: UseEditProfileOptions) {
   const { userStore } = useUserStore();
   const updateProfileMutation = useUpdateUserProfile();
 
@@ -45,14 +49,16 @@ export function useEditProfile() {
 
   // 프로필 수정 핸들러
   const handleSaveChanges = async () => {
-    if (!validateForm()) return false;
+    if (!validateForm()) return;
 
     try {
       await updateProfileMutation.mutateAsync({
         username: formData.username.trim(),
         about: formData.about.trim(),
       });
-      return true; // 성공
+
+      // 성공 콜백 호출
+      options?.onSuccess?.();
     } catch (error: unknown) {
       console.error('프로필 수정 실패:', error);
 
@@ -72,7 +78,6 @@ export function useEditProfile() {
       } else {
         setError('프로필 수정에 실패했습니다. 다시 시도해주세요.');
       }
-      return false; // 실패
     }
   };
 

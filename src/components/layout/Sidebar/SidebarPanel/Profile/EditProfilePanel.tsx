@@ -15,7 +15,11 @@ import ErrorMessage from '@/components/common/ErrorMessage';
 export default function EditProfilePanel() {
   const { setProfilePanelMode } = useProfileStore();
   const { formData, setFormData, error, isLoading, handleSaveChanges } =
-    useEditProfile();
+    useEditProfile({
+      onSuccess: () => {
+        setProfilePanelMode('profile');
+      },
+    });
   const {
     formData: passwordFormData,
     setFormData: setPasswordFormData,
@@ -43,10 +47,7 @@ export default function EditProfilePanel() {
 
   // 프로필 수정 핸들러
   const handleSubmit = async () => {
-    const success = await handleSaveChanges();
-    if (success) {
-      setProfilePanelMode('profile');
-    }
+    await handleSaveChanges();
   };
 
   // 비밀번호 변경 핸들러
