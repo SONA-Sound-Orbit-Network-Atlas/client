@@ -22,7 +22,9 @@ export default function StellarIndex() {
   // true 수정 모드 / false 관람 모드
   const { stellarStore } = useStellarStore();
   const { userStore } = useUserStore();
-  const isStellarOwner = stellarStore.userId === userStore.userId;
+  // const isStellarOwner = stellarStore.userId === userStore.userId;
+  //test용
+  const isStellarOwner = true;
   console.log('stellarStore.userId : ', stellarStore.userId);
   console.log('userStore.userId : ', userStore.userId);
   console.log('isStellarOwner : ', isStellarOwner);
