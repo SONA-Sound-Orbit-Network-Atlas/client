@@ -25,13 +25,11 @@ export function useEditProfile(options?: UseEditProfileOptions) {
 
   // 현재 사용자 정보로 폼 초기화
   useEffect(() => {
-    if (userStore.username) {
-      setFormData((prev) => ({ ...prev, username: userStore.username }));
-    }
-    if (userStore.about) {
-      setFormData((prev) => ({ ...prev, about: userStore.about! }));
-    }
-  }, [userStore]);
+    setFormData({
+      username: userStore.username ?? '',
+      about: userStore.about ?? '',
+    });
+  }, [userStore.username, userStore.about]);
 
   // 폼 검증
   const validateForm = () => {
