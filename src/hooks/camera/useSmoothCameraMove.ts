@@ -38,7 +38,7 @@ export function useSmoothCameraMove({
   onMoveEndRef.current = onMoveEnd;
 
   const offset = useMemo(() => new THREE.Vector3(5, 10, 6), []);
-  const targetCameraPosRef = useRef<THREE.Vector3>(
+  const targetCameraPosRef = useRef<THREE.Vector3 | undefined>(
     targetPosition?.clone().add(offset)
   );
 
