@@ -36,9 +36,8 @@ export const userAPI = {
   },
 
   // 사용자 비밀번호 변경
-  updatePassword: async (data: UpdatePasswordRequest): Promise<any> => {
-    const response = await axiosInstance.patch('/users/password', data);
-    return response.data;
+  updatePassword: async (data: UpdatePasswordRequest): Promise<void> => {
+    await axiosInstance.patch('/users/password', data);
   },
 
   // 회원탈퇴

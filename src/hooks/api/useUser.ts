@@ -68,7 +68,7 @@ export function useUpdatePassword() {
   const queryClient = useQueryClient();
   const { userStore } = useUserStore();
 
-  return useMutation<any, AxiosError, UpdatePasswordRequest>({
+  return useMutation<void, AxiosError, UpdatePasswordRequest>({
     mutationFn: (data: UpdatePasswordRequest) => userAPI.updatePassword(data),
     onSuccess: () => {
       console.log('✅ 비밀번호가 변경되었습니다!');
