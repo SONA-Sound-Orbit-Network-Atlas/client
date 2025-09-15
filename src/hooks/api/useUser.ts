@@ -4,6 +4,7 @@ import {
   type UpdateProfileRequest,
   type UpdateProfileResponse,
   type UpdatePasswordRequest,
+  type DeactivateAccountRequest,
 } from '@/api/user';
 import type { User } from '@/types/user';
 import { useUserStore } from '@/stores/useUserStore';
@@ -85,6 +86,29 @@ export function useUpdatePassword() {
     },
     onError: (error: AxiosError) => {
       console.error('비밀번호 변경 실패:', error);
+    },
+  });
+}
+
+// 회원탈퇴
+export function useDeactivateAccount() {
+  const queryClient = useQueryClient();
+  const { clearUserStore } = useUserStore();
+
+  return useMutation<void, AxiosError, DeactivateAccountRequest>({
+    mutationFn: (data: DeactivateAccountRequest) =>
+      userAPI.deactivateAccount(data),
+    onSuccess: () => {
+      console.log('✅ 회원탈퇴가 완료되었습니다.');
+
+      // 사용자 스토어 초기화 (로그아웃 처리)
+      clearUserStore();
+
+      // 모든 쿼리 캐시 무효화
+      queryClient.clear();
+    },
+    onError: (error: AxiosError) => {
+      console.error('회원탈퇴 실패:', error);
     },
   });
 }

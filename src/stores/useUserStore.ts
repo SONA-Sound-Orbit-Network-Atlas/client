@@ -5,6 +5,7 @@ import type { User } from '@/types/user';
 interface UserStore {
   userStore: User;
   setUserStore: (userStore: User) => void;
+  clearUserStore: () => void;
   isLoggedIn: boolean;
   setIsLoggedIn: (isLoggedIn: boolean) => void;
 }
@@ -19,6 +20,12 @@ export const useUserStore = create<UserStore>((set) => ({
   userStore: initialUserStore,
   setUserStore: (userStore: User) => {
     set({ userStore });
+  },
+  clearUserStore: () => {
+    set({
+      userStore: initialUserStore,
+      isLoggedIn: false,
+    });
   },
   isLoggedIn: false,
   setIsLoggedIn: (isLoggedIn: boolean) => {

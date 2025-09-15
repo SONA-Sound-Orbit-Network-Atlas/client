@@ -1,6 +1,7 @@
 import { useProfileStore } from '@/stores/useProfileStore';
 import { useEditProfile } from '@/hooks/useEditProfile';
 import { useChangePassword } from '@/hooks/useChangePassword';
+import { useDeactivateAccount } from '@/hooks/useDeactivateAccount';
 import PanelHeader from '../PanelHeader';
 import Iconframe from '@/components/common/Iconframe';
 import { FiUser } from 'react-icons/fi';
@@ -26,6 +27,19 @@ export default function EditProfilePanel() {
       setProfilePanelMode('profile');
     },
   });
+
+  // 회원탈퇴 관련 로직
+  const {
+    showDeactivateForm,
+    deactivatePassword,
+    deactivateError,
+    passwordValidationError,
+    isDeactivateLoading,
+    handleDeactivateClick,
+    handleDeactivateCancel,
+    handlePasswordChange,
+    handleDeactivateSubmit,
+  } = useDeactivateAccount();
 
   // 프로필 수정 핸들러
   const handleSubmit = async () => {
@@ -181,10 +195,74 @@ export default function EditProfilePanel() {
                 </Button>
               </div>
             </div>
-            <div className="w-full">
-              <p className="text-text-muted text-sm mt-[24px] text-center">
-                DEACTIVATE ACCOUNT
-              </p>
+            {/* DEACTIVATE ACCOUNT */}
+            <div className="w-full mt-[24px] flex flex-col">
+              {showDeactivateForm ? (
+                <div className="p-4 border border-error/20 rounded-lg bg-error/5">
+                  <h3 className="text-error font-medium mb-4 text-center">
+                    DEACTIVATE ACCOUNT
+                  </h3>
+
+                  <TextField label="CONFIRMATION" htmlFor="deactivate-password">
+                    <TextInput
+                      type="password"
+                      placeholder="Enter your password"
+                      id="deactivate-password"
+                      value={deactivatePassword}
+                      onChange={(e) => handlePasswordChange(e.target.value)}
+                      className={passwordValidationError ? 'border-error' : ''}
+                    />
+                  </TextField>
+
+                  {/* 비밀번호 유효성 검사 에러 메시지 */}
+                  {passwordValidationError && (
+                    <div className="mt-2">
+                      <p className="text-error text-xs">
+                        {passwordValidationError}
+                      </p>
+                    </div>
+                  )}
+
+                  {/* 회원탈퇴 에러 메시지 */}
+                  {deactivateError && (
+                    <div className="mt-4">
+                      <ErrorMessage message={deactivateError} />
+                    </div>
+                  )}
+
+                  <div className="flex gap-1 mt-4">
+                    <Button
+                      color="secondary"
+                      size="sm"
+                      className="flex-1 bg-error/20 text-error border-error/30 hover:bg-error/30 hover:border-error/50"
+                      onClick={handleDeactivateSubmit}
+                      disabled={
+                        isDeactivateLoading ||
+                        !!passwordValidationError ||
+                        !deactivatePassword.trim()
+                      }
+                    >
+                      {isDeactivateLoading ? 'DEACTIVATING...' : 'CONFIRM'}
+                    </Button>
+                    <Button
+                      color="secondary"
+                      size="sm"
+                      className="flex-1"
+                      onClick={handleDeactivateCancel}
+                      disabled={isDeactivateLoading}
+                    >
+                      CANCEL
+                    </Button>
+                  </div>
+                </div>
+              ) : (
+                <p
+                  className="text-text-muted text-sm text-center cursor-pointer hover:text-error transition-colors"
+                  onClick={handleDeactivateClick}
+                >
+                  DEACTIVATE ACCOUNT
+                </p>
+              )}
             </div>
           </div>
         </ScrollArea>

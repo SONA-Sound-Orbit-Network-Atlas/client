@@ -16,6 +16,10 @@ export interface UpdatePasswordRequest {
   newPassword: string;
 }
 
+export interface DeactivateAccountRequest {
+  password: string;
+}
+
 export const userAPI = {
   // 사용자 프로필 조회
   getUserProfile: async (userId: string): Promise<User> => {
@@ -35,5 +39,10 @@ export const userAPI = {
   updatePassword: async (data: UpdatePasswordRequest): Promise<any> => {
     const response = await axiosInstance.patch('/users/password', data);
     return response.data;
+  },
+
+  // 회원탈퇴
+  deactivateAccount: async (data: DeactivateAccountRequest): Promise<void> => {
+    await axiosInstance.delete('/users', { data });
   },
 };
