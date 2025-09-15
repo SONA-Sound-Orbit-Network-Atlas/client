@@ -1,11 +1,9 @@
-import { detailStellarSystemsMock } from '@/mocks/data/stellarSystems';
 import { useSceneStore } from '@/stores/useSceneStore';
+import { useSelectedStellarStore } from '@/stores/useSelectedStellarStore';
+import { useStellarStore } from '@/stores/useStellarStore';
 import { useCallback } from 'react';
-import * as THREE from 'three';
 
-const getStellarSystemOnMock = (stellarSystemId: number) => {
-  return detailStellarSystemsMock[stellarSystemId];
-};
+import * as THREE from 'three';
 
 export function useStellarSystem() {
   // 선택한 항성계 변경
@@ -15,35 +13,37 @@ export function useStellarSystem() {
     setViewMode,
     setCameraTarget,
   } = useSceneStore();
-
+  const { setSelectedStellarId, setIdle } = useSelectedStellarStore();
+  const { stellarStore } = useStellarStore();
   // 항성계 뷰 진입
   const enterStellarSystemView = useCallback(
-    (stellarSystemId: number) => {
-      // 데이터 로딩
-      const mockStellarSystem = getStellarSystemOnMock(stellarSystemId);
-      const newCameraTarget = new THREE.Vector3(
-        ...mockStellarSystem.stellarSystemPos
-      );
+    (stellarSystemId: string) => {
+      console.log('enterStellarSystem', stellarSystemId);
+      // // 데이터 로딩
+      // const mockStellarSystem = getStellarSystemOnMock(stellarSystemId);
+      // const newCameraTarget = new THREE.Vector3(
+      //   ...mockStellarSystem.stellarSystemPos
+      // );
 
       // 모든 상태를 한 번에 업데이트
-      setSelectedStellarSystemId(stellarSystemId);
-      setSelectedStellarSystem(mockStellarSystem);
+      // setSelectedStellarSystemId(stellarSystemId);
+      setSelectedStellarId(stellarSystemId);
+
+      // setSelectedStellarSystem(mockStellarSystem);
+      const position = stellarStore.position ?? [0, 0, 0];
+      const newCameraTarget = new THREE.Vector3(...position);
       setCameraTarget(newCameraTarget);
-      setViewMode('StellarSystem');
+      // setViewMode('StellarSystem');
     },
-    [
-      setSelectedStellarSystemId,
-      setSelectedStellarSystem,
-      setViewMode,
-      setCameraTarget,
-    ]
+    [setSelectedStellarId, setCameraTarget, stellarStore]
   );
 
   const changeToGalaxyView = useCallback(() => {
-    setViewMode('Galaxy');
-    setSelectedStellarSystemId(null);
-    setSelectedStellarSystem(null);
-  }, [setViewMode, setSelectedStellarSystemId, setSelectedStellarSystem]);
+    // setViewMode('Galaxy');
+    setIdle();
+    // setSelectedStellarSystemId(null);
+    // setSelectedStellarSystem(null);
+  }, [setIdle]);
 
   return { enterStellarSystemView, changeToGalaxyView };
 }
