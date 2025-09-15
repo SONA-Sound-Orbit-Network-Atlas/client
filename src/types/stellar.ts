@@ -11,7 +11,8 @@ export type { PlanetProperties, PropertyDefinition, UIProperty, InstrumentRole }
 
 export interface StellarSystem {
   id: string;
-  name: string;
+  title: string;
+  galaxy_id: string; // 소속 갤럭시 ID 추가
 
   // 원작자 추적 정보 (백엔드 스키마 호환)
   owner_id?: string;           // 현재 소유자
@@ -53,7 +54,7 @@ export interface Planet {
 // === 생성/수정 DTO 타입 ===
 
 export interface CreateStellarSystemDto {
-  name: string;
+  title: string;
   description?: string;
 }
 
@@ -70,7 +71,7 @@ export interface CreatePlanetDto {
 }
 
 export interface UpdateStellarSystemDto {
-  name?: string;
+  title?: string;
   description?: string;
 }
 

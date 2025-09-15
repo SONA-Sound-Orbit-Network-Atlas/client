@@ -102,7 +102,8 @@ const mockPlanets: Planet[] = [
 // 완전한 스텔라 시스템
 export const mockStellarSystem: StellarSystem = {
   id: 'system_001',
-  name: 'SONA Demo System',
+  title: 'SONA Demo System',
+  galaxy_id: 'galaxy_001', // galaxy_id 추가
   star: mockStar,
   planets: mockPlanets,
   // 원작자 추적 정보 (실제 백엔드에서 제공될 정보들)
@@ -246,6 +247,7 @@ const mockClonedPlanets: Planet[] = [
 export const mockClonedStellarSystem: StellarSystem = {
   id: 'system_002',
   name: 'My Version of SONA Demo', // 사용자가 변경한 이름
+  galaxy_id: 'galaxy_002', // galaxy_id 추가
   star: mockClonedStar,
   planets: mockClonedPlanets,
   // 클론 추적 정보
