@@ -36,6 +36,7 @@ export default function useStellarSystemSelection() {
   // 패칭 완료 시 커밋
   useEffect(() => {
     if (status === 'success' && data) {
+      console.log('=============================data : ', data);
       setStellarStore(data);
       setSelectedStellarId(targetId);
       setTabValue('INFO');

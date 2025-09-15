@@ -1,15 +1,19 @@
 import Card from '@/components/common/Card/Card';
-import type { Object, Planet } from '@/types/stellar';
+import type { Star, Planet } from '@/types/stellar';
+import { mergeClassNames } from '@/utils/mergeClassNames';
 
 interface StellarCardProps {
-  data: Object;
+  data: Star | Planet;
   index: number;
   onClick: () => void;
   active: boolean;
+  className?: string;
+  title: string;
 }
 
-function isPlanet(obj: Object): obj is Planet {
-  return obj.planetType === 'PLANET';
+// true 반환하면 Planet 타입이다 => Planet에만 있는 고유 속성으로 판별해야 함
+function isPlanet(data: Star | Planet): data is Planet {
+  return (data as Planet).role !== undefined;
 }
 
 export default function StellarCard({
@@ -17,25 +21,28 @@ export default function StellarCard({
   index,
   onClick,
   active,
+  className,
+  title,
 }: StellarCardProps) {
+  const description = isPlanet(data) ? 'PLANET • ' + data.role : 'CENTRAL STAR';
+
   return (
-    <Card onClick={onClick} className={active ? 'border-secondary-300' : ''}>
+    <Card
+      role="button"
+      onClick={onClick}
+      className={mergeClassNames(
+        className,
+        active ? 'border-secondary-300' : ''
+      )}
+    >
       <div className="flex gap-3 items-center">
         <div
           className={`w-[24px] h-[24px] rounded-full border-[2px] border-[rgba(255,255,255,0.2)]`}
           style={{ backgroundColor: getPlanetColor(index) }}
         ></div>
         <div>
-          <strong className="text-text-white">{data.name}</strong>
-          <p className="text-text-muted">
-            {data.planetType} • {isPlanet(data) ? data.soundType + ' •' : ''}{' '}
-            SIZE{' '}
-            {
-              data.properties.find(
-                (property) => property.label === 'planetSize'
-              )?.value
-            }
-          </p>
+          <strong className="text-text-white">{title}</strong>
+          <p className="text-text-muted">{description}</p>
         </div>
       </div>
     </Card>

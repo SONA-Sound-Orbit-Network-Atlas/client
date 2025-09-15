@@ -19,14 +19,12 @@ export default function StellarIndex() {
   // 현재 선택된 stellarId
   const { mode } = useSelectedStellarStore();
 
-  // isStellarOwner : 현재 선택된 Stellar의 userId 가 현재 로그인된 userId와 일치하는가?
+  // isStellarOwner : 현재 선택된 Stellar의 owner_id 가 현재 로그인된 userId와 일치하는가?
   // true 수정 모드 / false 관람 모드
   const { stellarStore } = useStellarStore();
   const { userStore } = useUserStore();
-  const isStellarOwner = stellarStore.userId === userStore.id;
-  console.log('stellarStore.userId : ', stellarStore.userId);
-  console.log('userStore.id : ', userStore.id);
-  console.log('isStellarOwner : ', isStellarOwner);
+  const isStellarOwner = stellarStore.owner_id === userStore.id;
+  console.log('isStellarOwner', isStellarOwner);
 
   // Stellar 패널 Tab value 스토어
   const { tabValue, setTabValue } = useStellarTabStore();

@@ -6,6 +6,7 @@ import { ErrorBoundary } from 'react-error-boundary';
 import { useStellarStore } from '@/stores/useStellarStore';
 import { useSelectedObjectStore } from '@/stores/useSelectedObjectStore';
 import AddNewObjectBtn from './AddNewObjectBtn';
+import type { Star, Planet } from '@/types/stellar';
 
 export default function Objects() {
   return (
@@ -20,30 +21,40 @@ export default function Objects() {
 // API 결과 반영 완료
 function ObjectsContent() {
   const { selectedObjectId, setSelectedObjectId } = useSelectedObjectStore();
+  console.log('selectedObjectId ', selectedObjectId);
   const { stellarStore } = useStellarStore();
+  const starInfo: Star = stellarStore.star;
+  const planetInfo: Planet[] = stellarStore.planets;
+  const objectsInfo: (Star | Planet)[] = [starInfo, ...planetInfo];
 
-  const clickObjectHandler = (id: number) => {
-    setSelectedObjectId(id);
-  };
-
-  if (!stellarStore) return <div>No data</div>;
+  if (!objectsInfo) return <div>No data</div>;
 
   return (
     <div>
       <PanelTitle fontSize="large">
-        SYSTEM OBJECTS ({stellarStore.objects.length})
+        SYSTEM OBJECTS ({objectsInfo.length})
       </PanelTitle>
 
       <div className="space-y-3">
-        {stellarStore.objects.length > 0 ? (
-          stellarStore.objects.map((data, index) => {
+        {objectsInfo.length > 0 ? (
+          objectsInfo.map((data, index) => {
+            const title =
+              data.object_type === 'STAR'
+                ? stellarStore.name // ★ Star는 시스템 이름을 사용
+                : (data.name ?? 'UNTITLED'); // ★ Planet은 자기 name 사용
+
             return (
               <StellarCard
-                key={index}
+                key={data.id}
                 index={index}
                 data={data}
-                onClick={() => clickObjectHandler(data.planetId)}
-                active={selectedObjectId === data.planetId}
+                onClick={() => {
+                  setSelectedObjectId(data.id);
+                  console.log('data.id ', data.id);
+                }}
+                active={selectedObjectId === data.id}
+                className="cursor-pointer"
+                title={title}
               />
             );
           })

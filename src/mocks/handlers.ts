@@ -2,7 +2,7 @@
 import { http, HttpResponse } from 'msw';
 import galaxiesCommunity from './data/galaxiesCommunity';
 import galaxiesMy from './data/galaxiesMy';
-import { stellar } from './data/stellar';
+import { mockStellarSystem } from './data/stellar';
 import { mockFetch, mockFetchInfinite } from './utils';
 
 const isLoggedIn = true; // 로그인 여부 테스트용
@@ -23,12 +23,12 @@ export const handlers = [
     return HttpResponse.json({ email: 'bomin@example.com', username: 'bomin' });
   }),
 
+  // stellar 상세 정보 조회
+  mockFetch('/api/stellar-systems/compose/:stellarId', mockStellarSystem, 2000),
+
   // galaxy Community 리스트 조회 (infinite)
-  mockFetchInfinite('/galaxies/community', galaxiesCommunity, 3, 2000),
+  mockFetchInfinite('/api/stellar-systems/compose', galaxiesCommunity, 3, 2000),
 
   // galaxy My 리스트 조회 (infinite)
-  mockFetchInfinite('/galaxies/my', galaxiesMy, 3, 2000),
-
-  // stellar 정보 조회
-  mockFetch('/stellarSystems/:stellarId', stellar, 2000),
+  mockFetchInfinite('/api/stellar-systems/me/compose', galaxiesMy, 3, 2000),
 ];

@@ -9,16 +9,17 @@ export const galaxyAPI = {
   // 갤럭시 - community 목록 조회
   getGalaxyCommunityList: async (params: ParamsGetGalaxyCommunityList) => {
     const response = await axiosInstance.get<GalaxyCommunityData>(
-      '/galaxies/community',
+      '/api/stellar-systems/compose',
       { params }
     );
     return response.data;
   },
   // 갤럭시 - my 목록 조회
   getGalaxyMyList: async (params: ParamsGetGalaxyMyList) => {
-    const response = await axiosInstance.get<GalaxyMyData>('/galaxies/my', {
-      params,
-    });
+    const response = await axiosInstance.get<GalaxyMyData>(
+      '/api/stellar-systems/me/compose',
+      { params }
+    );
     return response.data;
   },
 };

@@ -2,43 +2,70 @@ import Button from '@/components/common/Button';
 import minMaxRandomNo from '@/utils/minMaxRandomNo';
 import { useSelectedObjectStore } from '@/stores/useSelectedObjectStore';
 import { useStellarStore } from '@/stores/useStellarStore';
+import type { Star } from '@/types/stellar';
+import type { Planet } from '@/types/stellar';
+import {
+  PLANET_PROPERTIES,
+  type PlanetProperties,
+} from '@/types/planetProperties';
+import { type StarProperties } from '@/types/starProperties';
 
 interface RandomProps {
-  properties: {
-    label: string;
-    value: number;
-    min: number;
-    max: number;
-  }[];
+  target: Star | Planet; // Star 또는 Planet 전체 객체
 }
 
-export default function Random({ properties }: RandomProps) {
+export default function Random({ target }: RandomProps) {
   const { selectedObjectId } = useSelectedObjectStore();
   const { stellarStore, setStellarStore } = useStellarStore();
-  if (!properties) return null;
+
+  if (!target) return null;
 
   const handleRandomClick = () => {
-    // min max 배열 생성
-    const minMaxArray = properties.map((data) => ({
-      min: data.min,
-      max: data.max,
-    }));
-    // min max 범위의 랜덤 숫자 생성
-    const randomNumbers = minMaxRandomNo(minMaxArray);
-    // planetProperties 와 동일한 형태의 데이터 생성
-    const randomProperties = properties.map((property, index) => ({
-      ...property,
-      value: randomNumbers[index],
-    }));
+    if ('spin' in target.properties) {
+      // === STAR 처리 ===
+      const randomized: StarProperties = {
+        spin: Math.floor(Math.random() * 101), // 0~100
+        brightness: Math.floor(Math.random() * 101), // 0~100
+        color: Math.floor(Math.random() * 361), // 0~360
+        size: Math.floor(Math.random() * 101), // 0~100
+      };
 
-    setStellarStore({
-      ...stellarStore,
-      objects: stellarStore.objects.map((object) =>
-        object.planetId === selectedObjectId
-          ? { ...object, properties: randomProperties }
-          : object
-      ),
-    });
+      setStellarStore({
+        ...stellarStore,
+        star: {
+          ...stellarStore.star!,
+          properties: randomized,
+        },
+      });
+    } else {
+      // === PLANET 처리 ===
+      // 1) PLANET_PROPERTIES에서 min/max 추출
+      const minMaxArray = Object.values(PLANET_PROPERTIES).map((def) => ({
+        min: def.min,
+        max: def.max,
+      }));
+
+      // 2) 랜덤 값 배열 생성
+      const randomNumbers = minMaxRandomNo(minMaxArray);
+
+      // 3) 랜덤 값들을 PlanetProperties 객체로 매핑
+      const randomized: PlanetProperties = Object.keys(
+        PLANET_PROPERTIES
+      ).reduce((acc, key, idx) => {
+        acc[key as keyof PlanetProperties] = randomNumbers[idx];
+        return acc;
+      }, {} as PlanetProperties);
+
+      // 4) 해당 planet 업데이트
+      setStellarStore({
+        ...stellarStore,
+        planets: stellarStore.planets.map((planet) =>
+          planet.id === selectedObjectId
+            ? { ...planet, properties: randomized }
+            : planet
+        ),
+      });
+    }
   };
 
   return (

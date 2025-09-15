@@ -1,64 +1,70 @@
+// src/stores/useStellarSystemStore.ts
 import { create } from 'zustand';
-import type { Object, StellarType } from '@/types/stellar';
+import type {
+  StellarSystem,
+  Star,
+  Planet,
+  InstrumentRole,
+} from '@/types/stellar';
+import type { StarProperties } from '@/types/starProperties';
+import type { PlanetProperties } from '@/types/planetProperties';
 
+/***** 1) 기본 프로퍼티 디폴트 *****/
+const defaultStarProps: StarProperties = {
+  spin: 120,
+  brightness: 1,
+  color: 1,
+  size: 1,
+};
+
+const defaultPlanetProps: PlanetProperties = {
+  size: 0.5,
+  color: 0,
+  brightness: 3,
+  distanceFromStar: 8,
+  orbitSpeed: 0.4,
+  rotationSpeed: 0.4,
+  eccentricity: 0.2,
+  tilt: 0,
+};
+
+/***** 2) 초기 스텔라 시스템 *****/
+export const initialStellarStore: StellarSystem = {
+  id: '',
+  name: 'CENTRAL STAR SYSTEM',
+  owner_id: '',
+  created_by_id: '',
+  original_author_id: '',
+  source_system_id: '',
+  created_via: 'MANUAL',
+  created_at: '',
+  updated_at: '',
+
+  star: {
+    id: 'star_001',
+    object_type: 'STAR',
+    system_id: '',
+    properties: defaultStarProps,
+    created_at: '',
+    updated_at: '',
+  },
+  planets: [],
+};
+
+/***** 3) 유틸: 임시 ID 생성 *****/
+// function genId(prefix: string = 'tmp'): string {
+//   return `${prefix}_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
+// }
+
+/***** 4) 스토어 타입 *****/
 interface StellarStore {
-  stellarStore: StellarType;
-  setStellarStore: (stellarStore: StellarType) => void;
+  stellarStore: StellarSystem;
+  setStellarStore: (stellarStore: StellarSystem) => void;
   setInitialStellarStore: (username: string) => void;
-  addNewObjectAndReturnId: () => number;
+  addNewObjectAndReturnId: () => string;
 }
 
-// 초기 stellar 데이터
-const initialStellarStore: StellarType = {
-  userId: '',
-  stellarId: '', // 백엔드 자동 생성
-  stellarName: 'CENTRAL STAR SYSTEM', // 백엔드 자동 생성
-  updatedAt: '', // 현재 시각 (초기값만 프론트에서 제공)
-  objects: [
-    {
-      name: 'CENTRAL STAR', // 수정 가능
-      planetType: 'CENTRAL STAR', // 수정 불가
-      planetId: 0, // 수정 불가
-      status: '', // 수정 불가
-      bpm: 0, // 수정 불가?
-      creator: '', // (초기값) 유저 api에서 가져오기
-      author: '', // (초기값) 유저 api에서 가져오기
-      createSource: 'ORIGINAL COMPOSITION',
-      originalSource: 'SONA STUDIO',
-      properties: [
-        { label: 'size', value: 0, min: 0, max: 100, unit: 1 },
-        { label: '게이지 2', value: 0, min: 0, max: 360, unit: 1 },
-        { label: '게이지 3', value: 0, min: 0, max: 100, unit: 1 },
-      ],
-    },
-  ],
-};
-
-// new 오브젝트 템플릿
-const newObjectTemplate: Object = {
-  name: 'NEW OBJECT',
-  planetType: 'PLANET',
-  planetId: 1,
-  status: 'ACTIVE',
-  soundType: 'LEAD',
-  created: '2021-01-02',
-  properties: [
-    { label: 'size', value: 0, min: 0, max: 100, unit: 1 },
-    { label: '게이지 2', value: 0, min: 0, max: 360, unit: 1 },
-    { label: '게이지 3', value: 0, min: 0, max: 100, unit: 1 },
-  ],
-};
-
-// 템플릿 복제 함수
-function cloneNewObject(nextId: number, index: number): Object {
-  return {
-    ...newObjectTemplate,
-    planetId: nextId,
-    name: `NEW OBJECT ${index}`, // 보기 좋게 넘버링
-    properties: newObjectTemplate.properties.map((p) => ({ ...p })),
-  };
-}
-
+// ===== 구현 =====
 export const useStellarStore = create<StellarStore>((set) => ({
   stellarStore: initialStellarStore,
 
@@ -66,35 +72,55 @@ export const useStellarStore = create<StellarStore>((set) => ({
 
   setInitialStellarStore: (username) =>
     set(() => {
-      const first = {
-        ...initialStellarStore.objects[0],
-        creator: username,
-        author: username,
-      };
+      // 작성자/소유자 계열 필드를 username 기반으로 세팅
+      const now = new Date().toISOString();
       return {
         stellarStore: {
           ...initialStellarStore,
-          objects: [first, ...initialStellarStore.objects.slice(1)],
+          owner_id: username,
+          created_by_id: username,
+          original_author_id: username,
+          updated_at: now,
+          star: {
+            ...(initialStellarStore.star as Star),
+            system_id: '',
+            properties: { ...defaultStarProps },
+            updated_at: now,
+          },
+          planets: [],
         },
       };
     }),
 
   addNewObjectAndReturnId: () => {
-    let createdId = 0;
+    let createdIndex = 0;
     set((state) => {
       const prev = state.stellarStore;
-      // 단순히 길이만큼 카운트
-      const nextIndex = prev.objects.length; // 0부터 시작
-      const newObj = cloneNewObject(nextIndex, nextIndex);
-      createdId = nextIndex;
+
+      // 새 planet 1개 추가
+      const newPlanet: Planet = {
+        id: 'planet_' + (prev.planets.length + 1),
+        object_type: 'PLANET',
+        system_id: prev.id || '', // 아직 없을 수 있음
+        name: `NEW PLANET ${prev.planets.length + 1}`,
+        role: 'DRUM' as InstrumentRole,
+        properties: { ...defaultPlanetProps },
+        created_at: '',
+        updated_at: new Date().toISOString(),
+      };
+
+      const nextPlanets = [...prev.planets, newPlanet];
+      createdIndex = nextPlanets.length;
 
       return {
         stellarStore: {
           ...prev,
-          objects: [...prev.objects, newObj],
+          planets: nextPlanets,
+          updated_at: new Date().toISOString(),
         },
       };
     });
-    return createdId; // 숫자 반환
+
+    return 'planet_' + createdIndex;
   },
 }));

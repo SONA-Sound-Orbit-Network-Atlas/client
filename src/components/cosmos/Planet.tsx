@@ -3,7 +3,7 @@
 import { useFrame } from '@react-three/fiber';
 import { useEffect, useRef, useState, useMemo } from 'react';
 import * as THREE from 'three';
-import type { Planet } from '@/types/stellar';
+import type { Planet } from '@/types/old_stellar';
 import { calculateOrbitPosition } from '@/utils/orbitCalculations';
 import { useSceneStore } from '@/stores/useSceneStore';
 import { useSelectedObjectStore } from '@/stores/useSelectedObjectStore';
