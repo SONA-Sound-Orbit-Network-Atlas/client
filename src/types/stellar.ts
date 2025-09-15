@@ -12,13 +12,20 @@ export type { PlanetProperties, PropertyDefinition, UIProperty, InstrumentRole }
 export interface StellarSystem {
   id: string;
   name: string;
-  description?: string;
+
+  // 원작자 추적 정보 (백엔드 스키마 호환)
+  owner_id?: string;           // 현재 소유자
+  created_by_id?: string;      // 최초 생성자
+  original_author_id?: string; // 원작자 (클론 시 승계)
+  source_system_id?: string;   // 원본 시스템 ID (클론인 경우)
+  created_via?: 'MANUAL' | 'CLONE'; // 생성 방식
+
   created_at?: string;
   updated_at?: string;
-  
+
   // 1:1 관계 - 전역 제어용 항성
   star?: Star;
-  
+
   // 1:N 관계 - 개별 악기들
   planets: Planet[];
 }

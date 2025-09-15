@@ -12,13 +12,10 @@ const mockStar: Star = {
   id: 'star_001',
   system_id: 'system_001',
   properties: createDefaultStarProperties({
-    spin: 65,        // BPM ~= 138
-    brightness: 80,  // Volume 80%
-    color: 120,      // Key/Scale 조합
-    size: 70,        // Complexity 3
-    temperature: 75,
-    luminosity: 85,
-    radius: 60
+    spin: 65,        // BPM ~= 138 (60 + 65*1.2 = 138)
+    brightness: 80,  // Master Tone Character (전체 음색 특성)
+    color: 120,      // Key/Scale 조합 (C# Major)
+    size: 70,        // Complexity Level 3 (70/33.33+1 = 3)
   }),
   created_at: '2024-01-01T00:00:00Z',
   updated_at: '2024-01-01T00:00:00Z'
@@ -106,9 +103,14 @@ const mockPlanets: Planet[] = [
 export const mockStellarSystem: StellarSystem = {
   id: 'system_001',
   name: 'SONA Demo System',
-  description: 'A complete stellar system demonstrating Star/Planet audio architecture',
   star: mockStar,
   planets: mockPlanets,
+  // 원작자 추적 정보 (실제 백엔드에서 제공될 정보들)
+  owner_id: 'user_stann_001',
+  created_by_id: 'user_stann_001', 
+  original_author_id: 'user_stann_001', // 원본이므로 생성자와 동일
+  source_system_id: undefined, // 원본이므로 undefined
+  created_via: 'MANUAL', // 수동 생성
   created_at: '2024-01-01T00:00:00Z',
   updated_at: '2024-01-01T00:00:00Z'
 };
@@ -172,19 +174,86 @@ export const stellar: StellarType = {
 // 개별 조회를 위한 함수들
 export function getMockStellarSystem(id: string): StellarSystem | undefined {
   if (id === 'system_001') return mockStellarSystem;
+  if (id === 'system_002') return mockClonedStellarSystem;
   return undefined;
 }
 
 export function getMockStar(systemId: string): Star | undefined {
   if (systemId === 'system_001') return mockStar;
+  if (systemId === 'system_002') return mockClonedStellarSystem.star;
   return undefined;
 }
 
 export function getMockPlanets(systemId: string): Planet[] {
   if (systemId === 'system_001') return mockPlanets;
+  if (systemId === 'system_002') return mockClonedStellarSystem.planets;
   return [];
 }
 
 export function getMockPlanet(planetId: string): Planet | undefined {
-  return mockPlanets.find(p => p.id === planetId);
+  const allPlanets = [...mockPlanets, ...(mockClonedStellarSystem.planets || [])];
+  return allPlanets.find(p => p.id === planetId);
 }
+
+// === 클론된 시스템 예시 (원작자 추적 데모용) ===
+
+const mockClonedStar: Star = {
+  id: 'star_002',
+  system_id: 'system_002',
+  properties: createDefaultStarProperties({
+    // 원본에서 약간 변형
+    spin: 70,        // 조금 더 빠르게
+    brightness: 85,  // 조금 더 밝게
+    color: 150,      // 다른 키로
+    size: 75,        // 조금 더 복잡하게
+  // temperature: 80,
+  // luminosity: 90,
+  // radius: 65
+  }),
+  created_at: '2024-01-02T00:00:00Z',
+  updated_at: '2024-01-02T00:00:00Z'
+};
+
+const mockClonedPlanets: Planet[] = [
+  {
+    id: 'planet_005',
+    system_id: 'system_002',
+    name: 'Enhanced Rhythm Core', // 이름 변경
+    role: 'DRUM',
+    properties: createDefaultProperties({
+      planetSize: 0.35, // 조금 키움
+      planetColor: 15,  // 색상 변경
+      planetBrightness: 3.8,
+      distanceFromStar: 5.2,
+      orbitSpeed: 0.85,
+      rotationSpeed: 0.95,
+      eccentricity: 0.25,
+      tilt: 50
+    }),
+    created_at: '2024-01-02T00:00:00Z',
+    updated_at: '2024-01-02T00:00:00Z'
+  },
+  // 나머지 행성들은 원본과 거의 동일하지만 ID와 system_id만 변경
+  ...mockPlanets.slice(1).map((planet, index) => ({
+    ...planet,
+    id: `planet_${String(6 + index).padStart(3, '0')}`,
+    system_id: 'system_002',
+    created_at: '2024-01-02T00:00:00Z',
+    updated_at: '2024-01-02T00:00:00Z'
+  }))
+];
+
+export const mockClonedStellarSystem: StellarSystem = {
+  id: 'system_002',
+  name: 'My Version of SONA Demo', // 사용자가 변경한 이름
+  star: mockClonedStar,
+  planets: mockClonedPlanets,
+  // 클론 추적 정보
+  owner_id: 'user_alice_002',         // 현재 소유자 (클론한 사람)
+  created_by_id: 'user_alice_002',    // 클론 실행자
+  original_author_id: 'user_stann_001', // 원작자 (원본 시스템의 생성자)
+  source_system_id: 'system_001',    // 원본 시스템 참조
+  created_via: 'CLONE',              // 클론으로 생성
+  created_at: '2024-01-02T00:00:00Z',
+  updated_at: '2024-01-02T00:00:00Z'
+};

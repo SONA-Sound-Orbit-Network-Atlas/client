@@ -99,7 +99,7 @@ export interface GeneratedPattern {
 // 전역 Star (항성) 상태 - 오디오 시스템 전용
 export interface StarGlobalState {
   bpm: number;         // 60-180 (Spin → BPM)
-  volume: number;      // 0-100 (Brightness → Volume)
+  toneCharacter: number; // 0-100 (Brightness → Master Tone Character)
   key: KeyName;        // Color → Key
   scale: ScaleName;    // Color → Scale
   complexity: Complexity; // Size → Complexity (1~3 → 패턴 밀도)

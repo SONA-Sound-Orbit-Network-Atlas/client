@@ -5,16 +5,11 @@ import type { PropertyDefinition, PropertyCategory } from './planetProperties';
 
 // 항성 전용 속성 (전역 제어)
 export interface StarProperties {
-  // SONA 지침: 항성 → 전역 음악 제어
+  // SONA 지침: 항성 → 전역 음악 제어 (MVP)
   spin: number;           // 0-100 → BPM (60-180)
-  brightness: number;     // 0-100 → Volume (0-100)  
+  brightness: number;     // 0-100 → Master Tone Character
   color: number;          // 0-360 → Key/Scale
   size: number;           // 0-100 → Complexity (1-3)
-  
-  // 추가 시각적 속성 (UI용)
-  temperature?: number;   // 0-100 (항성 색온도)
-  luminosity?: number;    // 0-100 (항성 광도) 
-  radius?: number;        // 0-100 (항성 반지름)
 }
 
 // 항성 속성 설정 (전역 제어용)
@@ -38,7 +33,7 @@ export const STAR_PROPERTIES: Record<string, PropertyDefinition> = {
   brightness: {
     key: 'brightness',
     label: '항성 밝기',
-    description: '항성의 밝기 (전체 볼륨 결정)',
+    description: '항성의 밝기 (전체 음색 특성 결정 - 어두우면 따뜻하고 부드러운 톤, 밝으면 선명하고 날카로운 톤)',
     category: 'audio',
     min: 0,
     max: 100,
@@ -47,7 +42,7 @@ export const STAR_PROPERTIES: Record<string, PropertyDefinition> = {
     unit: '%',
     controlType: 'slider',
     audioTargets: [
-      { name: 'volume', weight: 1.0, transform: (n) => n } // 0-100 Volume
+      { name: 'toneCharacter', weight: 1.0, transform: (n) => n } // 0-100 Tone Character
     ]
   },
 
@@ -84,45 +79,7 @@ export const STAR_PROPERTIES: Record<string, PropertyDefinition> = {
     ]
   },
 
-  // 추가 시각적 속성들
-  temperature: {
-    key: 'temperature',
-    label: '항성 온도',
-    description: '항성의 표면 온도 (색온도)',
-    category: 'visual',
-    min: 0,
-    max: 100,
-    step: 1,
-    defaultValue: 50,
-    unit: '%',
-    controlType: 'slider'
-  },
 
-  luminosity: {
-    key: 'luminosity',
-    label: '항성 광도',
-    description: '항성의 총 광량',
-    category: 'visual',
-    min: 0,
-    max: 100,
-    step: 1,
-    defaultValue: 50,
-    unit: '%',
-    controlType: 'slider'
-  },
-
-  radius: {
-    key: 'radius',
-    label: '항성 반지름',
-    description: '항성의 물리적 크기',
-    category: 'visual',
-    min: 0,
-    max: 100,
-    step: 1,
-    defaultValue: 50,
-    unit: '%',
-    controlType: 'slider'
-  }
 };
 
 // === 유틸리티 함수들 ===

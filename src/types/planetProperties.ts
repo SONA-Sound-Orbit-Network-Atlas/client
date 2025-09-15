@@ -8,6 +8,12 @@ export type ControlType = 'slider' | 'color' | 'select' | 'toggle';
 export type InstrumentRole = 'DRUM' | 'BASS' | 'CHORD' | 'MELODY' | 'ARPEGGIO' | 'PAD';
 
 // 각 속성의 완전한 설정 정보
+//
+// audioTargets 주석:
+//   audioTargets는 "이 속성이 오디오 엔진의 어떤 파라미터에 매핑되는지"를 선언적으로 명시하는 용도입니다.
+//   실제 오디오 파라미터 적용(값 변환, Tone.js 등)은 audio 시스템 코드에서 처리합니다.
+//   즉, audioTargets는 구조와 의도를 문서화하는 선언적 정보이며, 데이터/오디오 처리 로직은 포함하지 않습니다.
+//
 export interface PropertyDefinition {
   // 기본 정보
   key: string;
