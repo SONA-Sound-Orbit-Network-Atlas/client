@@ -13,6 +13,7 @@ import { useStellarTabStore } from '@/stores/useStellarTabStore';
 import { useSelectedStellarStore } from '@/stores/useSelectedStellarStore';
 import SelectRequired from './SelectRequired';
 import { ScrollArea } from '@/components/common/Scrollarea';
+import AudioPlayer from './audioPlayer/Index';
 
 export default function StellarIndex() {
   // 현재 선택된 stellarId
@@ -37,41 +38,44 @@ export default function StellarIndex() {
           <SelectRequired />
         </div>
       ) : (
-        <Tabs
-          className="w-full h-full flex flex-col overflow-hidden"
-          defaultValue={tabValue}
-          value={tabValue}
-          onValueChange={(v) => setTabValue(v as typeof tabValue)}
-        >
-          <TabsList className="grid w-full [grid-template-columns:repeat(3,minmax(max-content,1fr))] gap-0 shrink-0">
-            <TabsTrigger value="INFO">INFO</TabsTrigger>
-            <TabsTrigger
-              value="OBJECTS"
-              disabled={!isStellarOwner && mode === 'view'}
-            >
-              OBJECTS
-            </TabsTrigger>
-            <TabsTrigger
-              value="PROPERTIES"
-              disabled={!isStellarOwner && mode === 'view'}
-            >
-              PROPERTIES
-            </TabsTrigger>
-          </TabsList>
-          <div className="flex-1 min-h-0">
-            <ScrollArea className="h-full">
-              <TabsContent value="INFO" className="p-4">
-                <Info isStellarOwner={isStellarOwner} />
-              </TabsContent>
-              <TabsContent value="OBJECTS" className="p-4">
-                <Objects />
-              </TabsContent>
-              <TabsContent value="PROPERTIES" className="p-4">
-                <Properties />
-              </TabsContent>
-            </ScrollArea>
-          </div>
-        </Tabs>
+        <div className="w-full h-full flex flex-col">
+          <Tabs
+            className="w-full h-full flex flex-col overflow-hidden flex-1"
+            defaultValue={tabValue}
+            value={tabValue}
+            onValueChange={(v) => setTabValue(v as typeof tabValue)}
+          >
+            <TabsList className="grid w-full [grid-template-columns:repeat(3,minmax(max-content,1fr))] gap-0 shrink-0">
+              <TabsTrigger value="INFO">INFO</TabsTrigger>
+              <TabsTrigger
+                value="OBJECTS"
+                disabled={!isStellarOwner && mode === 'view'}
+              >
+                OBJECTS
+              </TabsTrigger>
+              <TabsTrigger
+                value="PROPERTIES"
+                disabled={!isStellarOwner && mode === 'view'}
+              >
+                PROPERTIES
+              </TabsTrigger>
+            </TabsList>
+            <div className="flex-1 min-h-0">
+              <ScrollArea className="h-full">
+                <TabsContent value="INFO" className="p-4">
+                  <Info isStellarOwner={isStellarOwner} />
+                </TabsContent>
+                <TabsContent value="OBJECTS" className="p-4">
+                  <Objects />
+                </TabsContent>
+                <TabsContent value="PROPERTIES" className="p-4">
+                  <Properties />
+                </TabsContent>
+              </ScrollArea>
+            </div>
+          </Tabs>
+          <AudioPlayer className="w-full h-[49px] border-t border-gray-border" />
+        </div>
       )}
     </>
   );

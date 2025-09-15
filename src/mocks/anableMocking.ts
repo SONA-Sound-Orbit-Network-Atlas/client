@@ -6,6 +6,12 @@ export default async function enableMocking() {
     프로덕션 빌드 (npm run build): false */
   if (!import.meta.env.DEV) return;
 
+  // MSW 비활성화 옵션 (실제 API 테스트 시)
+  if (import.meta.env.VITE_USE_MOCK === 'false') {
+    console.log('MSW disabled - using real API');
+    return;
+  }
+
   const { worker } = await import('./browser');
 
   await worker.start({

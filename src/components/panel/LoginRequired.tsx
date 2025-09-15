@@ -1,10 +1,10 @@
 import { FiUser } from 'react-icons/fi';
 import Iconframe from '@/components/common/Iconframe';
 import Button from '@/components/common/Button';
-import { useSidebarStore } from '@/stores/sidebarStore';
+import { useSidebarStore } from '@/stores/useSidebarStore';
 
 export default function LoginRequired() {
-  const { setProfilePanelMode } = useSidebarStore();
+  const { openSecondarySidebar } = useSidebarStore();
   return (
     <div>
       <div className="flex flex-col items-center justify-center gap-4">
@@ -26,7 +26,7 @@ export default function LoginRequired() {
         className="mt-6 w-full"
         onClick={() => {
           // sidebar 스토어 값을 변경함에 따라 => 로그인 패널이 열려야 함
-          setProfilePanelMode('login');
+          openSecondarySidebar('profile');
         }}
       >
         + SIGN IN

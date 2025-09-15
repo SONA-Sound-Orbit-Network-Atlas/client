@@ -10,6 +10,12 @@ const axiosInstance = axios.create({
   },
 });
 
+// 디버깅용 로그
+console.log('🔍 Axios 설정 정보:');
+console.log('- VITE_API_BASE_URL:', import.meta.env.VITE_API_BASE_URL);
+console.log('- Axios baseURL:', axiosInstance.defaults.baseURL);
+console.log('- MSW 사용 여부:', import.meta.env.VITE_USE_MOCK);
+
 // 요청 인터셉터: accessToken 자동 삽입
 axiosInstance.interceptors.request.use(
   (config) => {

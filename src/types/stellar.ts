@@ -40,6 +40,7 @@ export type Object = CentralStar | Planet;
 export interface StellarType {
   userId: string;
   stellarId: string;
+  position?: [number, number, number];
   stellarName?: string;
   updatedAt?: string;
   creator?: string;

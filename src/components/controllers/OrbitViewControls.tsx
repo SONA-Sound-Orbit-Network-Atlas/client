@@ -1,10 +1,10 @@
 import { OrbitControls } from '@react-three/drei';
 import type { OrbitControls as OrbitControlsImpl } from 'three-stdlib';
-import * as THREE from 'three';
 import { useRef, useCallback, useState } from 'react';
 import { useSmoothCameraMove } from '@/hooks/camera/useSmoothCameraMove';
 import { VIEW_MODE_CONFIG } from '@/constants/viewModeConfig';
 import { useSceneStore } from '@/stores/useSceneStore';
+import { useSelectedStellarStore } from '@/stores/useSelectedStellarStore';
 
 /**
  * X,Z축 이동
@@ -13,15 +13,10 @@ import { useSceneStore } from '@/stores/useSceneStore';
  * @returns 카메라 및 이동 제어 컴포넌트
  */
 
-interface OrbitViewControlsProps {
-  targetPosition: THREE.Vector3;
-}
-
-export default function OrbitViewControls({
-  targetPosition,
-}: OrbitViewControlsProps) {
+export default function OrbitViewControls() {
   const controls = useRef<OrbitControlsImpl>(null);
-  const { cameraIsMoving, viewMode } = useSceneStore();
+  const { cameraIsMoving } = useSceneStore();
+  const { mode } = useSelectedStellarStore();
   const [controlsReady, setControlsReady] = useState(false);
 
   // OrbitControls ref 콜백
@@ -37,7 +32,6 @@ export default function OrbitViewControls({
 
   // 카메라 이동 로직
   useSmoothCameraMove({
-    targetPosition,
     controlsRef: shouldRunAnimation ? controls.current : null,
     duration: VIEW_MODE_CONFIG.transition.galaxyToStellar.duration,
   });
@@ -45,7 +39,7 @@ export default function OrbitViewControls({
   return (
     <OrbitControls
       ref={controlsRefCallback}
-      enabled={viewMode === 'StellarSystem'}
+      enabled={mode === 'view' || mode === 'create'}
       enableDamping={!cameraIsMoving} // 카메라 이동 중에는 damping 비활성화
       dampingFactor={0.05}
       enableRotate={!cameraIsMoving} // 카메라 이동 중에는 회전 비활성화

@@ -4,9 +4,9 @@ import * as THREE from 'three';
 import { useRef, useEffect, useMemo } from 'react';
 import type { OrbitControls as OrbitControlsImpl } from 'three-stdlib';
 import { useSceneStore } from '@/stores/useSceneStore';
+import { useStellarStore } from '@/stores/useStellarStore';
 
 interface UseSmoothCameraMoveProps {
-  targetPosition: THREE.Vector3; // 이동 목표 포지션
   controlsRef: OrbitControlsImpl | null | undefined;
   duration?: number; // 카메라 이동 시간
   onMoveEnd?: () => void;
@@ -14,7 +14,6 @@ interface UseSmoothCameraMoveProps {
 }
 
 export function useSmoothCameraMove({
-  targetPosition,
   controlsRef,
   duration = 2,
   onMoveEnd,
@@ -24,6 +23,11 @@ export function useSmoothCameraMove({
   const isMovingRef = useRef<boolean>(false);
   const startTimeRef = useRef<number>(0);
   const { camera } = useThree();
+  const { stellarStore } = useStellarStore();
+  const targetPosition = useMemo(() => {
+    if (!stellarStore.position) return undefined;
+    return new THREE.Vector3(...stellarStore.position);
+  }, [stellarStore.position]);
 
   // 콜백 함수들을 ref로 저장
   const onMoveStartRef = useRef(onMoveStart);
@@ -34,14 +38,14 @@ export function useSmoothCameraMove({
   onMoveEndRef.current = onMoveEnd;
 
   const offset = useMemo(() => new THREE.Vector3(5, 10, 6), []);
-  const targetCameraPosRef = useRef<THREE.Vector3>(
-    targetPosition.clone().add(offset)
+  const targetCameraPosRef = useRef<THREE.Vector3 | undefined>(
+    targetPosition?.clone().add(offset)
   );
 
   useEffect(() => {
     if (targetPosition && controlsRef) {
       // 새로운 타겟 위치 업데이트
-      targetCameraPosRef.current.copy(targetPosition.clone().add(offset));
+      targetCameraPosRef.current?.copy(targetPosition.clone().add(offset));
 
       // 애니메이션 시작
       isMovingRef.current = true;
@@ -52,13 +56,18 @@ export function useSmoothCameraMove({
   }, [targetPosition, offset, controlsRef, setCameraIsMoving]);
 
   useFrame((_, deltaTime) => {
-    if (targetPosition && isMovingRef.current && controlsRef) {
+    if (
+      targetPosition &&
+      targetCameraPosRef.current &&
+      isMovingRef.current &&
+      controlsRef
+    ) {
       startTimeRef.current += deltaTime;
       const progress = Math.min(startTimeRef.current / duration, 1.0);
       const easedProgress = easeInOutCubic(progress);
 
       // 카메라 위치를 부드럽게 보간
-      camera.position.lerp(targetCameraPosRef.current, easedProgress * 0.1);
+      camera.position.lerp(targetCameraPosRef.current!, easedProgress * 0.1);
 
       // 컨트롤 타겟도 부드럽게 보간
       if (controlsRef.target) {
@@ -66,7 +75,7 @@ export function useSmoothCameraMove({
       }
 
       // 애니메이션 완료 체크 (거리와 시간 모두 고려)
-      const distance = camera.position.distanceTo(targetCameraPosRef.current);
+      const distance = camera.position.distanceTo(targetCameraPosRef.current!);
       if (distance < 0.1 || progress >= 1.0) {
         isMovingRef.current = false;
         setCameraIsMoving(false);

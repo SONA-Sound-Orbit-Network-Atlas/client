@@ -6,7 +6,8 @@ import {
   FiUserCheck,
 } from 'react-icons/fi';
 import { IoPlanetOutline } from 'react-icons/io5';
-import { useProfileStore } from '@/stores/profileStore';
+import { useProfileStore } from '@/stores/useProfileStore';
+import { useLogout } from '@/hooks/api/useAuth';
 import Iconframe from '@/components/common/Iconframe';
 import Button from '@/components/common/Button';
 import Card from '@/components/common/Card/Card';
@@ -15,6 +16,7 @@ import { ScrollArea } from '@/components/common/Scrollarea';
 
 export default function ProfileView() {
   const { setProfilePanelMode } = useProfileStore();
+  const logoutMutation = useLogout();
 
   // 임시 데이터
   const profile = {
@@ -34,6 +36,10 @@ export default function ProfileView() {
 
   const handleFollowingsClick = () => {
     setProfilePanelMode('followings');
+  };
+
+  const handleLogout = () => {
+    logoutMutation.mutate();
   };
 
   return (
@@ -113,9 +119,15 @@ export default function ProfileView() {
         </div>
       </ScrollArea>
       <div className="flex-shrink-0 p-6 border-t border-gray-border">
-        <Button color="tertiary" size="lg" className="w-full">
+        <Button
+          color="tertiary"
+          size="lg"
+          className="w-full"
+          onClick={handleLogout}
+          disabled={logoutMutation.isPending}
+        >
           <FiLogOut />
-          SIGN OUT
+          {logoutMutation.isPending ? 'SIGNING OUT...' : 'SIGN OUT'}
         </Button>
       </div>
     </div>
