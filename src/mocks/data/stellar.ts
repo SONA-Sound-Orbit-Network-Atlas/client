@@ -117,11 +117,11 @@ export const mockStellarSystem: StellarSystem = {
   galaxy_id: 'galaxy_001', // galaxy_id 추가
   star: mockStar,
   planets: mockPlanets,
-  // 원작자 추적 정보 (실제 백엔드에서 제공될 정보들)
-  owner_id: 'user_stann_001',
-  created_by_id: 'user_stann_001',
-  original_author_id: 'user_stann_001', // 원본이므로 생성자와 동일
-  source_system_id: undefined, // 원본이므로 undefined
+  // 원작자 추적 정보 (새로운 필드명 사용)
+  creator_id: 'user_stann_001',         // 현재 소유자
+  author_id: 'user_stann_001',          // 최초 생성자 (원본이므로 생성자와 동일)
+  create_source_id: undefined,          // 클론한 스텔라 (원본이므로 undefined)
+  original_source_id: undefined,        // 최초 스텔라 (원본이므로 undefined)
   created_via: 'MANUAL', // 수동 생성
   created_at: '2024-01-01T00:00:00Z',
   updated_at: '2024-01-01T00:00:00Z',
@@ -267,11 +267,11 @@ export const mockClonedStellarSystem: StellarSystem = {
   galaxy_id: 'galaxy_002', // galaxy_id 추가
   star: mockClonedStar,
   planets: mockClonedPlanets,
-  // 클론 추적 정보
-  owner_id: 'user_alice_002', // 현재 소유자 (클론한 사람)
-  created_by_id: 'user_alice_002', // 클론 실행자
-  original_author_id: 'user_stann_001', // 원작자 (원본 시스템의 생성자)
-  source_system_id: 'system_001', // 원본 시스템 참조
+  // 클론 추적 정보 (새로운 필드명 사용)
+  creator_id: 'user_alice_002',         // 현재 소유자 (클론한 사람)
+  author_id: 'user_stann_001',          // 최초 생성자 (원작자)
+  create_source_id: 'system_001',       // 클론한 스텔라 (원본 시스템 참조)
+  original_source_id: 'system_001',     // 최초 스텔라 (이 경우 원본과 같음)
   created_via: 'CLONE', // 클론으로 생성
   created_at: '2024-01-02T00:00:00Z',
   updated_at: '2024-01-02T00:00:00Z',
