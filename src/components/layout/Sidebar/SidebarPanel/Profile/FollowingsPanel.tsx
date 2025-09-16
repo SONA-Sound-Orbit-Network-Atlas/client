@@ -1,45 +1,49 @@
-import { useProfileStore } from '@/stores/useProfileStore';
+import {
+  navigateToOtherUserProfile,
+  navigateBack,
+} from '@/utils/profileNavigation';
 import PanelHeader from '../PanelHeader';
 import UserCard from '@/components/common/Card/UserCard';
 import { ScrollArea } from '@/components/common/Scrollarea';
 
 export default function FollowingsPanel() {
-  const { setProfilePanelMode, viewingUserId } = useProfileStore();
-
-  // 현재 다른 유저의 프로필을 보고 있는지 확인
-  const isViewingOtherUser = !!viewingUserId;
-
-  // 임시 데이터
+  // 테스트용 하드코딩된 팔로잉 데이터
   const followings = [
     {
-      id: 1,
-      username: 'Following1',
+      id: 201,
+      username: 'Grace',
       isFollowing: true,
       isMutualFollow: true, // 서로 팔로우
     },
     {
-      id: 2,
-      username: 'Following2',
+      id: 202,
+      username: 'Henry',
       isFollowing: true,
       isMutualFollow: false,
     },
     {
-      id: 3,
-      username: 'Following3',
+      id: 203,
+      username: 'Ivy',
       isFollowing: true,
       isMutualFollow: true, // 서로 팔로우
     },
     {
-      id: 4,
-      username: 'Following4',
+      id: 204,
+      username: 'Jack',
       isFollowing: true,
       isMutualFollow: false,
     },
     {
-      id: 5,
-      username: 'Following5',
+      id: 205,
+      username: 'Kate',
       isFollowing: true,
       isMutualFollow: true, // 서로 팔로우
+    },
+    {
+      id: 206,
+      username: 'Liam',
+      isFollowing: true,
+      isMutualFollow: false,
     },
   ];
 
@@ -48,16 +52,16 @@ export default function FollowingsPanel() {
     // TODO: API 호출로 언팔로우 처리
   };
 
+  const handleUserClick = (userId: number) => {
+    navigateToOtherUserProfile(userId);
+  };
+
   return (
     <>
       <PanelHeader
         title="FOLLOWINGS"
         showBackButton={true}
-        onBack={() =>
-          setProfilePanelMode(
-            isViewingOtherUser ? 'otherUserProfile' : 'profile'
-          )
-        }
+        onBack={navigateBack}
       />
       <div className="flex flex-col h-full overflow-hidden">
         <ScrollArea className="flex-1 min-h-0">
@@ -74,6 +78,7 @@ export default function FollowingsPanel() {
                   isFollowing={following.isFollowing}
                   isMutualFollow={following.isMutualFollow}
                   onUnfollow={handleUnfollow}
+                  onClick={handleUserClick}
                 />
               ))}
             </div>

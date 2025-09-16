@@ -1,11 +1,12 @@
 import { useProfileStore } from '@/stores/useProfileStore';
+import { navigateBack } from '@/utils/profileNavigation';
 import PanelHeader from '../PanelHeader';
 import CardItem from '@/components/panel/galaxy/community/CardItem';
 import { ScrollArea } from '@/components/common/Scrollarea';
 import type { GalaxyCommunityListData } from '@/types/galaxyCommunity';
 
 export default function LikesPanel() {
-  const { setProfilePanelMode, viewingUserId } = useProfileStore();
+  const { viewingUserId } = useProfileStore();
 
   // 현재 다른 유저의 프로필을 보고 있는지 확인
   const isViewingOtherUser = !!viewingUserId;
@@ -63,11 +64,7 @@ export default function LikesPanel() {
       <PanelHeader
         title={isViewingOtherUser ? 'LIKES' : 'MY LIKES'}
         showBackButton={true}
-        onBack={() =>
-          setProfilePanelMode(
-            isViewingOtherUser ? 'otherUserProfile' : 'profile'
-          )
-        }
+        onBack={navigateBack}
       />
       <div className="flex flex-col h-full overflow-hidden">
         <ScrollArea className="flex-1 min-h-0">

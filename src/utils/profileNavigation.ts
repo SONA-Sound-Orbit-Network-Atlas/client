@@ -5,18 +5,43 @@ import { useProfileStore } from '@/stores/useProfileStore';
  * @param userId - 보려는 유저의 ID
  */
 export const navigateToOtherUserProfile = (userId: number) => {
-  const { setProfilePanelMode, setViewingUserId } = useProfileStore.getState();
+  const { setProfilePanelMode, setViewingUserId, pushNavigationHistory } =
+    useProfileStore.getState();
+
+  // 현재 상태를 히스토리에 추가
+  pushNavigationHistory();
 
   setViewingUserId(userId);
   setProfilePanelMode('otherUserProfile');
 };
 
 /**
- * 다른 유저 프로필에서 나가기 (본인 프로필로 돌아가기)
+ * 이전 화면으로 돌아가기 (히스토리 기반)
+ */
+export const navigateBack = () => {
+  const { popNavigationHistory } = useProfileStore.getState();
+
+  const previousState = popNavigationHistory();
+
+  // 히스토리가 없으면 기본 프로필로 돌아가기
+  if (!previousState) {
+    const { setProfilePanelMode, setViewingUserId } =
+      useProfileStore.getState();
+    setViewingUserId(null);
+    setProfilePanelMode('profile');
+  }
+};
+
+/**
+ * 다른 유저 프로필에서 나가기 (본인 프로필로 돌아가기) - 레거시 함수
+ * @deprecated navigateBack()을 사용하세요
  */
 export const navigateBackToOwnProfile = () => {
-  const { setProfilePanelMode, setViewingUserId } = useProfileStore.getState();
-
-  setViewingUserId(null);
-  setProfilePanelMode('profile');
+  navigateBack();
 };
+
+// 테스트용: 전역 함수로 등록하여 콘솔에서 호출 가능
+if (typeof window !== 'undefined') {
+  (window as any).testNavigateToUser = navigateToOtherUserProfile;
+  (window as any).testNavigateBack = navigateBackToOwnProfile;
+}
