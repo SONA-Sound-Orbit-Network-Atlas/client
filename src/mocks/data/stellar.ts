@@ -125,6 +125,7 @@ export const mockStellarSystem: StellarSystem = {
   created_via: 'MANUAL', // 수동 생성
   created_at: '2024-01-01T00:00:00Z',
   updated_at: '2024-01-01T00:00:00Z',
+  position: [0, 0, 0],
 };
 
 // === 레거시 호환성 유지 ===
@@ -275,4 +276,5 @@ export const mockClonedStellarSystem: StellarSystem = {
   created_via: 'CLONE', // 클론으로 생성
   created_at: '2024-01-02T00:00:00Z',
   updated_at: '2024-01-02T00:00:00Z',
+  position: [0, 0, 0],
 };

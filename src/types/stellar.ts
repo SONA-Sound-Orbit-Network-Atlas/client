@@ -40,7 +40,7 @@ export interface StellarSystem {
   // 1:N 관계 - 개별 악기들
   planets: Planet[];
 
-  // 좌표
+  // 위치
   position: [number, number, number];
 }
 

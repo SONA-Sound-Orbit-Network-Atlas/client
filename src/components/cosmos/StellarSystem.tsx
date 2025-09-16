@@ -10,9 +10,11 @@ import { useSelectedStellarStore } from '@/stores/useSelectedStellarStore';
 export default function StellarSystem({
   stellarSystemPos,
   id,
+  visible = true,
 }: {
   stellarSystemPos: [number, number, number];
   id: string;
+  visible?: boolean;
 }) {
   const { stellarStore } = useStellarStore();
   const { selectedStellarId } = useSelectedStellarStore();
@@ -24,7 +26,7 @@ export default function StellarSystem({
   }
 
   return (
-    <group ref={ref} position={stellarSystemPos}>
+    <group ref={ref} position={stellarSystemPos} visible={visible}>
       {/* 항성 렌더링 */}
       {stellarStore.star && (
         <Star star={stellarStore.star} position={[0, 0, 0]} />

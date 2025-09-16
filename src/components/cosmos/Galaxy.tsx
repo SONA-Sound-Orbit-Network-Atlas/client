@@ -11,10 +11,10 @@ const dummyStellarList = [
   { id: 'sys-001', stellarSystemPos: [0, 0, 0], starColor: 0 },
   { id: 'sys-002', stellarSystemPos: [20, 0, 0], starColor: 60 },
   { id: 'sys-003', stellarSystemPos: [-30, 0, 0], starColor: 120 },
-  { id: 'sys-004', stellarSystemPos: [0, 1, 30], starColor: 180 },
-  { id: 'sys-005', stellarSystemPos: [0, -2, 10], starColor: 240 },
-  { id: 'sys-006', stellarSystemPos: [0, 0, 120], starColor: 300 },
-  { id: 'sys-007', stellarSystemPos: [0, 0, -130], starColor: 45 },
+  { id: 'sys-004', stellarSystemPos: [0, -20, 30], starColor: 180 },
+  { id: 'sys-005', stellarSystemPos: [0, 20, 10], starColor: 240 },
+  { id: 'sys-006', stellarSystemPos: [0, 0, 400], starColor: 300 },
+  { id: 'sys-007', stellarSystemPos: [0, 0, -2000], starColor: 45 },
 ];
 
 export default function Galaxy() {

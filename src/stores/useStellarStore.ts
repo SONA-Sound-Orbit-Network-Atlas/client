@@ -14,7 +14,7 @@ const defaultStarProps: StarProperties = {
   spin: 120,
   brightness: 1,
   color: 1,
-  size: 1,
+  size: 1.0, // 적절한 크기 범위 (0.1 ~ 2.0)
 };
 
 const defaultPlanetProps: PlanetProperties = {

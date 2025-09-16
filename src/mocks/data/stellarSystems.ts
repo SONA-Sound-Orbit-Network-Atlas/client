@@ -9,7 +9,7 @@ const createMockStarProperties = (
   spin: 50,
   brightness: 75,
   color: 60,
-  size: 2,
+  size: 60,
   ...overrides,
 });
 
@@ -139,6 +139,7 @@ const stellarSystemsMock: StellarSystem[] = [
     updated_at: '2021-01-01T00:00:00Z',
     star: createMockStars('sys-001'),
     planets: createMockPlanets('sys-001'),
+    position: [0, 0, 0],
   },
   {
     id: 'sys-002',
@@ -152,6 +153,7 @@ const stellarSystemsMock: StellarSystem[] = [
     updated_at: '2021-01-02T00:00:00Z',
     star: createMockStars('sys-002'),
     planets: createMockPlanets('sys-002'),
+    position: [20, 0, 0],
   },
   {
     id: 'sys-003',
@@ -165,6 +167,7 @@ const stellarSystemsMock: StellarSystem[] = [
     updated_at: '2021-01-03T00:00:00Z',
     star: createMockStars('sys-003'),
     planets: createMockPlanets('sys-003'),
+    position: [30, 0, 0],
   },
   {
     id: 'sys-004',
@@ -178,6 +181,7 @@ const stellarSystemsMock: StellarSystem[] = [
     updated_at: '2021-01-04T00:00:00Z',
     star: createMockStars('sys-004'),
     planets: createMockPlanets('sys-004'),
+    position: [0, -20, 30],
   },
   {
     id: 'sys-005',
@@ -191,6 +195,7 @@ const stellarSystemsMock: StellarSystem[] = [
     updated_at: '2021-01-05T00:00:00Z',
     star: createMockStars('sys-005'),
     planets: createMockPlanets('sys-005'),
+    position: [0, -20, 10],
   },
   {
     id: 'sys-006',
@@ -204,6 +209,7 @@ const stellarSystemsMock: StellarSystem[] = [
     updated_at: '2021-01-06T00:00:00Z',
     star: createMockStars('sys-006'),
     planets: createMockPlanets('sys-006'),
+    position: [0, 0, 400],
   },
   {
     id: 'sys-007',
@@ -217,6 +223,7 @@ const stellarSystemsMock: StellarSystem[] = [
     updated_at: '2021-01-07T00:00:00Z',
     star: createMockStars('sys-007'),
     planets: createMockPlanets('sys-007'),
+    position: [0, 0, -2000],
   },
 ];
 

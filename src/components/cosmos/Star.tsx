@@ -1,12 +1,12 @@
 // 메인 항성성
 
 import type { Star } from '@/types/stellar';
-import { valueToColor } from '@/utils/valueToColor';
 import { FakeGlowMaterial } from './materials/FakeGlowMaterial';
 import { Outlines, Sphere } from '@react-three/drei';
 import * as THREE from 'three';
 import { useEffect, useState } from 'react';
 import { useSelectedObjectStore } from '@/stores/useSelectedObjectStore';
+import { normalizeStarProperties } from '@/utils/display/propertiesNormalization';
 
 interface StarProps {
   star: Star;
@@ -18,13 +18,12 @@ export default function Star({ star, position = [0, 0, 0] }: StarProps) {
   const [isSelected, setIsSelected] = useState(false);
   const { setSelectedObjectId, selectedObjectId } = useSelectedObjectStore();
 
-  // 필요한 속성들 추출 (실제 데이터의 속성명 사용)
-  const size = star.properties.size;
-  const colorValue = star.properties.color;
-  const brightness = star.properties.brightness; // 0.01 단위로 변환
+  const normalizedStar = normalizeStarProperties(star.properties);
 
-  // 색상 변환 (숫자 값을 색상으로)
-  const color = valueToColor(colorValue, 0, 360);
+  // 필요한 속성들 추출 (실제 데이터의 속성명 사용)
+  const size = normalizedStar.size;
+  const color = normalizedStar.color;
+  const brightness = normalizedStar.brightness; // 0.01 단위로 변환
 
   // brightness를 FakeGlowMaterial 속성으로 매핑
   const glowSize = brightness * 0.5; // 0.15 ~ 2.5
