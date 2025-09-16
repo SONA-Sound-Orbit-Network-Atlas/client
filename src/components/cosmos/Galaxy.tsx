@@ -1,61 +1,62 @@
 //은하계 컴포넌트
-
-import { useMemo } from 'react';
 import StellarSystem from './StellarSystem';
 import SimpleStellarPoint from './SimpleStellarPoint';
+import LoadingStellarSystem from './LoadingStellarSystem';
+import { useGalaxy } from '@/hooks/api/useGalaxy';
 import { useSelectedStellarStore } from '@/stores/useSelectedStellarStore';
 import useStellarSystemSelection from '@/hooks/useStellarSystemSelection';
+import type { simpleStellar } from '@/types/galaxy';
 
-// 임시 더미 데이터 (나중에 API로 교체)
-const dummyStellarList = [
-  { id: 'sys-001', stellarSystemPos: [0, 0, 0], starColor: 0 },
-  { id: 'sys-002', stellarSystemPos: [20, 0, 0], starColor: 60 },
-  { id: 'sys-003', stellarSystemPos: [-30, 0, 0], starColor: 120 },
-  { id: 'sys-004', stellarSystemPos: [0, -20, 30], starColor: 180 },
-  { id: 'sys-005', stellarSystemPos: [0, 20, 10], starColor: 240 },
-  { id: 'sys-006', stellarSystemPos: [0, 0, 400], starColor: 300 },
-  { id: 'sys-007', stellarSystemPos: [0, 0, -2000], starColor: 45 },
-];
+interface GalaxyProps {
+  galaxyId: string;
+}
 
-export default function Galaxy() {
+export default function Galaxy({ galaxyId }: GalaxyProps) {
+  const { data: galaxyData, isLoading, error } = useGalaxy(galaxyId);
   const { selectedStellarId } = useSelectedStellarStore();
   const { selectStellar } = useStellarSystemSelection();
 
-  // 선택된 스텔라 정보
-  const selectedStellar = useMemo(() => {
-    return dummyStellarList.find((stellar) => stellar.id === selectedStellarId);
-  }, [selectedStellarId]);
-
-  // 선택되지 않은 스텔라들
-  const unselectedStellars = useMemo(() => {
-    return dummyStellarList.filter(
-      (stellar) => stellar.id !== selectedStellarId
-    );
-  }, [selectedStellarId]);
+  // 스텔라 리스트 가져오기
+  const stellarSystems = galaxyData?.allStellarList || [];
 
   const handleStellarClick = (stellarId: string) => {
     selectStellar(stellarId);
   };
 
+  // 로딩 상태 처리
+  if (isLoading) {
+    return <LoadingStellarSystem text="갤럭시 데이터를 불러오는 중..." />;
+  }
+
+  // 에러 상태 처리
+  if (error) {
+    return (
+      <LoadingStellarSystem text="데이터를 불러오는 중 오류가 발생했습니다." />
+    );
+  }
+
+  // 빈 상태 처리
+  if (!stellarSystems.length) {
+    return <LoadingStellarSystem text="표시할 스텔라 시스템이 없습니다." />;
+  }
+
   return (
     <group>
       {/* 선택된 스텔라만 디테일 렌더링 */}
-      {selectedStellar && (
+      {selectedStellarId && (
         <StellarSystem
-          key={selectedStellar.id}
-          stellarSystemPos={
-            selectedStellar.stellarSystemPos as [number, number, number]
-          }
-          id={selectedStellar.id}
+          key={selectedStellarId}
+          stellarSystemPos={[0, 0, 0]} // TODO: 실제 위치 가져오기
+          id={selectedStellarId}
         />
       )}
 
-      {/* 선택되지 않은 스텔라들은 심플 포인트로 렌더링 */}
-      {unselectedStellars.map((stellar) => (
+      {/* 모든 스텔라를 심플 포인트로 렌더링 */}
+      {stellarSystems.map((stellar: simpleStellar) => (
         <SimpleStellarPoint
           key={stellar.id}
-          position={stellar.stellarSystemPos as [number, number, number]}
-          color={stellar.starColor}
+          position={stellar.position}
+          color={stellar.color}
           onClick={() => handleStellarClick(stellar.id)}
         />
       ))}
