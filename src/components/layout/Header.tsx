@@ -4,6 +4,7 @@ import sonaLogo from '@/assets/sona_logo_header_cropped_250w.png';
 import Button from '../common/Button';
 import { FiSave, FiArrowLeft } from 'react-icons/fi';
 import { useUserStore } from '@/stores/useUserStore';
+import { useSelectedStellarStore } from '@/stores/useSelectedStellarStore';
 
 interface HeaderProps {
   className?: string;
@@ -12,7 +13,7 @@ interface HeaderProps {
 
 export default function Header({ className, children }: HeaderProps) {
   const { isLoggedIn } = useUserStore();
-
+  const { setIdle } = useSelectedStellarStore();
   return (
     <header
       className={mergeClassNames(
@@ -51,7 +52,7 @@ export default function Header({ className, children }: HeaderProps) {
             <FiSave className="w-4 h-4" />
             SAVE
           </Button>
-          <Button color="tertiary" size="sm">
+          <Button color="tertiary" size="sm" onClick={() => setIdle()}>
             <FiArrowLeft className="w-4 h-4" />
             BACK TO GALAXY
           </Button>
