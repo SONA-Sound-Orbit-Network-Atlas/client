@@ -5,6 +5,7 @@
 import * as Tone from 'tone';
 import type { StarGlobalState, KeyName, ScaleName } from '../../types/audio';
 import { AudioEngine } from './AudioEngine';
+import { RandomManager, type SeededRng } from '../utils/random';
 
 export class Star {
   private static _instance: Star | null = null;
@@ -36,6 +37,10 @@ export class Star {
   
   // 클락 이벤트 콜백
   private onClockTick?: (beat: number, bar: number, sixteenth: number) => void;
+  
+  // === Seed 기반 랜덤 관리 ===
+  private seed: number | string | null = null;
+  private randomManager: RandomManager = new RandomManager();
   
   // 음계 매핑 테이블
   private readonly scaleMap = {
@@ -169,10 +174,10 @@ export class Star {
     this.properties[property] = value;
     this.updateGlobalState();
     
-    // AudioEngine과 Transport에 즉시 반영
+    // AudioEngine에 전역 상태 적용
     const audioEngine = AudioEngine.instance;
     if (audioEngine.isReady()) {
-      audioEngine.updateStar(this.globalState);
+      audioEngine.applyGlobalState(this.globalState);
       
       // BPM 변경 시 Transport 업데이트
       if (property === 'spin') {
@@ -190,13 +195,30 @@ export class Star {
     
     const audioEngine = AudioEngine.instance;
     if (audioEngine.isReady()) {
-      audioEngine.updateStar(this.globalState);
+      audioEngine.applyGlobalState(this.globalState);
       
       // BPM 변경이 포함된 경우 Transport 업데이트
       if ('spin' in props) {
         Tone.Transport.bpm.rampTo(this.globalState.bpm, 0.5);
       }
     }
+  }
+
+  // 전역 상태 직접 업데이트 (StellarSystem용)
+  setGlobalState(newState: Partial<StarGlobalState>): void {
+    Object.assign(this.globalState, newState);
+    
+    const audioEngine = AudioEngine.instance;
+    if (audioEngine.isReady()) {
+      audioEngine.applyGlobalState(this.globalState);
+      
+      // BPM 변경 시 Transport 업데이트
+      if ('bpm' in newState) {
+        Tone.Transport.bpm.rampTo(this.globalState.bpm, 0.5);
+      }
+    }
+    
+    console.log(`⭐ Star Global State 직접 업데이트:`, this.globalState);
   }
   
   // SONA 매핑에 따른 전역 상태 계산
@@ -292,5 +314,37 @@ export class Star {
     console.log('Scale Notes:', this.getScaleNotes());
     console.log('Key Root MIDI:', this.getKeyRoot());
     console.log('Active Listeners:', this.clockListeners.size);
+  }
+  
+  // === Seed 기반 랜덤 관리 ===
+  
+  // 시드 설정 (전체 음악 우주의 초기 조건 설정)
+  setSeed(seed: number | string): void {
+    this.seed = seed;
+    this.randomManager.setSeed(seed);
+    console.log(`🌱 Star Seed 설정: ${seed}`);
+  }
+  
+  // 현재 시드 반환
+  getSeed(): number | string | null {
+    return this.seed;
+  }
+  
+  // 도메인별 랜덤 생성기 반환 (Planet, Pattern 등에서 사용)
+  getDomainRng(domain: string): SeededRng {
+    return this.randomManager.getDomainRng(domain);
+  }
+  
+  // 전역 랜덤 함수들 (편의 메서드)
+  nextFloat(): number {
+    return this.randomManager.nextFloat();
+  }
+  
+  nextInt(min: number, max: number): number {
+    return this.randomManager.nextInt(min, max);
+  }
+  
+  choice<T>(arr: T[]): T {
+    return this.randomManager.choice(arr);
   }
 }

@@ -213,56 +213,62 @@ export class PadInstrument implements Instrument {
     this.triggerAttackRelease(chordNotes, duration, undefined, velocity);
   }
 
-  // SONA 매핑된 파라미터 적용
+  // SONA 매핑된 파라미터 적용 (안전한 null 처리)
   private applyParams(params: MappedAudioParameters): void {
     if (this.disposed) return;
 
     // 필터 컷오프 조절 - 패드는 부드러운 고음역 사용
-    if (this.padFilter) {
+    if (this.padFilter && typeof params.cutoffHz === 'number' && !isNaN(params.cutoffHz)) {
       const cutoff = Math.max(1000, Math.min(8000, params.cutoffHz));
       this.padFilter.frequency.rampTo(cutoff, 0.04); // 40ms 스무딩
     }
     
     // 필터 레조넌스 조절
-    if (this.padFilter) {
+    if (this.padFilter && typeof params.resonanceQ === 'number' && !isNaN(params.resonanceQ)) {
       const resonance = 0.5 + (params.resonanceQ * 2); // 0.5-2.5 범위
       this.padFilter.Q.rampTo(resonance, 0.04);
     }
     
     // 리버브 디케이 시간 조절 (SONA 지침: PAD reverb_size 0.4..0.9)
-    if (this.padReverb) {
+    if (this.padReverb && typeof params.reverbSend === 'number' && !isNaN(params.reverbSend)) {
       const reverbDecay = 1.5 + (params.reverbSend * 3); // 1.5-4.5초 범위
       this.padReverb.decay = Math.max(1.5, Math.min(4.5, reverbDecay));
     }
     
     // 코러스 깊이 조절
-    if (this.padChorus) {
+    if (this.padChorus && typeof params.chorusDepth === 'number' && !isNaN(params.chorusDepth)) {
       const chorusDepth = 0.3 + (params.chorusDepth * 0.4);
       this.padChorus.depth = Math.max(0.1, Math.min(0.8, chorusDepth));
       
       // 코러스 주파수 조절 (spin 매핑)
-      const chorusRate = 0.5 + (params.tremDepth * 2); // tremDepth를 모듈레이션 속도로 사용
-      this.padChorus.frequency.rampTo(Math.max(0.2, Math.min(3, chorusRate)), 0.08);
+      if (typeof params.tremDepth === 'number' && !isNaN(params.tremDepth)) {
+        const chorusRate = 0.5 + (params.tremDepth * 2); // tremDepth를 모듈레이션 속도로 사용
+        this.padChorus.frequency.rampTo(Math.max(0.2, Math.min(3, chorusRate)), 0.08);
+      }
     }
     
-    // 딜레이 시간 조절
+    // 딜레이 시간 조절 (새 파라미터 시스템)
     if (this.padDelay) {
-      const delayTime = Tone.Time(params.delayBeats + 'n').toSeconds();
-      this.padDelay.delayTime.rampTo(Math.max(0.1, Math.min(1, delayTime)), 0.08);
+      if (typeof params.delayTime === 'number' && !isNaN(params.delayTime)) {
+        const delayTimeSeconds = Math.max(0.1, Math.min(1.0, params.delayTime));
+        this.padDelay.delayTime.rampTo(delayTimeSeconds, 0.08);
+      }
       
-      // 딜레이 피드백 조절
-      const feedback = 0.2 + (params.reverbSend * 0.3);
-      this.padDelay.feedback.rampTo(Math.max(0.1, Math.min(0.6, feedback)), 0.08);
+      // 딜레이 피드백 조절 (새 파라미터)
+      if (typeof params.delayFeedback === 'number' && !isNaN(params.delayFeedback)) {
+        const feedback = Math.max(0.1, Math.min(0.6, params.delayFeedback));
+        this.padDelay.feedback.rampTo(feedback, 0.08);
+      }
     }
     
     // 어택 시간 조절 - 패드의 스웰 특성
-    if (this.padSynth) {
+    if (this.padSynth && typeof params.tremDepth === 'number' && !isNaN(params.tremDepth)) {
       const attack = 0.3 + ((1 - params.tremDepth) * 1.0); // 0.3-1.3초 범위
       this.padSynth.set({ envelope: { attack } });
     }
     
     // 전체 볼륨 조절
-    if (this.padSynth) {
+    if (this.padSynth && typeof params.outGainDb === 'number' && !isNaN(params.outGainDb)) {
       const volume = -12 + (params.outGainDb * 0.4);
       this.padSynth.volume.rampTo(Math.max(-20, Math.min(-4, volume)), 0.08);
     }

@@ -18,7 +18,7 @@ export interface Instrument {
   ): void;
   
   // 행성 속성 업데이트 (SONA의 핵심 기능)
-  updateFromPlanet(props: PlanetPhysicalProperties): void;
+  updateFromPlanet(props: PlanetPhysicalProperties | Record<string, number>): void;
   
   // 리소스 정리
   dispose(): void;
