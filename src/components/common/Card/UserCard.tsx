@@ -4,13 +4,14 @@ import Button from '../Button';
 import Card from './Card';
 
 interface UserCardProps {
-  id: number;
+  id: string;
   username: string;
   isFollowing?: boolean;
   isMutualFollow?: boolean;
-  onFollow?: (userId: number) => void;
-  onUnfollow?: (userId: number) => void;
-  onClick?: (userId: number) => void;
+  onFollow?: (userId: string) => void;
+  onUnfollow?: (userId: string) => void;
+  onClick?: (userId: string) => void;
+  isLoading?: boolean;
 }
 
 export default function UserCard({
@@ -21,6 +22,7 @@ export default function UserCard({
   onFollow,
   onUnfollow,
   onClick,
+  isLoading = false,
 }: UserCardProps) {
   const handleFollowClick = () => {
     if (isFollowing && onUnfollow) {
@@ -50,8 +52,13 @@ export default function UserCard({
             color={isFollowing ? 'secondary' : 'primary'}
             size="sm"
             onClick={handleFollowClick}
+            disabled={isLoading}
           >
-            {isFollowing ? 'Unfollow' : 'Follow Back'}
+            {isLoading
+              ? '처리 중...'
+              : isFollowing
+                ? 'Unfollow'
+                : 'Follow Back'}
           </Button>
         </div>
       </div>

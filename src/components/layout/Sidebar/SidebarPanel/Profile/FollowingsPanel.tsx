@@ -5,8 +5,11 @@ import {
 import PanelHeader from '../PanelHeader';
 import UserCard from '@/components/common/Card/UserCard';
 import { ScrollArea } from '@/components/common/Scrollarea';
+import { useDeleteFollow } from '@/hooks/api/useFollow';
 
 export default function FollowingsPanel() {
+  const deleteFollowMutation = useDeleteFollow();
+
   // 테스트용 하드코딩된 팔로잉 데이터
   const followings = [
     {
@@ -49,7 +52,19 @@ export default function FollowingsPanel() {
 
   const handleUnfollow = (userId: number) => {
     console.log('Unfollow user:', userId);
-    // TODO: API 호출로 언팔로우 처리
+    deleteFollowMutation.mutate(
+      { targetUserId: `cmg_user_${userId}` },
+      {
+        onSuccess: (data) => {
+          console.log('언팔로우 성공:', data);
+          // TODO: 로컬 상태 업데이트 또는 리페치
+        },
+        onError: (error) => {
+          console.error('언팔로우 실패:', error);
+          // TODO: 에러 처리 (토스트 메시지 등)
+        },
+      }
+    );
   };
 
   const handleUserClick = (userId: number) => {
@@ -79,6 +94,7 @@ export default function FollowingsPanel() {
                   isMutualFollow={following.isMutualFollow}
                   onUnfollow={handleUnfollow}
                   onClick={handleUserClick}
+                  isLoading={deleteFollowMutation.isPending}
                 />
               ))}
             </div>
