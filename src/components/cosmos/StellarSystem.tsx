@@ -8,11 +8,9 @@ import { useSelectedStellarStore } from '@/stores/useSelectedStellarStore';
 // 순수한 디테일 스텔라 시스템 컴포넌트
 // 선택된 스텔라만 렌더링하므로 조건부 로직 불필요
 export default function StellarSystem({
-  stellarSystemPos,
   id,
   visible = true,
 }: {
-  stellarSystemPos: [number, number, number];
   id: string;
   visible?: boolean;
 }) {
@@ -24,9 +22,10 @@ export default function StellarSystem({
   if (selectedStellarId !== id) {
     return null;
   }
+  const position = stellarStore.position;
 
   return (
-    <group ref={ref} position={stellarSystemPos} visible={visible}>
+    <group ref={ref} position={position} visible={visible}>
       {/* 항성 렌더링 */}
       {stellarStore.star && (
         <Star star={stellarStore.star} position={[0, 0, 0]} />

@@ -44,11 +44,7 @@ export default function Galaxy({ galaxyId = '1' }: GalaxyProps) {
     <group>
       {/* 선택된 스텔라만 디테일 렌더링 */}
       {selectedStellarId && (
-        <StellarSystem
-          key={selectedStellarId}
-          stellarSystemPos={[0, 0, 0]} // TODO: 실제 위치 가져오기
-          id={selectedStellarId}
-        />
+        <StellarSystem key={selectedStellarId} id={selectedStellarId} />
       )}
 
       {/* 모든 스텔라를 심플 포인트로 렌더링 */}
