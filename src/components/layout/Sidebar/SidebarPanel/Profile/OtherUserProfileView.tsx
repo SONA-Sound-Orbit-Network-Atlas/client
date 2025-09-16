@@ -2,12 +2,12 @@ import { FiUser, FiUserCheck } from 'react-icons/fi';
 import { IoPlanetOutline } from 'react-icons/io5';
 import { useProfileStore } from '@/stores/useProfileStore';
 import { navigateBack } from '@/utils/profileNavigation';
+import ProfileStateWrapper from './ProfileStateWrapper';
 import PanelHeader from '../PanelHeader';
 import Iconframe from '@/components/common/Iconframe';
 import Card from '@/components/common/Card/Card';
 import StatCard from '@/components/common/Card/StatCard';
 import { ScrollArea } from '@/components/common/Scrollarea';
-import LoadingIcon from '@/components/common/LoadingIcon';
 
 interface OtherUserProfileViewProps {
   userId: number;
@@ -47,78 +47,13 @@ export default function OtherUserProfileView({
     setProfilePanelMode('otherUserFollowings');
   };
 
-  // 로딩 상태
-  if (isLoading) {
-    return (
-      <>
-        <PanelHeader
-          title="PROFILE"
-          showBackButton={true}
-          onBack={navigateBack}
-        />
-        <div className="flex flex-col h-full overflow-hidden">
-          <ScrollArea className="flex-1 min-h-0">
-            <div className="flex flex-col items-center justify-center p-6 h-full">
-              <LoadingIcon />
-              <p className="text-text-muted text-sm mt-4">
-                프로필을 불러오는 중...
-              </p>
-            </div>
-          </ScrollArea>
-        </div>
-      </>
-    );
-  }
-
-  // 에러 상태
-  if (error) {
-    return (
-      <>
-        <PanelHeader
-          title="PROFILE"
-          showBackButton={true}
-          onBack={navigateBack}
-        />
-        <div className="flex flex-col h-full overflow-hidden">
-          <ScrollArea className="flex-1 min-h-0">
-            <div className="flex flex-col items-center justify-center p-6 h-full">
-              <p className="text-red-400 text-sm text-center">
-                프로필을 불러올 수 없습니다.
-              </p>
-              <p className="text-text-muted text-xs text-center mt-2">
-                잠시 후 다시 시도해주세요.
-              </p>
-            </div>
-          </ScrollArea>
-        </div>
-      </>
-    );
-  }
-
-  // 프로필 데이터가 없는 경우
-  if (!profile) {
-    return (
-      <>
-        <PanelHeader
-          title="PROFILE"
-          showBackButton={true}
-          onBack={navigateBack}
-        />
-        <div className="flex flex-col h-full overflow-hidden">
-          <ScrollArea className="flex-1 min-h-0">
-            <div className="flex flex-col items-center justify-center p-6 h-full">
-              <p className="text-text-muted text-sm text-center">
-                프로필 정보를 찾을 수 없습니다.
-              </p>
-            </div>
-          </ScrollArea>
-        </div>
-      </>
-    );
-  }
-
   return (
-    <>
+    <ProfileStateWrapper
+      isLoading={isLoading}
+      error={error}
+      profile={profile}
+      title="PROFILE"
+    >
       <PanelHeader
         title="PROFILE"
         showBackButton={true}
@@ -198,6 +133,6 @@ export default function OtherUserProfileView({
           </div>
         </ScrollArea>
       </div>
-    </>
+    </ProfileStateWrapper>
   );
 }
