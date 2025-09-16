@@ -1,7 +1,8 @@
-import { useRef } from 'react';
+import { useMemo, useRef } from 'react';
 import * as THREE from 'three';
 import { FakeGlowMaterial } from './materials/FakeGlowMaterial';
 import { valueToColor } from '@/utils/valueToColor';
+import { useSelectedStellarStore } from '@/stores/useSelectedStellarStore';
 
 interface SimpleStellarPointProps {
   position: [number, number, number];
@@ -21,8 +22,14 @@ export default function SimpleStellarPoint({
   const GLOW_SIZE = SIZE * 3;
   const colorHex = valueToColor(color, 0, 360);
 
+  const { mode } = useSelectedStellarStore();
+
+  const visible = useMemo(() => {
+    return mode === 'idle';
+  }, [mode]);
+
   return (
-    <group position={position}>
+    <group position={position} visible={visible}>
       {/* 메인 스텔라 포인트 */}
       <mesh ref={meshRef} onClick={onClick} renderOrder={1}>
         <sphereGeometry args={[SIZE, 16, 16]} />
