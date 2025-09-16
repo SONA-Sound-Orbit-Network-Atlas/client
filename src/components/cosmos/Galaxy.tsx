@@ -8,10 +8,10 @@ import useStellarSystemSelection from '@/hooks/useStellarSystemSelection';
 import type { simpleStellar } from '@/types/galaxy';
 
 interface GalaxyProps {
-  galaxyId: string;
+  galaxyId?: string;
 }
 
-export default function Galaxy({ galaxyId }: GalaxyProps) {
+export default function Galaxy({ galaxyId = '1' }: GalaxyProps) {
   const { data: galaxyData, isLoading, error } = useGalaxy(galaxyId);
   const { selectedStellarId } = useSelectedStellarStore();
   const { selectStellar } = useStellarSystemSelection();
