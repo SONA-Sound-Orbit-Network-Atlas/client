@@ -29,9 +29,17 @@ export interface FollowerUser extends User {
   isMutual: boolean; // 상호 팔로우 여부
 }
 
-// 팔로워 목록 응답
+// 팔로워 목록 응답 (Swagger 스펙에 맞는 올바른 구조)
 export interface FollowersResponse {
   meta: PaginationMeta;
+  items: FollowerUser[];
+}
+
+// 실제 백엔드 응답 구조 (잘못된 구조 - 임시용)
+export interface FollowersResponseRaw {
+  page: number;
+  limit: number;
+  total: number | number[]; // 실제로는 Array(2) 형태로 오는 경우가 있음
   items: FollowerUser[];
 }
 

@@ -4,6 +4,7 @@ import type {
   FollowStats,
   GetFollowersParams,
   FollowersResponse,
+  FollowersResponseRaw,
 } from '@/types/follow';
 
 export const followAPI = {
@@ -24,10 +25,32 @@ export const followAPI = {
     params: GetFollowersParams
   ): Promise<FollowersResponse> => {
     const { userId, page = 1, limit = 20 } = params;
-    const response = await axiosInstance.get(`/follows/${userId}/followers`, {
-      params: { page, limit },
-    });
-    return response.data;
+    const response = await axiosInstance.get<FollowersResponseRaw>(
+      `/follows/${userId}/followers`,
+      {
+        params: { page, limit },
+      }
+    );
+
+    // 백엔드 응답을 Swagger 스펙에 맞는 구조로 변환
+    const rawData = response.data;
+
+    // 이미 올바른 구조인 경우 (meta가 있는 경우)
+    if ('meta' in rawData && rawData.meta) {
+      return rawData as FollowersResponse;
+    }
+
+    // 잘못된 구조인 경우 변환
+    const transformedData: FollowersResponse = {
+      meta: {
+        page: rawData.page,
+        limit: rawData.limit,
+        total: Array.isArray(rawData.total) ? rawData.total[0] : rawData.total,
+      },
+      items: rawData.items,
+    };
+
+    return transformedData;
   },
 
   // TODO: 팔로잉 목록 조회

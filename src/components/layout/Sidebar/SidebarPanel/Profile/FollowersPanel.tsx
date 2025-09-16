@@ -22,6 +22,18 @@ export default function FollowersPanel() {
   const [hasMore, setHasMore] = useState(true);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
 
+  // 중복 제거 유틸리티 함수
+  const removeDuplicates = (followers: FollowerUser[]): FollowerUser[] => {
+    const seen = new Set<string>();
+    return followers.filter((follower) => {
+      if (seen.has(follower.id)) {
+        return false;
+      }
+      seen.add(follower.id);
+      return true;
+    });
+  };
+
   // 패널 모드에 따라 다른 사용자 ID 사용
   const targetUserId =
     profilePanelMode === 'followers'
@@ -51,41 +63,46 @@ export default function FollowersPanel() {
 
   // 데이터 누적 로직
   useEffect(() => {
-    if (followersData) {
+    console.log('followersData:', followersData);
+
+    if (followersData && followersData.meta && followersData.items) {
       if (currentPage === 1) {
-        // 첫 페이지: 기존 데이터 초기화
-        setAllFollowers(followersData.items);
+        // 첫 페이지: 기존 데이터 초기화 (중복 제거)
+        const uniqueFollowers = removeDuplicates(followersData.items);
+        setAllFollowers(uniqueFollowers);
       } else {
-        // 추가 페이지: 기존 데이터에 추가
-        setAllFollowers((prev) => [...prev, ...followersData.items]);
+        // 추가 페이지: 기존 데이터에 추가 (중복 제거)
+        setAllFollowers((prev) => {
+          const combined = [...prev, ...followersData.items];
+          const uniqueFollowers = removeDuplicates(combined);
+          return uniqueFollowers;
+        });
       }
 
       // 더 불러올 데이터가 있는지 확인
       const totalPages = Math.ceil(followersData.meta.total / 20);
-      setHasMore(currentPage < totalPages);
+      const hasMoreData = currentPage < totalPages;
+
+      setHasMore(hasMoreData);
       setIsLoadingMore(false);
     }
   }, [followersData, currentPage]);
 
   const handleFollow = (userId: string) => {
-    console.log('Follow user:', userId);
     createFollowMutation.mutate(
       { targetUserId: userId },
       {
-        onSuccess: (data) => {
-          console.log('팔로우 성공:', data);
+        onSuccess: () => {
           // TODO: 로컬 상태 업데이트 또는 리페치
         },
-        onError: (error) => {
-          console.error('팔로우 실패:', error);
+        onError: () => {
           // TODO: 에러 처리 (토스트 메시지 등)
         },
       }
     );
   };
 
-  const handleUnfollow = (userId: string) => {
-    console.log('Unfollow user:', userId);
+  const handleUnfollow = (_userId: string) => {
     // TODO: 언팔로우 API 구현 후 연동
   };
 
