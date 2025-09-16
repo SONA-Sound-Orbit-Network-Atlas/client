@@ -11,6 +11,7 @@ import type { StellarSystem, Star, Planet, StellarType } from '../../types/stell
 const mockStar: Star = {
   id: 'star_001',
   system_id: 'system_001',
+  name: 'Central Star',
   properties: createDefaultStarProperties({
     spin: 65,        // BPM ~= 138 (60 + 65*1.2 = 138)
     brightness: 80,  // Master Tone Character (전체 음색 특성)
@@ -201,6 +202,7 @@ export function getMockPlanet(planetId: string): Planet | undefined {
 const mockClonedStar: Star = {
   id: 'star_002',
   system_id: 'system_002',
+  name: 'Cloned Star', // name 필드 추가
   properties: createDefaultStarProperties({
     // 원본에서 약간 변형
     spin: 70,        // 조금 더 빠르게

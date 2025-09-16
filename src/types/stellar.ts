@@ -11,7 +11,7 @@ export type { PlanetProperties, PropertyDefinition, UIProperty, InstrumentRole }
 
 export interface StellarSystem {
   id: string;
-  title: string;
+  title: string; // 스텔라(항성계) 이름
   galaxy_id: string; // 소속 갤럭시 ID 추가
 
   // 원작자 추적 정보 (백엔드 스키마 호환)
@@ -35,6 +35,7 @@ export interface StellarSystem {
 export interface Star {
   id: string;
   system_id: string; // StellarSystem과 1:1 관계
+  name: string; // 항성 이름
   properties: StarProperties; // 전역 BPM, Volume, Key/Scale 등
   created_at?: string;
   updated_at?: string;
@@ -44,7 +45,7 @@ export interface Star {
 export interface Planet {
   id: string;
   system_id: string;
-  name: string;
+  name: string; // 행성 이름
   role: InstrumentRole; // 악기 역할
   properties: PlanetProperties; // 개별 악기 속성
   created_at?: string;
