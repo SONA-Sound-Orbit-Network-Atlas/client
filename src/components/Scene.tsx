@@ -20,10 +20,10 @@ export default function Scene() {
       </group>
 
       {/* 그리드 헬퍼 (공간감을 위해) */}
-      <Grid args={[20, 20]} />
+      {/* <Grid args={[20, 20]} /> */}
 
       {/* 축 헬퍼 */}
-      <primitive object={axesHelper} />
+      {/* <primitive object={axesHelper} /> */}
 
       <MainCamera />
 
