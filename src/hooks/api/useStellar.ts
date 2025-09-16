@@ -2,15 +2,15 @@
 
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { stellarAPI } from '@/api/stellar';
-import type { StellarType } from '@/types/stellar';
-import { useStellarStore } from '@/stores/useStellarStore';
-import { useEffect } from 'react';
-import { useSelectedStellarStore } from '@/stores/useSelectedStellarStore';
-import { useSidebarStore } from '@/stores/useSidebarStore';
-import { useStellarTabStore } from '@/stores/useStellarTabStore';
+import type { StellarSystem } from '@/types/stellar';
+// import { useStellarStore } from '@/stores/useStellarStore';
+// import { useEffect } from 'react';
+// import { useSelectedStellarStore } from '@/stores/useSelectedStellarStore';
+// import { useSidebarStore } from '@/stores/useSidebarStore';
+// import { useStellarTabStore } from '@/stores/useStellarTabStore';
 
 // 생성
-export function useCreateStellar(stellarData: StellarType) {
+export function useCreateStellar(stellarData: StellarSystem) {
   return useMutation({
     mutationFn: () => stellarAPI.createStellar(stellarData),
   });
@@ -64,7 +64,10 @@ export function useGetStellar(stellarId: string) {
 }
 
 // 수정
-export function useUpdateStellar(stellarId: string, stellarData: StellarType) {
+export function useUpdateStellar(
+  stellarId: string,
+  stellarData: StellarSystem
+) {
   const queryClient = useQueryClient();
 
   return useMutation({

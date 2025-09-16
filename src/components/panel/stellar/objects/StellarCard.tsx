@@ -1,55 +1,54 @@
 import Card from '@/components/common/Card/Card';
-import type { Object, Planet } from '@/types/stellar';
+import type { Star, Planet } from '@/types/stellar';
+import { mergeClassNames } from '@/utils/mergeClassNames';
+import { valueToColor } from '@/utils/valueToColor';
 
 interface StellarCardProps {
-  data: Object;
-  index: number;
+  data: Star | Planet;
   onClick: () => void;
   active: boolean;
-}
-
-function isPlanet(obj: Object): obj is Planet {
-  return obj.planetType === 'PLANET';
+  className?: string;
+  title: string;
 }
 
 export default function StellarCard({
   data,
-  index,
   onClick,
   active,
+  className,
+  title,
 }: StellarCardProps) {
+  const description =
+    data.object_type === 'PLANET' ? 'PLANET • ' + data.role : 'CENTRAL STAR';
+
   return (
-    <Card onClick={onClick} className={active ? 'border-secondary-300' : ''}>
+    <Card
+      role="button"
+      onClick={onClick}
+      className={mergeClassNames(
+        className,
+        active ? 'border-secondary-300' : ''
+      )}
+    >
       <div className="flex gap-3 items-center">
         <div
           className={`w-[24px] h-[24px] rounded-full border-[2px] border-[rgba(255,255,255,0.2)]`}
-          style={{ backgroundColor: getPlanetColor(index) }}
+          // style={{ backgroundColor: getPlanetColor(index) }}
+          style={{
+            backgroundColor: valueToColor(
+              data.object_type === 'PLANET'
+                ? (data.properties.planetColor ?? 0)
+                : (data.properties.color ?? 0),
+              0,
+              360
+            ),
+          }}
         ></div>
         <div>
-          <strong className="text-text-white">{data.name}</strong>
-          <p className="text-text-muted">
-            {data.planetType} • {isPlanet(data) ? data.soundType + ' •' : ''}{' '}
-            SIZE{' '}
-            {
-              data.properties.find(
-                (property) => property.label === 'planetSize'
-              )?.value
-            }
-          </p>
+          <strong className="text-text-white">{title}</strong>
+          <p className="text-text-muted">{description}</p>
         </div>
       </div>
     </Card>
   );
-}
-
-function getPlanetColor(index: number) {
-  const palette = [
-    '#fbbf24',
-    '#22d3ee',
-    '#8b5cf6',
-    '#ec4899',
-    '#10b981',
-    '#f59e0b',
-  ];
-  return palette[index % palette.length];
 }

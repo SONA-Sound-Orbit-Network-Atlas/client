@@ -10,7 +10,7 @@ import { FakeGlowMaterial } from './materials/FakeGlowMaterial';
 import type {
   Planet as PlanetType,
   CentralStar as CentralStarType,
-} from '@/types/stellar';
+} from '@/types/old_stellar';
 //항성계 컴포넌트
 
 export default function StellarSystem({

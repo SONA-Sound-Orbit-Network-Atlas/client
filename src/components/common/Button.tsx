@@ -21,6 +21,7 @@ const buttonVariants = cva(
         md: 'h-[40px] px-4',
         sm: 'h-[38px] px-3',
         xs: 'h-[30px] px-2',
+        xxs: 'h-[16px] px-0',
       },
       textAlign: {
         left: 'justify-start',
@@ -45,6 +46,7 @@ const buttonVariants = cva(
       { iconOnly: true, size: 'md', class: 'w-[40px] px-0' },
       { iconOnly: true, size: 'sm', class: 'w-[38px] px-0' },
       { iconOnly: true, size: 'xs', class: 'w-[30px] px-0' },
+      { iconOnly: true, size: 'xxs', class: 'w-[16px] px-0' },
 
       // ✅ 요구사항: color=tertiary + clicked → primary 스타일로 스왑
       {
@@ -53,18 +55,6 @@ const buttonVariants = cva(
         class:
           'bg-gradient-to-r from-secondary-300 to-primary-300 text-text-white border-secondary-300-20',
       },
-      // (예시) 다른 color일 때 clicked 추가 스타일
-      // { color: 'primary', clicked: true, class: 'ring-2 ring-primary-300/50' },
-      // {
-      //   color: 'secondary',
-      //   clicked: true,
-      //   class: 'ring-2 ring-tertiary-200/40',
-      // },
-      // {
-      //   color: 'transparent',
-      //   clicked: true,
-      //   class: 'bg-gray-800/30 border border-gray-border/60',
-      // },
     ],
     defaultVariants: {
       color: 'primary',

@@ -1,4 +1,4 @@
-import type { StellarType, Object } from '@/types/stellar';
+import type { StellarType, Object } from '@/types/old_stellar';
 
 const mockPlanets: Object[] = [
   {

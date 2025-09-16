@@ -1,6 +1,6 @@
 // 메인 항성성
 
-import type { CentralStar } from '@/types/stellar';
+import type { CentralStar } from '@/types/old_stellar';
 import { valueToColor } from '@/utils/valueToColor';
 import { FakeGlowMaterial } from './materials/FakeGlowMaterial';
 import { Outlines, Sphere } from '@react-three/drei';

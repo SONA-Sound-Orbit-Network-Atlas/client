@@ -6,6 +6,7 @@ import { ErrorBoundary } from 'react-error-boundary';
 import { useStellarStore } from '@/stores/useStellarStore';
 import { useSelectedObjectStore } from '@/stores/useSelectedObjectStore';
 import AddNewObjectBtn from './AddNewObjectBtn';
+import type { Star, Planet } from '@/types/stellar';
 
 export default function Objects() {
   return (
@@ -22,28 +23,37 @@ function ObjectsContent() {
   const { selectedObjectId, setSelectedObjectId } = useSelectedObjectStore();
   const { stellarStore } = useStellarStore();
 
-  const clickObjectHandler = (id: number) => {
-    setSelectedObjectId(id);
-  };
+  // === 스텔라 상세정보 스토어에서 object 정보(Star, Planet)만 추출 ===
+  const starInfo: Star = stellarStore.star;
+  const planetInfo: Planet[] = stellarStore.planets;
+  const objectsInfo: (Star | Planet)[] = [starInfo, ...planetInfo];
 
-  if (!stellarStore) return <div>No data</div>;
+  if (!objectsInfo) return <div>No data</div>;
 
   return (
     <div>
       <PanelTitle fontSize="large">
-        SYSTEM OBJECTS ({stellarStore.objects.length})
+        SYSTEM OBJECTS ({objectsInfo.length})
       </PanelTitle>
 
       <div className="space-y-3">
-        {stellarStore.objects.length > 0 ? (
-          stellarStore.objects.map((data, index) => {
+        {objectsInfo.length > 0 ? (
+          objectsInfo.map((data) => {
+            const title =
+              data.object_type === 'STAR'
+                ? stellarStore.title
+                : (data.name ?? 'UNTITLED');
+
             return (
               <StellarCard
-                key={index}
-                index={index}
+                key={data.id}
                 data={data}
-                onClick={() => clickObjectHandler(data.planetId)}
-                active={selectedObjectId === data.planetId}
+                onClick={() => {
+                  setSelectedObjectId(data.id);
+                }}
+                active={selectedObjectId === data.id}
+                className="cursor-pointer"
+                title={title}
               />
             );
           })

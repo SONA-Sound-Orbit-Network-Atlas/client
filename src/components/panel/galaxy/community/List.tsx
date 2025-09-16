@@ -10,9 +10,6 @@ import Button from '@/components/common/Button';
 import { SkeletonCard } from '@/components/common/Card/SkeletonCard';
 import { ErrorBoundary } from 'react-error-boundary';
 import LoadingIcon from '@/components/common/LoadingIcon';
-import { useSelectedStellarStore } from '@/stores/useSelectedStellarStore';
-import { useStellarTabStore } from '@/stores/useStellarTabStore';
-import { useSidebarStore } from '@/stores/useSidebarStore';
 import useStellarSystemSelection from '@/hooks/useStellarSystemSelection';
 
 const GALAXY_LIST_LIMIT = 3;

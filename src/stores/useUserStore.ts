@@ -5,12 +5,13 @@ import type { User } from '@/types/user';
 interface UserStore {
   userStore: User;
   setUserStore: (userStore: User) => void;
+  clearUserStore: () => void;
   isLoggedIn: boolean;
   setIsLoggedIn: (isLoggedIn: boolean) => void;
 }
 
 const initialUserStore: User = {
-  userId: '',
+  id: 'user_stann_001', // mock 데이터랑 일치하는 id : user_stann_001
   email: '',
   username: '',
 };
@@ -20,7 +21,13 @@ export const useUserStore = create<UserStore>((set) => ({
   setUserStore: (userStore: User) => {
     set({ userStore });
   },
-  isLoggedIn: false,
+  clearUserStore: () => {
+    set({
+      userStore: initialUserStore,
+      isLoggedIn: false,
+    });
+  },
+  isLoggedIn: true,
   setIsLoggedIn: (isLoggedIn: boolean) => {
     set({ isLoggedIn });
   },
