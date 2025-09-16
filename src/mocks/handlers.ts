@@ -3,7 +3,12 @@ import { http, HttpResponse } from 'msw';
 import galaxiesCommunity from './data/galaxiesCommunity';
 import galaxiesMy from './data/galaxiesMy';
 import { mockStellarSystem } from './data/stellar';
-import { mockFetch, mockFetchInfinite } from './utils';
+import {
+  mockFetch,
+  mockFetchInfinite,
+  mockFetchInfiniteDataMeta,
+} from './utils';
+import { API_PREFIX } from '@/api/endpoints';
 
 const isLoggedIn = true; // 로그인 여부 테스트용
 
@@ -24,11 +29,16 @@ export const handlers = [
   }),
 
   // stellar 상세 정보 조회
-  mockFetch('/api/stellar-systems/compose/:stellarId', mockStellarSystem, 2000),
+  mockFetch('/api/stellar-systems/:stellarId', mockStellarSystem, 2000),
 
   // galaxy Community 리스트 조회 (infinite)
-  mockFetchInfinite('/api/stellar-systems/compose', galaxiesCommunity, 3, 2000),
+  mockFetchInfiniteDataMeta(
+    `${API_PREFIX}/likes/rankings`,
+    galaxiesCommunity,
+    3,
+    2000
+  ),
 
   // galaxy My 리스트 조회 (infinite)
-  mockFetchInfinite('/api/stellar-systems/me/compose', galaxiesMy, 3, 2000),
+  mockFetchInfinite(`${API_PREFIX}/stellar-list/me`, galaxiesMy, 3, 2000),
 ];

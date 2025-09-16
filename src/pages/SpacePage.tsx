@@ -2,7 +2,7 @@ import { Canvas } from '@react-three/fiber';
 import { Suspense } from 'react';
 import Scene from '../components/Scene';
 import DebugMessage from '@/components/DebugMessage';
-import Header from '@/components/layout/Header';
+import Header from '@/components/layout/Header/Header';
 import Sidebar from '@/components/layout/Sidebar/Sidebar';
 import TestSliders from '@/components/TestSliders';
 import TestButtons from '@/components/cosmos/TestButtons';
