@@ -6,6 +6,45 @@ import { http, HttpResponse, type JsonBodyType, delay } from 'msw';
  * @param path 엔드포인트 경로 (ex. '/galaxies')
  * @param data 전체 mock 데이터 (totalCount와 list를 포함한 객체)
  */
+
+export function mockFetchInfiniteDataMeta<T>(
+  path: string,
+  source: T[] | { data: T[] },
+  defaultLimit = 20,
+  delayMs = 0
+) {
+  return http.get(path, async ({ request }) => {
+    const url = new URL(request.url);
+    const page = Math.max(1, Number(url.searchParams.get('page') ?? '1'));
+    const limit = Math.max(
+      1,
+      Number(url.searchParams.get('limit') ?? String(defaultLimit))
+    );
+
+    const all: T[] = Array.isArray(source) ? source : (source.data ?? []);
+    const total = all.length;
+    const totalPages = Math.max(1, Math.ceil(total / limit));
+
+    const start = (page - 1) * limit;
+    const end = start + limit;
+    const data = all.slice(start, end);
+
+    if (delayMs > 0) await delay(delayMs);
+
+    return HttpResponse.json({
+      data,
+      meta: {
+        page,
+        limit,
+        total,
+        totalPages,
+        hasNext: page < totalPages,
+        hasPrev: page > 1,
+      },
+    });
+  });
+}
+
 export function mockFetchInfinite<T>(
   path: string,
   data: { totalCount: number; list: T[] },

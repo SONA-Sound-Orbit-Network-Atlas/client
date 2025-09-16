@@ -1,10 +1,11 @@
 import React from 'react';
 import { mergeClassNames } from '@/utils/mergeClassNames';
 import sonaLogo from '@/assets/sona_logo_header_cropped_250w.png';
-import Button from '../common/Button';
-import { FiSave, FiArrowLeft } from 'react-icons/fi';
+import Button from '@/components/common/Button';
+import { FiArrowLeft } from 'react-icons/fi';
 import { useUserStore } from '@/stores/useUserStore';
 import { useSelectedStellarStore } from '@/stores/useSelectedStellarStore';
+import SaveButton from './SavaButton';
 
 interface HeaderProps {
   className?: string;
@@ -38,7 +39,7 @@ export default function Header({ className, children }: HeaderProps) {
       {/* 우측 사용자 메뉴 영역 - 로그인 상태일 때만 표시 */}
       {isLoggedIn && (
         <div className="flex items-center gap-3">
-          {/* 항성계 정보 텍스트 => 제거 */}
+          {/* 항성계 정보 텍스트 => 기획에서 제거됨 */}
           {/* <div className="text-right mr-2">
             <div className="text-white text-[14px] font-medium leading-tight">
               항성계 이름
@@ -48,10 +49,9 @@ export default function Header({ className, children }: HeaderProps) {
             </div>
           </div> */}
 
-          <Button color="tertiary" size="sm">
-            <FiSave className="w-4 h-4" />
-            SAVE
-          </Button>
+          <SaveButton />
+
+          {/* BACK TO GALAXY 버튼 */}
           <Button color="tertiary" size="sm" onClick={() => setIdle()}>
             <FiArrowLeft className="w-4 h-4" />
             BACK TO GALAXY

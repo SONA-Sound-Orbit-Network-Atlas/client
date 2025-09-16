@@ -1,6 +1,6 @@
 // Star - 항성 시스템 (전역 상태 관리 + 중앙 클락)
 // 모든 행성(악기)에 영향을 주는 전역 설정을 관리하고 중앙 클락을 제공합니다.
-// SONA 지침: Spin→BPM, Color→Key/Scale, Brightness→Volume, Size→Complexity
+// SONA 지침: Spin→BPM, Color→Key/Scale, Brightness→Master Tone Character, Size→Complexity
 
 import * as Tone from 'tone';
 import type { StarGlobalState, KeyName, ScaleName } from '../../types/audio';
@@ -13,7 +13,7 @@ export class Star {
   // 항성의 물리적 속성
   private properties = {
     spin: 50,       // 0-100 → BPM 60-180
-    brightness: 70, // 0-100 → Volume 0-100  
+    brightness: 70, // 0-100 → Master Tone Character (0-30: Warm, 70-100: Bright)
     color: 0,       // 0-360 → Key/Scale
     size: 50        // 0-100 → Complexity 1-3
   };
@@ -21,7 +21,7 @@ export class Star {
   // 파생된 전역 상태
   private globalState: StarGlobalState = {
     bpm: 120,
-    volume: 70,
+    toneCharacter: 70,
     key: 'C',
     scale: 'Major',
     complexity: 2
@@ -226,8 +226,9 @@ export class Star {
     // Spin → BPM (60-180)
     this.globalState.bpm = Math.round(60 + (this.properties.spin / 100) * 120);
     
-    // Brightness → Volume (0-100)
-    this.globalState.volume = this.properties.brightness;
+    // Brightness → Master Tone Character (0-100)
+    // 0-30: Warm/Dark, 30-70: Balanced, 70-100: Bright/Sharp
+    this.globalState.toneCharacter = this.properties.brightness;
     
     // Size → Complexity (1-3)
     this.globalState.complexity = Math.max(1, Math.min(3, Math.round(1 + (this.properties.size / 100) * 2))) as 1 | 2 | 3;

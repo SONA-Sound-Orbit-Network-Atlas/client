@@ -9,13 +9,6 @@ import type { StellarSystem } from '@/types/stellar';
 // import { useSidebarStore } from '@/stores/useSidebarStore';
 // import { useStellarTabStore } from '@/stores/useStellarTabStore';
 
-// 생성
-export function useCreateStellar(stellarData: StellarSystem) {
-  return useMutation({
-    mutationFn: () => stellarAPI.createStellar(stellarData),
-  });
-}
-
 // 조회
 // 갤럭시 id 값 변경 => 스텔라 정보 api 호출 및 갱신 후 => 스토어에 저장
 // export function useGetStellar() {
@@ -63,17 +56,33 @@ export function useGetStellar(stellarId: string) {
   });
 }
 
+// 생성
+export function useCreateStellar() {
+  return useMutation({
+    mutationFn: (stellarData: StellarSystem) =>
+      stellarAPI.createStellar(stellarData),
+  });
+}
+
 // 수정
-export function useUpdateStellar(
-  stellarId: string,
-  stellarData: StellarSystem
-) {
+export function useUpdateStellar() {
   const queryClient = useQueryClient();
 
-  return useMutation({
-    mutationFn: () => stellarAPI.updateStellar(stellarId, stellarData),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['stellar', stellarId] });
+  return useMutation<
+    StellarSystem,
+    Error,
+    { stellarId: string; stellarData: StellarSystem }
+  >({
+    // 1) 변수 하나로 받기
+    mutationFn: ({ stellarId, stellarData }) =>
+      stellarAPI.updateStellar(stellarId, stellarData),
+
+    // 2) 성공 시 캐시 갱신
+    onSuccess: (data, { stellarId }) => {
+      // 방어적으로 상세 캐시 직접 갱신
+      queryClient.setQueryData(['stellar', stellarId], data);
+      // 혹시 다른 곳에서 쓰는 목록/상위 캐시가 있으면 무효화
+      queryClient.invalidateQueries({ queryKey: ['stellarList'] });
     },
   });
 }

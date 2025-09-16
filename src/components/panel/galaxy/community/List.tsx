@@ -3,7 +3,7 @@ import { useGetGalaxyCommunityList } from '@/hooks/api/useGalaxy';
 import CardItem from './CardItem';
 import {
   type SortLabel,
-  type GalaxyCommunityListData,
+  type GalaxyCommunityItem,
   toSortValue,
 } from '@/types/galaxyCommunity';
 import Button from '@/components/common/Button';
@@ -33,7 +33,7 @@ function ContentComp({ sort }: { sort: SortLabel }) {
     useGetGalaxyCommunityList({
       page: 1,
       limit: GALAXY_LIST_LIMIT,
-      sort: toSortValue(sort),
+      rank_type: toSortValue(sort),
     });
   // 평탄화 된 list 데이터
   const galaxyCommunityList = data?.list ?? [];
@@ -42,7 +42,7 @@ function ContentComp({ sort }: { sort: SortLabel }) {
     <div>
       {/* 은하 리스트 */}
       <div className="space-y-3">
-        {galaxyCommunityList.map((galaxySystem: GalaxyCommunityListData) => (
+        {galaxyCommunityList.map((galaxySystem: GalaxyCommunityItem) => (
           <CardItem
             key={galaxySystem.id}
             {...galaxySystem}

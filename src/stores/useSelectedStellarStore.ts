@@ -1,8 +1,8 @@
 import { create } from 'zustand';
 
 type PanelMode = 'idle' | 'view' | 'create';
-// view: 기존 stellar 보기
 // idle: 아무 것도 선택 안 함(SelectRequired 보여줌)
+// view: 기존 stellar 보기
 // create: 새 galaxy/stellar 생성 폼
 
 interface SelectedStellarStore {

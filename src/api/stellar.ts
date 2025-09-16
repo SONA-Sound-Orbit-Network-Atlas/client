@@ -1,21 +1,22 @@
 import axiosInstance from '@/lib/axios';
 import type { StellarSystem } from '@/types/stellar';
+import { endpoints } from './endpoints';
 
 // stellar API
 export const stellarAPI = {
-  // 생성
-  createStellar: async (stellarData: StellarSystem): Promise<StellarSystem> => {
-    const response = await axiosInstance.post<StellarSystem>(
-      '/api/stellar-systems/compose',
-      stellarData
+  // 조회
+  getStellar: async (stellarId: string): Promise<StellarSystem> => {
+    const response = await axiosInstance.get<StellarSystem>(
+      endpoints.stellarSystem.byId(stellarId)
     );
     return response.data;
   },
 
-  // 조회
-  getStellar: async (stellarId: string): Promise<StellarSystem> => {
-    const response = await axiosInstance.get<StellarSystem>(
-      `/stellarSystems/${stellarId}`
+  // 생성
+  createStellar: async (stellarData: StellarSystem): Promise<StellarSystem> => {
+    const response = await axiosInstance.post<StellarSystem>(
+      endpoints.stellarSystem.base,
+      stellarData
     );
     return response.data;
   },
@@ -26,7 +27,7 @@ export const stellarAPI = {
     stellarData: StellarSystem
   ): Promise<StellarSystem> => {
     const response = await axiosInstance.put<StellarSystem>(
-      `/api/stellarSystems/${stellarId}`,
+      endpoints.stellarSystem.byId(stellarId),
       stellarData
     );
     return response.data;
@@ -34,6 +35,6 @@ export const stellarAPI = {
 
   // 삭제
   deleteStellar: async (stellarId: string): Promise<void> => {
-    await axiosInstance.delete(`/api/stellarSystems/${stellarId}`);
+    await axiosInstance.delete(endpoints.stellarSystem.byId(stellarId));
   },
 };
