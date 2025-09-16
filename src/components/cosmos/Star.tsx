@@ -71,17 +71,17 @@ export default function Star({ centralStar, position = [0, 0, 0] }: StarProps) {
           emissive={color}
           emissiveIntensity={brightness}
         />
-        <Sphere args={[size * 1.5, 32, 32]} renderOrder={1}>
-          <FakeGlowMaterial
-            falloff={0.2}
-            glowInternalRadius={3}
-            glowColor={color}
-            glowSharpness={1}
-            side={THREE.DoubleSide}
-            depthTest={true}
-            depthWrite={false}
-          />
-        </Sphere>
+      </Sphere>
+      <Sphere args={[size * 2.0, 32, 32]} renderOrder={1} position={position}>
+        <FakeGlowMaterial
+          falloff={0.4}
+          glowInternalRadius={5}
+          glowColor={color}
+          glowSharpness={1}
+          side={THREE.DoubleSide}
+          depthTest={true}
+          depthWrite={false}
+        />
       </Sphere>
     </group>
   );

@@ -1,9 +1,10 @@
-import { useMemo } from 'react';
+import { useMemo, useEffect, useRef } from 'react';
 import { shaderMaterial } from '@react-three/drei';
 import { extend } from '@react-three/fiber';
 import type { Side } from 'three';
 import { AdditiveBlending, Color, FrontSide } from 'three';
 import type { ColorRepresentation } from 'three';
+import * as THREE from 'three';
 
 /**
  * @typedef {Object} FakeGlowMaterialProps
@@ -45,13 +46,15 @@ export const FakeGlowMaterial = ({
   depthTest = true,
   depthWrite = false,
 }: Props) => {
+  const materialRef = useRef<THREE.ShaderMaterial>(null);
+
   const FakeGlowMaterial = useMemo(() => {
     return shaderMaterial(
       {
-        falloffAmount: falloff,
-        glowInternalRadius,
-        glowColor: new Color(glowColor),
-        glowSharpness,
+        falloffAmount: 0.1,
+        glowInternalRadius: 6,
+        glowColor: new Color('#00ff00'),
+        glowSharpness: 1,
       },
       /*GLSL */
       `
@@ -88,13 +91,24 @@ export const FakeGlowMaterial = ({
         gl_FragColor = vec4(clamp(glowColor * fresnel, 0., 1.0), clamp(fakeGlow, 0., 1.0));
       }`
     );
+  }, []); // 빈 의존성 배열로 한 번만 생성
+
+  // props가 변경될 때마다 uniform 값을 업데이트
+  useEffect(() => {
+    if (materialRef.current) {
+      materialRef.current.uniforms.falloffAmount.value = falloff;
+      materialRef.current.uniforms.glowInternalRadius.value =
+        glowInternalRadius;
+      materialRef.current.uniforms.glowColor.value = new Color(glowColor);
+      materialRef.current.uniforms.glowSharpness.value = glowSharpness;
+    }
   }, [falloff, glowInternalRadius, glowColor, glowSharpness]);
 
   extend({ FakeGlowMaterial });
 
   return (
     <fakeGlowMaterial
-      key={FakeGlowMaterial.key}
+      ref={materialRef}
       side={side}
       transparent={true}
       blending={AdditiveBlending}
