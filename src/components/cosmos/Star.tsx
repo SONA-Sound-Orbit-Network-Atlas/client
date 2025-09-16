@@ -37,6 +37,11 @@ export default function Star({ centralStar, position = [0, 0, 0] }: StarProps) {
   // 색상 변환 (숫자 값을 색상으로)
   const color = valueToColor(colorValue, 0, 360);
 
+  // brightness를 FakeGlowMaterial 속성으로 매핑
+  const glowSize = brightness * 0.5; // 0.15 ~ 2.5
+  const glowIntensity = Math.min(brightness * 0.3, 1.0); // 0.09 ~ 1.0
+  const glowFalloff = Math.max(0.1, 1.0 - brightness * 0.2); // 0.1 ~ 0.9
+
   const onStarPointerOver = () => {
     setIsHovered(true);
   };
@@ -72,12 +77,16 @@ export default function Star({ centralStar, position = [0, 0, 0] }: StarProps) {
           emissiveIntensity={brightness}
         />
       </Sphere>
-      <Sphere args={[size * 2.0, 32, 32]} renderOrder={1} position={position}>
+      <Sphere
+        args={[size * (3.0 + glowSize), 32, 32]}
+        renderOrder={1}
+        position={position}
+      >
         <FakeGlowMaterial
-          falloff={0.4}
-          glowInternalRadius={5}
+          falloff={glowFalloff}
+          glowInternalRadius={6}
           glowColor={color}
-          glowSharpness={1}
+          glowSharpness={glowIntensity * 3}
           side={THREE.DoubleSide}
           depthTest={true}
           depthWrite={false}

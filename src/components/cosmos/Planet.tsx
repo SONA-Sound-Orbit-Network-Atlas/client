@@ -40,6 +40,11 @@ export default function Planet({ planet, isSelectable = false }: PlanetProps) {
     'distanceFromStar',
     planet.planetId + 1
   );
+
+  // planetBrightness를 FakeGlowMaterial 속성으로 매핑
+  const glowSize = planetBrightness * 0.3; // 0.09 ~ 1.5
+  const glowIntensity = Math.min(planetBrightness * 0.2, 1.0); // 0.06 ~ 1.0
+  const glowFalloff = Math.max(0.1, 1.0 - planetBrightness * 0.15); // 0.1 ~ 0.925
   const orbitSpeed = getPropertyValue('orbitSpeed', 0.5);
   const rotationSpeed = getPropertyValue('rotationSpeed', 0.01);
   const inclination = getPropertyValue('inclination', 0);
@@ -134,12 +139,12 @@ export default function Planet({ planet, isSelectable = false }: PlanetProps) {
             emissiveIntensity={0}
           />
         </mesh>
-        <Sphere args={[planetSize * 1.5, 16, 16]} renderOrder={1}>
+        <Sphere args={[planetSize * (2 + glowSize), 16, 16]} renderOrder={1}>
           <FakeGlowMaterial
-            falloff={0.4}
-            glowInternalRadius={5}
+            falloff={glowFalloff}
+            glowInternalRadius={6}
             glowColor={valueToColor(planetColor, 0, 360)}
-            glowSharpness={10}
+            glowSharpness={glowIntensity * 5}
             side={THREE.DoubleSide}
             depthTest={true}
             depthWrite={false}
