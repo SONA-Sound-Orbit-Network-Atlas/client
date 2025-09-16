@@ -1,5 +1,5 @@
 import axiosInstance from '@/lib/axios';
-import type { Galaxy, ParamsGetAllStellarList } from '@/types/galaxy';
+import type { ParamsGetAllStellarList } from '@/types/galaxy';
 import type {
   GalaxyCommunityData,
   ParamsGetGalaxyCommunityList,

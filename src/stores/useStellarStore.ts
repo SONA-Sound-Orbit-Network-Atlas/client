@@ -51,6 +51,7 @@ export const initialStellarStore: StellarSystem = {
     updated_at: '',
   },
   planets: [],
+  position: [0, 0, 0],
 };
 
 /***** 3) 유틸: 임시 ID 생성 *****/
