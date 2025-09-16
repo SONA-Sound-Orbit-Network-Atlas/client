@@ -5,6 +5,8 @@ import type {
   FollowStats,
   GetFollowersParams,
   FollowersResponse,
+  GetFollowingsParams,
+  FollowingsResponse,
 } from '@/types/follow';
 import type { AxiosError } from 'axios';
 
@@ -65,15 +67,16 @@ export function useGetFollowers(params: GetFollowersParams) {
   });
 }
 
-// TODO: 팔로잉 목록 조회
-// export function useGetFollowings(userId: string) {
-//   return useQuery<User[]>({
-//     queryKey: ['followings', userId],
-//     queryFn: () => followAPI.getFollowings(userId),
-//     enabled: !!userId,
-//     staleTime: 5 * 60 * 1000, // 5분간 캐시 유지
-//   });
-// }
+// 팔로잉 목록 조회
+export function useGetFollowings(params: GetFollowingsParams) {
+  return useQuery<FollowingsResponse, AxiosError>({
+    queryKey: ['followings', params.userId, params.page, params.limit],
+    queryFn: () => followAPI.getFollowings(params),
+    enabled: !!params.userId,
+    staleTime: 5 * 60 * 1000, // 5분간 캐시 유지
+    placeholderData: (previousData) => previousData, // 페이지네이션 시 이전 데이터 유지
+  });
+}
 
 // TODO: 팔로우 상태 확인
 // export function useCheckFollowStatus(targetUserId: string) {

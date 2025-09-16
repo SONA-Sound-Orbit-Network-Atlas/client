@@ -10,7 +10,7 @@ import { useProfileStore } from '@/stores/useProfileStore';
 import { useLogout } from '@/hooks/api/useAuth';
 import { useGetUserProfile } from '@/hooks/api/useUser';
 import { useUserStore } from '@/stores/useUserStore';
-import { useGetFollowers } from '@/hooks/api/useFollow';
+import { useGetFollowers, useGetFollowings } from '@/hooks/api/useFollow';
 import ProfileStateWrapper from './ProfileStateWrapper';
 import Iconframe from '@/components/common/Iconframe';
 import Button from '@/components/common/Button';
@@ -32,6 +32,13 @@ export default function ProfileView() {
 
   // 팔로워 수 조회
   const { data: followersData } = useGetFollowers({
+    userId: userStore.id || '',
+    page: 1,
+    limit: 1, // 총 개수만 필요하므로 1개만 조회
+  });
+
+  // 팔로잉 수 조회
+  const { data: followingsData } = useGetFollowings({
     userId: userStore.id || '',
     page: 1,
     limit: 1, // 총 개수만 필요하므로 1개만 조회
@@ -151,7 +158,7 @@ export default function ProfileView() {
                   />
                   <StatCard
                     icon={<FiUserCheck className="text-secondary-300" />}
-                    value={18}
+                    value={followingsData?.meta?.total || 0}
                     label="FOLLOWINGS"
                     onClick={handleFollowingsClick}
                     className="hover:brightness-110 hover:bg-secondary-300/20 border-secondary-300/20 hover:text-secondary-300 hover:[&_p]:text-secondary-300 hover:[&_svg]:text-secondary-300"

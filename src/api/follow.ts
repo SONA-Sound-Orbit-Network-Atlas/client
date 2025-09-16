@@ -5,6 +5,9 @@ import type {
   GetFollowersParams,
   FollowersResponse,
   FollowersResponseRaw,
+  GetFollowingsParams,
+  FollowingsResponse,
+  FollowingsResponseRaw,
 } from '@/types/follow';
 
 export const followAPI = {
@@ -53,11 +56,38 @@ export const followAPI = {
     return transformedData;
   },
 
-  // TODO: 팔로잉 목록 조회
-  // getFollowings: async (userId: string): Promise<User[]> => {
-  //   const response = await axiosInstance.get(`/users/${userId}/followings`);
-  //   return response.data;
-  // },
+  // 팔로잉 목록 조회
+  getFollowings: async (
+    params: GetFollowingsParams
+  ): Promise<FollowingsResponse> => {
+    const { userId, page = 1, limit = 20 } = params;
+    const response = await axiosInstance.get<FollowingsResponseRaw>(
+      `/follows/${userId}/followings`,
+      {
+        params: { page, limit },
+      }
+    );
+
+    // 백엔드 응답을 Swagger 스펙에 맞는 구조로 변환
+    const rawData = response.data;
+
+    // 이미 올바른 구조인 경우 (meta가 있는 경우)
+    if ('meta' in rawData && rawData.meta) {
+      return rawData as FollowingsResponse;
+    }
+
+    // 잘못된 구조인 경우 변환
+    const transformedData: FollowingsResponse = {
+      meta: {
+        page: rawData.page,
+        limit: rawData.limit,
+        total: Array.isArray(rawData.total) ? rawData.total[0] : rawData.total,
+      },
+      items: rawData.items,
+    };
+
+    return transformedData;
+  },
 
   // TODO: 팔로우 상태 확인
   // checkFollowStatus: async (targetUserId: string): Promise<boolean> => {
