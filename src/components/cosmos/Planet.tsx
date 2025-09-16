@@ -3,9 +3,8 @@
 import { useFrame } from '@react-three/fiber';
 import { useEffect, useRef, useState, useMemo } from 'react';
 import * as THREE from 'three';
-import type { Planet } from '@/types/old_stellar';
+import type { Planet } from '@/types/stellar';
 import { calculateOrbitPosition } from '@/utils/orbitCalculations';
-import { useSceneStore } from '@/stores/useSceneStore';
 import { useSelectedObjectStore } from '@/stores/useSelectedObjectStore';
 import { valueToColor } from '@/utils/valueToColor';
 import { Outlines, Sphere } from '@react-three/drei';
@@ -18,28 +17,23 @@ interface PlanetProps {
 
 export default function Planet({ planet, isSelectable = false }: PlanetProps) {
   const meshRef = useRef<THREE.Mesh>(null);
-  const { setSelectedPlanetIndex } = useSceneStore();
   const { setSelectedObjectId, selectedObjectId } = useSelectedObjectStore();
   const [isHovered, setIsHovered] = useState(false);
   const [isSelected, setIsSelected] = useState(false);
 
   // Planet의 properties에서 필요한 값들을 추출하는 헬퍼 함수들
   const getPropertyValue = (
-    label: string,
+    key: keyof typeof planet.properties,
     defaultValue: number = 0
   ): number => {
-    const property = planet.properties.find((prop) => prop.label === label);
-    return property?.value ?? defaultValue;
+    return planet.properties[key] ?? defaultValue;
   };
 
   // 필요한 속성들 추출
   const planetSize = getPropertyValue('planetSize', 0.3);
   const planetColor = getPropertyValue('planetColor', 100);
   const planetBrightness = getPropertyValue('planetBrightness', 0.3);
-  const distanceFromStar = getPropertyValue(
-    'distanceFromStar',
-    planet.planetId + 1
-  );
+  const distanceFromStar = getPropertyValue('distanceFromStar', 10.5);
 
   // planetBrightness를 FakeGlowMaterial 속성으로 매핑
   const glowSize = planetBrightness * 0.3; // 0.09 ~ 1.5
@@ -75,13 +69,12 @@ export default function Planet({ planet, isSelectable = false }: PlanetProps) {
   }, [orbitPoints]);
 
   useEffect(() => {
-    setIsSelected(selectedObjectId === planet.planetId);
-  }, [selectedObjectId, planet.planetId]);
+    setIsSelected(selectedObjectId === planet.id);
+  }, [selectedObjectId, planet.id]);
 
   const onPlanetClicked = () => {
     if (isSelectable) {
-      setSelectedPlanetIndex(planet.planetId);
-      setSelectedObjectId(planet.planetId);
+      setSelectedObjectId(planet.id);
     }
   };
   const onPlanetPointerOver = () => {

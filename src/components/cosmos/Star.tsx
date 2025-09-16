@@ -1,6 +1,6 @@
 // 메인 항성성
 
-import type { CentralStar } from '@/types/old_stellar';
+import type { Star } from '@/types/stellar';
 import { valueToColor } from '@/utils/valueToColor';
 import { FakeGlowMaterial } from './materials/FakeGlowMaterial';
 import { Outlines, Sphere } from '@react-three/drei';
@@ -9,30 +9,19 @@ import { useEffect, useState } from 'react';
 import { useSelectedObjectStore } from '@/stores/useSelectedObjectStore';
 
 interface StarProps {
-  centralStar: CentralStar;
+  star: Star;
   position?: [number, number, number];
 }
 
-export default function Star({ centralStar, position = [0, 0, 0] }: StarProps) {
+export default function Star({ star, position = [0, 0, 0] }: StarProps) {
   const [isHovered, setIsHovered] = useState(false);
   const [isSelected, setIsSelected] = useState(false);
   const { setSelectedObjectId, selectedObjectId } = useSelectedObjectStore();
 
-  // CentralStar의 properties에서 필요한 값들을 추출하는 헬퍼 함수
-  const getPropertyValue = (
-    label: string,
-    defaultValue: number = 1
-  ): number => {
-    const property = centralStar.properties.find(
-      (prop) => prop.label === label
-    );
-    return property?.value ?? defaultValue;
-  };
-
   // 필요한 속성들 추출 (실제 데이터의 속성명 사용)
-  const size = getPropertyValue('planetSize', 1); // 0.01 단위로 변환
-  const colorValue = getPropertyValue('planetColor', 100);
-  const brightness = getPropertyValue('planetBrightness', 0.5); // 0.01 단위로 변환
+  const size = star.properties.size;
+  const colorValue = star.properties.color;
+  const brightness = star.properties.brightness; // 0.01 단위로 변환
 
   // 색상 변환 (숫자 값을 색상으로)
   const color = valueToColor(colorValue, 0, 360);
@@ -49,11 +38,11 @@ export default function Star({ centralStar, position = [0, 0, 0] }: StarProps) {
     setIsHovered(false);
   };
   const onClick = () => {
-    setSelectedObjectId(centralStar.planetId);
+    setSelectedObjectId(star.id);
   };
   useEffect(() => {
-    setIsSelected(selectedObjectId === centralStar.planetId);
-  }, [selectedObjectId, centralStar.planetId]);
+    setIsSelected(selectedObjectId === star.id);
+  }, [selectedObjectId, star.id]);
 
   return (
     <group>

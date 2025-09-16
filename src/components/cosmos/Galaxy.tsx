@@ -1,7 +1,12 @@
 //은하계 컴포넌트
 
+import { useMemo } from 'react';
 import StellarSystem from './StellarSystem';
+import SimpleStellarPoint from './SimpleStellarPoint';
+import { useSelectedStellarStore } from '@/stores/useSelectedStellarStore';
+import useStellarSystemSelection from '@/hooks/useStellarSystemSelection';
 
+// 임시 더미 데이터 (나중에 API로 교체)
 const dummyStellarList = [
   { id: 'sys-001', stellarSystemPos: [0, 0, 0], starColor: 0 },
   { id: 'sys-002', stellarSystemPos: [20, 0, 0], starColor: 60 },
@@ -13,16 +18,45 @@ const dummyStellarList = [
 ];
 
 export default function Galaxy() {
+  const { selectedStellarId } = useSelectedStellarStore();
+  const { selectStellar } = useStellarSystemSelection();
+
+  // 선택된 스텔라 정보
+  const selectedStellar = useMemo(() => {
+    return dummyStellarList.find((stellar) => stellar.id === selectedStellarId);
+  }, [selectedStellarId]);
+
+  // 선택되지 않은 스텔라들
+  const unselectedStellars = useMemo(() => {
+    return dummyStellarList.filter(
+      (stellar) => stellar.id !== selectedStellarId
+    );
+  }, [selectedStellarId]);
+
+  const handleStellarClick = (stellarId: string) => {
+    selectStellar(stellarId);
+  };
+
   return (
     <group>
-      {dummyStellarList.map((stellar) => (
+      {/* 선택된 스텔라만 디테일 렌더링 */}
+      {selectedStellar && (
         <StellarSystem
-          key={stellar.id}
+          key={selectedStellar.id}
           stellarSystemPos={
-            stellar.stellarSystemPos as [number, number, number]
+            selectedStellar.stellarSystemPos as [number, number, number]
           }
-          id={stellar.id}
-          starColor={stellar.starColor}
+          id={selectedStellar.id}
+        />
+      )}
+
+      {/* 선택되지 않은 스텔라들은 심플 포인트로 렌더링 */}
+      {unselectedStellars.map((stellar) => (
+        <SimpleStellarPoint
+          key={stellar.id}
+          position={stellar.stellarSystemPos as [number, number, number]}
+          color={stellar.starColor}
+          onClick={() => handleStellarClick(stellar.id)}
         />
       ))}
     </group>
