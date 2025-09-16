@@ -1,6 +1,6 @@
 // 행성들 ( 악기들)
 
-import { useFrame } from '@react-three/fiber';
+import { useFrame, useLoader } from '@react-three/fiber';
 import { useEffect, useRef, useState, useMemo } from 'react';
 import * as THREE from 'three';
 import type { Planet } from '@/types/stellar';
@@ -20,6 +20,7 @@ export default function Planet({ planet, isSelectable = false }: PlanetProps) {
   const { setSelectedObjectId, selectedObjectId } = useSelectedObjectStore();
   const [isHovered, setIsHovered] = useState(false);
   const [isSelected, setIsSelected] = useState(false);
+  const atmosphereRef = useRef<THREE.Mesh>(null);
 
   // Planet의 properties에서 필요한 값들을 추출하는 헬퍼 함수들
   const getPropertyValue = (
@@ -28,6 +29,11 @@ export default function Planet({ planet, isSelectable = false }: PlanetProps) {
   ): number => {
     return planet.properties[key] ?? defaultValue;
   };
+
+  const cloudTexture = useLoader(
+    THREE.TextureLoader,
+    'public/assets/Clouds2.png'
+  );
 
   // 필요한 속성들 추출
   const planetSize = getPropertyValue('planetSize', 0.3);
@@ -84,6 +90,54 @@ export default function Planet({ planet, isSelectable = false }: PlanetProps) {
     setIsHovered(false);
   };
 
+  const color = new THREE.Color(valueToColor(planetColor, 0, 360));
+  // Atmosphere + Cloud Shader
+  const atmosphereMaterial = useMemo(() => {
+    return new THREE.ShaderMaterial({
+      transparent: true,
+      blending: THREE.AdditiveBlending,
+      uniforms: {
+        uTime: { value: 0 },
+        uBaseColor: { value: new THREE.Color(color) },
+        uCloudMap: { value: cloudTexture },
+        uRotation: { value: 0 },
+      },
+      vertexShader: `
+        varying vec2 vUv;
+        void main() {
+          vUv = uv;
+          gl_Position = projectionMatrix * modelViewMatrix * vec4(position,1.0);
+        }
+      `,
+      fragmentShader: `
+        uniform float uTime;
+        uniform vec3 uBaseColor;
+        uniform sampler2D uCloudMap;
+        uniform float uRotation;
+        varying vec2 vUv;
+
+        vec2 rotateUV(vec2 uv, float angle) {
+          vec2 center = uv - 0.5;
+          float s = sin(angle);
+          float c = cos(angle);
+          mat2 rot = mat2(c, -s, s, c);
+          return rot * center + 0.5;
+        }
+
+        void main() {
+          vec2 uv = rotateUV(vUv, uRotation);
+          vec3 cloudColor = texture2D(uCloudMap, uv).rgb;
+
+          // 채도 낮추기: gray mix
+          float gray = dot(cloudColor, vec3(0.299, 0.587, 0.114));
+          vec3 finalColor = mix(uBaseColor, vec3(gray), 0.5);
+
+          gl_FragColor = vec4(finalColor, 0.5);
+        }
+      `,
+    });
+  }, [color, cloudTexture]);
+
   useFrame((state, deltaTime) => {
     if (meshRef.current) {
       // 1. 공전 각도 계산
@@ -100,11 +154,19 @@ export default function Planet({ planet, isSelectable = false }: PlanetProps) {
       // 3. 위치 업데이트
       meshRef.current.position.set(x, y, z);
 
-      // 4. 자전
+      // 4. 자전 (Y축 기준으로 자전속도만 적용)
       meshRef.current.rotation.y += rotationSpeed * deltaTime;
-      meshRef.current.rotation.z += tilt * deltaTime;
     }
   });
+
+  // 자전축 기울기(tilt) 초기 설정
+  useEffect(() => {
+    if (meshRef.current) {
+      // tilt를 라디안으로 변환하여 X축 회전으로 적용 (자전축 기울기)
+      // Z축 회전이 아닌 X축 회전으로 자전축을 기울임
+      meshRef.current.rotation.x = (tilt * Math.PI) / 180;
+    }
+  }, [tilt]);
 
   return (
     <>
@@ -115,6 +177,7 @@ export default function Planet({ planet, isSelectable = false }: PlanetProps) {
 
       {/* Planet 렌더링 */}
       <group ref={meshRef}>
+        {/* planet */}
         <mesh
           onClick={onPlanetClicked}
           onPointerOver={onPlanetPointerOver}
@@ -127,12 +190,18 @@ export default function Planet({ planet, isSelectable = false }: PlanetProps) {
             visible={isHovered || isSelected}
           />
           <sphereGeometry args={[planetSize, 16, 16]} />
-          <meshStandardMaterial
-            color={valueToColor(planetColor, 0, 360)}
-            emissiveIntensity={0}
-          />
+          <meshStandardMaterial color={color} />
         </mesh>
-        <Sphere args={[planetSize * (2 + glowSize), 16, 16]} renderOrder={1}>
+        Atmosphere + Clouds
+        <mesh ref={atmosphereRef} scale={1.01} material={atmosphereMaterial}>
+          <sphereGeometry args={[planetSize, 64, 64]} />
+        </mesh>
+        {/* glow */}
+        <Sphere
+          args={[planetSize * (2 + glowSize), 16, 16]}
+          renderOrder={1}
+          visible={true}
+        >
           <FakeGlowMaterial
             falloff={glowFalloff}
             glowInternalRadius={6}
