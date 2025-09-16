@@ -1,4 +1,8 @@
-import { useSuspenseInfiniteQuery, type QueryKey } from '@tanstack/react-query';
+import {
+  useSuspenseInfiniteQuery,
+  useQuery,
+  type QueryKey,
+} from '@tanstack/react-query';
 import { galaxyAPI } from '@/api/galaxy';
 import type {
   ParamsGetGalaxyCommunityList,
@@ -10,6 +14,7 @@ import type {
   GalaxyMyData,
   GalaxyMyListData,
 } from '@/types/galaxyMy';
+import type { Galaxy, ParamsGetAllStellarList } from '@/types/galaxy';
 
 // Galaxy Community 리스트 조회
 type FlattenedCommunity = {
@@ -82,3 +87,17 @@ export function useGetGalaxyMyList(params: ParamsGetGalaxyMyList) {
     },
   });
 }
+
+/**
+ * Galaxy 데이터를 React Query로 관리하는 간단한 훅
+ * 전체 스텔라 리스트를 가져옴
+ */
+export const useGalaxy = (galaxyId: string) => {
+  return useQuery({
+    queryKey: ['galaxy', galaxyId],
+    queryFn: () => galaxyAPI.getAllStellarList({ id: galaxyId }),
+    enabled: !!galaxyId,
+    staleTime: 5 * 60 * 1000, // 5분
+    gcTime: 10 * 60 * 1000, // 10분
+  });
+};
