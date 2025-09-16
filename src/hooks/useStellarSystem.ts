@@ -7,12 +7,7 @@ import * as THREE from 'three';
 
 export function useStellarSystem() {
   // 선택한 항성계 변경
-  const {
-    setSelectedStellarSystemId,
-    setSelectedStellarSystem,
-    setViewMode,
-    setCameraTarget,
-  } = useSceneStore();
+  const { setCameraTarget } = useSceneStore();
   const { setSelectedStellarId, setIdle } = useSelectedStellarStore();
   const { stellarStore } = useStellarStore();
   // 항성계 뷰 진입
