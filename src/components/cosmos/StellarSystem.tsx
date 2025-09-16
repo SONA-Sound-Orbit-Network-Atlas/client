@@ -59,7 +59,7 @@ export default function StellarSystem({
         onClick={onStellarSystemClicked}
         renderOrder={1}
       >
-        <sphereGeometry args={[LOW_DETAIL_SIZE, 8, 8]} />
+        <sphereGeometry args={[LOW_DETAIL_SIZE, 16, 16]} />
         <meshStandardMaterial
           color="#ff6b6b"
           emissive="#ffffff"
