@@ -2,37 +2,37 @@ import ButtonFavorite from '@/components/common/ButtonFavorite';
 import Card from '@/components/common/Card/Card';
 import { IoPlanetOutline } from 'react-icons/io5';
 import { FaRegHeart } from 'react-icons/fa';
-import type { GalaxyCommunityListData } from '@/types/galaxyCommunity';
+import type { GalaxyCommunityItem } from '@/types/galaxyCommunity';
 import { useCreateFavorite, useDeleteFavorite } from '@/hooks/api/useFavorite';
 
-interface CardItemProps extends GalaxyCommunityListData {
+interface CardItemProps extends GalaxyCommunityItem {
   onClick: () => void;
 }
 
 export default function CardItem({
   id,
   rank,
-  galaxyName,
-  makerName,
-  updatedAt,
-  planetCount,
-  favoriteCount,
-  myFavorite, // api 데이터에서 로그인 되어있다면 boolean, 비로그인이면 null
+  title,
+  created_by_id,
+  updated_at,
+  planet_count,
+  like_count,
+  // myFavorite, // api 데이터에서 로그인 되어있다면 boolean, 비로그인이면 null
   onClick,
 }: CardItemProps) {
   // 좋아요 hook
   const { mutate: createFavorite } = useCreateFavorite();
   const { mutate: deleteFavorite } = useDeleteFavorite();
   // 좋아요 클릭
-  const handleClickFavorite = () => {
-    if (myFavorite === null) return;
+  // const handleClickFavorite = () => {
+  //   if (myFavorite === null) return;
 
-    if (myFavorite === true) {
-      deleteFavorite({ targetId: id });
-    } else if (myFavorite === false) {
-      createFavorite({ targetId: id });
-    }
-  };
+  //   if (myFavorite === true) {
+  //     deleteFavorite({ targetId: id });
+  //   } else if (myFavorite === false) {
+  //     createFavorite({ targetId: id });
+  //   }
+  // };
 
   return (
     <Card onClick={onClick} role="button">
@@ -44,21 +44,21 @@ export default function CardItem({
               #{rank}
             </span>
             <strong className="text-white truncate flex-1 min-w-0">
-              {galaxyName}
+              {title}
             </strong>
           </div>
           <div className="mt-3 flex flex-col items-start gap-1 text-[12px] text-text-muted">
             <span>
-              BY <span className="text-primary-300">{makerName}</span>
+              BY <span className="text-primary-300">{created_by_id}</span>
             </span>
-            <span>{updatedAt}</span>
+            <span>{updated_at}</span>
           </div>
         </div>
         {/* 좋아요 버튼 => active에 null 이 들어가면 비로그인 상태이므로 비활성화 */}
         <ButtonFavorite
           className="flex-shrink-0"
-          active={myFavorite}
-          onClick={handleClickFavorite}
+          // active={myFavorite}
+          // onClick={handleClickFavorite}
         />
       </div>
 
@@ -66,11 +66,11 @@ export default function CardItem({
       <div className="mt-3 flex gap-4">
         <div>
           <IoPlanetOutline className="inline-block w-[12px] h-[16px] mr-1" />
-          {planetCount}
+          {planet_count}
         </div>
         <div>
           <FaRegHeart className="inline-block w-[12px] h-[16px] mr-1" />
-          {favoriteCount}
+          {like_count}
         </div>
       </div>
     </Card>

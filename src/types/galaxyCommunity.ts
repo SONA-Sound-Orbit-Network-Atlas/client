@@ -1,27 +1,72 @@
-// Galaxy Community 데이터
-export interface GalaxyCommunityData {
-  totalCount: number;
-  list: GalaxyCommunityListData[];
+export interface GalaxyCommunityItem {
+  id: string;
+  title: string;
+  galaxy_id: string;
+  owner_id: string;
+  created_by_id: string;
+  created_at: string;
+  updated_at: string;
+  like_count: number;
+  planet_count: number;
+  rank: number;
+  // myFavorite: boolean | null;
 }
 
-// Galaxy Community - List 데이터
-export interface GalaxyCommunityListData {
-  id: string;
-  userId: string;
-  rank: number;
-  galaxyName: string;
-  makerName: string;
-  updatedAt: string;
-  planetCount: number;
-  favoriteCount: number;
-  myFavorite: boolean | null; // 로그인 상태면 true/false, 비로그인 상태면 null
+export interface GalaxyCommunityMeta {
+  page: number;
+  limit: number;
+  total: number;
+  totalPages: number;
+  hasNext: boolean;
+  hasPrev: boolean;
 }
+
+export interface GalaxyCommunityResponse {
+  data: GalaxyCommunityItem[];
+  meta: GalaxyCommunityMeta;
+}
+
+// 우리 앱에서 쓰는 어댑트 결과/플랫 결과 타입
+export interface GalaxyCommunityPage {
+  list: GalaxyCommunityItem[];
+  totalCount: number;
+  page: number;
+  hasNext: boolean;
+}
+
+export interface FlattenedCommunity {
+  list: GalaxyCommunityItem[];
+  totalCount: number;
+}
+
+// Galaxy Community 데이터 => 평탄화 타입
+// export type GalaxyCommunityData = {
+//   list: BackendItem[];
+//   totalCount: number;
+//   page: number;
+//   hasNext: boolean;
+// };
+
+// Galaxy Community - List 데이터
+// export interface GalaxyCommunityListData {
+//   id: string;
+//   title: string;
+//   galaxy_id: string;
+//   owner_id: string;
+//   created_by_id: string;
+//   created_at: string;
+//   updated_at: string;
+//   planet_count: number;
+//   like_count: number;
+//   myFavorite: boolean | null; // 로그인 상태면 true/false, 비로그인 상태면 null
+//   rank: number;
+// }
 
 // 은하 목록 조회 파라미터
 export interface ParamsGetGalaxyCommunityList {
   page: number;
   limit: number;
-  sort: string;
+  rank_type: string;
 }
 
 // 은하 목록 정렬 타입

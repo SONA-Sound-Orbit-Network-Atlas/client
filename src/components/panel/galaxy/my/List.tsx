@@ -24,12 +24,11 @@ export default function List() {
 function ContentComp() {
   const { selectStellar } = useStellarSystemSelection();
 
-  const queryResult = useGetGalaxyMyList({
-    page: 1,
-    limit: GALAXY_LIST_LIMIT,
-  });
-
-  const { data, fetchNextPage, hasNextPage, isFetchingNextPage } = queryResult;
+  const { data, fetchNextPage, hasNextPage, isFetchingNextPage } =
+    useGetGalaxyMyList({
+      page: 1,
+      limit: GALAXY_LIST_LIMIT,
+    });
 
   const myGalaxyList = data?.list ?? [];
 

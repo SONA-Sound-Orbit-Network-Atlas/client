@@ -8,6 +8,7 @@ import type {
 } from '@/types/stellar';
 import type { StarProperties } from '@/types/starProperties';
 import type { PlanetProperties } from '@/types/planetProperties';
+import { useUserStore } from '@/stores/useUserStore';
 
 /***** 1) 기본 프로퍼티 디폴트 *****/
 const defaultStarProps: StarProperties = {
@@ -62,7 +63,7 @@ export const initialStellarStore: StellarSystem = {
 interface StellarStore {
   stellarStore: StellarSystem;
   setStellarStore: (stellarStore: StellarSystem) => void;
-  setInitialStellarStore: (username: string) => void;
+  setInitialStellarStore: () => void;
   addNewObjectAndReturnId: () => string;
 }
 
@@ -72,16 +73,19 @@ export const useStellarStore = create<StellarStore>((set) => ({
 
   setStellarStore: (stellarStore) => set({ stellarStore }),
 
-  setInitialStellarStore: (username) =>
+  setInitialStellarStore: () =>
     set(() => {
-      // 작성자/소유자 계열 필드를 username 기반으로 세팅
+      // 작성자/소유자 계열 필드를 userId 기반으로 세팅 => 비로그인 경우 '' 빈 값
+      // 훅 호출하지 않고, 스토어 인스턴스의 getState() 사용
+      const userId = useUserStore.getState().userStore.id ?? '';
       const now = new Date().toISOString();
       return {
         stellarStore: {
           ...initialStellarStore,
-          owner_id: username,
-          created_by_id: username,
-          original_author_id: username,
+          owner_id: userId,
+          created_by_id: userId,
+          original_author_id: userId,
+          created_at: now,
           updated_at: now,
           star: {
             ...(initialStellarStore.star as Star),

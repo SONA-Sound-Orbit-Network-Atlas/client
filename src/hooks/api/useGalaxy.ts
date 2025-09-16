@@ -2,8 +2,9 @@ import { useSuspenseInfiniteQuery, type QueryKey } from '@tanstack/react-query';
 import { galaxyAPI } from '@/api/galaxy';
 import type {
   ParamsGetGalaxyCommunityList,
-  GalaxyCommunityData,
-  GalaxyCommunityListData,
+  GalaxyCommunityPage,
+  FlattenedCommunity,
+  GalaxyCommunityItem,
 } from '@/types/galaxyCommunity';
 import type {
   ParamsGetGalaxyMyList,
@@ -11,39 +12,31 @@ import type {
   GalaxyMyListData,
 } from '@/types/galaxyMy';
 
-// Galaxy Community 리스트 조회
-type FlattenedCommunity = {
-  list: GalaxyCommunityListData[];
-  totalCount: number;
-};
-
 export function useGetGalaxyCommunityList(
   params: ParamsGetGalaxyCommunityList
 ) {
   return useSuspenseInfiniteQuery<
-    GalaxyCommunityData, // 서버 원본 페이지 타입
-    Error, // 에러 타입
-    FlattenedCommunity, // 최종적으로 컴포넌트에서 data로 받을 타입 (select 적용 후)
-    QueryKey, // queryKey 타입
-    number // pageParam 타입
+    GalaxyCommunityPage, // TQueryFnData: API 어댑트 반환
+    Error, // TError
+    FlattenedCommunity, // TData: select 이후
+    QueryKey, // TQueryKey
+    number // TPageParam
   >({
-    queryKey: ['galaxyCommunityList', params.limit, params.sort],
+    queryKey: ['galaxyCommunityList', params.limit, params.rank_type],
     initialPageParam: 1,
     queryFn: ({ pageParam }) =>
       galaxyAPI.getGalaxyCommunityList({
         page: pageParam,
         limit: params.limit,
-        sort: params.sort,
+        rank_type: params.rank_type,
       }),
-    getNextPageParam: (lastPage, allPages, lastPageParam) => {
-      const totalCount = lastPage.totalCount;
-      const loadedCount = allPages.flatMap((p) => p.list).length;
-      return loadedCount < totalCount ? lastPageParam + 1 : undefined;
-    },
+    getNextPageParam: (lastPage) =>
+      lastPage.hasNext ? lastPage.page + 1 : undefined,
     select: (data) => {
-      // useQuery가 컴포넌트에 넘겨주는 data가 바뀐 형태
-      const list = data.pages.flatMap((p) => p.list);
-      const totalCount = data.pages[0]?.totalCount ?? 0; // 첫 페이지 메타 사용
+      const list: GalaxyCommunityItem[] = data.pages.flatMap(
+        (p) => p.list ?? []
+      );
+      const totalCount = data.pages[0]?.totalCount ?? 0;
       return { list, totalCount };
     },
   });
