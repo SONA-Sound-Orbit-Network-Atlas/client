@@ -1,4 +1,4 @@
-// SolarSystem - 태양계 관리 클래스
+// StellarSystem - 항성계 관리 클래스
 // Star(항성)와 Planet(행성)들을 통합 관리합니다.
 
 import type { InstrumentRole, PlanetPhysicalProperties } from '../../types/audio';
@@ -6,8 +6,8 @@ import { Star } from './Star';
 import { Planet } from './Planet';
 import { AudioEngine } from './AudioEngine';
 
-export class SolarSystem {
-  private static _instance: SolarSystem | null = null;
+export class StellarSystem {
+  private static _instance: StellarSystem | null = null;
   
   private star: Star;
   private planets = new Map<string, Planet>();
@@ -19,23 +19,37 @@ export class SolarSystem {
   }
   
   // 싱글톤 패턴
-  static get instance(): SolarSystem {
+  static get instance(): StellarSystem {
     if (!this._instance) {
-      this._instance = new SolarSystem();
+      this._instance = new StellarSystem();
     }
     return this._instance;
   }
+
+  // === 랜덤 시드 관리 ===
+  setSeed(seed: number | string): void {
+    this.star.setSeed(seed);
+    console.log(`🌱 StellarSystem Seed 설정 (Star로 위임): ${seed}`);
+    // 재생 중인 행성 패턴 재생성하여 동일 결과 보장
+    Array.from(this.planets.values()).forEach(planet => {
+      if (planet.getIsPlaying()) {
+        // 행성 내부 regeneratePattern 은 private 이므로 stop/start 방식 사용
+        planet.stopPattern();
+        planet.startPattern().catch(err => console.error('Seed 재적용 패턴 시작 실패', err));
+      }
+    });
+  }
+
+  getSeed(): number | string | null { return this.star.getSeed(); }
   
   // 오디오 시스템 초기화
   async initialize(): Promise<void> {
     if (!this.audioEngine.isReady()) {
-      await this.audioEngine.init();
+      // 항성의 초기 상태를 AudioEngine 초기화에 전달
+      await this.audioEngine.init(this.star.getGlobalState());
     }
     
-    // 항성 초기 상태를 AudioEngine에 적용
-    this.audioEngine.updateStar(this.star.getGlobalState());
-    
-    console.log('🌌 SolarSystem 초기화 완료');
+    console.log('🌌 StellarSystem 초기화 완료');
   }
   
   // === 항성(Star) 관리 ===
@@ -63,13 +77,23 @@ export class SolarSystem {
   
   // 새 행성 추가
   addPlanet(role: InstrumentRole, customId?: string): string {
-    const planet = new Planet(role, customId);
+    const planet = new Planet(role, this.star, customId); // Star 인스턴스 주입
     const planetId = planet.getId();
     
     this.planets.set(planetId, planet);
     
     console.log(`🪐 행성 추가됨: ${planet.getName()} (${planetId})`);
     return planetId;
+  }
+
+  // 새 행성 생성 (addPlanet의 별칭)
+  createPlanet(role: InstrumentRole, customId?: string): string {
+    return this.addPlanet(role, customId);
+  }
+
+  // 항성 전역 상태 업데이트
+  updateStarGlobalState(globalState: Partial<import('../../types/audio').StarGlobalState>): void {
+    this.star.setGlobalState(globalState);
   }
   
   // 행성 제거
@@ -166,9 +190,7 @@ export class SolarSystem {
   
   // 모든 행성 패턴 정지
   stopAllPatterns(): void {
-    for (const planet of this.planets.values()) {
-      planet.stopPattern();
-    }
+    Array.from(this.planets.values()).forEach(planet => planet.stopPattern());
     console.log('⏹️ 모든 행성 패턴 정지');
   }
   
@@ -221,17 +243,15 @@ export class SolarSystem {
   dispose(): void {
     this.stopAllPatterns();
     
-    for (const planet of this.planets.values()) {
-      planet.dispose();
-    }
+    Array.from(this.planets.values()).forEach(planet => planet.dispose());
     
     this.planets.clear();
-    console.log('🌌 SolarSystem 정리됨');
+    console.log('🌌 StellarSystem 정리됨');
   }
   
   // 시스템 상태 디버깅
   debug(): void {
-    console.log('🌌 SolarSystem Debug Info:');
+    console.log('🌌 StellarSystem Debug Info:');
     console.log('📊 통계:');
     console.log(`  - 총 행성 수: ${this.getTotalPlanetsCount()}`);
     console.log(`  - 재생 중인 행성: ${this.getPlayingPlanetsCount()}`);
@@ -240,8 +260,8 @@ export class SolarSystem {
     this.star.debug();
     
     console.log('🪐 행성 목록:');
-    for (const planet of this.planets.values()) {
+    Array.from(this.planets.values()).forEach(planet => {
       console.log(`  - ${planet.getName()} (${planet.getId()}): ${planet.getIsPlaying() ? '재생중' : '정지'}`);
-    }
+    });
   }
 }

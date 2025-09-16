@@ -1,42 +1,49 @@
-import { useProfileStore } from '@/stores/useProfileStore';
+import {
+  navigateToOtherUserProfile,
+  navigateBack,
+} from '@/utils/profileNavigation';
 import PanelHeader from '../PanelHeader';
 import UserCard from '@/components/common/Card/UserCard';
 import { ScrollArea } from '@/components/common/Scrollarea';
 
 export default function FollowersPanel() {
-  const { setProfilePanelMode } = useProfileStore();
-
-  // 임시 데이터
+  // 테스트용 하드코딩된 팔로워 데이터
   const followers = [
     {
-      id: 1,
-      username: 'Follower1',
+      id: 101,
+      username: 'Alice',
       isFollowing: false,
       isMutualFollow: false,
     },
     {
-      id: 2,
-      username: 'Follower2',
+      id: 102,
+      username: 'Bob',
       isFollowing: true,
       isMutualFollow: true, // 서로 팔로우
     },
     {
-      id: 3,
-      username: 'Follower3',
+      id: 103,
+      username: 'Charlie',
       isFollowing: false,
       isMutualFollow: false,
     },
     {
-      id: 4,
-      username: 'Follower4',
+      id: 104,
+      username: 'Diana',
       isFollowing: true,
       isMutualFollow: false,
     },
     {
-      id: 5,
-      username: 'Follower5',
+      id: 105,
+      username: 'Eve',
       isFollowing: false,
       isMutualFollow: false,
+    },
+    {
+      id: 106,
+      username: 'Frank',
+      isFollowing: true,
+      isMutualFollow: true,
     },
   ];
 
@@ -50,12 +57,16 @@ export default function FollowersPanel() {
     // TODO: API 호출로 언팔로우 처리
   };
 
+  const handleUserClick = (userId: number) => {
+    navigateToOtherUserProfile(userId);
+  };
+
   return (
     <>
       <PanelHeader
         title="FOLLOWERS"
         showBackButton={true}
-        onBack={() => setProfilePanelMode('profile')}
+        onBack={navigateBack}
       />
       <div className="flex flex-col h-full overflow-hidden">
         <ScrollArea className="flex-1 min-h-0">
@@ -73,6 +84,7 @@ export default function FollowersPanel() {
                   isMutualFollow={follower.isMutualFollow}
                   onFollow={handleFollow}
                   onUnfollow={handleUnfollow}
+                  onClick={handleUserClick}
                 />
               ))}
             </div>

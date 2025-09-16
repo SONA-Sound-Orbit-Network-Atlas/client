@@ -3,7 +3,12 @@
 
 import { createDefaultProperties } from '../../types/planetProperties';
 import { createDefaultStarProperties } from '../../types/starProperties';
-import type { StellarSystem, Star, Planet } from '../../types/stellar';
+import type {
+  StellarSystem,
+  Star,
+  Planet,
+  StellarType,
+} from '../../types/stellar';
 
 // === 새로운 Star/Planet 분리 구조 ===
 
@@ -12,6 +17,7 @@ const mockStar: Star = {
   id: 'star_001',
   object_type: 'STAR',
   system_id: 'system_001',
+  name: 'Central Star',
   properties: createDefaultStarProperties({
     spin: 65, // BPM ~= 138 (60 + 65*1.2 = 138)
     brightness: 80, // Master Tone Character (전체 음색 특성)
@@ -108,6 +114,7 @@ const mockPlanets: Planet[] = [
 export const mockStellarSystem: StellarSystem = {
   id: 'system_001',
   title: 'SONA Demo System',
+  galaxy_id: 'galaxy_001', // galaxy_id 추가
   star: mockStar,
   planets: mockPlanets,
   // 원작자 추적 정보 (실제 백엔드에서 제공될 정보들)
@@ -123,45 +130,58 @@ export const mockStellarSystem: StellarSystem = {
 // === 레거시 호환성 유지 ===
 // 기존 코드가 stellar을 사용하는 경우를 위한 호환성 보장
 
-// export const stellar: StellarSystem = {
-//   userId: 'testUser', // testUser하면 로그인으로 가정 , bob하면 비로그인으로 가정
-//   stellarId: 'sys-001',
-//   stellarName: 'CENTRAL STAR SYSTEM',
-//   updatedAt: '2021-01-03',
-//   planets: [
-//     {
-//       name: 'CENTRAL STAR',
-//       planet_type: 'CENTRAL_STAR',
-//       planetId: 0,
-//       status: 'ACTIVE',
-//       bpm: 120,
-//       creator: 'STANN',
-//       author: 'STANN',
-//       createSource: 'ORIGINAL COMPOSITION',
-//       originalSource: 'SONA STUDIO',
-//       properties: createDefaultProperties({
-//         planetSize: 0.8, // 항성은 더 크게
-//         planetBrightness: 4.5, // 항성은 더 밝게
-//         distanceFromStar: 0, // 항성은 중심에
-//       }),
-//     },
-//     {
-//       name: 'BASS PLANET',
-//       planet_type: 'PLANET',
-//       instrument_role: 'BASS',
-//       planetId: 1,
-//       status: 'ACTIVE',
-//       created: '2021-01-01',
-//       properties: createDefaultProperties({
-//         planetColor: 240, // 파란색 계열
-//         distanceFromStar: 8,
-//         filterResonance: 2.5, // 베이스는 낮은 주파수
-//         rhythmDensity: 70, // 베이스는 리듬감 중요
-//       }),
-//     },
-//     // ... PERCUSSION / HARMONY / EFFECTS 등
-//   ],
-// };
+export const stellar: StellarType = {
+  userId: 'testUser', // testUser하면 로그인으로 가정 , bob하면 비로그인으로 가정
+  stellarId: 'sys-001',
+  stellarName: 'CENTRAL STAR SYSTEM',
+  updatedAt: '2021-01-03',
+  planets: [
+    {
+      name: 'CENTRAL STAR',
+      planet_type: 'CENTRAL_STAR',
+      planetId: 0,
+      status: 'ACTIVE',
+      bpm: 120,
+      creator: 'STANN',
+      author: 'STANN',
+      createSource: 'ORIGINAL COMPOSITION',
+      originalSource: 'SONA STUDIO',
+      properties: createDefaultProperties({
+        planetSize: 0.8, // 항성은 더 크게
+        planetBrightness: 4.5, // 항성은 더 밝게
+        distanceFromStar: 0, // 항성은 중심에
+      }),
+    },
+    {
+      name: 'BASS PLANET',
+      planet_type: 'PLANET',
+      instrument_role: 'BASS',
+      planetId: 1,
+      status: 'ACTIVE',
+      created: '2021-01-01',
+      properties: createDefaultProperties({
+        planetColor: 240, // 파란색 계열
+        distanceFromStar: 8,
+        filterResonance: 2.5, // 베이스는 낮은 주파수
+        rhythmDensity: 70, // 베이스는 리듬감 중요
+      }),
+    },
+    {
+      name: 'MELODY PLANET',
+      planet_type: 'PLANET',
+      instrument_role: 'ARPEGGIO',
+      planetId: 2,
+      properties: createDefaultProperties({
+        planetColor: 60, // 황색 계열
+        distanceFromStar: 15,
+        orbitSpeed: 0.8, // 더 빠른 궤도
+        melodicVariation: 75, // 멜로디 변화 많이
+        patternComplexity: 60, // 복잡한 아르페지오
+      }),
+    },
+    // ... PERCUSSION / HARMONY / EFFECTS 등
+  ],
+};
 
 // 개별 조회를 위한 함수들
 export function getMockStellarSystem(id: string): StellarSystem | undefined {
@@ -196,6 +216,7 @@ const mockClonedStar: Star = {
   id: 'star_002',
   object_type: 'STAR',
   system_id: 'system_002',
+  name: 'Cloned Star', // name 필드 추가
   properties: createDefaultStarProperties({
     // 원본에서 약간 변형
     spin: 70, // 조금 더 빠르게
@@ -243,6 +264,7 @@ const mockClonedPlanets: Planet[] = [
 export const mockClonedStellarSystem: StellarSystem = {
   id: 'system_002',
   title: 'My Version of SONA Demo', // 사용자가 변경한 이름
+  galaxy_id: 'galaxy_002', // galaxy_id 추가
   star: mockClonedStar,
   planets: mockClonedPlanets,
   // 클론 추적 정보
