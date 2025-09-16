@@ -39,6 +39,9 @@ export interface StellarSystem {
 
   // 1:N 관계 - 개별 악기들
   planets: Planet[];
+
+  // 위치
+  position: [number, number, number];
 }
 
 export type ObjectType = 'STAR' | 'PLANET';
