@@ -1,74 +1,71 @@
-import {
-  FiEdit3,
-  FiUser,
-  FiLogOut,
-  FiHeart,
-  FiUserCheck,
-} from 'react-icons/fi';
+import { FiUser, FiUserCheck } from 'react-icons/fi';
 import { IoPlanetOutline } from 'react-icons/io5';
 import { useProfileStore } from '@/stores/useProfileStore';
-import { useLogout } from '@/hooks/api/useAuth';
-import { useGetUserProfile } from '@/hooks/api/useUser';
-import { useUserStore } from '@/stores/useUserStore';
+import { navigateBack } from '@/utils/profileNavigation';
 import ProfileStateWrapper from './ProfileStateWrapper';
+import PanelHeader from '../PanelHeader';
 import Iconframe from '@/components/common/Iconframe';
-import Button from '@/components/common/Button';
 import Card from '@/components/common/Card/Card';
 import StatCard from '@/components/common/Card/StatCard';
 import { ScrollArea } from '@/components/common/Scrollarea';
 
-export default function ProfileView() {
+interface OtherUserProfileViewProps {
+  userId: number;
+}
+
+export default function OtherUserProfileView({
+  userId,
+}: OtherUserProfileViewProps) {
   const { setProfilePanelMode } = useProfileStore();
-  const logoutMutation = useLogout();
-  const { userStore } = useUserStore();
 
-  // 사용자 프로필 데이터 조회
-  const {
-    data: serverProfile,
-    isLoading,
-    error,
-  } = useGetUserProfile(userStore.id);
+  // 다른 유저의 프로필 데이터 조회 (테스트용 하드코딩)
+  // const {
+  //   data: profile,
+  //   isLoading,
+  //   error,
+  // } = useGetUserProfile(userId.toString());
 
-  // userStore 데이터를 우선적으로 사용하고, 서버 데이터가 있으면 병합
-  const profile = userStore.id
-    ? {
-        ...serverProfile,
-        username: userStore.username,
-        about: userStore.about,
-        email: userStore.email,
-        // 서버에서 가져온 추가 데이터가 있으면 유지
-        ...(serverProfile && {
-          image: serverProfile.image,
-          created_at: serverProfile.created_at,
-          updated_at: serverProfile.updated_at,
-        }),
-      }
-    : serverProfile;
-
-  const handleLikesClick = () => {
-    setProfilePanelMode('likes');
+  // 테스트용 하드코딩된 프로필 데이터
+  const profile = {
+    id: userId,
+    username: `User${userId}`,
+    about: `안녕하세요! 음악과 우주를 좋아해요. 🌟`,
+    email: `user${userId}@example.com`,
+    image: null as string | null, // 기본 아바타 사용
+    created_at: '2024-01-15T10:30:00Z',
+    updated_at: '2024-01-20T15:45:00Z',
   };
 
+  const isLoading = false;
+  const error = null;
+
   const handleFollowersClick = () => {
-    setProfilePanelMode('followers');
+    setProfilePanelMode('otherUserFollowers');
   };
 
   const handleFollowingsClick = () => {
-    setProfilePanelMode('followings');
-  };
-
-  const handleLogout = () => {
-    logoutMutation.mutate();
+    setProfilePanelMode('otherUserFollowings');
   };
 
   return (
-    <ProfileStateWrapper isLoading={isLoading} error={error} profile={profile}>
+    <ProfileStateWrapper
+      isLoading={isLoading}
+      error={error}
+      profile={profile}
+      title="PROFILE"
+    >
+      <PanelHeader
+        title="PROFILE"
+        showBackButton={true}
+        onBack={navigateBack}
+      />
       <div className="flex flex-col h-full overflow-hidden">
         <ScrollArea className="flex-1 min-h-0">
           <div className="flex flex-col">
             <div className="flex flex-col items-center border-b border-gray-border p-6">
               <div className="flex flex-col items-center mb-[24px]">
-                {profile?.image &&
+                {profile.image &&
+                typeof profile.image === 'string' &&
                 !profile.image.includes('defaults/avatar.png') ? (
                   <div className="w-16 h-16 rounded-full overflow-hidden mb-[16px] border-2 border-tertiary-300">
                     <img
@@ -87,21 +84,12 @@ export default function ProfileView() {
                   </Iconframe>
                 )}
                 <h3 className="text-white font-semibold text-base">
-                  {profile?.username}
+                  {profile.username}
                 </h3>
                 <p className="text-text-muted text-sm text-center">
-                  {profile?.about || '소개가 없습니다.'}
+                  {profile.about || '소개가 없습니다.'}
                 </p>
               </div>
-              <Button
-                color="secondary"
-                size="lg"
-                className="w-full"
-                onClick={() => setProfilePanelMode('editProfile')}
-              >
-                <FiEdit3 />
-                EDIT PROFILE
-              </Button>
             </div>
             <div className="flex flex-col p-6">
               <p className="text-tertiary-200 text-sm font-semibold mb-[16px]">
@@ -121,16 +109,7 @@ export default function ProfileView() {
                   </p>
                 </Card>
               </div>
-              <div className="mb-[24px]">
-                <p className="text-text-muted text-sm mb-[16px]">LIKES</p>
-                <StatCard
-                  icon={<FiHeart className="text-white" />}
-                  value={85}
-                  label="MY LIKES"
-                  onClick={handleLikesClick}
-                  className="w-full hover:brightness-110 hover:bg-text-white/20 border-white/20 hover:text-white hover:[&_p]:text-white hover:[&_svg]:text-white"
-                />
-              </div>
+              {/* 다른 유저 프로필에서는 Likes 섹션을 숨김 */}
               <div className="mb-[24px]">
                 <p className="text-text-muted text-sm mb-[16px]">SOCIALS</p>
                 <div className="flex flex-col gap-[12px] w-full">
@@ -153,18 +132,6 @@ export default function ProfileView() {
             </div>
           </div>
         </ScrollArea>
-        <div className="flex-shrink-0 p-6 border-t border-gray-border">
-          <Button
-            color="tertiary"
-            size="lg"
-            className="w-full"
-            onClick={handleLogout}
-            disabled={logoutMutation.isPending}
-          >
-            <FiLogOut />
-            {logoutMutation.isPending ? 'SIGNING OUT...' : 'SIGN OUT'}
-          </Button>
-        </div>
       </div>
     </ProfileStateWrapper>
   );

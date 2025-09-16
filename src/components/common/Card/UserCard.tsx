@@ -10,6 +10,7 @@ interface UserCardProps {
   isMutualFollow?: boolean;
   onFollow?: (userId: number) => void;
   onUnfollow?: (userId: number) => void;
+  onClick?: (userId: number) => void;
 }
 
 export default function UserCard({
@@ -19,6 +20,7 @@ export default function UserCard({
   isMutualFollow = false,
   onFollow,
   onUnfollow,
+  onClick,
 }: UserCardProps) {
   const handleFollowClick = () => {
     if (isFollowing && onUnfollow) {
@@ -29,7 +31,10 @@ export default function UserCard({
   };
 
   return (
-    <Card className="w-full hover:brightness-110 hover:cursor-pointer">
+    <Card
+      className="w-full hover:brightness-110 hover:cursor-pointer"
+      onClick={() => onClick?.(id)}
+    >
       <div className="flex items-center gap-3">
         <Iconframe color="primary" size="small">
           <FiUser className="w-5 h-5" />

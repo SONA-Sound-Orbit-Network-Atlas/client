@@ -3,6 +3,7 @@ import { useProfileStore } from '@/stores/useProfileStore';
 import LoginPanel from './LoginPanel';
 import SignUpPanel from './SignUpPanel';
 import ProfileView from './ProfileView';
+import OtherUserProfileView from './OtherUserProfileView';
 import EditProfilePanel from './EditProfilePanel';
 import LikesPanel from './LikesPanel';
 import FollowersPanel from './FollowersPanel';
@@ -10,7 +11,7 @@ import FollowingsPanel from './FollowingsPanel';
 
 export default function ProfilePanel() {
   const { isLoggedIn } = useUserStore();
-  const { profilePanelMode } = useProfileStore();
+  const { profilePanelMode, viewingUserId } = useProfileStore();
 
   const renderContent = () => {
     if (!isLoggedIn) {
@@ -25,6 +26,16 @@ export default function ProfilePanel() {
 
     // 로그인된 상태
     switch (profilePanelMode) {
+      case 'otherUserProfile':
+        return viewingUserId ? (
+          <OtherUserProfileView userId={viewingUserId} />
+        ) : (
+          <ProfileView />
+        );
+      case 'otherUserFollowers':
+        return <FollowersPanel />;
+      case 'otherUserFollowings':
+        return <FollowingsPanel />;
       case 'editProfile':
         return <EditProfilePanel />;
       case 'likes':
