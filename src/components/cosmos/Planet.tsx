@@ -112,7 +112,7 @@ export default function Planet({ planet, isSelectable = false }: PlanetProps) {
     <>
       {/* OrbitLine 렌더링 */}
       <lineLoop geometry={orbitGeometry}>
-        <lineBasicMaterial color={isSelected ? 'green' : 'white'} />
+        <lineBasicMaterial color={isSelected ? 'green' : '#4f4f4f'} />
       </lineLoop>
 
       {/* Planet 렌더링 */}
@@ -125,7 +125,7 @@ export default function Planet({ planet, isSelectable = false }: PlanetProps) {
         >
           <Outlines
             thickness={1}
-            color={isHovered ? 'white' : 'yellow'}
+            color={isHovered ? '#FFFFFF' : 'yellow'}
             visible={isHovered || isSelected}
           />
           <sphereGeometry args={[planetSize, 16, 16]} />
