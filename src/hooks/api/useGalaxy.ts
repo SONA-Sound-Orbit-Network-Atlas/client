@@ -14,7 +14,6 @@ import type {
   GalaxyMyData,
   GalaxyMyListData,
 } from '@/types/galaxyMy';
-import type { Galaxy, ParamsGetAllStellarList } from '@/types/galaxy';
 
 // Galaxy Community 리스트 조회
 type FlattenedCommunity = {
