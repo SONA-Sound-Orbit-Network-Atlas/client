@@ -16,17 +16,13 @@ import { ScrollArea } from '@/components/common/Scrollarea';
 import AudioPlayer from './audioPlayer/Index';
 
 export default function StellarIndex() {
-  // 현재 선택된 stellarId
-  const { mode } = useSelectedStellarStore();
-
-  // isStellarOwner : 현재 선택된 Stellar의 userId 가 현재 로그인된 userId와 일치하는가?
-  // true 수정 모드 / false 관람 모드
+  // isStellarOwner : 현재 선택된 Stellar의 owner_id 가 현재 로그인된 userId와 일치하는가? => true 수정 모드 / false 관람 모드
   const { stellarStore } = useStellarStore();
   const { userStore } = useUserStore();
-  const isStellarOwner = stellarStore.userId === userStore.id;
-  console.log('stellarStore.userId : ', stellarStore.userId);
-  console.log('userStore.id : ', userStore.id);
-  console.log('isStellarOwner : ', isStellarOwner);
+  const isStellarOwner = stellarStore.owner_id === userStore.id;
+
+  // 현재 선택된 Stellar의 모드 : 수정,관람 모드와 관계 없는 모드
+  const { mode } = useSelectedStellarStore();
 
   // Stellar 패널 Tab value 스토어
   const { tabValue, setTabValue } = useStellarTabStore();

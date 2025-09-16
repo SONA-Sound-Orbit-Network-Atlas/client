@@ -37,7 +37,6 @@ function ContentComp({ sort }: { sort: SortLabel }) {
     });
   // 평탄화 된 list 데이터
   const galaxyCommunityList = data?.list ?? [];
-  console.log('galaxyCommunityList', galaxyCommunityList);
 
   return (
     <div>

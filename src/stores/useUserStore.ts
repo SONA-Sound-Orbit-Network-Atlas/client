@@ -11,7 +11,7 @@ interface UserStore {
 }
 
 const initialUserStore: User = {
-  id: '',
+  id: 'user_stann_001', // mock 데이터랑 일치하는 id : user_stann_001
   email: '',
   username: '',
 };
@@ -27,7 +27,7 @@ export const useUserStore = create<UserStore>((set) => ({
       isLoggedIn: false,
     });
   },
-  isLoggedIn: false,
+  isLoggedIn: true,
   setIsLoggedIn: (isLoggedIn: boolean) => {
     set({ isLoggedIn });
   },

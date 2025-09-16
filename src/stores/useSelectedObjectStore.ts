@@ -1,11 +1,11 @@
 import { create } from 'zustand';
 
 interface SelectedObjectStore {
-  selectedObjectId: number;
-  setSelectedObjectId: (no: number) => void;
+  selectedObjectId: 'star_001' | string;
+  setSelectedObjectId: (no: string) => void;
 }
 
 export const useSelectedObjectStore = create<SelectedObjectStore>((set) => ({
-  selectedObjectId: 0,
-  setSelectedObjectId: (no: number) => set({ selectedObjectId: no }),
+  selectedObjectId: 'star_001',
+  setSelectedObjectId: (id: string) => set({ selectedObjectId: id }),
 }));
