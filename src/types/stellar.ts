@@ -24,15 +24,15 @@ export interface StellarSystem {
   title: string; // 스텔라(항성계) 이름
   galaxy_id: string; // 소속 갤럭시 ID 추가
 
-  // 원작자 추적 정보 (백엔드 스키마 호환)
-  owner_id?: string; // 현재 소유자
-  created_by_id?: string; // 최초 생성자
-  original_author_id?: string; // 원작자 (클론 시 승계)
-  source_system_id?: string; // 원본 시스템 ID (클론인 경우)
-  created_via?: 'MANUAL' | 'CLONE'; // 생성 방식
+  // 원작자 추적 정보 (새로운 필드명 사용)
+  creator_id: string; // 현재 소유자
+  author_id: string; // 최초 생성자 (원작자)
+  create_source_id?: string; // 클론한 스텔라 (클론인 경우)
+  original_source_id?: string; // 최초 스텔라 (클론 체인의 첫 번째)
+  created_via: 'MANUAL' | 'CLONE'; // 생성 방식
 
-  created_at?: string;
-  updated_at?: string;
+  created_at: string;
+  updated_at: string;
 
   // 1:1 관계 - 전역 제어용 항성
   star: Star;
