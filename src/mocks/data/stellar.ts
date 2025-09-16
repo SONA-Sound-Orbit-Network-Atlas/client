@@ -263,7 +263,7 @@ const mockClonedPlanets: Planet[] = [
 
 export const mockClonedStellarSystem: StellarSystem = {
   id: 'system_002',
-  name: 'My Version of SONA Demo', // 사용자가 변경한 이름
+  title: 'My Version of SONA Demo', // 사용자가 변경한 이름
   galaxy_id: 'galaxy_002', // galaxy_id 추가
   star: mockClonedStar,
   planets: mockClonedPlanets,

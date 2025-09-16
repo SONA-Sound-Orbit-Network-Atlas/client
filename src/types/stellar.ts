@@ -29,10 +29,10 @@ export interface StellarSystem {
   author_id: string; // 최초 생성자 (원작자)
   create_source_id?: string; // 클론한 스텔라 (클론인 경우)
   original_source_id?: string; // 최초 스텔라 (클론 체인의 첫 번째)
-  created_via: 'MANUAL' | 'CLONE'; // 생성 방식
+  created_via?: 'MANUAL' | 'CLONE'; // 생성 방식
 
   created_at: string;
-  updated_at: string;
+  updated_at?: string;
 
   // 1:1 관계 - 전역 제어용 항성
   star: Star;

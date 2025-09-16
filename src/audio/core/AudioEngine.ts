@@ -81,11 +81,6 @@ export class AudioEngine {
     // 0-30: Warm/Dark, 30-70: Balanced, 70-100: Bright/Sharp
     
     // 예: 전역 EQ나 필터로 구현 가능 (추후 확장)
-    console.log(`🎚️ Master Tone Character: ${toneCharacter} (${
-      toneCharacter < 30 ? 'Warm/Dark' : 
-      toneCharacter > 70 ? 'Bright/Sharp' : 'Balanced'
-    })`);
-    
     // TODO: 실제 전역 오디오 처리 로직 구현
     // - Master EQ 조절
     // - 전역 필터 적용  
