@@ -21,7 +21,7 @@ export default function Random({ target }: RandomProps) {
   if (!target) return null;
 
   const handleRandomClick = () => {
-    if ('spin' in target.properties) {
+    if (target.object_type === 'STAR') {
       // === STAR 처리 ===
       const randomized: StarProperties = {
         spin: Math.floor(Math.random() * 101), // 0~100
@@ -39,16 +39,13 @@ export default function Random({ target }: RandomProps) {
       });
     } else {
       // === PLANET 처리 ===
-      // 1) PLANET_PROPERTIES에서 min/max 추출
       const minMaxArray = Object.values(PLANET_PROPERTIES).map((def) => ({
         min: def.min,
         max: def.max,
       }));
 
-      // 2) 랜덤 값 배열 생성
       const randomNumbers = minMaxRandomNo(minMaxArray);
 
-      // 3) 랜덤 값들을 PlanetProperties 객체로 매핑
       const randomized: PlanetProperties = Object.keys(
         PLANET_PROPERTIES
       ).reduce((acc, key, idx) => {
@@ -56,7 +53,6 @@ export default function Random({ target }: RandomProps) {
         return acc;
       }, {} as PlanetProperties);
 
-      // 4) 해당 planet 업데이트
       setStellarStore({
         ...stellarStore,
         planets: stellarStore.planets.map((planet) =>

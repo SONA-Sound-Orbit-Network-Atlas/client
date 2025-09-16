@@ -31,7 +31,7 @@ const defaultPlanetProps: PlanetProperties = {
 /***** 2) 초기 스텔라 시스템 *****/
 export const initialStellarStore: StellarSystem = {
   id: '',
-  name: 'CENTRAL STAR SYSTEM',
+  title: 'NEW STELLAR SYSTEM',
   owner_id: '',
   created_by_id: '',
   original_author_id: '',

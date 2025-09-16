@@ -21,8 +21,9 @@ export default function Objects() {
 // API 결과 반영 완료
 function ObjectsContent() {
   const { selectedObjectId, setSelectedObjectId } = useSelectedObjectStore();
-  console.log('selectedObjectId ', selectedObjectId);
   const { stellarStore } = useStellarStore();
+
+  // === 스텔라 상세정보 스토어에서 object 정보(Star, Planet)만 추출 ===
   const starInfo: Star = stellarStore.star;
   const planetInfo: Planet[] = stellarStore.planets;
   const objectsInfo: (Star | Planet)[] = [starInfo, ...planetInfo];
@@ -37,20 +38,18 @@ function ObjectsContent() {
 
       <div className="space-y-3">
         {objectsInfo.length > 0 ? (
-          objectsInfo.map((data, index) => {
+          objectsInfo.map((data) => {
             const title =
               data.object_type === 'STAR'
-                ? stellarStore.name // ★ Star는 시스템 이름을 사용
-                : (data.name ?? 'UNTITLED'); // ★ Planet은 자기 name 사용
+                ? stellarStore.title
+                : (data.name ?? 'UNTITLED');
 
             return (
               <StellarCard
                 key={data.id}
-                index={index}
                 data={data}
                 onClick={() => {
                   setSelectedObjectId(data.id);
-                  console.log('data.id ', data.id);
                 }}
                 active={selectedObjectId === data.id}
                 className="cursor-pointer"

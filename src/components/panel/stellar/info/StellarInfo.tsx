@@ -25,7 +25,7 @@ export default function StellarInfo({
 
   // 3) 스타 정보 (표시용)
   const starInfo = {
-    NAME: stellarStore.name,
+    NAME: stellarStore.title,
     CREATOR: stellarStore.created_by_id,
     AUTHOR: stellarStore.original_author_id,
     ['CREATE SOURCE']: 'ORIGINAL COMPOSITION',
@@ -67,7 +67,7 @@ export default function StellarInfo({
                         const nextName = e.target.value;
 
                         if (isStarSelected || !planetInfo) {
-                          setStellarStore({ ...stellarStore, name: nextName });
+                          setStellarStore({ ...stellarStore, title: nextName });
                         } else {
                           setStellarStore({
                             ...stellarStore,

@@ -21,7 +21,7 @@ export type {
 
 export interface StellarSystem {
   id: string;
-  name: string;
+  title: string; // name -> title로 변경 됨
 
   // 원작자 추적 정보 (백엔드 스키마 호환)
   owner_id?: string; // 현재 소유자

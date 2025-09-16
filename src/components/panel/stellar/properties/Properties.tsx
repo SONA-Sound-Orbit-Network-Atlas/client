@@ -49,8 +49,9 @@ export default function Properties() {
           <Card className="p-[17px] space-y-2">
             <p className="text-text-muted text-xs">SOUND TYPE</p>
             <div className=" flex gap-2 flex-wrap">
-              {soundTypeList.map((type) => (
+              {soundTypeList.map((soundType) => (
                 <Button
+                  key={soundType}
                   color="tertiary"
                   size="xs"
                   className="text-xs"
@@ -59,15 +60,15 @@ export default function Properties() {
                       ...stellarStore,
                       planets: stellarStore.planets.map((planet) => {
                         if (planet.id === selectedObjectId) {
-                          return { ...planet, role: type };
+                          return { ...planet, role: soundType };
                         }
                         return planet;
                       }),
                     });
                   }}
-                  clicked={planetObj?.role === type}
+                  clicked={planetObj?.role === soundType}
                 >
-                  {type}
+                  {soundType}
                 </Button>
               ))}
             </div>
