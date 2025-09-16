@@ -35,11 +35,13 @@ export class AudioEngine {
     // Transport 설정 (초기 상태가 있다면 적용)
     if (initialState) {
       Tone.Transport.bpm.value = initialState.bpm;
-      Tone.Destination.volume.value = this.dbFromVolume(initialState.volume);
+      // 볼륨은 플레이어에서 별도 관리하므로 기본값 설정
+      Tone.Destination.volume.value = -6; // 기본 볼륨
+      this.applyToneCharacter(initialState.toneCharacter);
     } else {
       // 기본 설정
       Tone.Transport.bpm.value = 120;
-      Tone.Destination.volume.value = this.dbFromVolume(70);
+      Tone.Destination.volume.value = -6; // 기본 볼륨
     }
     
     Tone.Transport.swing = 0; // 기본 스윙 0
@@ -66,9 +68,28 @@ export class AudioEngine {
   applyGlobalState(state: StarGlobalState): void {
     if (!this._initialized) return;
     
-    // Transport에 즉시 반영
+    // Transport에 BPM만 반영 (볼륨은 플레이어에서 별도 처리)
     Tone.Transport.bpm.rampTo(state.bpm, 0.2);
-    Tone.Destination.volume.rampTo(this.dbFromVolume(state.volume), 0.3);
+    
+    // 전역 톤 캐릭터 적용 (필터나 마스터 이펙트로 구현 가능)
+    this.applyToneCharacter(state.toneCharacter);
+  }
+
+  // 전역 톤 캐릭터 적용
+  private applyToneCharacter(toneCharacter: number): void {
+    // toneCharacter 0-100을 전역 음색 특성으로 변환
+    // 0-30: Warm/Dark, 30-70: Balanced, 70-100: Bright/Sharp
+    
+    // 예: 전역 EQ나 필터로 구현 가능 (추후 확장)
+    console.log(`🎚️ Master Tone Character: ${toneCharacter} (${
+      toneCharacter < 30 ? 'Warm/Dark' : 
+      toneCharacter > 70 ? 'Bright/Sharp' : 'Balanced'
+    })`);
+    
+    // TODO: 실제 전역 오디오 처리 로직 구현
+    // - Master EQ 조절
+    // - 전역 필터 적용  
+    // - 어택/릴리즈 타임 조절 등
   }
 
   // 노트 양자화 (키/스케일을 매개변수로 받음)
@@ -81,8 +102,8 @@ export class AudioEngine {
     return { reverb: this.reverb, delay: this.delay };
   }
 
-  // 볼륨 값을 dB로 변환
-  private dbFromVolume(volume: number): number {
-    return (volume / 100) * -6; // 0-100 → 0 to -6dB
+  // 초기화 상태 확인
+  isReady(): boolean {
+    return this._initialized;
   }
 }
