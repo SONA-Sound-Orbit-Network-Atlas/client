@@ -24,7 +24,8 @@ export default function UserCard({
   onClick,
   isLoading = false,
 }: UserCardProps) {
-  const handleFollowClick = () => {
+  const handleFollowClick = (e: React.MouseEvent) => {
+    e.stopPropagation(); // 이벤트 버블링 방지
     if (isFollowing && onUnfollow) {
       onUnfollow(id);
     } else if (!isFollowing && onFollow) {

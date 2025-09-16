@@ -5,7 +5,11 @@ import {
 import PanelHeader from '../PanelHeader';
 import UserCard from '@/components/common/Card/UserCard';
 import { ScrollArea } from '@/components/common/Scrollarea';
-import { useCreateFollow, useGetFollowers } from '@/hooks/api/useFollow';
+import {
+  useCreateFollow,
+  useGetFollowers,
+  useDeleteFollow,
+} from '@/hooks/api/useFollow';
 import { useUserStore } from '@/stores/useUserStore';
 import { useProfileStore } from '@/stores/useProfileStore';
 import { useState, useEffect } from 'react';
@@ -13,6 +17,7 @@ import type { FollowerUser } from '@/types/follow';
 
 export default function FollowersPanel() {
   const createFollowMutation = useCreateFollow();
+  const deleteFollowMutation = useDeleteFollow();
   const { userStore } = useUserStore();
   const { profilePanelMode, viewingUserId } = useProfileStore();
 
@@ -21,6 +26,10 @@ export default function FollowersPanel() {
   const [allFollowers, setAllFollowers] = useState<FollowerUser[]>([]);
   const [hasMore, setHasMore] = useState(true);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
+
+  // 팔로우 상태를 위한 로컬 상태 관리
+  const [followedUsers, setFollowedUsers] = useState<Set<string>>(new Set());
+  const [mutualFollows, setMutualFollows] = useState<Set<string>>(new Set());
 
   // 중복 제거 유틸리티 함수
   const removeDuplicates = (followers: FollowerUser[]): FollowerUser[] => {
@@ -59,6 +68,8 @@ export default function FollowersPanel() {
     setAllFollowers([]);
     setHasMore(true);
     setIsLoadingMore(false);
+    setFollowedUsers(new Set());
+    setMutualFollows(new Set());
   }, [targetUserId]);
 
   // 데이터 누적 로직
@@ -93,7 +104,10 @@ export default function FollowersPanel() {
       { targetUserId: userId },
       {
         onSuccess: () => {
-          // TODO: 로컬 상태 업데이트 또는 리페치
+          // 로컬 상태 업데이트: 팔로우한 사용자를 followedUsers에 추가
+          setFollowedUsers((prev) => new Set(prev).add(userId));
+          // 맞팔로우 상태로 업데이트
+          setMutualFollows((prev) => new Set(prev).add(userId));
         },
         onError: () => {
           // TODO: 에러 처리 (토스트 메시지 등)
@@ -102,8 +116,28 @@ export default function FollowersPanel() {
     );
   };
 
-  const handleUnfollow = (_userId: string) => {
-    // TODO: 언팔로우 API 구현 후 연동
+  const handleUnfollow = (userId: string) => {
+    deleteFollowMutation.mutate(
+      { targetUserId: userId },
+      {
+        onSuccess: () => {
+          // 로컬 상태 업데이트: 언팔로우한 사용자를 제거
+          setFollowedUsers((prev) => {
+            const newSet = new Set(prev);
+            newSet.delete(userId);
+            return newSet;
+          });
+          setMutualFollows((prev) => {
+            const newSet = new Set(prev);
+            newSet.delete(userId);
+            return newSet;
+          });
+        },
+        onError: () => {
+          // TODO: 에러 처리 (토스트 메시지 등)
+        },
+      }
+    );
   };
 
   const handleUserClick = (userId: string) => {
@@ -177,12 +211,17 @@ export default function FollowersPanel() {
                     key={follower.id}
                     id={follower.id}
                     username={follower.username}
-                    isFollowing={false} // TODO: 현재 사용자가 이 사용자를 팔로우하는지 확인하는 로직 필요
-                    isMutualFollow={follower.isMutual}
+                    isFollowing={followedUsers.has(follower.id)}
+                    isMutualFollow={
+                      mutualFollows.has(follower.id) || follower.isMutual
+                    }
                     onFollow={handleFollow}
                     onUnfollow={handleUnfollow}
                     onClick={handleUserClick}
-                    isLoading={createFollowMutation.isPending}
+                    isLoading={
+                      createFollowMutation.isPending ||
+                      deleteFollowMutation.isPending
+                    }
                   />
                 ))}
               </div>

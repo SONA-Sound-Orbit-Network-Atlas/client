@@ -22,6 +22,11 @@ export default function FollowingsPanel() {
   const [hasMore, setHasMore] = useState(true);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
 
+  // 언팔로우 상태를 위한 로컬 상태 관리
+  const [unfollowedUsers, setUnfollowedUsers] = useState<Set<string>>(
+    new Set()
+  );
+
   // 중복 제거 유틸리티 함수
   const removeDuplicates = (followings: FollowingUser[]): FollowingUser[] => {
     const seen = new Set<string>();
@@ -59,6 +64,7 @@ export default function FollowingsPanel() {
     setAllFollowings([]);
     setHasMore(true);
     setIsLoadingMore(false);
+    setUnfollowedUsers(new Set());
   }, [targetUserId]);
 
   // 데이터 누적 로직
@@ -93,7 +99,8 @@ export default function FollowingsPanel() {
       { targetUserId: userId },
       {
         onSuccess: () => {
-          // TODO: 로컬 상태 업데이트 또는 리페치
+          // 로컬 상태 업데이트: 언팔로우한 사용자를 unfollowedUsers에 추가
+          setUnfollowedUsers((prev) => new Set(prev).add(userId));
         },
         onError: () => {
           // TODO: 에러 처리 (토스트 메시지 등)
@@ -173,8 +180,10 @@ export default function FollowingsPanel() {
                     key={following.id}
                     id={following.id}
                     username={following.username}
-                    isFollowing={true} // 팔로잉 목록이므로 항상 true
-                    isMutualFollow={following.isMutual}
+                    isFollowing={!unfollowedUsers.has(following.id)} // 언팔로우하지 않은 경우에만 true
+                    isMutualFollow={
+                      following.isMutual && !unfollowedUsers.has(following.id)
+                    }
                     onUnfollow={handleUnfollow}
                     onClick={handleUserClick}
                     isLoading={deleteFollowMutation.isPending}
