@@ -52,7 +52,17 @@ export function useFollowList<T extends FollowUser>(
     ) => {
       const totalPages = Math.ceil(lastPage.meta.total / lastPage.meta.limit);
       const currentPage = allPages.length;
-      return currentPage < totalPages ? currentPage + 1 : undefined;
+
+      // 현재 페이지가 마지막 페이지인지 확인
+      const isLastPage = currentPage >= totalPages;
+
+      // 현재 페이지의 아이템 수가 limit보다 적으면 마지막 페이지
+      const isPartialPage = lastPage.items.length < lastPage.meta.limit;
+
+      // 더 불러올 페이지가 있는지 확인
+      const hasMorePages = !isLastPage && !isPartialPage;
+
+      return hasMorePages ? currentPage + 1 : undefined;
     },
     enabled: !!options.userId,
     staleTime: 2 * 60 * 1000, // 2분간 캐시 유지
@@ -89,7 +99,7 @@ export function useFollowList<T extends FollowUser>(
 
   return {
     allUsers,
-    hasMore: hasNextPage ?? false,
+    hasMore: hasNextPage === true,
     isLoadingMore: isFetchingNextPage,
     isLoading,
     error,

@@ -75,7 +75,7 @@ export default function FollowListPanel({
           <ScrollArea className="flex-1 min-h-0">
             <div className="p-4">
               <div className="text-center py-4">
-                <p className="text-text-muted">사용자 정보를 불러오는 중...</p>
+                <p className="text-text-muted">Loading...</p>
               </div>
             </div>
           </ScrollArea>
@@ -97,7 +97,7 @@ export default function FollowListPanel({
             {/* 로딩 상태 */}
             {isLoading && (
               <div className="text-center py-4">
-                <p className="text-text-muted">로딩 중...</p>
+                <p className="text-text-muted">Loading...</p>
               </div>
             )}
 
@@ -136,7 +136,7 @@ export default function FollowListPanel({
             )}
 
             {/* Load More 버튼 */}
-            {hasMore && !error && (
+            {hasMore && !error && allUsers.length > 0 && (
               <div className="flex justify-center mt-6">
                 <Button
                   onClick={loadMore}
@@ -144,7 +144,7 @@ export default function FollowListPanel({
                   color="tertiary"
                   className="w-full"
                 >
-                  {isLoadingMore ? '로딩 중...' : '더 보기'}
+                  {isLoadingMore ? 'Loading...' : 'LOAD MORE'}
                 </Button>
               </div>
             )}
