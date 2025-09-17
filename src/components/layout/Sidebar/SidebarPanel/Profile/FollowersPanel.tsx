@@ -74,7 +74,22 @@ export default function FollowersPanel() {
 
   // 데이터 누적 로직
   useEffect(() => {
-    console.log('followersData:', followersData);
+    console.log('=== 팔로워 데이터 분석 ===');
+    console.log('전체 응답:', followersData);
+    console.log('메타 정보:', followersData?.meta);
+    console.log('아이템 개수:', followersData?.items?.length);
+    if (followersData?.items?.length > 0) {
+      console.log('첫 번째 팔로워 데이터:', followersData.items[0]);
+      console.log(
+        '첫 번째 팔로워의 모든 키:',
+        Object.keys(followersData.items[0])
+      );
+      console.log(
+        'isMutual 필드 존재 여부:',
+        'isMutual' in followersData.items[0]
+      );
+      console.log('isMutual 값:', followersData.items[0].isMutual);
+    }
 
     if (followersData && followersData.meta && followersData.items) {
       if (currentPage === 1) {
