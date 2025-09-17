@@ -1,3 +1,5 @@
+export type GalaxyAllStellarListResponse = simpleStellar[];
+
 export interface Galaxy {
   id: string;
   createdAt: string;
@@ -13,7 +15,7 @@ export interface simpleStellar {
 }
 
 export interface ParamsGetAllStellarList {
-  id: string;
+  galaxyId: string;
 }
 
 // Galaxy 화면에서 사용할 확장된 타입들

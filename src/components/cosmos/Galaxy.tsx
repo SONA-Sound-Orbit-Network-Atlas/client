@@ -11,13 +11,17 @@ interface GalaxyProps {
   galaxyId?: string;
 }
 
-export default function Galaxy({ galaxyId = '1' }: GalaxyProps) {
-  const { data: galaxyData, isLoading, error } = useStellarList(galaxyId);
+export default function Galaxy({ galaxyId = 'gal_abc123' }: GalaxyProps) {
+  const {
+    data: galaxyStellarListData,
+    isLoading,
+    error,
+  } = useStellarList(galaxyId);
   const { selectedStellarId } = useSelectedStellarStore();
   const { selectStellar } = useStellarSystemSelection();
 
   // 스텔라 리스트 가져오기
-  const stellarSystems = galaxyData?.allStellarList || [];
+  const stellarSystems = galaxyStellarListData || [];
 
   const handleStellarClick = (stellarId: string) => {
     selectStellar(stellarId);
