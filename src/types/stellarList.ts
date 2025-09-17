@@ -31,7 +31,7 @@ export interface StellarListPage {
   list: StellarListItem[];
   total: number;
   page: number;
-  hasNext: boolean;
+  limit: number;
 }
 
 export interface FlattenedStellarList {
@@ -49,6 +49,7 @@ export interface ParamsGetStellarList {
 
 // 정렬 옵션(그대로)
 export const sortOptions = [
+  { label: 'TOP TOTAL', value: 'total' },
   { label: 'TOP WEEK', value: 'week' },
   { label: 'TOP MONTH', value: 'month' },
   { label: 'TOP YEAR', value: 'year' },

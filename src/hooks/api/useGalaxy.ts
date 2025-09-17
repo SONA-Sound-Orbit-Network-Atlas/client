@@ -29,7 +29,9 @@ export function useGetStellarList(params: ParamsGetStellarList) {
         rank_type: params.rank_type, // COMMUNITY에서만 사용
       }),
     getNextPageParam: (lastPage) =>
-      lastPage.hasNext ? lastPage.page + 1 : undefined,
+      lastPage.total > lastPage.page * lastPage.limit
+        ? lastPage.page + 1
+        : undefined,
     select: (data) => {
       const list: StellarListItem[] = data.pages.flatMap((p) => p.list ?? []);
       const totalCount = data.pages[0]?.total ?? 0;
@@ -56,9 +58,12 @@ export function useGetStellarMyList(params: ParamsGetStellarList) {
         // rank_type 미전달
       }),
     getNextPageParam: (lastPage) =>
-      lastPage.hasNext ? lastPage.page + 1 : undefined,
+      lastPage.total > lastPage.page * lastPage.limit
+        ? lastPage.page + 1
+        : undefined,
     select: (data) => {
       const list = data.pages.flatMap((p) => p.list ?? []);
+      console.log('=================data.pages', data.pages);
       const totalCount = data.pages[0]?.total ?? 0;
       return { list, totalCount };
     },

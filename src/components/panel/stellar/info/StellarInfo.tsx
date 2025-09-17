@@ -4,6 +4,8 @@ import TextInput from '@/components/common/TextInput';
 import { useSelectedObjectStore } from '@/stores/useSelectedObjectStore';
 import { useSelectedStellarStore } from '@/stores/useSelectedStellarStore';
 import { useStellarStore } from '@/stores/useStellarStore';
+import CloneStellarButton from './CloneStellarButton';
+import DeleteStellarButton from './DeleteStellarButton';
 
 export default function StellarInfo({
   isStellarOwner,
@@ -40,10 +42,12 @@ export default function StellarInfo({
 
   return (
     <div>
+      {/* 타이틀 */}
       <PanelTitle fontSize="large" textColor="text-primary-300">
         행성 INFO
       </PanelTitle>
 
+      {/* INFO 카드 */}
       <Card className="space-y-4">
         {stellarInfoArr.map(([rawKey, value]) => {
           const key = rawKey.toLowerCase(); // ← 소문자로 통일
@@ -98,6 +102,12 @@ export default function StellarInfo({
           }
         })}
       </Card>
+
+      {/* CLONE 버튼 */}
+      {mode !== 'create' && !isStellarOwner && <CloneStellarButton />}
+
+      {/* DELETE 버튼 */}
+      {mode === 'view' && isStellarOwner && <DeleteStellarButton />}
     </div>
   );
 }

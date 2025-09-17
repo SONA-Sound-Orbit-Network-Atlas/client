@@ -5,7 +5,6 @@ import type { PropertyDefinition, PropertyCategory } from './planetProperties';
 
 // 항성 전용 속성 (전역 제어)
 export interface StarProperties {
-  name: string;
   // SONA 지침: 항성 → 전역 음악 제어 (MVP)
   spin: number; // 0-100 → BPM (60-180)
   brightness: number; // 0-100 → Master Tone Character
@@ -99,7 +98,6 @@ export function createDefaultStarProperties(
   });
 
   return {
-    name: 'Star',
     spin: 50,
     brightness: 75,
     color: 60,
