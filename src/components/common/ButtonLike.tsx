@@ -1,17 +1,17 @@
 import Button from '@/components/common/Button';
 import { FaHeart, FaRegHeart } from 'react-icons/fa';
 
-interface ButtonFavoriteProps {
+interface ButtonLikeProps {
   className?: string;
   active: boolean | null;
   onClick?: () => void;
 }
 
-export default function ButtonFavorite({
+export default function ButtonLike({
   className,
   active,
   onClick,
-}: ButtonFavoriteProps) {
+}: ButtonLikeProps) {
   const onClickHandle = (e: React.MouseEvent) => {
     e.stopPropagation();
     if (active === null) {

@@ -1,4 +1,4 @@
-import ButtonFavorite from '@/components/common/ButtonFavorite';
+import ButtonLike from '@/components/common/ButtonLike';
 import Card from '@/components/common/Card/Card';
 import { IoPlanetOutline } from 'react-icons/io5';
 import { FaRegHeart } from 'react-icons/fa';
@@ -24,12 +24,12 @@ export default function CardItem({
 }: CardItemProps) {
   const { isLoggedIn } = useUserStore();
   console.log('isLoggedIn', isLoggedIn);
-  const [favoriteActive, setFavoriteActive] = useState(is_liked);
+  const [likeActive, setLikeActive] = useState(is_liked);
   // 좋아요 hook
   const { mutate: createLike } = useCreateLike();
   const { mutate: deleteLike } = useDeleteLike();
   // 좋아요 클릭
-  const handleClickFavorite = () => {
+  const handleClickLike = () => {
     if (!isLoggedIn) {
       return alert('로그인 후 이용해주세요.');
     }
@@ -40,7 +40,7 @@ export default function CardItem({
         { system_id: id },
         {
           onSuccess: () => {
-            setFavoriteActive(false);
+            setLikeActive(false);
           },
         }
       );
@@ -49,7 +49,7 @@ export default function CardItem({
         { system_id: id },
         {
           onSuccess: () => {
-            setFavoriteActive(true);
+            setLikeActive(true);
           },
         }
       );
@@ -86,10 +86,10 @@ export default function CardItem({
           </div>
         </div>
 
-        <ButtonFavorite
+        <ButtonLike
           className="flex-shrink-0 ml-3"
-          active={favoriteActive}
-          onClick={handleClickFavorite}
+          active={likeActive}
+          onClick={handleClickLike}
         />
       </div>
 
