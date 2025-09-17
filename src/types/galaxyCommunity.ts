@@ -2,8 +2,8 @@ export interface GalaxyCommunityItem {
   id: string;
   title: string;
   galaxy_id: string;
-  owner_id: string;
-  created_by_id: string;
+  creator_id: string;
+  author_id: string;
   created_at: string;
   updated_at: string;
   like_count: number;
@@ -52,8 +52,8 @@ export interface FlattenedCommunity {
 //   id: string;
 //   title: string;
 //   galaxy_id: string;
-//   owner_id: string;
-//   created_by_id: string;
+//   creator_id: string;
+//   author_id: string;
 //   created_at: string;
 //   updated_at: string;
 //   planet_count: number;

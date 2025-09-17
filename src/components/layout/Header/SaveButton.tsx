@@ -35,7 +35,7 @@ export default function SaveButton() {
       });
     }
     // 2. (수정) view 모드, 선택된 stellar 스토어의 userId와 현재 로그인한 userId가 같을 때
-    if (mode === 'view' && stellarStore.owner_id === userStore.id) {
+    if (mode === 'view' && stellarStore.creator_id === userStore.id) {
       console.log('view모드 save버튼 클릭 => 수정');
       updateStellar({ stellarId: stellarStore.id, stellarData: stellarStore });
     }

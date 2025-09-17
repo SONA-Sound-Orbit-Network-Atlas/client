@@ -1,12 +1,12 @@
-import { useStellarSystem } from '@/hooks/useStellarSystem';
+import { useSelectedStellarStore } from '@/stores/useSelectedStellarStore';
 import Button from '../common/Button';
 
 export default function TestButtons() {
-  const { changeToGalaxyView } = useStellarSystem();
+  const { setIdle } = useSelectedStellarStore();
   return (
     <Button
       onClick={() => {
-        changeToGalaxyView();
+        setIdle();
       }}
     >
       TestButtons

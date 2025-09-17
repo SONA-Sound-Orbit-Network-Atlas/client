@@ -15,7 +15,7 @@ const defaultStarProps: StarProperties = {
   spin: 120,
   brightness: 1,
   color: 1,
-  size: 1,
+  size: 1.0, // 적절한 크기 범위 (0.1 ~ 2.0)
 };
 
 const defaultPlanetProps: PlanetProperties = {
@@ -34,10 +34,10 @@ export const initialStellarStore: StellarSystem = {
   id: '',
   title: 'NEW STELLAR SYSTEM',
   galaxy_id: 'gal_abc123',
-  owner_id: '',
-  created_by_id: '',
-  original_author_id: '',
-  source_system_id: '',
+  creator_id: '',
+  author_id: '',
+  create_source_id: '',
+  original_source_id: '',
   created_via: 'MANUAL',
   created_at: '',
   updated_at: '',
@@ -52,6 +52,7 @@ export const initialStellarStore: StellarSystem = {
     updated_at: '',
   },
   planets: [],
+  position: [0, 0, 0],
 };
 
 /***** 3) 유틸: 임시 ID 생성 *****/
@@ -82,9 +83,9 @@ export const useStellarStore = create<StellarStore>((set) => ({
       return {
         stellarStore: {
           ...initialStellarStore,
-          owner_id: userId,
-          created_by_id: userId,
-          original_author_id: userId,
+          creator_id: userId,
+          author_id: userId,
+          create_source_id: userId,
           created_at: now,
           updated_at: now,
           star: {

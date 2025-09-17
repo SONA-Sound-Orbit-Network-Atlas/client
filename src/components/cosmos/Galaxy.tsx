@@ -1,27 +1,59 @@
 //은하계 컴포넌트
-
 import StellarSystem from './StellarSystem';
+import SimpleStellarPoint from './SimpleStellarPoint';
+import LoadingStellarSystem from './LoadingStellarSystem';
+import { useGalaxy } from '@/hooks/api/useGalaxy';
+import { useSelectedStellarStore } from '@/stores/useSelectedStellarStore';
+import useStellarSystemSelection from '@/hooks/useStellarSystemSelection';
+import type { simpleStellar } from '@/types/galaxy';
 
-const dummyStellarList = [
-  { id: 'sys-001', stellarSystemPos: [0, 0, 0] },
-  { id: 'sys-002', stellarSystemPos: [20, 0, 0] },
-  { id: 'sys-003', stellarSystemPos: [-30, 0, 0] },
-  { id: 'sys-004', stellarSystemPos: [0, 1, 30] },
-  { id: 'sys-005', stellarSystemPos: [0, -2, 10] },
-  { id: 'sys-006', stellarSystemPos: [0, 0, 120] },
-  { id: 'sys-007', stellarSystemPos: [0, 0, -130] },
-];
+interface GalaxyProps {
+  galaxyId?: string;
+}
 
-export default function Galaxy() {
+export default function Galaxy({ galaxyId = '1' }: GalaxyProps) {
+  const { data: galaxyData, isLoading, error } = useGalaxy(galaxyId);
+  const { selectedStellarId } = useSelectedStellarStore();
+  const { selectStellar } = useStellarSystemSelection();
+
+  // 스텔라 리스트 가져오기
+  const stellarSystems = galaxyData?.allStellarList || [];
+
+  const handleStellarClick = (stellarId: string) => {
+    selectStellar(stellarId);
+  };
+
+  // 로딩 상태 처리
+  if (isLoading) {
+    return <LoadingStellarSystem text="갤럭시 데이터를 불러오는 중..." />;
+  }
+
+  // 에러 상태 처리
+  if (error) {
+    return (
+      <LoadingStellarSystem text="데이터를 불러오는 중 오류가 발생했습니다." />
+    );
+  }
+
+  // 빈 상태 처리
+  if (!stellarSystems.length) {
+    return <LoadingStellarSystem text="표시할 스텔라 시스템이 없습니다." />;
+  }
+
   return (
     <group>
-      {dummyStellarList.map((stellar) => (
-        <StellarSystem
+      {/* 선택된 스텔라만 디테일 렌더링 */}
+      {selectedStellarId && (
+        <StellarSystem key={selectedStellarId} id={selectedStellarId} />
+      )}
+
+      {/* 모든 스텔라를 심플 포인트로 렌더링 */}
+      {stellarSystems.map((stellar: simpleStellar) => (
+        <SimpleStellarPoint
           key={stellar.id}
-          stellarSystemPos={
-            stellar.stellarSystemPos as [number, number, number]
-          }
-          id={stellar.id}
+          position={stellar.position}
+          color={stellar.color}
+          onClick={() => handleStellarClick(stellar.id)}
         />
       ))}
     </group>
