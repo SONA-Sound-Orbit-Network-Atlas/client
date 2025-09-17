@@ -3,7 +3,7 @@ import axiosInstance from '@/lib/axios';
 import type { ParamsGetStellarList } from '@/types/stellarList';
 import type { StellarListResponse, StellarListPage } from '@/types/stellarList';
 import { endpoints } from './endpoints';
-import { getGalaxyMock } from '@/mocks/data/galaxyMock';
+import type { GalaxyAllStellarListResponse } from '@/types/galaxy';
 import type { ParamsGetAllStellarList } from '@/types/galaxy';
 
 // 공용 어댑터: 서버 응답 → 앱 포맷
@@ -39,14 +39,11 @@ export const stellarListAPI = {
 
   // 갤럭시 - 모든 스텔라 목록 조회 (그대로)
   getAllStellarList: async (params: ParamsGetAllStellarList) => {
-    // 목 데이터 사용 (개발 중)
-    return getGalaxyMock(params.id);
-
     // 실제 API 호출 (나중에 활성화)
-    // const response = await axiosInstance.get<Galaxy>(
-    //   '/api/stellar-systems/all',
-    //   { params }
-    // );
-    // return response.data;
+    const response = await axiosInstance.get<GalaxyAllStellarListResponse>(
+      endpoints.stellarList.all(params.galaxyId),
+      { params }
+    );
+    return response.data;
   },
 };
