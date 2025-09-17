@@ -145,18 +145,6 @@ export function useGetMyLikes(params: { page?: number; limit?: number }) {
     staleTime: 5 * 60 * 1000, // 5분
   });
 
-  // 성공 시 로그 출력
-  React.useEffect(() => {
-    if (query.isSuccess && query.data) {
-      console.log('좋아요 목록을 조회했습니다!', {
-        params,
-        count: query.data.list?.length || 0,
-        total: query.data.total || 0,
-        response: query.data,
-      });
-    }
-  }, [query.isSuccess, query.data, params]);
-
   return query;
 }
 
@@ -231,18 +219,6 @@ export function useGetMyLikesInfinite(options: { limit?: number } = {}) {
       fetchNextPage();
     }
   };
-
-  // 성공 시 로그 출력
-  React.useEffect(() => {
-    if (data && allItems.length > 0) {
-      console.log('좋아요 목록을 조회했습니다! (무한스크롤)', {
-        totalItems: allItems.length,
-        totalPages: data.pages.length,
-        hasMore: hasNextPage,
-        response: data,
-      });
-    }
-  }, [data, allItems.length, hasNextPage]);
 
   return {
     allItems,
