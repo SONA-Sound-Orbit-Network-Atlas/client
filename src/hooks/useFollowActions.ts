@@ -6,8 +6,7 @@ export function useFollowActions() {
   const createFollowMutation = useCreateFollow();
   const deleteFollowMutation = useDeleteFollow();
 
-  // 팔로우 상태를 위한 로컬 상태 관리
-  const [followedUsers, setFollowedUsers] = useState<Set<string>>(new Set());
+  // 팔로우 상태를 위한 로컬 상태 관리 (팔로잉 패널용)
   const [unfollowedUsers, setUnfollowedUsers] = useState<Set<string>>(
     new Set()
   );
@@ -18,8 +17,6 @@ export function useFollowActions() {
       { targetUserId: userId },
       {
         onSuccess: () => {
-          // 로컬 상태 업데이트: 팔로우한 사용자를 followedUsers에 추가
-          setFollowedUsers((prev) => new Set(prev).add(userId));
           // 언팔로우 상태에서 제거
           setUnfollowedUsers((prev) => {
             const newSet = new Set(prev);
@@ -41,12 +38,7 @@ export function useFollowActions() {
       { targetUserId: userId },
       {
         onSuccess: () => {
-          // 로컬 상태 업데이트: 언팔로우한 사용자를 제거
-          setFollowedUsers((prev) => {
-            const newSet = new Set(prev);
-            newSet.delete(userId);
-            return newSet;
-          });
+          // 언팔로우한 사용자를 로컬 상태에 추가
           setUnfollowedUsers((prev) => new Set(prev).add(userId));
         },
         onError: (error) => {
@@ -57,12 +49,6 @@ export function useFollowActions() {
     );
   };
 
-  // 팔로우 상태 확인 (팔로워 패널용)
-  // 내가 실제로 팔로우한 사용자인지 확인
-  const isFollowing = (userId: string) => {
-    return followedUsers.has(userId);
-  };
-
   // 맞팔로우 상태 확인 (팔로워 패널용)
   // API에서 받은 isMutual 값이 true이면 맞팔로우
   const isMutualFollow = (isMutualFromAPI: boolean) => {
@@ -71,8 +57,9 @@ export function useFollowActions() {
 
   // 팔로우백 상태 확인 (팔로워 패널용)
   // 상대방이 나를 팔로우하고 있지만 내가 팔로우하지 않은 경우
-  const isFollowBack = (userId: string, isMutualFromAPI: boolean) => {
-    return !followedUsers.has(userId) && !isMutualFromAPI;
+  // API에서 isMutual이 false이면 팔로우백 가능
+  const isFollowBack = (isMutualFromAPI: boolean) => {
+    return !isMutualFromAPI;
   };
 
   // 팔로잉 상태 확인 (팔로잉 패널용)
@@ -90,14 +77,12 @@ export function useFollowActions() {
 
   // 상태 초기화 (메모이제이션)
   const resetStates = useCallback(() => {
-    setFollowedUsers(new Set());
     setUnfollowedUsers(new Set());
   }, []);
 
   return {
     handleFollow,
     handleUnfollow,
-    isFollowing,
     isMutualFollow,
     isFollowBack,
     isStillFollowing,

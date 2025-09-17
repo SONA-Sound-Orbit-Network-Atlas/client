@@ -25,7 +25,6 @@ export default function FollowListPanel({
   const {
     handleFollow,
     handleUnfollow,
-    isFollowing,
     isMutualFollow,
     isFollowBack,
     isStillFollowing,
@@ -117,7 +116,7 @@ export default function FollowListPanel({
                     username={user.username}
                     isFollowing={
                       type === 'followers'
-                        ? isFollowing(user.id)
+                        ? isMutualFollow(user.isMutual)
                         : isStillFollowing(user.id)
                     }
                     isMutualFollow={
@@ -126,9 +125,7 @@ export default function FollowListPanel({
                         : isStillMutualFollow(user.id, user.isMutual)
                     }
                     isFollowBack={
-                      type === 'followers'
-                        ? isFollowBack(user.id, user.isMutual)
-                        : false
+                      type === 'followers' ? isFollowBack(user.isMutual) : false
                     }
                     onFollow={type === 'followers' ? handleFollow : undefined}
                     onUnfollow={handleUnfollow}
