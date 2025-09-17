@@ -1,4 +1,4 @@
-// hooks/api/useFavorite.ts
+// hooks/api/useLikes.ts
 import {
   useMutation,
   useQueryClient,
