@@ -87,7 +87,7 @@ export function useGetGalaxyMyList(params: ParamsGetGalaxyMyList) {
 export const useGalaxy = (galaxyId: string) => {
   return useQuery({
     queryKey: ['galaxy', galaxyId],
-    queryFn: () => galaxyAPI.getAllStellarList({ id: galaxyId }),
+    queryFn: () => galaxyAPI.getAllStellarList({ galaxyId: galaxyId }),
     enabled: !!galaxyId,
     staleTime: 5 * 60 * 1000, // 5분
     gcTime: 10 * 60 * 1000, // 10분
