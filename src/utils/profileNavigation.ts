@@ -19,16 +19,25 @@ export const navigateToOtherUserProfile = (userId: string) => {
  * 이전 화면으로 돌아가기 (히스토리 기반)
  */
 export const navigateBack = () => {
-  const { popNavigationHistory } = useProfileStore.getState();
+  const { popNavigationHistory, profilePanelMode, viewingUserId } =
+    useProfileStore.getState();
 
   const previousState = popNavigationHistory();
 
-  // 히스토리가 없으면 기본 프로필로 돌아가기
+  // 히스토리가 없으면 현재 상태에 따라 적절한 기본값으로 돌아가기
   if (!previousState) {
     const { setProfilePanelMode, setViewingUserId } =
       useProfileStore.getState();
-    setViewingUserId(null);
-    setProfilePanelMode('profile');
+
+    // 현재 다른 유저 프로필을 보고 있다면 해당 유저 프로필로 돌아가기
+    if (profilePanelMode.startsWith('otherUser') && viewingUserId) {
+      setProfilePanelMode('otherUserProfile');
+      // viewingUserId는 이미 설정되어 있으므로 변경하지 않음
+    } else {
+      // 그 외의 경우에는 내 프로필로 돌아가기
+      setViewingUserId(null);
+      setProfilePanelMode('profile');
+    }
   }
 };
 

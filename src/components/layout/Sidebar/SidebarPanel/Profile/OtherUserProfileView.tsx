@@ -38,10 +38,16 @@ export default function OtherUserProfileView({
   const error = profileError || statsError;
 
   const handleFollowersClick = () => {
+    // 현재 상태를 히스토리에 저장
+    const { pushNavigationHistory } = useProfileStore.getState();
+    pushNavigationHistory();
     setProfilePanelMode('otherUserFollowers');
   };
 
   const handleFollowingsClick = () => {
+    // 현재 상태를 히스토리에 저장
+    const { pushNavigationHistory } = useProfileStore.getState();
+    pushNavigationHistory();
     setProfilePanelMode('otherUserFollowings');
   };
 
