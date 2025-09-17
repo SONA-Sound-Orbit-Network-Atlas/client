@@ -23,7 +23,6 @@ export default function CardItem({
   onClick,
 }: CardItemProps) {
   const { isLoggedIn } = useUserStore();
-  console.log('isLoggedIn', isLoggedIn);
   const [likeActive, setLikeActive] = useState(is_liked);
   // 좋아요 hook
   const { mutate: createLike } = useCreateLike();
