@@ -3,6 +3,7 @@ import Card from '@/components/common/Card/Card';
 import { IoPlanetOutline } from 'react-icons/io5';
 import { FaRegHeart } from 'react-icons/fa';
 import type { StellarListItem } from '@/types/stellarList';
+import { likeUtils } from '@/utils/likeUtils';
 import { useLikeToggle } from '@/hooks/api/useLikes';
 
 interface CardItemProps extends StellarListItem {
@@ -21,7 +22,7 @@ export default function CardItem({
   onClick,
 }: CardItemProps) {
   // 통합된 좋아요 훅 사용 - 중복 로직 제거
-  const { isLiked, toggleLike } = useLikeToggle(id, is_liked);
+  const { likeStatus, toggleLike } = useLikeToggle(id, is_liked);
 
   return (
     <Card onClick={onClick} role="button">
@@ -55,7 +56,7 @@ export default function CardItem({
 
         <ButtonLike
           className="flex-shrink-0 ml-3"
-          active={isLiked}
+          active={likeUtils.toBoolean(likeStatus)}
           onClick={toggleLike}
         />
       </div>

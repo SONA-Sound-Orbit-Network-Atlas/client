@@ -9,7 +9,7 @@ import {
   type QueryKey,
 } from '@tanstack/react-query';
 import { likesAPI } from '@/api/likes';
-import type { StellarListPage } from '@/types/stellarList';
+import type { StellarListPage, LikeStatus } from '@/types/stellarList';
 import { useUserStore } from '@/stores/useUserStore';
 
 // 무한스크롤 페이지 타입
@@ -29,7 +29,7 @@ function patchLike(
         item.id === system_id
           ? {
               ...item,
-              is_liked: nextLike,
+              is_liked: nextLike ? 'liked' : 'not_liked',
               like_count: Math.max(0, item.like_count + (nextLike ? 1 : -1)),
             }
           : item
@@ -201,9 +201,9 @@ export function useGetMyLikesInfinite(options: { limit?: number } = {}) {
 }
 
 /** 통합된 좋아요 토글 훅 - 중복 로직 제거 */
-export function useLikeToggle(system_id: string, initialLiked: boolean | null) {
+export function useLikeToggle(system_id: string, initialLiked: LikeStatus) {
   const { isLoggedIn } = useUserStore();
-  const [isLiked, setIsLiked] = useState(initialLiked);
+  const [likeStatus, setLikeStatus] = useState<LikeStatus>(initialLiked);
   const { mutate: createLike } = useCreateLike();
   const { mutate: deleteLike } = useDeleteLike();
 
@@ -212,28 +212,28 @@ export function useLikeToggle(system_id: string, initialLiked: boolean | null) {
       alert('로그인 후 이용해주세요.');
       return;
     }
-    if (isLiked === null) return;
+    if (likeStatus === 'unknown') return;
 
-    if (isLiked) {
+    if (likeStatus === 'liked') {
       deleteLike(
         { system_id },
         {
           onSuccess: () => {
-            setIsLiked(false);
+            setLikeStatus('not_liked');
           },
         }
       );
-    } else {
+    } else if (likeStatus === 'not_liked') {
       createLike(
         { system_id },
         {
           onSuccess: () => {
-            setIsLiked(true);
+            setLikeStatus('liked');
           },
         }
       );
     }
-  }, [isLoggedIn, isLiked, system_id, createLike, deleteLike]);
+  }, [isLoggedIn, likeStatus, system_id, createLike, deleteLike]);
 
-  return { isLiked, toggleLike };
+  return { likeStatus, toggleLike };
 }
