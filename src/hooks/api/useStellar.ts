@@ -26,6 +26,9 @@ export function useCreateStellar() {
     onSuccess: () => {
       // 목록/상위 캐시 무효화
       qc.invalidateQueries({ queryKey: ['stellar'] });
+      qc.invalidateQueries({ queryKey: ['stellarList'] });
+      qc.invalidateQueries({ queryKey: ['stellarMyList'] });
+      qc.invalidateQueries({ queryKey: ['stellarListAll'] });
     },
   });
 }
@@ -48,6 +51,9 @@ export function useUpdateStellar() {
       queryClient.setQueryData(['stellar', stellarId], data);
       // 목록 등 연관 캐시 무효화
       queryClient.invalidateQueries({ queryKey: ['stellar'] });
+      queryClient.invalidateQueries({ queryKey: ['stellarList'] });
+      queryClient.invalidateQueries({ queryKey: ['stellarMyList'] });
+      queryClient.invalidateQueries({ queryKey: ['stellarListAll'] });
     },
   });
 }
@@ -60,6 +66,9 @@ export function useDeleteStellar(stellarId: string) {
     mutationFn: () => stellarAPI.deleteStellar(stellarId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['stellar', stellarId] });
+      queryClient.invalidateQueries({ queryKey: ['stellarList'] });
+      queryClient.invalidateQueries({ queryKey: ['stellarMyList'] });
+      queryClient.invalidateQueries({ queryKey: ['stellarListAll'] });
     },
   });
 }
