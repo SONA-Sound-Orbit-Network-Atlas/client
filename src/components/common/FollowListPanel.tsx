@@ -10,6 +10,7 @@ import { ScrollArea } from '@/components/common/Scrollarea';
 import Button from '@/components/common/Button';
 import { useFollowList } from '@/hooks/useFollowList';
 import { useFollowActions } from '@/hooks/useFollowActions';
+import { userUtils } from '@/constants/user';
 import type {
   FollowerUser,
   FollowingUser,
@@ -67,7 +68,7 @@ export default function FollowListPanel({
 
   // 사용자 클릭 핸들러
   const handleUserClick = (userId: string) => {
-    const numericId = parseInt(userId.replace('cmf_user_', ''));
+    const numericId = userUtils.extractNumericId(userId);
     navigateToOtherUserProfile(numericId);
   };
 

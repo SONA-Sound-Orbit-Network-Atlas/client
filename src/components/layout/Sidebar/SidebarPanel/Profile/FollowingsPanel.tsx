@@ -1,6 +1,7 @@
 import { useUserStore } from '@/stores/useUserStore';
 import { useProfileStore } from '@/stores/useProfileStore';
 import FollowListPanel from '@/components/common/FollowListPanel';
+import { userUtils } from '@/constants/user';
 
 export default function FollowingsPanel() {
   const { userStore } = useUserStore();
@@ -11,7 +12,7 @@ export default function FollowingsPanel() {
     profilePanelMode === 'followings'
       ? userStore.id // 내 팔로잉
       : viewingUserId
-        ? `cmf_user_${viewingUserId}`
+        ? userUtils.createUserId(viewingUserId)
         : null; // 다른 사용자 팔로잉
 
   return <FollowListPanel type="followings" targetUserId={targetUserId} />;
