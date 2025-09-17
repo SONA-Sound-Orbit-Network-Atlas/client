@@ -2,7 +2,7 @@
 import StellarSystem from './StellarSystem';
 import SimpleStellarPoint from './SimpleStellarPoint';
 import LoadingStellarSystem from './LoadingStellarSystem';
-import { useGalaxy } from '@/hooks/api/useGalaxy';
+import { useStellarList } from '@/hooks/api/useGalaxy';
 import { useSelectedStellarStore } from '@/stores/useSelectedStellarStore';
 import useStellarSystemSelection from '@/hooks/useStellarSystemSelection';
 import type { simpleStellar } from '@/types/galaxy';

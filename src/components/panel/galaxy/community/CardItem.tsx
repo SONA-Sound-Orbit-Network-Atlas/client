@@ -2,7 +2,7 @@ import ButtonFavorite from '@/components/common/ButtonFavorite';
 import Card from '@/components/common/Card/Card';
 import { IoPlanetOutline } from 'react-icons/io5';
 import { FaRegHeart } from 'react-icons/fa';
-import type { GalaxyCommunityItem } from '@/types/galaxyCommunity';
+import type { GalaxyCommunityItem } from '@/types/stellarList';
 import { useCreateFavorite, useDeleteFavorite } from '@/hooks/api/useFavorite';
 
 interface CardItemProps extends GalaxyCommunityItem {
@@ -13,7 +13,7 @@ export default function CardItem({
   id,
   rank,
   title,
-  created_by_id,
+  author_id,
   updated_at,
   planet_count,
   like_count,
@@ -49,7 +49,7 @@ export default function CardItem({
           </div>
           <div className="mt-3 flex flex-col items-start gap-1 text-[12px] text-text-muted">
             <span>
-              BY <span className="text-primary-300">{created_by_id}</span>
+              BY <span className="text-primary-300">{author_id}</span>
             </span>
             <span>{updated_at}</span>
           </div>

@@ -3,91 +3,73 @@ import {
   useQuery,
   type QueryKey,
 } from '@tanstack/react-query';
-import { galaxyAPI } from '@/api/galaxy';
+import { stellarListAPI } from '@/api/stellarList';
 import type {
-  ParamsGetGalaxyCommunityList,
-  GalaxyCommunityPage,
-  FlattenedCommunity,
-  GalaxyCommunityItem,
-} from '@/types/galaxyCommunity';
-import type {
-  ParamsGetGalaxyMyList,
-  GalaxyMyData,
-  GalaxyMyListData,
-} from '@/types/galaxyMy';
+  StellarListItem,
+  StellarListPage,
+  FlattenedStellarList,
+  ParamsGetStellarList,
+} from '@/types/stellarList';
 
-export function useGetGalaxyCommunityList(
-  params: ParamsGetGalaxyCommunityList
-) {
+// COMMUNITY 리스트
+export function useGetStellarList(params: ParamsGetStellarList) {
   return useSuspenseInfiniteQuery<
-    GalaxyCommunityPage, // TQueryFnData: API 어댑트 반환
-    Error, // TError
-    FlattenedCommunity, // TData: select 이후
-    QueryKey, // TQueryKey
-    number // TPageParam
+    StellarListPage, // queryFn 반환
+    Error,
+    FlattenedStellarList, // select 이후
+    QueryKey,
+    number // pageParam
   >({
-    queryKey: ['galaxyCommunityList', params.limit, params.rank_type],
+    queryKey: ['stellarList', params.limit, params.rank_type],
     initialPageParam: 1,
     queryFn: ({ pageParam }) =>
-      galaxyAPI.getGalaxyCommunityList({
+      stellarListAPI.getStellarListList({
         page: pageParam,
         limit: params.limit,
-        rank_type: params.rank_type,
+        rank_type: params.rank_type, // COMMUNITY에서만 사용
       }),
     getNextPageParam: (lastPage) =>
       lastPage.hasNext ? lastPage.page + 1 : undefined,
     select: (data) => {
-      const list: GalaxyCommunityItem[] = data.pages.flatMap(
-        (p) => p.list ?? []
-      );
-      const totalCount = data.pages[0]?.totalCount ?? 0;
+      const list: StellarListItem[] = data.pages.flatMap((p) => p.list ?? []);
+      const totalCount = data.pages[0]?.total ?? 0;
       return { list, totalCount };
     },
   });
 }
 
-// Galaxy My 리스트 조회
-type FlattenedMy = {
-  list: GalaxyMyListData[];
-  totalCount: number;
-};
-
-export function useGetGalaxyMyList(params: ParamsGetGalaxyMyList) {
+// MY 리스트 (rank_type 없음)
+export function useGetStellarMyList(params: ParamsGetStellarList) {
   return useSuspenseInfiniteQuery<
-    GalaxyMyData,
+    StellarListPage,
     Error,
-    FlattenedMy,
+    FlattenedStellarList,
     QueryKey,
     number
   >({
-    queryKey: ['galaxyMyList', params.limit],
+    queryKey: ['stellarMyList', params.limit, params.page],
     initialPageParam: 1,
     queryFn: ({ pageParam }) =>
-      galaxyAPI.getGalaxyMyList({
+      stellarListAPI.getStellarMyList({
         page: pageParam,
         limit: params.limit,
+        // rank_type 미전달
       }),
-    getNextPageParam: (lastPage, allPages, lastPageParam) => {
-      const totalCount = lastPage.totalCount;
-      const loadedCount = allPages.flatMap((p) => p.list).length;
-      return loadedCount < totalCount ? lastPageParam + 1 : undefined;
-    },
+    getNextPageParam: (lastPage) =>
+      lastPage.hasNext ? lastPage.page + 1 : undefined,
     select: (data) => {
-      const list = data.pages.flatMap((p) => p.list);
-      const totalCount = data.pages[0]?.totalCount ?? 0;
+      const list = data.pages.flatMap((p) => p.list ?? []);
+      const totalCount = data.pages[0]?.total ?? 0;
       return { list, totalCount };
     },
   });
 }
 
-/**
- * Galaxy 데이터를 React Query로 관리하는 간단한 훅
- * 전체 스텔라 리스트를 가져옴
- */
-export const useGalaxy = (galaxyId: string) => {
+// 전체 스텔라 리스트 조회 (pagination 없음)
+export const useStellarList = (galaxyId: string) => {
   return useQuery({
-    queryKey: ['galaxy', galaxyId],
-    queryFn: () => galaxyAPI.getAllStellarList({ galaxyId: galaxyId }),
+    queryKey: ['stellarListAll', galaxyId],
+    queryFn: () => stellarListAPI.getAllStellarList({ galaxyId: galaxyId }),
     enabled: !!galaxyId,
     staleTime: 5 * 60 * 1000, // 5분
     gcTime: 10 * 60 * 1000, // 10분

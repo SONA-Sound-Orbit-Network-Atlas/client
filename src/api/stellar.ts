@@ -1,6 +1,7 @@
 import axiosInstance from '@/lib/axios';
 import type { StellarSystem } from '@/types/stellar';
 import { endpoints } from './endpoints';
+import type { StellarWritePayload } from '@/types/stellarWrite';
 
 // stellar API
 export const stellarAPI = {
@@ -12,25 +13,29 @@ export const stellarAPI = {
     return response.data;
   },
 
-  // 생성
-  createStellar: async (stellarData: StellarSystem): Promise<StellarSystem> => {
-    const response = await axiosInstance.post<StellarSystem>(
+  // 생성: 공용 페이로드 사용
+  createStellar: async (
+    payload: StellarWritePayload
+  ): Promise<StellarSystem> => {
+    const res = await axiosInstance.post<StellarSystem>(
       endpoints.stellarSystem.base,
-      stellarData
+      payload,
+      { headers: { 'Content-Type': 'application/json' } }
     );
-    return response.data;
+    return res.data;
   },
 
-  // 수정
+  // 수정: 공용 페이로드 사용
   updateStellar: async (
     stellarId: string,
-    stellarData: StellarSystem
+    payload: StellarWritePayload
   ): Promise<StellarSystem> => {
-    const response = await axiosInstance.put<StellarSystem>(
+    const res = await axiosInstance.put<StellarSystem>(
       endpoints.stellarSystem.byId(stellarId),
-      stellarData
+      payload,
+      { headers: { 'Content-Type': 'application/json' } }
     );
-    return response.data;
+    return res.data;
   },
 
   // 삭제

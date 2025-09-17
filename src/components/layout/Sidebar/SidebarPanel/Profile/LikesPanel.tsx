@@ -3,7 +3,7 @@ import { navigateBack } from '@/utils/profileNavigation';
 import PanelHeader from '../PanelHeader';
 import CardItem from '@/components/panel/galaxy/community/CardItem';
 import { ScrollArea } from '@/components/common/Scrollarea';
-import type { GalaxyCommunityListData } from '@/types/galaxyCommunity';
+import type { GalaxyCommunityListData } from '@/types/stellarList';
 
 export default function LikesPanel() {
   const { viewingUserId } = useProfileStore();
