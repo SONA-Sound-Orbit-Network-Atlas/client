@@ -78,6 +78,7 @@ export class Planet {
     
     // 새로운 파라미터 시스템 직접 사용 (레거시 변환 없이)
     try {
+      console.log(`🎵 ${this.name} 악기 속성 업데이트:`, this.properties);
       this.instrument.updateFromPlanet(this.properties);
     } catch (error) {
       console.error(`❌ ${this.name} 인스트루먼트 업데이트 실패:`, error);
@@ -157,20 +158,28 @@ export class Planet {
   }
 
   private calculatePatternParams(): PatternParameters {
+    // 안전한 기본값을 사용해 타입 오류 및 런타임 예외를 방지합니다.
+    const orbitSpeed = this.properties.orbitSpeed ?? 0.5;
+    const inclination = this.properties.inclination ?? 0;
+    const eccentricity = this.properties.eccentricity ?? 0;
+    const distanceFromStar = this.properties.distanceFromStar ?? 10.5;
+    const tilt = this.properties.tilt ?? 0;
+
     return {
-      pulses: Math.floor(2 + this.properties.orbitSpeed * 14),
+      pulses: Math.floor(2 + orbitSpeed * 14),
       steps: 16,
-      rotation: Math.floor((this.properties.inclination + 180) / 360 * 16),
-      swingPct: this.properties.eccentricity * 100,
-      accentDb: this.properties.eccentricity * 2,
-      gateLen: 0.35 + (this.properties.distanceFromStar - 1.0) / (20.0 - 1.0) * 0.5,
-      phase: this.properties.tilt,
-      eccentricity: this.properties.eccentricity * 100,
+      rotation: Math.floor(((inclination + 180) / 360) * 16),
+      swingPct: eccentricity * 100,
+      accentDb: eccentricity * 2,
+      gateLen: 0.35 + ((distanceFromStar - 1.0) / (20.0 - 1.0)) * 0.5,
+      phase: tilt,
+      eccentricity: eccentricity * 100,
     };
   }
 
   private calculateVelocity(isAccent: boolean): number {
-    const accentDb = (this.properties.eccentricity / 0.9) * 2;
+  const ecc = this.properties.eccentricity ?? 0;
+  const accentDb = (ecc / 0.9) * 2;
     const baseVelocity = isAccent ? 0.8 : 0.6;
     const accentBoost = isAccent ? accentDb / 10 : 0;
     return Math.min(1.0, baseVelocity + accentBoost);
@@ -192,7 +201,8 @@ export class Planet {
     };
 
     const baseMidi = baseMidiByRole[this.role];
-    const octaveShift = Math.floor((this.properties.inclination + 180) / 180) - 1;
+  const inclination = this.properties.inclination ?? 0;
+  const octaveShift = Math.floor((inclination + 180) / 180) - 1;
     const center = baseMidi + 12 * octaveShift;
 
     const chordProgression = [[0, 2, 4], [4, 6, 1], [5, 0, 2], [3, 5, 0]];
@@ -212,13 +222,17 @@ export class Planet {
         noteIndex = currentChord[stepIdx % 3];
         rawMidi = center + scaleNotes[noteIndex % scaleNotes.length];
         break;
-      case 'MELODY':
-        noteIndex = this.properties.planetColor % 100 < 70 
+      case 'MELODY': {
+        // 색상과 틸트 기본값 처리
+        const planetColor = this.properties.planetColor ?? 0;
+        const tilt = this.properties.tilt ?? 0;
+        noteIndex = planetColor % 100 < 70 
           ? currentChord[stepIdx % 3]
-          : (stepIdx + Math.floor(this.properties.tilt / 45)) % scaleNotes.length;
+          : (stepIdx + Math.floor(tilt / 45)) % scaleNotes.length;
         rawMidi = center + scaleNotes[noteIndex % scaleNotes.length];
         rawMidi = Math.max(55, Math.min(84, rawMidi));
         break;
+      }
       case 'ARPEGGIO': {
         const arpPattern = [...currentChord, ...currentChord.slice().reverse()];
         noteIndex = arpPattern[stepIdx % arpPattern.length];
