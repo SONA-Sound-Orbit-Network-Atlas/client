@@ -101,13 +101,3 @@ export function useGetFollowings(params: GetFollowingsParams) {
     },
   });
 }
-
-// TODO: 팔로우 상태 확인
-// export function useCheckFollowStatus(targetUserId: string) {
-//   return useQuery<boolean>({
-//     queryKey: ['followStatus', targetUserId],
-//     queryFn: () => followAPI.checkFollowStatus(targetUserId),
-//     enabled: !!targetUserId,
-//     staleTime: 2 * 60 * 1000, // 2분간 캐시 유지
-//   });
-// }
