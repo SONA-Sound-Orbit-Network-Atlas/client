@@ -6,6 +6,7 @@ import type { PlanetProperties } from '@/types/planetProperties';
 export type StellarWritePayload = {
   title: string;
   galaxy_id: string;
+  position: [number, number, number];
   star: {
     name: string;
     spin: number;
@@ -60,6 +61,7 @@ export function toStellarWritePayload(
   return {
     title: system.title,
     galaxy_id: system.galaxy_id,
+    position: system.position,
     star: mapStarProps(system.star.properties),
     planets: (system.planets ?? []).map((p) => ({
       name: p.name,
