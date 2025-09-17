@@ -12,7 +12,7 @@ export const VIEW_MODE_CONFIG = {
     },
   },
   thresholds: {
-    maxStellarZoomDistance: 15,
+    maxStellarZoomDistance: 100,
     minGalaxyZoomDistance: 2,
   },
 };
