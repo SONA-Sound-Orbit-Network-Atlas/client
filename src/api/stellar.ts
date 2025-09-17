@@ -45,9 +45,9 @@ export const stellarAPI = {
 
   // 클론
   cloneStellar: async (stellarId: string): Promise<StellarSystem> => {
-    const res = await axiosInstance.post(
-      endpoints.stellarSystem.clone(stellarId)
-    );
+    const res = await axiosInstance.post(endpoints.stellarSystem.clone, {
+      create_source_id: stellarId,
+    });
     return res.data;
   },
 };

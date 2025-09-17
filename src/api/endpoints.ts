@@ -15,7 +15,7 @@ export const endpoints = {
   stellarSystem: {
     base: `${API_PREFIX}/stellar-systems`,
     byId: (id: string) => `${API_PREFIX}/stellar-systems/${id}`,
-    clone: (id: string) => `${API_PREFIX}/stellar-systems/${id}/clone`,
+    clone: `${API_PREFIX}/stellar-systems/clone`,
   },
   follows: {
     base: `${API_PREFIX}/follows`,

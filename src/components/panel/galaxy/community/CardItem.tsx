@@ -2,10 +2,10 @@ import ButtonFavorite from '@/components/common/ButtonFavorite';
 import Card from '@/components/common/Card/Card';
 import { IoPlanetOutline } from 'react-icons/io5';
 import { FaRegHeart } from 'react-icons/fa';
-import type { GalaxyCommunityItem } from '@/types/stellarList';
+import type { StellarListItem } from '@/types/stellarList';
 import { useCreateFavorite, useDeleteFavorite } from '@/hooks/api/useFavorite';
 
-interface CardItemProps extends GalaxyCommunityItem {
+interface CardItemProps extends StellarListItem {
   onClick: () => void;
 }
 
@@ -17,36 +17,33 @@ export default function CardItem({
   updated_at,
   planet_count,
   like_count,
-  // myFavorite, // api 데이터에서 로그인 되어있다면 boolean, 비로그인이면 null
+  is_liked,
   onClick,
 }: CardItemProps) {
   // 좋아요 hook
   const { mutate: createFavorite } = useCreateFavorite();
   const { mutate: deleteFavorite } = useDeleteFavorite();
   // 좋아요 클릭
-  // const handleClickFavorite = () => {
-  //   if (myFavorite === null) return;
+  const handleClickFavorite = () => {
+    if (is_liked === null) return;
 
-  //   if (myFavorite === true) {
-  //     deleteFavorite({ targetId: id });
-  //   } else if (myFavorite === false) {
-  //     createFavorite({ targetId: id });
-  //   }
-  // };
+    if (is_liked === true) {
+      deleteFavorite({ targetId: id });
+    } else if (is_liked === false) {
+      createFavorite({ targetId: id });
+    }
+  };
 
   return (
     <Card onClick={onClick} role="button">
-      {/* 카드 상단 : 타이틀 및 좋아요 버튼 */}
-      <div className="flex justify-between items-center">
+      <div className="flex items-center justify-between min-w-0">
+        {' '}
         <div className="flex-1 min-w-0">
-          <div className="text-[14px] font-bold flex items-center">
-            <span className="text-text-muted inline-block mr-2 flex-shrink-0">
-              #{rank}
-            </span>
-            <strong className="text-white truncate flex-1 min-w-0">
-              {title}
-            </strong>
+          <div className="flex items-center gap-2 min-w-0">
+            <span className="text-text-muted flex-shrink-0">#{rank}</span>
+            <strong className="text-white w-0 flex-1 truncate">{title}</strong>
           </div>
+
           <div className="mt-3 flex flex-col items-start gap-1 text-[12px] text-text-muted">
             <span>
               BY <span className="text-primary-300">{author_id}</span>
@@ -54,11 +51,10 @@ export default function CardItem({
             <span>{updated_at}</span>
           </div>
         </div>
-        {/* 좋아요 버튼 => active에 null 이 들어가면 비로그인 상태이므로 비활성화 */}
         <ButtonFavorite
-          className="flex-shrink-0"
-          // active={myFavorite}
-          // onClick={handleClickFavorite}
+          className="flex-shrink-0 ml-3"
+          active={is_liked}
+          onClick={handleClickFavorite}
         />
       </div>
 

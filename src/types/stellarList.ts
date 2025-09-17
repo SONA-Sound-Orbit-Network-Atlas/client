@@ -11,6 +11,7 @@ export interface StellarListItem {
   like_count: number;
   planet_count: number;
   rank: number;
+  is_liked: boolean | null;
 }
 
 export interface StellarListMeta {
