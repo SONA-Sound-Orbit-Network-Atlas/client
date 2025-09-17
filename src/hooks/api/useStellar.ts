@@ -72,3 +72,17 @@ export function useDeleteStellar(stellarId: string) {
     },
   });
 }
+
+// 클론
+export function useCloneStellar(stellarId: string) {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: () => stellarAPI.cloneStellar(stellarId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['stellarList'] });
+      queryClient.invalidateQueries({ queryKey: ['stellarMyList'] });
+      queryClient.invalidateQueries({ queryKey: ['stellarListAll'] });
+    },
+  });
+}

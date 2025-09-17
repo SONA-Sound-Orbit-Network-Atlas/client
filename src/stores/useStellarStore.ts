@@ -9,26 +9,17 @@ import type {
 import type { StarProperties } from '@/types/starProperties';
 import type { PlanetProperties } from '@/types/planetProperties';
 import { useUserStore } from '@/stores/useUserStore';
+import { createDefaultProperties } from '@/types/planetProperties';
 
 /***** 1) 기본 프로퍼티 디폴트 *****/
 const defaultStarProps: StarProperties = {
-  name: 'Star',
   spin: 50,
   brightness: 1,
   color: 1,
   size: 1.0, // 적절한 크기 범위 (0.1 ~ 2.0)
 };
 
-const defaultPlanetProps: PlanetProperties = {
-  size: 0.5,
-  color: 0,
-  brightness: 3,
-  distanceFromStar: 8,
-  orbitSpeed: 0.4,
-  rotationSpeed: 0.4,
-  eccentricity: 0.2,
-  tilt: 0,
-};
+export const defaultPlanetProps: PlanetProperties = createDefaultProperties();
 
 /***** 2) 초기 스텔라 시스템 *****/
 export const initialStellarStore: StellarSystem = {

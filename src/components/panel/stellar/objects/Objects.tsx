@@ -49,6 +49,7 @@ function ObjectsContent() {
                 key={data.id}
                 data={data}
                 onClick={() => {
+                  console.log('=================data.id', data.id);
                   setSelectedObjectId(data.id);
                 }}
                 active={selectedObjectId === data.id}
