@@ -16,7 +16,7 @@ export function useCreateFollow() {
 
   return useMutation<FollowStats, AxiosError, FollowRequest>({
     mutationFn: (data: FollowRequest) => followAPI.createFollow(data),
-    onSuccess: (response: FollowStats) => {
+    onSuccess: (response: FollowStats, variables: FollowRequest) => {
       console.log('✅ 팔로우가 완료되었습니다!', {
         userId: response.userId,
         followersCount: response.followersCount,
@@ -24,14 +24,17 @@ export function useCreateFollow() {
       });
 
       // 팔로우 관련 쿼리 무효화하여 최신 데이터 반영
+      const myUserId = response.userId;
+      const targetUserId = variables.targetUserId;
+
+      // 내 프로필과 팔로잉 목록 무효화
+      queryClient.invalidateQueries({ queryKey: ['userProfile', myUserId] });
+      queryClient.invalidateQueries({ queryKey: ['followings', myUserId] });
+
+      // 상대방의 팔로워 목록 무효화 (프로필도 캐시한다면 함께 무효화)
+      queryClient.invalidateQueries({ queryKey: ['followers', targetUserId] });
       queryClient.invalidateQueries({
-        queryKey: ['userProfile'],
-      });
-      queryClient.invalidateQueries({
-        queryKey: ['followers'],
-      });
-      queryClient.invalidateQueries({
-        queryKey: ['followings'],
+        queryKey: ['userProfile', targetUserId],
       });
     },
     onError: (error: AxiosError) => {
@@ -46,20 +49,25 @@ export function useDeleteFollow() {
 
   return useMutation<FollowStats, AxiosError, FollowRequest>({
     mutationFn: (data: FollowRequest) => followAPI.deleteFollow(data),
-    onSuccess: (response: FollowStats) => {
+    onSuccess: (response: FollowStats, variables: FollowRequest) => {
       console.log('✅ 팔로우가 취소되었습니다!', {
         userId: response.userId,
         followersCount: response.followersCount,
         followingsCount: response.followingsCount,
       });
+
+      // 팔로우 관련 쿼리 무효화하여 최신 데이터 반영
+      const myUserId = response.userId;
+      const targetUserId = variables.targetUserId;
+
+      // 내 프로필과 팔로잉 목록 무효화
+      queryClient.invalidateQueries({ queryKey: ['userProfile', myUserId] });
+      queryClient.invalidateQueries({ queryKey: ['followings', myUserId] });
+
+      // 상대방의 팔로워 목록 무효화 (프로필도 캐시한다면 함께 무효화)
+      queryClient.invalidateQueries({ queryKey: ['followers', targetUserId] });
       queryClient.invalidateQueries({
-        queryKey: ['userProfile'],
-      });
-      queryClient.invalidateQueries({
-        queryKey: ['followers'],
-      });
-      queryClient.invalidateQueries({
-        queryKey: ['followings'],
+        queryKey: ['userProfile', targetUserId],
       });
     },
     onError: (error: AxiosError) => {
