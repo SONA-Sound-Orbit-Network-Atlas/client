@@ -11,7 +11,6 @@ export function useFollowActions() {
   const [unfollowedUsers, setUnfollowedUsers] = useState<Set<string>>(
     new Set()
   );
-  const [mutualFollows, setMutualFollows] = useState<Set<string>>(new Set());
 
   // 팔로우 핸들러
   const handleFollow = (userId: string) => {
@@ -21,8 +20,12 @@ export function useFollowActions() {
         onSuccess: () => {
           // 로컬 상태 업데이트: 팔로우한 사용자를 followedUsers에 추가
           setFollowedUsers((prev) => new Set(prev).add(userId));
-          // 맞팔로우 상태로 업데이트
-          setMutualFollows((prev) => new Set(prev).add(userId));
+          // 언팔로우 상태에서 제거
+          setUnfollowedUsers((prev) => {
+            const newSet = new Set(prev);
+            newSet.delete(userId);
+            return newSet;
+          });
         },
         onError: (error) => {
           console.error('팔로우 실패:', error);
@@ -45,11 +48,6 @@ export function useFollowActions() {
             return newSet;
           });
           setUnfollowedUsers((prev) => new Set(prev).add(userId));
-          setMutualFollows((prev) => {
-            const newSet = new Set(prev);
-            newSet.delete(userId);
-            return newSet;
-          });
         },
         onError: (error) => {
           console.error('언팔로우 실패:', error);
@@ -60,21 +58,32 @@ export function useFollowActions() {
   };
 
   // 팔로우 상태 확인 (팔로워 패널용)
-  const isFollowing = (userId: string, isMutualFromAPI: boolean) => {
-    return followedUsers.has(userId) || isMutualFromAPI;
+  // 내가 실제로 팔로우한 사용자인지 확인
+  const isFollowing = (userId: string) => {
+    return followedUsers.has(userId);
   };
 
   // 맞팔로우 상태 확인 (팔로워 패널용)
-  const isMutualFollow = (userId: string, isMutualFromAPI: boolean) => {
-    return mutualFollows.has(userId) || isMutualFromAPI;
+  // API에서 받은 isMutual 값이 true이면 맞팔로우
+  const isMutualFollow = (isMutualFromAPI: boolean) => {
+    return isMutualFromAPI;
+  };
+
+  // 팔로우백 상태 확인 (팔로워 패널용)
+  // 상대방이 나를 팔로우하고 있지만 내가 팔로우하지 않은 경우
+  const isFollowBack = (userId: string, isMutualFromAPI: boolean) => {
+    return !followedUsers.has(userId) && !isMutualFromAPI;
   };
 
   // 팔로잉 상태 확인 (팔로잉 패널용)
+  // 팔로잉 패널에서는 기본적으로 모든 사용자가 팔로우 상태
+  // 단, 언팔로우한 사용자는 제외
   const isStillFollowing = (userId: string) => {
     return !unfollowedUsers.has(userId);
   };
 
   // 맞팔로우 상태 확인 (팔로잉 패널용)
+  // API에서 받은 isMutual 값이 true이고, 언팔로우하지 않은 경우
   const isStillMutualFollow = (userId: string, isMutualFromAPI: boolean) => {
     return isMutualFromAPI && !unfollowedUsers.has(userId);
   };
@@ -83,7 +92,6 @@ export function useFollowActions() {
   const resetStates = useCallback(() => {
     setFollowedUsers(new Set());
     setUnfollowedUsers(new Set());
-    setMutualFollows(new Set());
   }, []);
 
   return {
@@ -91,6 +99,7 @@ export function useFollowActions() {
     handleUnfollow,
     isFollowing,
     isMutualFollow,
+    isFollowBack,
     isStillFollowing,
     isStillMutualFollow,
     resetStates,
