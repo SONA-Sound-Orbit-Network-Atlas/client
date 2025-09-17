@@ -12,7 +12,11 @@ interface GalaxyProps {
 }
 
 export default function Galaxy({ galaxyId = 'gal_abc123' }: GalaxyProps) {
-  const { data: galaxyStellarListData, isLoading, error } = useGalaxy(galaxyId);
+  const {
+    data: galaxyStellarListData,
+    isLoading,
+    error,
+  } = useStellarList(galaxyId);
   const { selectedStellarId } = useSelectedStellarStore();
   const { selectStellar } = useStellarSystemSelection();
 
