@@ -58,3 +58,10 @@ export interface GetFollowingsParams {
   page?: number;
   limit?: number;
 }
+
+// 팔로우 리스트 훅 옵션
+export interface UseFollowListOptions {
+  userId: string;
+  page: number;
+  limit?: number;
+}
