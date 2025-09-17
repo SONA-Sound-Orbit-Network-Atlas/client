@@ -17,10 +17,10 @@ export default function SpacePage() {
       <Header />
       <div className="flex-1 flex min-h-0">
         <Sidebar />
-        <div className="flex-1 flex flex-col min-h-0">
+        <div className="flex-1 flex flex-col min-h-0 min-w-0">
           <h1 className="text-white p-4">Space</h1>
           {/* <TestButtons /> */}
-          <div className="flex-1 min-h-0 relative">
+          <div className="flex-1 min-h-0 min-w-0 relative w-full h-full overflow-hidden">
             <Canvas style={canvasStyle} shadows>
               <Suspense fallback={null}>
                 <Scene />
