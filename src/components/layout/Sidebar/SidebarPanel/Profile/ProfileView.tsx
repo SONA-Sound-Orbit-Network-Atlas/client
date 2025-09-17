@@ -11,6 +11,7 @@ import { useLogout } from '@/hooks/api/useAuth';
 import { useGetUserProfile } from '@/hooks/api/useUser';
 import { useUserStore } from '@/stores/useUserStore';
 import { useGetFollowers, useGetFollowings } from '@/hooks/api/useFollow';
+import { useGetMyLikes } from '@/hooks/api/useLikes';
 import ProfileStateWrapper from './ProfileStateWrapper';
 import Iconframe from '@/components/common/Iconframe';
 import Button from '@/components/common/Button';
@@ -42,6 +43,12 @@ export default function ProfileView() {
     userId: userStore.id || '',
     page: 1,
     limit: 1, // 총 개수만 필요하므로 1개만 조회
+  });
+
+  // 좋아요 개수 조회
+  const { data: likesData, isLoading: likesLoading } = useGetMyLikes({
+    page: 1,
+    limit: 1,
   });
 
   // userStore 데이터를 우선적으로 사용하고, 서버 데이터가 있으면 병합
@@ -140,7 +147,7 @@ export default function ProfileView() {
                 <p className="text-text-muted text-sm mb-[16px]">LIKES</p>
                 <StatCard
                   icon={<FiHeart className="text-white" />}
-                  value={85}
+                  value={likesLoading ? 0 : likesData?.total || 0}
                   label="MY LIKES"
                   onClick={handleLikesClick}
                   className="w-full hover:brightness-110 hover:bg-text-white/20 border-white/20 hover:text-white hover:[&_p]:text-white hover:[&_svg]:text-white"

@@ -1,68 +1,96 @@
-import { useProfileStore } from '@/stores/useProfileStore';
 import { navigateBack } from '@/utils/profileNavigation';
 import PanelHeader from '../PanelHeader';
 import CardItem from '@/components/panel/galaxy/community/CardItem';
 import { ScrollArea } from '@/components/common/Scrollarea';
-import type { GalaxyCommunityListData } from '@/types/stellarList';
+import { SkeletonCard } from '@/components/common/Card/SkeletonCard';
+import { useGetMyLikesInfinite } from '@/hooks/api/useLikes';
+import Button from '@/components/common/Button';
+import useStellarSystemSelection from '@/hooks/useStellarSystemSelection';
 
 export default function LikesPanel() {
-  const { viewingUserId } = useProfileStore();
+  // 갤럭시 선택 훅
+  const { selectStellar } = useStellarSystemSelection();
 
-  // 현재 다른 유저의 프로필을 보고 있는지 확인
-  const isViewingOtherUser = !!viewingUserId;
+  // API 호출 - 내가 좋아요 한 항성계 목록 조회 (무한스크롤)
+  const {
+    allItems,
+    hasMore,
+    isLoadingMore,
+    isLoading,
+    error,
+    loadMore,
+    totalCount,
+  } = useGetMyLikesInfinite({
+    limit: 20,
+  });
 
-  // 임시 데이터 - GalaxyCommunityListData 타입에 맞게 수정
-  const likedItems: GalaxyCommunityListData[] = [
-    {
-      id: '1',
-      userId: 'user1',
-      rank: 1,
-      galaxyName: 'galaxy1',
-      makerName: 'User1',
-      updatedAt: '2 days ago',
-      planetCount: 5,
-      favoriteCount: 24,
-      myFavorite: true,
-    },
-    {
-      id: '2',
-      userId: 'user2',
-      rank: 2,
-      galaxyName: 'galaxy2',
-      makerName: 'User2',
-      updatedAt: '1 week ago',
-      planetCount: 3,
-      favoriteCount: 18,
-      myFavorite: true,
-    },
-    {
-      id: '3',
-      userId: 'user3',
-      rank: 3,
-      galaxyName: 'galaxy3',
-      makerName: 'User3',
-      updatedAt: '3 days ago',
-      planetCount: 7,
-      favoriteCount: 32,
-      myFavorite: true,
-    },
-    {
-      id: '4',
-      userId: 'user4',
-      rank: 4,
-      galaxyName: 'galaxy4',
-      makerName: 'User4',
-      updatedAt: '5 days ago',
-      planetCount: 4,
-      favoriteCount: 15,
-      myFavorite: true,
-    },
-  ];
+  // 로딩 상태 - 스켈레톤 UI
+  if (isLoading) {
+    return (
+      <>
+        <PanelHeader
+          title="MY LIKES"
+          showBackButton={true}
+          onBack={navigateBack}
+        />
+        <div className="flex flex-col h-full overflow-hidden">
+          <ScrollArea className="flex-1 min-h-0">
+            <div className="p-4">
+              <p className="text-text-muted text-sm font-semibold mb-[16px]">
+                TOTAL LIKES (0)
+              </p>
+              <div className="space-y-3">
+                {/* 스켈레톤 카드들 */}
+                {Array.from({ length: 3 }).map((_, index) => (
+                  <SkeletonCard key={index} />
+                ))}
+              </div>
+            </div>
+          </ScrollArea>
+        </div>
+      </>
+    );
+  }
+
+  // 에러 상태 - 재시도 기능 포함
+  if (error) {
+    return (
+      <>
+        <PanelHeader
+          title="MY LIKES"
+          showBackButton={true}
+          onBack={navigateBack}
+        />
+        <div className="flex flex-col h-full overflow-hidden">
+          <ScrollArea className="flex-1 min-h-0">
+            <div className="p-4">
+              <div className="flex flex-col items-center justify-center h-64 text-center">
+                <div className="text-red-400 text-4xl mb-4">⚠️</div>
+                <h3 className="text-white text-lg font-semibold mb-2">
+                  Failed to load likes
+                </h3>
+                <p className="text-text-muted text-sm mb-6 max-w-sm">
+                  Unable to load your liked stellar systems. Please check your
+                  connection and try again.
+                </p>
+                <button
+                  onClick={() => window.location.reload()}
+                  className="px-4 py-2 bg-primary-500 hover:bg-primary-600 text-white rounded-lg transition-colors"
+                >
+                  Try Again
+                </button>
+              </div>
+            </div>
+          </ScrollArea>
+        </div>
+      </>
+    );
+  }
 
   return (
     <>
       <PanelHeader
-        title={isViewingOtherUser ? 'LIKES' : 'MY LIKES'}
+        title="MY LIKES"
         showBackButton={true}
         onBack={navigateBack}
       />
@@ -70,21 +98,67 @@ export default function LikesPanel() {
         <ScrollArea className="flex-1 min-h-0">
           <div className="p-4">
             <p className="text-text-muted text-sm font-semibold mb-[16px]">
-              {isViewingOtherUser ? 'LIKES' : 'TOTAL LIKES'} (
-              {likedItems.length})
+              TOTAL LIKES ({totalCount})
             </p>
-            <div className="space-y-3">
-              {likedItems.map((item) => (
-                <CardItem
-                  key={item.galaxyName}
-                  {...item}
-                  onClick={() => {
-                    // TODO: 갤럭시 상세 페이지로 이동
-                    console.log('Navigate to galaxy:', item.galaxyName);
-                  }}
-                />
-              ))}
-            </div>
+
+            {/* 로딩 상태 */}
+            {isLoading && (
+              <div className="text-center py-4">
+                <p className="text-text-muted">Loading...</p>
+              </div>
+            )}
+
+            {/* 에러 상태 */}
+            {error && (
+              <div className="text-center py-4">
+                <p className="text-red-400">Failed to load likes</p>
+              </div>
+            )}
+
+            {/* 좋아요 목록 */}
+            {!isLoading && !error && allItems.length > 0 && (
+              <div className="space-y-3">
+                {allItems.map((item) => (
+                  <CardItem
+                    key={item.id}
+                    {...item}
+                    onClick={() => {
+                      selectStellar(item.id);
+                    }}
+                  />
+                ))}
+              </div>
+            )}
+
+            {/* Load More 버튼 */}
+            {hasMore && !error && allItems.length > 0 && (
+              <div className="flex justify-center mt-6">
+                <Button
+                  onClick={loadMore}
+                  disabled={isLoadingMore}
+                  color="tertiary"
+                  className="w-full"
+                >
+                  {isLoadingMore ? 'Loading...' : 'LOAD MORE'}
+                </Button>
+              </div>
+            )}
+
+            {/* 모든 데이터 로드 완료 메시지 */}
+            {!hasMore && allItems.length > 0 && (
+              <div className="text-center mt-6">
+                <p className="text-text-muted text-sm">
+                  All liked stellar systems loaded
+                </p>
+              </div>
+            )}
+
+            {/* 빈 상태 */}
+            {!isLoading && !error && allItems.length === 0 && (
+              <div className="text-center py-4">
+                <p className="text-text-muted">No liked stellar systems.</p>
+              </div>
+            )}
           </div>
         </ScrollArea>
       </div>
