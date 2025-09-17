@@ -14,10 +14,6 @@ export default function ButtonLike({
 }: ButtonLikeProps) {
   const onClickHandle = (e: React.MouseEvent) => {
     e.stopPropagation();
-    if (active === null) {
-      alert('로그인 후 이용해주세요.');
-      return;
-    }
     onClick?.();
   };
 

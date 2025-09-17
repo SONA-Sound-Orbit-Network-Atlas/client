@@ -1,5 +1,5 @@
 // hooks/api/useLikes.ts
-import React from 'react';
+import { useState, useCallback } from 'react';
 import {
   useMutation,
   useQuery,
@@ -10,6 +10,7 @@ import {
 } from '@tanstack/react-query';
 import { likesAPI } from '@/api/likes';
 import type { StellarListPage } from '@/types/stellarList';
+import { useUserStore } from '@/stores/useUserStore';
 
 // 무한스크롤 페이지 타입
 type StellarInfinite = InfiniteData<StellarListPage>;
@@ -229,4 +230,42 @@ export function useGetMyLikesInfinite(options: { limit?: number } = {}) {
     loadMore,
     totalCount: data?.pages?.[0]?.total || 0,
   };
+}
+
+/** 통합된 좋아요 토글 훅 - 중복 로직 제거 */
+export function useLikeToggle(system_id: string, initialLiked: boolean | null) {
+  const { isLoggedIn } = useUserStore();
+  const [isLiked, setIsLiked] = useState(initialLiked);
+  const { mutate: createLike } = useCreateLike();
+  const { mutate: deleteLike } = useDeleteLike();
+
+  const toggleLike = useCallback(() => {
+    if (!isLoggedIn) {
+      alert('로그인 후 이용해주세요.');
+      return;
+    }
+    if (isLiked === null) return;
+
+    if (isLiked) {
+      deleteLike(
+        { system_id },
+        {
+          onSuccess: () => {
+            setIsLiked(false);
+          },
+        }
+      );
+    } else {
+      createLike(
+        { system_id },
+        {
+          onSuccess: () => {
+            setIsLiked(true);
+          },
+        }
+      );
+    }
+  }, [isLoggedIn, isLiked, system_id, createLike, deleteLike]);
+
+  return { isLiked, toggleLike };
 }

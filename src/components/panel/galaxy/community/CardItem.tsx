@@ -3,9 +3,7 @@ import Card from '@/components/common/Card/Card';
 import { IoPlanetOutline } from 'react-icons/io5';
 import { FaRegHeart } from 'react-icons/fa';
 import type { StellarListItem } from '@/types/stellarList';
-import { useState } from 'react';
-import { useCreateLike, useDeleteLike } from '@/hooks/api/useLikes';
-import { useUserStore } from '@/stores/useUserStore';
+import { useLikeToggle } from '@/hooks/api/useLikes';
 
 interface CardItemProps extends StellarListItem {
   onClick: () => void;
@@ -22,38 +20,8 @@ export default function CardItem({
   is_liked,
   onClick,
 }: CardItemProps) {
-  const { isLoggedIn } = useUserStore();
-  const [likeActive, setLikeActive] = useState(is_liked);
-  // 좋아요 hook
-  const { mutate: createLike } = useCreateLike();
-  const { mutate: deleteLike } = useDeleteLike();
-  // 좋아요 클릭
-  const handleClickLike = () => {
-    if (!isLoggedIn) {
-      return alert('로그인 후 이용해주세요.');
-    }
-    if (is_liked === null) return;
-
-    if (is_liked === true) {
-      deleteLike(
-        { system_id: id },
-        {
-          onSuccess: () => {
-            setLikeActive(false);
-          },
-        }
-      );
-    } else if (is_liked === false) {
-      createLike(
-        { system_id: id },
-        {
-          onSuccess: () => {
-            setLikeActive(true);
-          },
-        }
-      );
-    }
-  };
+  // 통합된 좋아요 훅 사용 - 중복 로직 제거
+  const { isLiked, toggleLike } = useLikeToggle(id, is_liked);
 
   return (
     <Card onClick={onClick} role="button">
@@ -87,8 +55,8 @@ export default function CardItem({
 
         <ButtonLike
           className="flex-shrink-0 ml-3"
-          active={likeActive}
-          onClick={handleClickLike}
+          active={isLiked}
+          onClick={toggleLike}
         />
       </div>
 
