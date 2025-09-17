@@ -1,4 +1,5 @@
 import axiosInstance from '@/lib/axios';
+import { endpoints } from './endpoints';
 import type {
   FollowRequest,
   FollowStats,
@@ -11,13 +12,15 @@ import type {
 export const followAPI = {
   // 팔로우 생성
   createFollow: async (data: FollowRequest): Promise<FollowStats> => {
-    const response = await axiosInstance.post('/follows', data);
+    const response = await axiosInstance.post(endpoints.follows.base, data);
     return response.data;
   },
 
   // 팔로우 취소
   deleteFollow: async (data: FollowRequest): Promise<FollowStats> => {
-    const response = await axiosInstance.delete('/follows', { data });
+    const response = await axiosInstance.delete(endpoints.follows.base, {
+      data,
+    });
     return response.data;
   },
 
@@ -28,7 +31,7 @@ export const followAPI = {
     const { userId, page = 1, limit = 20 } = params;
 
     const response = await axiosInstance.get<FollowersResponse>(
-      `/follows/${userId}/followers`,
+      endpoints.follows.followers(userId),
       {
         params: {
           page,
@@ -47,7 +50,7 @@ export const followAPI = {
     const { userId, page = 1, limit = 20 } = params;
 
     const response = await axiosInstance.get<FollowingsResponse>(
-      `/follows/${userId}/followings`,
+      endpoints.follows.followings(userId),
       {
         params: {
           page,

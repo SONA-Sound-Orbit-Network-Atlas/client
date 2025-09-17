@@ -20,6 +20,9 @@ export const endpoints = {
   },
   follows: {
     base: `${API_PREFIX}/follows`,
+    followers: (userId: string) => `${API_PREFIX}/follows/${userId}/followers`,
+    followings: (userId: string) =>
+      `${API_PREFIX}/follows/${userId}/followings`,
   },
   user: {
     profile: `${API_PREFIX}/users/profile`,
