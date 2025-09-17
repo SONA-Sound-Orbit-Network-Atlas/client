@@ -48,15 +48,16 @@ function ContentComp({ sort }: { sort: SortLabel }) {
     });
   // 평탄화 된 list 데이터
   const galaxyCommunityList = data?.list ?? [];
+  console.log('galaxyCommunityList : ', galaxyCommunityList);
 
   if (galaxyCommunityList.length === 0) {
     return <div>No data</div>;
   }
 
   return (
-    <div>
+    <div className="w-full">
       {/* 은하 리스트 */}
-      <div className="space-y-3">
+      <div className="space-y-3 w-full">
         {galaxyCommunityList.map((galaxySystem: StellarListItem) => (
           <CardItem
             key={galaxySystem.id}
