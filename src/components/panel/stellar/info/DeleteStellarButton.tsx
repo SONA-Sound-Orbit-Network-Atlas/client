@@ -8,7 +8,7 @@ import { useStellarTabStore } from '@/stores/useStellarTabStore';
 
 export default function DeleteStellarButton() {
   const { mutate: deleteStellar, isPending } = useDeleteStellar();
-  const { selectedObjectId } = useSelectedObjectStore();
+  const { selectedStellarId } = useSelectedStellarStore();
   const { openSecondarySidebar } = useSidebarStore();
   const { setInitialStellarStore } = useStellarStore();
   const { setIdle } = useSelectedStellarStore();
@@ -22,7 +22,7 @@ export default function DeleteStellarButton() {
       onClick={() => {
         const confirm = window.confirm('DEACTIVATE ACCOUNT');
         if (confirm) {
-          deleteStellar(selectedObjectId, {
+          deleteStellar(selectedStellarId, {
             onSuccess: () => {
               alert('DEACTIVATE ACCOUNT success');
               openSecondarySidebar('galaxy');

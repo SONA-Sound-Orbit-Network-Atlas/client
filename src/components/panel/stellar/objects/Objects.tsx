@@ -7,6 +7,8 @@ import { useStellarStore } from '@/stores/useStellarStore';
 import { useSelectedObjectStore } from '@/stores/useSelectedObjectStore';
 import AddNewObjectBtn from './AddNewObjectBtn';
 import type { Star, Planet } from '@/types/stellar';
+import { useSelectedStellarStore } from '@/stores/useSelectedStellarStore';
+import { useUserStore } from '@/stores/useUserStore';
 
 export default function Objects() {
   return (
@@ -22,7 +24,9 @@ export default function Objects() {
 function ObjectsContent() {
   const { selectedObjectId, setSelectedObjectId } = useSelectedObjectStore();
   const { stellarStore } = useStellarStore();
-
+  const { mode } = useSelectedStellarStore();
+  const { userStore } = useUserStore();
+  const isStellarOwner = stellarStore.creator_id === userStore.id;
   // === 스텔라 상세정보 스토어에서 object 정보(Star, Planet)만 추출 ===
   const starInfo: Star = stellarStore.star;
   const planetInfo: Planet[] = stellarStore.planets;
@@ -64,7 +68,7 @@ function ObjectsContent() {
       </div>
 
       {/* new OBJECT 추가 버튼 */}
-      <AddNewObjectBtn />
+      {(isStellarOwner || mode === 'create') && <AddNewObjectBtn />}
     </div>
   );
 }
