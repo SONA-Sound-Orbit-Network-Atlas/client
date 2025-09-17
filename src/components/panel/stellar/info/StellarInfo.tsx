@@ -26,8 +26,8 @@ export default function StellarInfo({
   // 3) 스타 정보 (표시용)
   const starInfo = {
     NAME: stellarStore.title,
-    CREATOR: stellarStore.created_by_id,
-    AUTHOR: stellarStore.original_author_id,
+    CREATOR: stellarStore.author_id,
+    AUTHOR: stellarStore.create_source_id,
     ['CREATE SOURCE']: 'ORIGINAL COMPOSITION',
     ['ORIGINAL SOURCE']: 'SONA STUDIO',
   };

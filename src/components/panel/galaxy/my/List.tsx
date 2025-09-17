@@ -1,7 +1,7 @@
 import { Suspense } from 'react';
-import { useGetGalaxyMyList } from '@/hooks/api/useGalaxy';
+import { useGetStellarMyList } from '@/hooks/api/useGalaxy';
 import CardItem from './CardItem';
-import { type GalaxyMyListData } from '@/types/galaxyMy';
+import { type StellarListItem } from '@/types/stellarList';
 import Button from '@/components/common/Button';
 import { SkeletonCard } from '@/components/common/Card/SkeletonCard';
 import { ErrorBoundary } from 'react-error-boundary';
@@ -25,7 +25,7 @@ function ContentComp() {
   const { selectStellar } = useStellarSystemSelection();
 
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage } =
-    useGetGalaxyMyList({
+    useGetStellarMyList({
       page: 1,
       limit: GALAXY_LIST_LIMIT,
     });
@@ -36,7 +36,7 @@ function ContentComp() {
     <div>
       {/* 내 갤럭시 리스트 */}
       <div className="space-y-3">
-        {myGalaxyList.map((galaxySystem: GalaxyMyListData) => (
+        {myGalaxyList.map((galaxySystem: StellarListItem) => (
           <CardItem
             key={galaxySystem.id}
             {...galaxySystem}

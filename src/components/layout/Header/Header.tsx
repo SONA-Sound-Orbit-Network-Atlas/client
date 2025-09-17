@@ -5,7 +5,7 @@ import Button from '@/components/common/Button';
 import { FiArrowLeft } from 'react-icons/fi';
 import { useUserStore } from '@/stores/useUserStore';
 import { useSelectedStellarStore } from '@/stores/useSelectedStellarStore';
-import SaveButton from './SavaButton';
+import SaveButton from './SaveButton';
 
 interface HeaderProps {
   className?: string;

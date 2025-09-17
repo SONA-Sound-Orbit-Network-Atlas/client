@@ -135,53 +135,30 @@ export interface PlanetListResponse {
   message?: string;
 }
 
-// === 레거시 타입들 (하위 호환성 유지) ===
-
-export type PlanetType = 'CENTRAL_STAR' | 'PLANET';
-
-// 레거시 Property 인터페이스 (하위 호환성 유지)
-export interface Property {
-  label: string;
-  value: number;
-  min: number;
-  max: number;
-  unit: number;
-}
-
-interface BasePlanet {
-  name: string;
-  planet_type: PlanetType;
-  planetId?: number;
-  status?: string;
-}
-
-export interface CentralStar extends BasePlanet {
-  planet_type: 'CENTRAL_STAR';
-  bpm?: number;
-  creator?: string;
-  author?: string;
-  createSource?: string;
-  originalSource?: string;
-  properties: PlanetProperties; // 통합 타입 사용
-}
-
-export interface LegacyPlanet extends BasePlanet {
-  planet_type: 'PLANET';
-  instrument_role?: InstrumentRole;
-  lastEdited?: string;
-  created?: string;
-  properties: PlanetProperties; // 통합 타입 사용
-}
-
-export type PlanetObject = CentralStar | LegacyPlanet;
-
-export interface StellarType {
-  userId: string;
-  stellarId: string;
-  position?: [number, number, number];
-  stellarName?: string;
-  updatedAt?: string;
-  creator?: string;
-  author?: string;
-  planets: PlanetObject[];
-}
+// === (Stellar 생성 API) Payload 타입 ===
+export type CreateStellarPayload = {
+  title: string;
+  galaxy_id: string;
+  star: {
+    spin: number;
+    brightness: number;
+    color: number;
+    size: number;
+  };
+  planets: Array<{
+    name: string;
+    role: InstrumentRole;
+    properties: {
+      size: number;
+      color: number;
+      brightness: number;
+      distance: number;
+      speed: number;
+      tilt: number;
+      spin: number;
+      eccentricity: number;
+      elevation: number;
+      phase: number;
+    };
+  }>;
+};

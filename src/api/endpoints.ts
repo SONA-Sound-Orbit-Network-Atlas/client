@@ -8,9 +8,9 @@ export const endpoints = {
     logout: `${API_PREFIX}/auth/logout`,
     session: `${API_PREFIX}/auth/session`,
   },
-  galaxyList: {
+  stellarList: {
     base: `${API_PREFIX}/likes/rankings`,
-    my: `${API_PREFIX}/stellar-list/me`,
+    my: `${API_PREFIX}/stellar-systems/me`,
   },
   stellarSystem: {
     base: `${API_PREFIX}/stellar-systems`,

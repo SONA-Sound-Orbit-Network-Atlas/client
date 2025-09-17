@@ -5,7 +5,7 @@ import {
   type InfiniteData,
 } from '@tanstack/react-query';
 import { favoriteAPI } from '@/api/favorite';
-import type { GalaxyCommunityData } from '@/types/galaxyCommunity';
+import type { GalaxyCommunityData } from '@/types/stellarList';
 
 type CommunityInfinite = InfiniteData<GalaxyCommunityData>;
 

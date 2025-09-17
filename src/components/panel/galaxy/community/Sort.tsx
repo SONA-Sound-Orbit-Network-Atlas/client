@@ -10,7 +10,7 @@ import {
   DropdownMenuRadioItem,
 } from '@/components/common/DropdownMenu';
 import { useState } from 'react';
-import { type SortLabel } from '@/types/galaxyCommunity';
+import { type SortLabel } from '@/types/stellarList';
 import PanelTitle from '../../PanelTitle';
 
 interface SortProps {
