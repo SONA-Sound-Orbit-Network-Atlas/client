@@ -55,11 +55,7 @@ export default function UserCard({
             onClick={handleFollowClick}
             disabled={isLoading}
           >
-            {isLoading
-              ? '처리 중...'
-              : isFollowing
-                ? 'Unfollow'
-                : 'Follow Back'}
+            {isFollowing ? 'Unfollow' : 'Follow Back'}
           </Button>
         </div>
       </div>
