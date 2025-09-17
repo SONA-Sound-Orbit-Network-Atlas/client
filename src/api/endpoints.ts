@@ -31,4 +31,7 @@ export const endpoints = {
     base: `${API_PREFIX}/users`,
     profileById: (id: string) => `${API_PREFIX}/users/${id}/profile`,
   },
+  likes: {
+    base: `${API_PREFIX}/likes`,
+  },
 } as const;

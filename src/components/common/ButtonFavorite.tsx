@@ -1,5 +1,4 @@
 import Button from '@/components/common/Button';
-import { useState } from 'react';
 import { FaHeart, FaRegHeart } from 'react-icons/fa';
 
 interface ButtonFavoriteProps {
@@ -13,14 +12,12 @@ export default function ButtonFavorite({
   active,
   onClick,
 }: ButtonFavoriteProps) {
-  const [isActive, setIsActive] = useState<boolean | null>(active);
-
-  const onClickHandle = () => {
+  const onClickHandle = (e: React.MouseEvent) => {
+    e.stopPropagation();
     if (active === null) {
       alert('로그인 후 이용해주세요.');
       return;
     }
-    setIsActive(!isActive);
     onClick?.();
   };
 
@@ -28,13 +25,9 @@ export default function ButtonFavorite({
     <Button
       color="transparent"
       className={`w-[30px] h-[40px] ${className}`}
-      onClick={(e) => {
-        console.log('좋아요 버튼 클릭');
-        e.stopPropagation();
-        onClickHandle();
-      }}
+      onClick={onClickHandle}
     >
-      {isActive ? <FaHeart /> : <FaRegHeart />}
+      {active ? <FaHeart /> : <FaRegHeart />}
     </Button>
   );
 }

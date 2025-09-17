@@ -45,7 +45,7 @@ export default function StellarIndex() {
               <TabsTrigger value="INFO">INFO</TabsTrigger>
               <TabsTrigger
                 value="OBJECTS"
-                disabled={!isStellarOwner && mode === 'view'}
+                // disabled={!isStellarOwner && mode === 'view'}
               >
                 OBJECTS
               </TabsTrigger>
