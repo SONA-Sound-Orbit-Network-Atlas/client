@@ -185,6 +185,7 @@ export default function FollowingsPanel() {
                     isMutualFollow={
                       following.isMutual && !unfollowedUsers.has(following.id)
                     }
+                    onFollow={undefined} // 팔로잉 패널에서는 팔로우 기능 없음
                     onUnfollow={handleUnfollow}
                     onClick={handleUserClick}
                     isLoading={deleteFollowMutation.isPending}

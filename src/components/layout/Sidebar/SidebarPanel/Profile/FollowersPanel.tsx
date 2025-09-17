@@ -213,7 +213,9 @@ export default function FollowersPanel() {
                     key={follower.id}
                     id={follower.id}
                     username={follower.username}
-                    isFollowing={followedUsers.has(follower.id)}
+                    isFollowing={
+                      followedUsers.has(follower.id) || follower.isMutual
+                    }
                     isMutualFollow={
                       mutualFollows.has(follower.id) || follower.isMutual
                     }
