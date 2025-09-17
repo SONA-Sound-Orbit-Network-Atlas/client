@@ -2,18 +2,18 @@
 import axiosInstance from '@/lib/axios';
 import { endpoints } from './endpoints';
 
-export const favoriteAPI = {
+export const likesAPI = {
   // 등록 (팔로우)
-  createFavorite: async (targetId: string) => {
-    const response = await axiosInstance.post(endpoints.follows.base, {
+  createLike: async (targetId: string) => {
+    const response = await axiosInstance.post(endpoints.likes.base, {
       system_id: targetId,
     });
     return response.data;
   },
 
   // 삭제 (언팔로우)
-  deleteFavorite: async (targetId: string) => {
-    const response = await axiosInstance.delete(endpoints.follows.base, {
+  deleteLike: async (targetId: string) => {
+    const response = await axiosInstance.delete(endpoints.likes.base, {
       data: { system_id: targetId },
     });
     return response.data;
