@@ -61,7 +61,7 @@ export type GetFollowingsParams = FollowListParams;
 // ===== 훅 옵션 =====
 export interface UseFollowListOptions {
   userId: string;
-  page: number;
+  page?: number; // useInfiniteQuery에서는 page가 필요하지 않음
   limit?: number;
 }
 

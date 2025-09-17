@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useEffect } from 'react';
 import {
   navigateToOtherUserProfile,
   navigateBack,
@@ -22,9 +22,6 @@ export default function FollowListPanel({
   targetUserId,
   onBack = navigateBack,
 }: FollowListPanelProps) {
-  // 페이지네이션 상태 관리
-  const [currentPage, setCurrentPage] = useState(1);
-
   // 팔로우 액션 훅
   const {
     handleFollow,
@@ -48,23 +45,13 @@ export default function FollowListPanel({
     totalCount,
   } = useFollowList<FollowerUser | FollowingUser>(type, {
     userId: targetUserId || '',
-    page: currentPage,
     limit: 20,
   });
 
   // 사용자 ID 변경 시 상태 초기화
   useEffect(() => {
-    setCurrentPage(1);
     resetStates();
   }, [targetUserId, resetStates]);
-
-  // Load More 핸들러
-  const handleLoadMore = () => {
-    if (!isLoadingMore && hasMore && !error) {
-      loadMore();
-      setCurrentPage((prev) => prev + 1);
-    }
-  };
 
   // 사용자 클릭 핸들러
   const handleUserClick = (userId: string) => {
@@ -152,7 +139,7 @@ export default function FollowListPanel({
             {hasMore && !error && (
               <div className="flex justify-center mt-6">
                 <Button
-                  onClick={handleLoadMore}
+                  onClick={loadMore}
                   disabled={isLoadingMore}
                   color="tertiary"
                   className="w-full"

@@ -1,9 +1,11 @@
-import { useState, useEffect } from 'react';
-import { useGetFollowers, useGetFollowings } from '@/hooks/api/useFollow';
+import { useInfiniteQuery, type InfiniteData } from '@tanstack/react-query';
+import { followAPI } from '@/api/follow';
 import type {
   FollowerUser,
   FollowingUser,
   UseFollowListOptions,
+  FollowersResponse,
+  FollowingsResponse,
 } from '@/types/follow';
 
 // 공통 팔로우 사용자 타입
@@ -17,26 +19,50 @@ export function useFollowList<T extends FollowUser>(
   type: FollowListType,
   options: UseFollowListOptions
 ) {
-  const [allUsers, setAllUsers] = useState<T[]>([]);
-  const [hasMore, setHasMore] = useState(true);
-  const [isLoadingMore, setIsLoadingMore] = useState(false);
+  const {
+    data,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+    isLoading,
+    error,
+  } = useInfiniteQuery<
+    FollowersResponse | FollowingsResponse,
+    Error,
+    InfiniteData<FollowersResponse | FollowingsResponse>,
+    (string | number | undefined)[],
+    number
+  >({
+    queryKey: [type, options.userId, options.limit],
+    queryFn: ({ pageParam = 1 }) => {
+      const params = {
+        userId: options.userId,
+        page: pageParam as number,
+        limit: options.limit || 20,
+      };
 
-  // 타입에 따라 적절한 API 훅 사용
-  const followersQuery = useGetFollowers({
-    userId: options.userId,
-    page: options.page,
-    limit: options.limit,
+      return type === 'followers'
+        ? followAPI.getFollowers(params)
+        : followAPI.getFollowings(params);
+    },
+    initialPageParam: 1,
+    getNextPageParam: (
+      lastPage: FollowersResponse | FollowingsResponse,
+      allPages
+    ) => {
+      const totalPages = Math.ceil(lastPage.meta.total / lastPage.meta.limit);
+      const currentPage = allPages.length;
+      return currentPage < totalPages ? currentPage + 1 : undefined;
+    },
+    enabled: !!options.userId,
+    staleTime: 2 * 60 * 1000, // 2분간 캐시 유지
+    gcTime: 5 * 60 * 1000, // 5분간 가비지 컬렉션 방지
+    retry: (failureCount, error) => {
+      // 404 에러는 재시도하지 않음
+      if (error.message.includes('404')) return false;
+      return failureCount < 3;
+    },
   });
-
-  const followingsQuery = useGetFollowings({
-    userId: options.userId,
-    page: options.page,
-    limit: options.limit,
-  });
-
-  // 현재 타입에 맞는 쿼리 선택
-  const currentQuery = type === 'followers' ? followersQuery : followingsQuery;
-  const { data, isLoading, error } = currentQuery;
 
   // 중복 제거 유틸리티 함수
   const removeDuplicates = (users: T[]): T[] => {
@@ -50,52 +76,25 @@ export function useFollowList<T extends FollowUser>(
     });
   };
 
-  // 사용자 ID 변경 시 상태 초기화
-  useEffect(() => {
-    setAllUsers([]);
-    setHasMore(true);
-    setIsLoadingMore(false);
-  }, [options.userId]);
-
-  // 데이터 누적 로직
-  useEffect(() => {
-    if (data?.meta && data?.items) {
-      if (options.page === 1) {
-        // 첫 페이지: 기존 데이터 초기화 (중복 제거)
-        const uniqueUsers = removeDuplicates(data.items as T[]);
-        setAllUsers(uniqueUsers);
-      } else {
-        // 추가 페이지: 기존 데이터에 추가 (중복 제거)
-        setAllUsers((prev) => {
-          const combined = [...prev, ...(data.items as T[])];
-          const uniqueUsers = removeDuplicates(combined);
-          return uniqueUsers;
-        });
-      }
-
-      // 더 불러올 데이터가 있는지 확인
-      const totalPages = Math.ceil(data.meta.total / data.meta.limit);
-      const hasMoreData = options.page < totalPages;
-
-      setHasMore(hasMoreData);
-      setIsLoadingMore(false);
-    }
-  }, [data, options.page]);
+  // 모든 페이지의 데이터를 누적하여 하나의 배열로 만들기
+  const allUsers = data?.pages
+    ? removeDuplicates(data.pages.flatMap((page) => page.items as T[]))
+    : [];
 
   const loadMore = () => {
-    if (!isLoadingMore && hasMore && !error) {
-      setIsLoadingMore(true);
+    if (hasNextPage && !isFetchingNextPage) {
+      fetchNextPage();
     }
   };
 
   return {
     allUsers,
-    hasMore,
-    isLoadingMore,
+    hasMore: hasNextPage ?? false,
+    isLoadingMore: isFetchingNextPage,
     isLoading,
     error,
     loadMore,
-    totalCount: data?.meta?.total || 0,
+    totalCount: data?.pages?.[0]?.meta?.total || 0,
   };
 }
 
