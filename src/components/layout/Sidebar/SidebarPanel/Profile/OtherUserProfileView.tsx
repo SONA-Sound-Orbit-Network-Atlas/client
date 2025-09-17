@@ -2,6 +2,8 @@ import { FiUser, FiUserCheck } from 'react-icons/fi';
 import { IoPlanetOutline } from 'react-icons/io5';
 import { useProfileStore } from '@/stores/useProfileStore';
 import { navigateBack } from '@/utils/profileNavigation';
+import { useGetUserProfile } from '@/hooks/api/useUser';
+import { useGetFollowCount } from '@/hooks/api/useFollow';
 import ProfileStateWrapper from './ProfileStateWrapper';
 import PanelHeader from '../PanelHeader';
 import Iconframe from '@/components/common/Iconframe';
@@ -10,7 +12,7 @@ import StatCard from '@/components/common/Card/StatCard';
 import { ScrollArea } from '@/components/common/Scrollarea';
 
 interface OtherUserProfileViewProps {
-  userId: number;
+  userId: string;
 }
 
 export default function OtherUserProfileView({
@@ -18,26 +20,22 @@ export default function OtherUserProfileView({
 }: OtherUserProfileViewProps) {
   const { setProfilePanelMode } = useProfileStore();
 
-  // 다른 유저의 프로필 데이터 조회 (테스트용 하드코딩)
-  // const {
-  //   data: profile,
-  //   isLoading,
-  //   error,
-  // } = useGetUserProfile(userId.toString());
+  // 다른 유저의 프로필 데이터 조회
+  const {
+    data: profile,
+    isLoading: isProfileLoading,
+    error: profileError,
+  } = useGetUserProfile(userId.toString());
 
-  // 테스트용 하드코딩된 프로필 데이터
-  const profile = {
-    id: userId,
-    username: `User${userId}`,
-    about: `안녕하세요! 음악과 우주를 좋아해요. 🌟`,
-    email: `user${userId}@example.com`,
-    image: null as string | null, // 기본 아바타 사용
-    created_at: '2024-01-15T10:30:00Z',
-    updated_at: '2024-01-20T15:45:00Z',
-  };
+  // 다른 유저의 팔로우 통계 조회
+  const {
+    data: followStats,
+    isLoading: isStatsLoading,
+    error: statsError,
+  } = useGetFollowCount(userId.toString());
 
-  const isLoading = false;
-  const error = null;
+  const isLoading = isProfileLoading || isStatsLoading;
+  const error = profileError || statsError;
 
   const handleFollowersClick = () => {
     setProfilePanelMode('otherUserFollowers');
@@ -64,7 +62,7 @@ export default function OtherUserProfileView({
           <div className="flex flex-col">
             <div className="flex flex-col items-center border-b border-gray-border p-6">
               <div className="flex flex-col items-center mb-[24px]">
-                {profile.image &&
+                {profile?.image &&
                 typeof profile.image === 'string' &&
                 !profile.image.includes('defaults/avatar.png') ? (
                   <div className="w-16 h-16 rounded-full overflow-hidden mb-[16px] border-2 border-tertiary-300">
@@ -84,11 +82,13 @@ export default function OtherUserProfileView({
                   </Iconframe>
                 )}
                 <h3 className="text-white font-semibold text-base">
-                  {profile.username}
+                  {profile?.username || 'Loading...'}
                 </h3>
-                <p className="text-text-muted text-sm text-center">
-                  {profile.about || '소개가 없습니다.'}
-                </p>
+                {profile?.about && (
+                  <p className="text-text-muted text-sm text-center">
+                    {profile.about}
+                  </p>
+                )}
               </div>
             </div>
             <div className="flex flex-col p-6">
@@ -115,14 +115,14 @@ export default function OtherUserProfileView({
                 <div className="flex flex-col gap-[12px] w-full">
                   <StatCard
                     icon={<FiUser className="text-primary-300" />}
-                    value={24}
+                    value={followStats?.followersCount || 0}
                     label="FOLLOWERS"
                     onClick={handleFollowersClick}
                     className="hover:brightness-110 hover:bg-primary-300/20 border-primary-300/20 hover:text-primary-300 hover:[&_p]:text-primary-300 hover:[&_svg]:text-primary-300"
                   />
                   <StatCard
                     icon={<FiUserCheck className="text-secondary-300" />}
-                    value={18}
+                    value={followStats?.followingsCount || 0}
                     label="FOLLOWINGS"
                     onClick={handleFollowingsClick}
                     className="hover:brightness-110 hover:bg-secondary-300/20 border-secondary-300/20 hover:text-secondary-300 hover:[&_p]:text-secondary-300 hover:[&_svg]:text-secondary-300"
