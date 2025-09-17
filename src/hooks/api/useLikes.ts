@@ -40,13 +40,15 @@ function patchLike(
 
 const LIST_QUERY_KEY: QueryKey = ['stellarList'];
 
-/** 좋아요 등록 */
-export function useCreateLike() {
+/** 공통 좋아요 뮤테이션 로직 - 중복 제거 */
+function useLikeMutation(isCreate: boolean) {
   const qc = useQueryClient();
 
   return useMutation({
     mutationFn: ({ system_id }: { system_id: string }) =>
-      likesAPI.createLike(system_id),
+      isCreate
+        ? likesAPI.createLike(system_id)
+        : likesAPI.deleteLike(system_id),
 
     // 낙관적 업데이트
     onMutate: async ({ system_id }) => {
@@ -60,7 +62,10 @@ export function useCreateLike() {
       // 캐시 패치
       snapshots.forEach(([key, data]) => {
         if (!data) return;
-        qc.setQueryData<StellarInfinite>(key, patchLike(data, system_id, true));
+        qc.setQueryData<StellarInfinite>(
+          key,
+          patchLike(data, system_id, isCreate)
+        );
       });
 
       return { snapshots };
@@ -68,7 +73,8 @@ export function useCreateLike() {
 
     // 성공 시 로그
     onSuccess: (data, { system_id }) => {
-      console.log('좋아요를 생성했습니다!', { system_id, response: data });
+      const action = isCreate ? '생성' : '삭제';
+      console.log(`좋아요를 ${action}했습니다!`, { system_id, response: data });
     },
 
     // 실패 시 롤백
@@ -90,52 +96,14 @@ export function useCreateLike() {
   });
 }
 
+/** 좋아요 등록 */
+export function useCreateLike() {
+  return useLikeMutation(true);
+}
+
 /** 좋아요 삭제 */
 export function useDeleteLike() {
-  const qc = useQueryClient();
-
-  return useMutation({
-    mutationFn: ({ system_id }: { system_id: string }) =>
-      likesAPI.deleteLike(system_id),
-
-    onMutate: async ({ system_id }) => {
-      await qc.cancelQueries({ queryKey: LIST_QUERY_KEY });
-
-      const snapshots = qc.getQueriesData<StellarInfinite>({
-        queryKey: LIST_QUERY_KEY,
-      });
-
-      snapshots.forEach(([key, data]) => {
-        if (!data) return;
-        qc.setQueryData<StellarInfinite>(
-          key,
-          patchLike(data, system_id, false)
-        );
-      });
-
-      return { snapshots };
-    },
-
-    // 성공 시 로그
-    onSuccess: (data, { system_id }) => {
-      console.log('좋아요를 삭제했습니다!', { system_id, response: data });
-    },
-
-    onError: (_err, _vars, ctx) => {
-      ctx?.snapshots?.forEach(([key, data]) => {
-        qc.setQueryData(key, data);
-      });
-    },
-
-    onSettled: () => {
-      qc.invalidateQueries({ queryKey: LIST_QUERY_KEY, refetchType: 'active' });
-      qc.invalidateQueries({ queryKey: ['myLikes'], refetchType: 'active' });
-      qc.invalidateQueries({
-        queryKey: ['myLikesInfinite'],
-        refetchType: 'active',
-      });
-    },
-  });
+  return useLikeMutation(false);
 }
 
 /** 내가 좋아요 한 항성계 목록 조회 */
