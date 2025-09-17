@@ -1,11 +1,11 @@
 import { Suspense, useEffect } from 'react';
-import { useGetGalaxyCommunityList } from '@/hooks/api/useGalaxy';
+import { useGetStellarList } from '@/hooks/api/useGalaxy';
 import CardItem from './CardItem';
 import {
   type SortLabel,
-  type GalaxyCommunityItem,
+  type StellarListItem,
   toSortValue,
-} from '@/types/galaxyCommunity';
+} from '@/types/stellarList';
 import Button from '@/components/common/Button';
 import { SkeletonCard } from '@/components/common/Card/SkeletonCard';
 import { ErrorBoundary } from 'react-error-boundary';
@@ -41,7 +41,7 @@ function ContentComp({ sort }: { sort: SortLabel }) {
   }, [sort]);
   // 갤럭시 리스트 데이터
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage } =
-    useGetGalaxyCommunityList({
+    useGetStellarList({
       page: 1,
       limit: GALAXY_LIST_LIMIT,
       rank_type: toSortValue(sort),
@@ -57,7 +57,7 @@ function ContentComp({ sort }: { sort: SortLabel }) {
     <div>
       {/* 은하 리스트 */}
       <div className="space-y-3">
-        {galaxyCommunityList.map((galaxySystem: GalaxyCommunityItem) => (
+        {galaxyCommunityList.map((galaxySystem: StellarListItem) => (
           <CardItem
             key={galaxySystem.id}
             {...galaxySystem}
@@ -97,10 +97,10 @@ function LoadingComp() {
 }
 
 // 에러 처리
-function ErrorComp({ error, resetErrorBoundary }: FallbackProps) {
+function ErrorComp({ resetErrorBoundary }: FallbackProps) {
   return (
     <div className="p-4">
-      <p className="mb-2">에러 발생 : {error.message}</p>
+      <p className="mb-2">에러 발생</p>
       <Button color="tertiary" onClick={resetErrorBoundary}>
         다시 시도
       </Button>

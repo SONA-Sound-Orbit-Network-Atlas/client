@@ -2,7 +2,7 @@ import ButtonFavorite from '@/components/common/ButtonFavorite';
 import Card from '@/components/common/Card/Card';
 import { IoPlanetOutline } from 'react-icons/io5';
 import { FaRegHeart } from 'react-icons/fa';
-import type { GalaxyCommunityItem } from '@/types/galaxyCommunity';
+import type { GalaxyCommunityItem } from '@/types/stellarList';
 import { useCreateFavorite, useDeleteFavorite } from '@/hooks/api/useFavorite';
 
 interface CardItemProps extends GalaxyCommunityItem {

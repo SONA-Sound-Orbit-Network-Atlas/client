@@ -17,6 +17,7 @@ export default function SaveButton() {
   // save 버튼 동작 기준
   const onSaveHandler = () => {
     console.log('save버튼 클릭');
+    console.log('stellarStore', stellarStore);
 
     if (!isLoggedIn) {
       alert('login is required.');

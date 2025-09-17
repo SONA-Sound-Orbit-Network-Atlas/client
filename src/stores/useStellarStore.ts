@@ -12,7 +12,8 @@ import { useUserStore } from '@/stores/useUserStore';
 
 /***** 1) 기본 프로퍼티 디폴트 *****/
 const defaultStarProps: StarProperties = {
-  spin: 120,
+  name: 'Star',
+  spin: 50,
   brightness: 1,
   color: 1,
   size: 1.0, // 적절한 크기 범위 (0.1 ~ 2.0)
@@ -86,6 +87,7 @@ export const useStellarStore = create<StellarStore>((set) => ({
           creator_id: userId,
           author_id: userId,
           create_source_id: userId,
+          original_source_id: userId,
           created_at: now,
           updated_at: now,
           star: {

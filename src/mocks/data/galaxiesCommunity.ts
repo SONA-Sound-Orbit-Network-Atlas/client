@@ -2,7 +2,7 @@
 import type {
   GalaxyCommunityItem,
   GalaxyCommunityResponse,
-} from '@/types/galaxyCommunity';
+} from '@/types/stellarList';
 
 const data: GalaxyCommunityItem[] = [
   {

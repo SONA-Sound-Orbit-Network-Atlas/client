@@ -1,8 +1,8 @@
 // GALAXY > COMMUNITY (다른 사람 항성계 리스트)
 
 import { useState } from 'react';
-import { sortOptions } from '@/types/galaxyCommunity';
-import type { SortLabel } from '@/types/galaxyCommunity';
+import { sortOptions } from '@/types/stellarList';
+import type { SortLabel } from '@/types/stellarList';
 import Sort from './Sort';
 import List from './List';
 import PanelTitle from '../../PanelTitle';
