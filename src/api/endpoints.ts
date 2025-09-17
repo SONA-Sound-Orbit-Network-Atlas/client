@@ -11,6 +11,8 @@ export const endpoints = {
   stellarList: {
     base: `${API_PREFIX}/likes/rankings`,
     my: `${API_PREFIX}/stellar-systems/me`,
+    all: (galaxyId: string) =>
+      `${API_PREFIX}/stellar-systems/galaxy/${galaxyId}/systems`,
   },
   stellarSystem: {
     base: `${API_PREFIX}/stellar-systems`,
