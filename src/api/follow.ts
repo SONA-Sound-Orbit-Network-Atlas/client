@@ -27,22 +27,17 @@ export const followAPI = {
   ): Promise<FollowersResponse> => {
     const { userId, page = 1, limit = 20 } = params;
 
-    try {
-      const response = await axiosInstance.get<FollowersResponse>(
-        `/follows/${userId}/followers`,
-        {
-          params: {
-            page,
-            limit,
-          },
-        }
-      );
+    const response = await axiosInstance.get<FollowersResponse>(
+      `/follows/${userId}/followers`,
+      {
+        params: {
+          page,
+          limit,
+        },
+      }
+    );
 
-      return response.data;
-    } catch (error) {
-      console.error('팔로워 목록 조회 실패:', error);
-      throw error;
-    }
+    return response.data;
   },
 
   // 팔로잉 목록 조회
@@ -51,22 +46,17 @@ export const followAPI = {
   ): Promise<FollowingsResponse> => {
     const { userId, page = 1, limit = 20 } = params;
 
-    try {
-      const response = await axiosInstance.get<FollowingsResponse>(
-        `/follows/${userId}/followings`,
-        {
-          params: {
-            page,
-            limit,
-          },
-        }
-      );
+    const response = await axiosInstance.get<FollowingsResponse>(
+      `/follows/${userId}/followings`,
+      {
+        params: {
+          page,
+          limit,
+        },
+      }
+    );
 
-      return response.data;
-    } catch (error) {
-      console.error('팔로잉 목록 조회 실패:', error);
-      throw error;
-    }
+    return response.data;
   },
 
   // TODO: 팔로우 상태 확인
