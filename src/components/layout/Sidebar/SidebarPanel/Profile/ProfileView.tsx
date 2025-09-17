@@ -7,6 +7,7 @@ import { useGetUserProfile } from '@/hooks/api/useUser';
 import { useUserStore } from '@/stores/useUserStore';
 import { useGetFollowers, useGetFollowings } from '@/hooks/api/useFollow';
 import { useGetMyLikes } from '@/hooks/api/useLikes';
+import { useGetStellarMyList } from '@/hooks/api/useGalaxy';
 import ProfileStateWrapper from './ProfileStateWrapper';
 import Iconframe from '@/components/common/Iconframe';
 import Button from '@/components/common/Button';
@@ -45,6 +46,13 @@ export default function ProfileView() {
     page: 1,
     limit: 1,
   });
+
+  // 내 스텔라 시스템 갯수 조회
+  const { data: myStellarData, isLoading: myStellarLoading } =
+    useGetStellarMyList({
+      page: 1,
+      limit: 1, // 갯수만 필요하므로 1개만 조회
+    });
 
   // userStore 데이터를 우선적으로 사용하고, 서버 데이터가 있으면 병합
   const profile = userStore.id
@@ -134,7 +142,7 @@ export default function ProfileView() {
                     <p className="text-text-muted text-sm">CREATED</p>
                   </div>
                   <p className="text-white text-center text-[24px] font-semibold">
-                    3
+                    {myStellarLoading ? 0 : (myStellarData?.totalCount ?? 0)}
                   </p>
                 </Card>
               </div>
