@@ -4,7 +4,7 @@ import sonaLogo from '@/assets/sona_logo_header_cropped_250w.png';
 import Button from '@/components/common/Button';
 import { FiArrowLeft } from 'react-icons/fi';
 import { useUserStore } from '@/stores/useUserStore';
-import SaveButton from './SavaButton';
+import SaveButton from './SaveButton';
 
 interface HeaderProps {
   className?: string;

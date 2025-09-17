@@ -33,7 +33,7 @@ const defaultPlanetProps: PlanetProperties = {
 export const initialStellarStore: StellarSystem = {
   id: '',
   title: 'NEW STELLAR SYSTEM',
-  galaxy_id: '',
+  galaxy_id: 'gal_abc123',
   owner_id: '',
   created_by_id: '',
   original_author_id: '',

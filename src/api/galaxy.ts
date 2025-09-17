@@ -14,6 +14,9 @@ export const galaxyAPI = {
       { params }
     );
     const { data, meta } = response.data;
+    console.log('response : ', response);
+    console.log('data : ', data);
+    console.log('meta : ', meta);
 
     return {
       list: data,
