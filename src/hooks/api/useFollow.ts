@@ -27,6 +27,12 @@ export function useCreateFollow() {
       queryClient.invalidateQueries({
         queryKey: ['userProfile'],
       });
+      queryClient.invalidateQueries({
+        queryKey: ['followers'],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ['followings'],
+      });
     },
     onError: (error: AxiosError) => {
       console.error('팔로우 실패:', error);
@@ -49,6 +55,12 @@ export function useDeleteFollow() {
       queryClient.invalidateQueries({
         queryKey: ['userProfile'],
       });
+      queryClient.invalidateQueries({
+        queryKey: ['followers'],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ['followings'],
+      });
     },
     onError: (error: AxiosError) => {
       console.error('팔로우 취소 실패:', error);
@@ -62,8 +74,14 @@ export function useGetFollowers(params: GetFollowersParams) {
     queryKey: ['followers', params.userId, params.page, params.limit],
     queryFn: () => followAPI.getFollowers(params),
     enabled: !!params.userId,
-    staleTime: 5 * 60 * 1000, // 5분간 캐시 유지
+    staleTime: 2 * 60 * 1000, // 2분간 캐시 유지
+    gcTime: 5 * 60 * 1000, // 5분간 가비지 컬렉션 방지
     placeholderData: (previousData) => previousData, // 페이지네이션 시 이전 데이터 유지
+    retry: (failureCount, error) => {
+      // 404 에러는 재시도하지 않음
+      if (error.response?.status === 404) return false;
+      return failureCount < 3;
+    },
   });
 }
 
@@ -73,8 +91,14 @@ export function useGetFollowings(params: GetFollowingsParams) {
     queryKey: ['followings', params.userId, params.page, params.limit],
     queryFn: () => followAPI.getFollowings(params),
     enabled: !!params.userId,
-    staleTime: 5 * 60 * 1000, // 5분간 캐시 유지
+    staleTime: 2 * 60 * 1000, // 2분간 캐시 유지
+    gcTime: 5 * 60 * 1000, // 5분간 가비지 컬렉션 방지
     placeholderData: (previousData) => previousData, // 페이지네이션 시 이전 데이터 유지
+    retry: (failureCount, error) => {
+      // 404 에러는 재시도하지 않음
+      if (error.response?.status === 404) return false;
+      return failureCount < 3;
+    },
   });
 }
 

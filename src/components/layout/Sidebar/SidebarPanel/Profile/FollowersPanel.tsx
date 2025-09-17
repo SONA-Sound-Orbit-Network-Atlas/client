@@ -74,24 +74,7 @@ export default function FollowersPanel() {
 
   // 데이터 누적 로직
   useEffect(() => {
-    console.log('=== 팔로워 데이터 분석 ===');
-    console.log('전체 응답:', followersData);
-    console.log('메타 정보:', followersData?.meta);
-    console.log('아이템 개수:', followersData?.items?.length);
-    if (followersData?.items?.length > 0) {
-      console.log('첫 번째 팔로워 데이터:', followersData.items[0]);
-      console.log(
-        '첫 번째 팔로워의 모든 키:',
-        Object.keys(followersData.items[0])
-      );
-      console.log(
-        'isMutual 필드 존재 여부:',
-        'isMutual' in followersData.items[0]
-      );
-      console.log('isMutual 값:', followersData.items[0].isMutual);
-    }
-
-    if (followersData && followersData.meta && followersData.items) {
+    if (followersData?.meta && followersData?.items) {
       if (currentPage === 1) {
         // 첫 페이지: 기존 데이터 초기화 (중복 제거)
         const uniqueFollowers = removeDuplicates(followersData.items);
@@ -106,7 +89,9 @@ export default function FollowersPanel() {
       }
 
       // 더 불러올 데이터가 있는지 확인
-      const totalPages = Math.ceil(followersData.meta.total / 20);
+      const totalPages = Math.ceil(
+        followersData.meta.total / followersData.meta.limit
+      );
       const hasMoreData = currentPage < totalPages;
 
       setHasMore(hasMoreData);
@@ -124,8 +109,9 @@ export default function FollowersPanel() {
           // 맞팔로우 상태로 업데이트
           setMutualFollows((prev) => new Set(prev).add(userId));
         },
-        onError: () => {
-          // TODO: 에러 처리 (토스트 메시지 등)
+        onError: (error) => {
+          console.error('팔로우 실패:', error);
+          // TODO: 토스트 메시지로 사용자에게 에러 알림
         },
       }
     );
@@ -148,8 +134,9 @@ export default function FollowersPanel() {
             return newSet;
           });
         },
-        onError: () => {
-          // TODO: 에러 처리 (토스트 메시지 등)
+        onError: (error) => {
+          console.error('팔로우 실패:', error);
+          // TODO: 토스트 메시지로 사용자에게 에러 알림
         },
       }
     );

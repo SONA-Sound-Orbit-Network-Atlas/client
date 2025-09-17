@@ -69,24 +69,7 @@ export default function FollowingsPanel() {
 
   // 데이터 누적 로직
   useEffect(() => {
-    console.log('=== 팔로잉 데이터 분석 ===');
-    console.log('전체 응답:', followingsData);
-    console.log('메타 정보:', followingsData?.meta);
-    console.log('아이템 개수:', followingsData?.items?.length);
-    if (followingsData?.items?.length > 0) {
-      console.log('첫 번째 팔로잉 데이터:', followingsData.items[0]);
-      console.log(
-        '첫 번째 팔로잉의 모든 키:',
-        Object.keys(followingsData.items[0])
-      );
-      console.log(
-        'isMutual 필드 존재 여부:',
-        'isMutual' in followingsData.items[0]
-      );
-      console.log('isMutual 값:', followingsData.items[0].isMutual);
-    }
-
-    if (followingsData && followingsData.meta && followingsData.items) {
+    if (followingsData?.meta && followingsData?.items) {
       if (currentPage === 1) {
         // 첫 페이지: 기존 데이터 초기화 (중복 제거)
         const uniqueFollowings = removeDuplicates(followingsData.items);
@@ -101,7 +84,9 @@ export default function FollowingsPanel() {
       }
 
       // 더 불러올 데이터가 있는지 확인
-      const totalPages = Math.ceil(followingsData.meta.total / 20);
+      const totalPages = Math.ceil(
+        followingsData.meta.total / followingsData.meta.limit
+      );
       const hasMoreData = currentPage < totalPages;
 
       setHasMore(hasMoreData);
@@ -117,8 +102,9 @@ export default function FollowingsPanel() {
           // 로컬 상태 업데이트: 언팔로우한 사용자를 unfollowedUsers에 추가
           setUnfollowedUsers((prev) => new Set(prev).add(userId));
         },
-        onError: () => {
-          // TODO: 에러 처리 (토스트 메시지 등)
+        onError: (error) => {
+          console.error('언팔로우 실패:', error);
+          // TODO: 토스트 메시지로 사용자에게 에러 알림
         },
       }
     );
