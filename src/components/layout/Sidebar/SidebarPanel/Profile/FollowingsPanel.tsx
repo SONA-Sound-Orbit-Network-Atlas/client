@@ -5,6 +5,7 @@ import {
 import PanelHeader from '../PanelHeader';
 import UserCard from '@/components/common/Card/UserCard';
 import { ScrollArea } from '@/components/common/Scrollarea';
+import Button from '@/components/common/Button';
 import { useDeleteFollow, useGetFollowings } from '@/hooks/api/useFollow';
 import { useUserStore } from '@/stores/useUserStore';
 import { useProfileStore } from '@/stores/useProfileStore';
@@ -197,13 +198,14 @@ export default function FollowingsPanel() {
             {/* Load More 버튼 */}
             {hasMore && !error && (
               <div className="flex justify-center mt-6">
-                <button
+                <Button
                   onClick={handleLoadMore}
                   disabled={isLoadingMore}
-                  className="w-full py-3 px-4 bg-primary-600 hover:bg-primary-700 disabled:bg-gray-600 disabled:cursor-not-allowed text-white rounded-lg font-medium transition-colors"
+                  color="tertiary"
+                  className="w-full"
                 >
                   {isLoadingMore ? '로딩 중...' : '더 보기'}
-                </button>
+                </Button>
               </div>
             )}
 
