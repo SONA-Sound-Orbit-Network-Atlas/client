@@ -1,10 +1,5 @@
-import {
-  FiEdit3,
-  FiUser,
-  FiLogOut,
-  FiHeart,
-  FiUserCheck,
-} from 'react-icons/fi';
+import { FiEdit3, FiUser, FiLogOut, FiUserCheck } from 'react-icons/fi';
+import { FaHeart } from 'react-icons/fa';
 import { IoPlanetOutline } from 'react-icons/io5';
 import { useProfileStore } from '@/stores/useProfileStore';
 import { useLogout } from '@/hooks/api/useAuth';
@@ -146,7 +141,7 @@ export default function ProfileView() {
               <div className="mb-[24px]">
                 <p className="text-text-muted text-sm mb-[16px]">LIKES</p>
                 <StatCard
-                  icon={<FiHeart className="text-white" />}
+                  icon={<FaHeart className="text-text-white size-[16px]" />}
                   value={likesLoading ? 0 : likesData?.total || 0}
                   label="MY LIKES"
                   onClick={handleLikesClick}
