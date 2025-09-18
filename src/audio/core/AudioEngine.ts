@@ -196,7 +196,7 @@ export class AudioEngine {
           }
         } else {
           // Tone이 준비되지 않은 경우에도 잠시 지연을 두어 UX 상 갑작스러운 끊김을 완화합니다.
-          await new Promise((resolve) => setTimeout(resolve, Math.max(0, rampSeconds) * 250));
+          await new Promise((resolve) => setTimeout(resolve, (Math.max(0, rampSeconds) * 1000) / 4));
         }
       } catch (error) {
         console.warn('AudioEngine 페이드 처리 중 오류:', error);
