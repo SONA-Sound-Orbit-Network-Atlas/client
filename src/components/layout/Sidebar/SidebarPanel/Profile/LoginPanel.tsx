@@ -60,15 +60,15 @@ export default function LoginPanel() {
         onInputChange={loginForm.handleInputChange}
         onSubmit={loginForm.handleSubmit}
       />
-      <div className="flex justify-center mt-[24px] mb-[24px]">
+      {/* <div className="flex justify-center mt-[24px] mb-[24px]">
         <a
           href="#"
           className="text-primary-300 text-xs hover:text-primary-200 transition-colors cursor-pointer"
         >
           FORGOT PASSWORD?
         </a>
-      </div>
-      <div className="flex flex-col items-center border-t border-gray-border pt-[24px]">
+      </div> */}
+      <div className="flex flex-col items-center border-t border-gray-border mt-[24px] pt-[24px]">
         <p className="text-text-muted text-xs mb-[8px]">
           DON'T HAVE AN ACCOUNT?
         </p>
