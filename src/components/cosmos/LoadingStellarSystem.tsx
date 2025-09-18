@@ -15,7 +15,7 @@ interface LoadingStellarSystemProps {
  * 실제 StellarSystem과 동일한 구조로 작동하지만 로딩용 데이터 사용
  */
 export default function LoadingStellarSystem({
-  text = '로딩 중...',
+  text = '...LOADING...',
 }: LoadingStellarSystemProps) {
   const stellarSystemRef = useRef<THREE.Group>(null);
 
