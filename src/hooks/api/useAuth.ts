@@ -68,7 +68,7 @@ export function useLogout() {
 
       queryClient.setQueryData(['session'], null); // 즉시 비로그인으로 반영
       await queryClient.invalidateQueries({ queryKey: ['galaxyMyList'] });
-      setIsLoggedIn(false);
+      clearUserStore(); // 사용자 스토어 완전 초기화
     },
     onError: async (error: AxiosError) => {
       console.warn('로그아웃 API 호출 실패:', error);
