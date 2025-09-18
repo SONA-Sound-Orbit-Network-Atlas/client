@@ -3,7 +3,7 @@ import { FaHeart } from 'react-icons/fa';
 import { IoPlanetOutline } from 'react-icons/io5';
 import { useProfileStore } from '@/stores/useProfileStore';
 import { useLogout } from '@/hooks/api/useAuth';
-import { useGetUserProfile } from '@/hooks/api/useUser';
+import { useGetCurrentUserProfile } from '@/hooks/api/useUser';
 import { useUserStore } from '@/stores/useUserStore';
 import { useGetFollowers, useGetFollowings } from '@/hooks/api/useFollow';
 import { useGetMyLikes } from '@/hooks/api/useLikes';
@@ -20,12 +20,8 @@ export default function ProfileView() {
   const logoutMutation = useLogout();
   const { userStore } = useUserStore();
 
-  // 사용자 프로필 데이터 조회
-  const {
-    data: serverProfile,
-    isLoading,
-    error,
-  } = useGetUserProfile(userStore.id);
+  // 현재 사용자 프로필 데이터 조회
+  const { data: serverProfile, isLoading, error } = useGetCurrentUserProfile();
 
   // 팔로워 수 조회
   const { data: followersData } = useGetFollowers({

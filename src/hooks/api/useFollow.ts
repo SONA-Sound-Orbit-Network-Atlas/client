@@ -31,8 +31,11 @@ export function useCreateFollow() {
       queryClient.invalidateQueries({ queryKey: ['userProfile', myUserId] });
       queryClient.invalidateQueries({ queryKey: ['followings', myUserId] });
 
-      // 상대방의 팔로워 목록 무효화 (프로필도 캐시한다면 함께 무효화)
+      // 상대방의 팔로워 목록과 통계 무효화
       queryClient.invalidateQueries({ queryKey: ['followers', targetUserId] });
+      queryClient.invalidateQueries({
+        queryKey: ['followCount', targetUserId],
+      });
       queryClient.invalidateQueries({
         queryKey: ['userProfile', targetUserId],
       });
@@ -64,8 +67,11 @@ export function useDeleteFollow() {
       queryClient.invalidateQueries({ queryKey: ['userProfile', myUserId] });
       queryClient.invalidateQueries({ queryKey: ['followings', myUserId] });
 
-      // 상대방의 팔로워 목록 무효화 (프로필도 캐시한다면 함께 무효화)
+      // 상대방의 팔로워 목록과 통계 무효화
       queryClient.invalidateQueries({ queryKey: ['followers', targetUserId] });
+      queryClient.invalidateQueries({
+        queryKey: ['followCount', targetUserId],
+      });
       queryClient.invalidateQueries({
         queryKey: ['userProfile', targetUserId],
       });
@@ -102,6 +108,22 @@ export function useGetFollowings(params: GetFollowingsParams) {
     staleTime: 2 * 60 * 1000, // 2분간 캐시 유지
     gcTime: 5 * 60 * 1000, // 5분간 가비지 컬렉션 방지
     placeholderData: (previousData) => previousData, // 페이지네이션 시 이전 데이터 유지
+    retry: (failureCount, error) => {
+      // 404 에러는 재시도하지 않음
+      if (error.response?.status === 404) return false;
+      return failureCount < 3;
+    },
+  });
+}
+
+// 팔로우 통계 조회
+export function useGetFollowCount(userId: string) {
+  return useQuery<FollowStats, AxiosError>({
+    queryKey: ['followCount', userId],
+    queryFn: () => followAPI.getFollowCount(userId),
+    enabled: !!userId,
+    staleTime: 2 * 60 * 1000, // 2분간 캐시 유지
+    gcTime: 5 * 60 * 1000, // 5분간 가비지 컬렉션 방지
     retry: (failureCount, error) => {
       // 404 에러는 재시도하지 않음
       if (error.response?.status === 404) return false;

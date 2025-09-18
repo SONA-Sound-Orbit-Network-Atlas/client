@@ -24,6 +24,7 @@ export const endpoints = {
     followers: (userId: string) => `${API_PREFIX}/follows/${userId}/followers`,
     followings: (userId: string) =>
       `${API_PREFIX}/follows/${userId}/followings`,
+    count: (userId: string) => `${API_PREFIX}/follows/${userId}/count`,
   },
   user: {
     profile: `${API_PREFIX}/users/profile`,

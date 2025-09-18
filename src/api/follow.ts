@@ -62,9 +62,9 @@ export const followAPI = {
     return response.data;
   },
 
-  // TODO: 팔로우 상태 확인
-  // checkFollowStatus: async (targetUserId: string): Promise<boolean> => {
-  //   const response = await axiosInstance.get(`/follows/status/${targetUserId}`);
-  //   return response.data.isFollowing;
-  // },
+  // 팔로우 통계 조회
+  getFollowCount: async (userId: string): Promise<FollowStats> => {
+    const response = await axiosInstance.get(endpoints.follows.count(userId));
+    return response.data;
+  },
 };
