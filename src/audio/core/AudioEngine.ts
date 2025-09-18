@@ -12,11 +12,13 @@ export class AudioEngine {
   private static _instance: AudioEngine | null = null;
   private _initialized = false;
   // 마스터 볼륨(0~100)을 내부적으로 dB로 변환하여 Tone.Destination.volume에 적용
-  private _masterVolume = 70; // UI 기준 퍼센트 보관 (기본 70)
+  private _masterVolume = 60; // UI 기준 퍼센트 보관 (기본 60)
   
   // 이펙트 버스 (전역 공유)
   private reverb: Tone.Reverb | null = null;
   private delay: Tone.FeedbackDelay | null = null;
+  private _transitioning = false;
+  private transitionListeners: Set<(transitioning: boolean) => void> = new Set();
 
   private constructor() {}
 
@@ -28,11 +30,31 @@ export class AudioEngine {
     return this._instance;
   }
 
-  // 오디오 엔진 초기화 (사용자 제스처 후 호출 필요)
+  // 오디오 엔진 초기화 (사용자 제스처 후 호출 필요) - 강화된 버전
   async init(initialState?: StarGlobalState): Promise<void> {
-    if (this._initialized) return;
+    if (this._initialized) {
+      console.log('🔊 AudioEngine 이미 초기화됨, 스킵');
+      return;
+    }
+    
+    console.log('🔊 AudioEngine 초기화 시작...');
+    
+    // 혹시 남아있을 수 있는 이전 상태 정리
+    try {
+      if (Tone.Transport.state === 'started') {
+        Tone.Transport.stop();
+        Tone.Transport.cancel(0);
+      }
+    } catch (error) {
+      console.warn('초기화 중 Transport 정리 오류:', error);
+    }
+    
+    // 컨텍스트 시작 전 초기 볼륨을 직접 세팅해 첫 소리가 100%로 나오는 것을 방지
+    const initDb = -60 + (this._masterVolume / 100) * 60;
+    Tone.Destination.volume.value = initDb;
     
     await Tone.start();
+    console.log('🔊 Tone.js 컨텍스트 시작됨');
     
     // Transport 설정 (초기 상태가 있다면 적용)
     if (initialState) {
@@ -154,5 +176,127 @@ export class AudioEngine {
   getEffectNodes() {
     this.ensureEffects();
     return { reverb: this.reverb, delay: this.delay };
+  }
+
+  // 부드럽게 페이드아웃 후 트랜스포트 정지 (강화된 버전)
+  async fadeOutAndStop(rampSeconds: number = 0.6): Promise<void> {
+    if (!this._initialized) return;
+    
+    console.log('🔊 AudioEngine 페이드아웃 시작...');
+    
+    try {
+      // 볼륨을 먼저 페이드아웃
+      Tone.Destination.volume.rampTo(-60, rampSeconds);
+      await new Promise((resolve) => setTimeout(resolve, Math.max(0, rampSeconds) * 1000));
+    } catch (error) {
+      console.warn('볼륨 페이드아웃 중 오류:', error);
+    }
+    
+    try {
+      // Transport 완전히 정지 및 모든 스케줄 취소
+      Tone.Transport.stop();
+      Tone.Transport.cancel(0);
+      
+      // 모든 활성 소스들 강제 정지 (추가된 강력한 정리)
+      const context = Tone.getContext();
+      if (context.state === 'running') {
+        // 모든 활성 소스를 찾아서 정지
+        try {
+          // Tone.js의 내부 스케줄러에서 모든 이벤트 제거
+          Tone.Transport.scheduleRepeat(() => {}, '1m'); // 임시 스케줄 추가 후
+          Tone.Transport.cancel(0); // 즉시 모든 스케줄 취소
+          
+          console.log('🔊 모든 스케줄된 이벤트 강제 취소됨');
+        } catch (error) {
+          console.warn('스케줄 취소 중 오류:', error);
+        }
+      }
+      
+      // Transport의 모든 이벤트 리스너도 제거
+      Tone.Transport.off('start');
+      Tone.Transport.off('stop');
+      Tone.Transport.off('pause');
+      
+      console.log('🔊 AudioEngine Transport 완전히 정지됨');
+    } catch (error) {
+      console.warn('Transport 정지 중 오류:', error);
+    }
+  }
+
+  // 전환 상태 관리 (구독 가능)
+  beginTransition(): void {
+    if (this._transitioning) return;
+    this._transitioning = true;
+    this.transitionListeners.forEach((cb) => cb(true));
+  }
+
+  endTransition(): void {
+    if (!this._transitioning) return;
+    this._transitioning = false;
+    this.transitionListeners.forEach((cb) => cb(false));
+  }
+
+  isTransitioning(): boolean {
+    return this._transitioning;
+  }
+
+  onTransition(cb: (transitioning: boolean) => void): () => void {
+    this.transitionListeners.add(cb);
+    return () => this.transitionListeners.delete(cb);
+  }
+
+  // 다른 스텔라로 이동/새 생성 시 오디오 상태 초기화 (강화된 버전)
+  reset(): void {
+    console.log('🔊 AudioEngine 리셋 시작...');
+    
+    try {
+      // Transport 완전히 정지 및 모든 스케줄 취소
+      Tone.Transport.stop();
+      Tone.Transport.cancel(0);
+      
+      // Transport 이벤트 리스너 모두 제거
+      Tone.Transport.off('start');
+      Tone.Transport.off('stop');
+      Tone.Transport.off('pause');
+      
+      // Transport 상태 초기화
+      Tone.Transport.position = 0;
+      Tone.Transport.bpm.value = 120; // 기본 BPM으로 리셋
+      
+      console.log('🔊 Transport 완전히 리셋됨');
+    } catch (error) {
+      console.warn('Transport 리셋 중 오류:', error);
+    }
+
+    // 전역 이펙트/마스터 체인 정리
+    try {
+      this.reverb?.dispose();
+      this.delay?.dispose();
+      this.masterFilter?.dispose();
+      this.masterEQ?.dispose();
+      
+      console.log('🔊 이펙트 체인 정리됨');
+    } catch (error) {
+      console.warn('이펙트 정리 중 오류:', error);
+    }
+
+    this.reverb = null;
+    this.delay = null;
+    this.masterFilter = null;
+    this.masterEQ = null;
+
+    // 볼륨을 기본값으로 복원 (다음 시스템에서 정상 재생을 위해)
+    try {
+      const initDb = -60 + (this._masterVolume / 100) * 60;
+      Tone.Destination.volume.value = initDb;
+      console.log('🔊 볼륨 기본값으로 복원됨');
+    } catch (error) {
+      console.warn('볼륨 복원 중 오류:', error);
+    }
+
+    // 초기화 플래그 해제: 다음 재생 시 init 재호출
+    this._initialized = false;
+    
+    console.log('🔊 AudioEngine 리셋 완료');
   }
 }

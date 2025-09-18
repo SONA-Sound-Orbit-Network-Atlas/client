@@ -11,7 +11,7 @@ interface VolumeProps {
 }
 
 export default function Volume({ className, onVolumeChange }: VolumeProps) {
-  const [volume, setVolume] = useState(50);
+  const [volume, setVolume] = useState(80);
 
   useEffect(() => {
     onVolumeChange?.(volume);

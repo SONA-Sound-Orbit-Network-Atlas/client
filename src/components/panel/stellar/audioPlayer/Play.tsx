@@ -6,20 +6,19 @@ import { useState } from 'react';
 interface PlayButtonProps {
   className?: string;
   onClick?: (isPlaying: boolean) => void;
+  disabled?: boolean;
+  playing?: boolean;
 }
 
-export default function Play({ className, onClick }: PlayButtonProps) {
-  const [isPlaying, setIsPlaying] = useState(false);
+export default function Play({ className, onClick, disabled, playing = false }: PlayButtonProps) {
 
   const handleClick = () => {
-    const next = !isPlaying;
-    setIsPlaying(next);
-    onClick?.(next);
+    onClick?.(!playing);
   };
 
   return (
-    <Button iconOnly size="md" className={className} onClick={handleClick}>
-      {isPlaying ? <BsFillPauseFill /> : <BsFillPlayFill />}
+    <Button iconOnly size="md" className={className} onClick={handleClick} disabled={disabled} color={disabled ? 'tertiary' : undefined}>
+      {playing ? <BsFillPauseFill /> : <BsFillPlayFill />}
     </Button>
   );
 }

@@ -107,8 +107,9 @@ function getNormalizedProperty(
 ): number {
   const def = PLANET_PROPERTIES[key as string];
   if (!def) return 0.5;
-  const value = (props as any)[key] ?? def.defaultValue;
-  return normalize(value, def.min, def.max);
+  const value = (props as Record<string, unknown>)[key] ?? def.defaultValue;
+  const numericValue = typeof value === 'number' ? value : def.defaultValue;
+  return normalize(numericValue, def.min, def.max);
 }
 
 // === 신스 프리셋 & 오실레이터 옵션 ===
@@ -511,6 +512,8 @@ export abstract class BaseInstrument implements Instrument {
   dispose(): void {
     if (this.disposed) return;
     this.disposed = true;
+    this.lastContext = null;
+    console.log(`🗑️ BaseInstrument ${this.id} (${this.role}) 기본 dispose 완료`);
   }
 
   protected abstract handleParameterUpdate(
@@ -522,11 +525,15 @@ export abstract class BaseInstrument implements Instrument {
   protected abstract applyOscillatorType(type: OscillatorTypeId): void;
 
   triggerAttackRelease(
-    _notes: string | string[],
-    _duration: string | number,
-    _time?: Tone.Unit.Time,
-    _velocity?: number
+    notes: string | string[],
+    duration: string | number,
+    time?: Tone.Unit.Time,
+    velocity?: number
   ): void {
+    // 하위 클래스에서 구현해야 함
+    console.warn(`triggerAttackRelease not implemented in ${this.role} instrument`, {
+      notes, duration, time, velocity
+    });
     throw new Error('triggerAttackRelease must be implemented by concrete instrument classes.');
   }
 }

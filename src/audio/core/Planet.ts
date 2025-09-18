@@ -4,6 +4,7 @@ import type {
   PatternParameters,
 } from '../../types/audio';
 import type { Instrument } from '../instruments/InstrumentInterface';
+import * as Tone from 'tone';
 import {
   getDefaultSynthType,
   getDefaultOscillatorType,
@@ -242,10 +243,43 @@ export class Planet {
   stopPattern(): void {
     if (!this.isPlaying) return;
     
+    console.log(`🛑 ${this.name} 패턴 정지 시작...`);
+    
+    // 1. Star에서 클락 리스너 제거
     this.star.removeClockListener(this.id);
+    
+    // 2. 악기의 모든 스케줄된 노트 강제 취소
+    if (this.instrument && !this.instrument.isDisposed()) {
+      try {
+        // 악기에서 현재 재생 중인 모든 노트를 강제 정지
+        const now = Tone.now();
+        
+        // 각 악기 타입별로 강제 릴리즈 (타입 안전하게)
+        const instrumentWithRelease = this.instrument as unknown as { 
+          releaseAll?: (time?: number) => void;
+          triggerRelease?: (time?: number) => void;
+        };
+        
+        // releaseAll 메서드가 있으면 사용
+        if (instrumentWithRelease.releaseAll) {
+          instrumentWithRelease.releaseAll(now);
+          console.log(`🛑 ${this.name} releaseAll 호출됨`);
+        } else if (instrumentWithRelease.triggerRelease) {
+          // releaseAll이 없으면 triggerRelease 사용
+          instrumentWithRelease.triggerRelease(now);
+          console.log(`🛑 ${this.name} triggerRelease 호출됨`);
+        }
+      } catch (error) {
+        console.warn(`${this.name} 악기 강제 정지 중 오류:`, error);
+      }
+    }
+    
+    // 3. 내부 상태 초기화
     this.isPlaying = false;
     this.currentPattern = null;
     this.patternParams = null;
+    
+    console.log(`🛑 ${this.name} 패턴 정지 완료`);
   }
 
   private generateNoteForStep(stepIdx: number): string {
@@ -346,7 +380,33 @@ export class Planet {
   }
 
   dispose(): void {
-    this.stopPattern();
-    this.instrument.dispose();
+    console.log(`🗑️ ${this.name} dispose 시작...`);
+    
+    // 1. 패턴이 재생 중이면 완전히 정지
+    if (this.isPlaying) {
+      this.stopPattern();
+      
+      // 약간 대기 후 다시 한 번 확인
+      setTimeout(() => {
+        if (this.isPlaying) {
+          console.warn(`${this.name} 패턴이 여전히 재생 중, 강제 정지`);
+          this.isPlaying = false;
+          this.currentPattern = null;
+          this.patternParams = null;
+        }
+      }, 50);
+    }
+    
+    // 2. 악기 완전히 dispose
+    if (this.instrument && !this.instrument.isDisposed()) {
+      try {
+        this.instrument.dispose();
+        console.log(`🗑️ ${this.name} 악기 dispose 완료`);
+      } catch (error) {
+        console.warn(`${this.name} 악기 dispose 중 오류:`, error);
+      }
+    }
+    
+    console.log(`🗑️ ${this.name} dispose 완료`);
   }
 }
