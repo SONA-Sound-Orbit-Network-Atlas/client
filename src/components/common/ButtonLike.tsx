@@ -4,23 +4,19 @@ import { mergeClassNames } from '@/utils/mergeClassNames';
 import { FaHeartCirclePlus } from 'react-icons/fa6';
 import { FaHeartCrack } from 'react-icons/fa6';
 
-interface ButtonFavoriteProps {
+interface ButtonLikeProps {
   className?: string;
   active: boolean | null;
   onClick?: () => void;
 }
 
-export default function ButtonFavorite({
+export default function ButtonLike({
   className,
   active,
   onClick,
-}: ButtonFavoriteProps) {
+}: ButtonLikeProps) {
   const onClickHandle = (e: React.MouseEvent) => {
     e.stopPropagation();
-    if (active === null) {
-      alert('로그인 후 이용해주세요.');
-      return;
-    }
     onClick?.();
   };
 

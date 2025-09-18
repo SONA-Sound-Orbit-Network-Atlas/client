@@ -1,16 +1,13 @@
-import {
-  FiEdit3,
-  FiUser,
-  FiLogOut,
-  FiHeart,
-  FiUserCheck,
-} from 'react-icons/fi';
+import { FiEdit3, FiUser, FiLogOut, FiUserCheck } from 'react-icons/fi';
+import { FaHeart } from 'react-icons/fa';
 import { IoPlanetOutline } from 'react-icons/io5';
 import { useProfileStore } from '@/stores/useProfileStore';
 import { useLogout } from '@/hooks/api/useAuth';
-import { useGetUserProfile } from '@/hooks/api/useUser';
+import { useGetCurrentUserProfile } from '@/hooks/api/useUser';
 import { useUserStore } from '@/stores/useUserStore';
 import { useGetFollowers, useGetFollowings } from '@/hooks/api/useFollow';
+import { useGetMyLikes } from '@/hooks/api/useLikes';
+import { useGetStellarMyList } from '@/hooks/api/useGalaxy';
 import ProfileStateWrapper from './ProfileStateWrapper';
 import Iconframe from '@/components/common/Iconframe';
 import Button from '@/components/common/Button';
@@ -23,12 +20,8 @@ export default function ProfileView() {
   const logoutMutation = useLogout();
   const { userStore } = useUserStore();
 
-  // 사용자 프로필 데이터 조회
-  const {
-    data: serverProfile,
-    isLoading,
-    error,
-  } = useGetUserProfile(userStore.id);
+  // 현재 사용자 프로필 데이터 조회
+  const { data: serverProfile, isLoading, error } = useGetCurrentUserProfile();
 
   // 팔로워 수 조회
   const { data: followersData } = useGetFollowers({
@@ -43,6 +36,19 @@ export default function ProfileView() {
     page: 1,
     limit: 1, // 총 개수만 필요하므로 1개만 조회
   });
+
+  // 좋아요 개수 조회
+  const { data: likesData, isLoading: likesLoading } = useGetMyLikes({
+    page: 1,
+    limit: 1,
+  });
+
+  // 내 스텔라 시스템 갯수 조회
+  const { data: myStellarData, isLoading: myStellarLoading } =
+    useGetStellarMyList({
+      page: 1,
+      limit: 1, // 갯수만 필요하므로 1개만 조회
+    });
 
   // userStore 데이터를 우선적으로 사용하고, 서버 데이터가 있으면 병합
   const profile = userStore.id
@@ -132,15 +138,15 @@ export default function ProfileView() {
                     <p className="text-text-muted text-sm">CREATED</p>
                   </div>
                   <p className="text-white text-center text-[24px] font-semibold">
-                    3
+                    {myStellarLoading ? 0 : (myStellarData?.totalCount ?? 0)}
                   </p>
                 </Card>
               </div>
               <div className="mb-[24px]">
                 <p className="text-text-muted text-sm mb-[16px]">LIKES</p>
                 <StatCard
-                  icon={<FiHeart className="text-white" />}
-                  value={85}
+                  icon={<FaHeart className="text-text-white size-[16px]" />}
+                  value={likesLoading ? 0 : likesData?.total || 0}
                   label="MY LIKES"
                   onClick={handleLikesClick}
                   className="w-full hover:brightness-110 hover:bg-text-white/20 border-white/20 hover:text-white hover:[&_p]:text-white hover:[&_svg]:text-white"

@@ -11,14 +11,14 @@ import type { User } from '@/types/user';
 import { useUserStore } from '@/stores/useUserStore';
 import type { AxiosError } from 'axios';
 
-// 사용자 프로필 조회
-export function useGetUserProfile(userId: string) {
-  const { setUserStore } = useUserStore();
+// 현재 사용자 프로필 조회 (userStore 업데이트 포함)
+export function useGetCurrentUserProfile() {
+  const { setUserStore, userStore } = useUserStore();
 
   const query = useQuery<User>({
-    queryKey: ['userProfile', userId],
-    queryFn: () => userAPI.getUserProfile(userId),
-    enabled: !!userId, // userId가 있을 때만 실행
+    queryKey: ['currentUserProfile'],
+    queryFn: () => userAPI.getUserProfile(userStore.id),
+    enabled: !!userStore.id,
     staleTime: 5 * 60 * 1000, // 5분간 캐시 유지
   });
 
@@ -28,6 +28,18 @@ export function useGetUserProfile(userId: string) {
       setUserStore(query.data);
     }
   }, [query.data, setUserStore]);
+
+  return query;
+}
+
+// 다른 사용자 프로필 조회 (userStore 업데이트 없음)
+export function useGetUserProfile(userId: string) {
+  const query = useQuery<User>({
+    queryKey: ['userProfile', userId],
+    queryFn: () => userAPI.getUserProfile(userId),
+    enabled: !!userId, // userId가 있을 때만 실행
+    staleTime: 5 * 60 * 1000, // 5분간 캐시 유지
+  });
 
   return query;
 }

@@ -8,6 +8,7 @@ interface UserCardProps {
   username: string;
   isFollowing?: boolean;
   isMutualFollow?: boolean;
+  isFollowBack?: boolean; // 상대방이 나를 팔로우하고 있는지 여부
   onFollow?: (userId: string) => void;
   onUnfollow?: (userId: string) => void;
   onClick?: (userId: string) => void;
@@ -19,6 +20,7 @@ export default function UserCard({
   username,
   isFollowing = false,
   isMutualFollow = false,
+  isFollowBack = false,
   onFollow,
   onUnfollow,
   onClick,
@@ -55,7 +57,7 @@ export default function UserCard({
             onClick={handleFollowClick}
             disabled={isLoading}
           >
-            {isFollowing ? 'Unfollow' : 'Follow Back'}
+            {isFollowing ? 'Unfollow' : isFollowBack ? 'Follow Back' : 'Follow'}
           </Button>
         </div>
       </div>

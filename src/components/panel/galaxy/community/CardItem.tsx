@@ -1,11 +1,10 @@
-import ButtonFavorite from '@/components/common/ButtonFavorite';
+import ButtonLike from '@/components/common/ButtonLike';
 import Card from '@/components/common/Card/Card';
 import { IoPlanetOutline } from 'react-icons/io5';
 import { FaRegHeart } from 'react-icons/fa';
 import type { StellarListItem } from '@/types/stellarList';
-import { useState } from 'react';
-import { useCreateLike, useDeleteLike } from '@/hooks/api/useLikes';
-import { useUserStore } from '@/stores/useUserStore';
+import { likeUtils } from '@/utils/likeUtils';
+import { useLikeToggle } from '@/hooks/api/useLikes';
 import { formatDateToYMD } from '@/utils/formatDateToYMD';
 
 interface CardItemProps extends StellarListItem {
@@ -16,7 +15,6 @@ export default function CardItem({
   id,
   rank,
   title,
-  // creator_id,
   creator_name,
   updated_at,
   planet_count,
@@ -24,42 +22,11 @@ export default function CardItem({
   is_liked,
   onClick,
 }: CardItemProps) {
-  console.log('creator_name', creator_name);
-  const { isLoggedIn } = useUserStore();
-  const [favoriteActive, setFavoriteActive] = useState(is_liked);
-  // 좋아요 hook
-  const { mutate: createLike } = useCreateLike();
-  const { mutate: deleteLike } = useDeleteLike();
-  // 좋아요 클릭
-  const handleClickFavorite = () => {
-    if (!isLoggedIn) {
-      return alert('로그인 후 이용해주세요.');
-    }
-    if (is_liked === null) return;
-
-    if (is_liked === true) {
-      deleteLike(
-        { system_id: id },
-        {
-          onSuccess: () => {
-            setFavoriteActive(false);
-          },
-        }
-      );
-    } else if (is_liked === false) {
-      createLike(
-        { system_id: id },
-        {
-          onSuccess: () => {
-            setFavoriteActive(true);
-          },
-        }
-      );
-    }
-  };
+  // 통합된 좋아요 훅 사용 - 중복 로직 제거
+  const { likeStatus, toggleLike } = useLikeToggle(id, is_liked);
 
   return (
-    <Card onClick={onClick} role="button" className="hover:cursor-pointer">
+    <Card onClick={onClick} role="button">
       <div className="flex items-center justify-between min-w-0 w-full max-w-full">
         {/* ← 왼쪽 영역: 줄어들 수 있게 basis-0 grow min-w-0 */}
         <div className="basis-0 grow min-w-0">
@@ -88,10 +55,10 @@ export default function CardItem({
           </div>
         </div>
 
-        <ButtonFavorite
+        <ButtonLike
           className="flex-shrink-0 ml-3"
-          active={favoriteActive}
-          onClick={handleClickFavorite}
+          active={likeUtils.toBoolean(likeStatus)}
+          onClick={toggleLike}
         />
       </div>
 

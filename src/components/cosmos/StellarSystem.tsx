@@ -16,10 +16,11 @@ export default function StellarSystem({
 }) {
   const { stellarStore } = useStellarStore();
   const { selectedStellarId } = useSelectedStellarStore();
+  const { mode } = useSelectedStellarStore();
   const ref = useRef<THREE.Group>(null);
 
   // 선택된 스텔라가 아니면 렌더링하지 않음
-  if (selectedStellarId !== id) {
+  if (selectedStellarId !== id && mode !== 'create') {
     return null;
   }
   const position = stellarStore.position;
