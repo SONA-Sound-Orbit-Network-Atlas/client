@@ -18,7 +18,7 @@ export function useLogin(data: LoginData) {
   const { setUserStore, setIsLoggedIn } = useUserStore();
 
   return useMutation({
-    mutationKey: ['auth', 'login', data.email],
+    mutationKey: ['auth', 'login', data.identifier],
     mutationFn: () => authAPI.login(data),
     onSuccess: (response) => {
       const { access_token, user } = response;

@@ -25,7 +25,7 @@ export const useLoginForm = (
   options?: UseLoginFormOptions
 ): UseLoginFormReturn => {
   const [formData, setFormData] = useState<LoginFormData>({
-    email: '',
+    identifier: '',
     password: '',
   });
 

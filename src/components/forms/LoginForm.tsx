@@ -24,17 +24,17 @@ export default function LoginForm({
   return (
     <form onSubmit={onSubmit}>
       <div className="flex flex-col mt-[24px] text-left gap-[16px]">
-        <TextField label="Email" htmlFor="email">
+        <TextField label="Email or Username" htmlFor="identifier">
           <TextInput
-            type="email"
-            placeholder="Enter your email"
-            id="email"
-            value={formData.email}
-            onChange={(e) => onInputChange('email', e.target.value)}
-            className={errors.email ? 'border-error' : ''}
+            type="text"
+            placeholder="Enter your email or username"
+            id="identifier"
+            value={formData.identifier}
+            onChange={(e) => onInputChange('identifier', e.target.value)}
+            className={errors.identifier ? 'border-error' : ''}
           />
-          {errors.email && (
-            <p className="text-error text-xs mt-1">{errors.email}</p>
+          {errors.identifier && (
+            <p className="text-error text-xs mt-1">{errors.identifier}</p>
           )}
         </TextField>
         <TextField label="Password" htmlFor="password">
