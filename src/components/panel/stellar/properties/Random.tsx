@@ -1,17 +1,25 @@
 import Button from '@/components/common/Button';
-import minMaxRandomNo from '@/utils/minMaxRandomNo';
+// ❌ minMaxRandomNo는 정수 전용이라 제거
+// import minMaxRandomNo from '@/utils/minMaxRandomNo';
 import { useSelectedObjectStore } from '@/stores/useSelectedObjectStore';
 import { useStellarStore } from '@/stores/useStellarStore';
-import type { Star } from '@/types/stellar';
-import type { Planet } from '@/types/stellar';
+import type { Star, Planet } from '@/types/stellar';
 import {
   PLANET_PROPERTIES,
   type PlanetProperties,
 } from '@/types/planetProperties';
-import { type StarProperties } from '@/types/starProperties';
+import type { StarProperties } from '@/types/starProperties';
 
 interface RandomProps {
   target: Star | Planet; // Star 또는 Planet 전체 객체
+}
+
+// step/precision 반영 랜덤 유틸 (컴포넌트 내부에 둠)
+function randStep(min: number, max: number, step = 1, precision?: number) {
+  const steps = Math.floor((max - min) / step);
+  const k = Math.floor(Math.random() * (steps + 1));
+  const v = min + k * step;
+  return precision != null ? +v.toFixed(precision) : v;
 }
 
 export default function Random({ target }: RandomProps) {
@@ -22,7 +30,7 @@ export default function Random({ target }: RandomProps) {
 
   const handleRandomClick = () => {
     if (target.object_type === 'STAR') {
-      // === STAR 처리 ===
+      // === STAR: 기존 로직 유지 ===
       const randomized: StarProperties = {
         spin: Math.floor(Math.random() * 101), // 0~100
         brightness: Math.floor(Math.random() * 101), // 0~100
@@ -38,20 +46,23 @@ export default function Random({ target }: RandomProps) {
         },
       });
     } else {
-      // === PLANET 처리 ===
-      const minMaxArray = Object.values(PLANET_PROPERTIES).map((def) => ({
-        min: def.min,
-        max: def.max,
-      }));
+      // === PLANET: step/precision 반영 랜덤 ===
+      const randomized = Object.entries(PLANET_PROPERTIES).reduce(
+        (acc, [key, def]) => {
+          // 서버 제약 보호: inclination은 ±90으로 제한 (원하면 삭제 가능)
+          const min = key === 'inclination' ? Math.max(def.min, -90) : def.min;
+          const max = key === 'inclination' ? Math.min(def.max, 90) : def.max;
 
-      const randomNumbers = minMaxRandomNo(minMaxArray);
-
-      const randomized: PlanetProperties = Object.keys(
-        PLANET_PROPERTIES
-      ).reduce((acc, key, idx) => {
-        acc[key as keyof PlanetProperties] = randomNumbers[idx];
-        return acc;
-      }, {} as PlanetProperties);
+          (acc as PlanetProperties)[key] = randStep(
+            min,
+            max,
+            def.step ?? 1,
+            def.precision
+          );
+          return acc;
+        },
+        {} as PlanetProperties
+      );
 
       setStellarStore({
         ...stellarStore,

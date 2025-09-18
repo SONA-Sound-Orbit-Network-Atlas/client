@@ -1,5 +1,8 @@
 // src/types/StellarList.ts
 
+// 좋아요 상태를 명확하게 정의
+export type LikeStatus = 'liked' | 'not_liked' | 'unknown';
+
 export interface StellarListItem {
   id: string;
   title: string;
@@ -11,6 +14,7 @@ export interface StellarListItem {
   like_count: number;
   planet_count: number;
   rank: number;
+  is_liked: LikeStatus;
 }
 
 export interface StellarListMeta {
@@ -31,7 +35,7 @@ export interface StellarListPage {
   list: StellarListItem[];
   total: number;
   page: number;
-  hasNext: boolean;
+  limit: number;
 }
 
 export interface FlattenedStellarList {
@@ -49,6 +53,7 @@ export interface ParamsGetStellarList {
 
 // 정렬 옵션(그대로)
 export const sortOptions = [
+  { label: 'TOP TOTAL', value: 'total' },
   { label: 'TOP WEEK', value: 'week' },
   { label: 'TOP MONTH', value: 'month' },
   { label: 'TOP YEAR', value: 'year' },

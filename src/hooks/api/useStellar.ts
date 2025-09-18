@@ -59,13 +59,27 @@ export function useUpdateStellar() {
 }
 
 // 삭제
-export function useDeleteStellar(stellarId: string) {
+export function useDeleteStellar() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: () => stellarAPI.deleteStellar(stellarId),
+    mutationFn: (stellarId: string) => stellarAPI.deleteStellar(stellarId),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['stellar', stellarId] });
+      queryClient.invalidateQueries({ queryKey: ['stellar'] });
+      queryClient.invalidateQueries({ queryKey: ['stellarList'] });
+      queryClient.invalidateQueries({ queryKey: ['stellarMyList'] });
+      queryClient.invalidateQueries({ queryKey: ['stellarListAll'] });
+    },
+  });
+}
+
+// 클론
+export function useCloneStellar() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (stellarId: string) => stellarAPI.cloneStellar(stellarId),
+    onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['stellarList'] });
       queryClient.invalidateQueries({ queryKey: ['stellarMyList'] });
       queryClient.invalidateQueries({ queryKey: ['stellarListAll'] });

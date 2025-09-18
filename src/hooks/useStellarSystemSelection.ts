@@ -39,7 +39,7 @@ export default function useStellarSystemSelection() {
     if (status === 'success' && data) {
       setStellarStore(data); // 스텔라 스토어 업데이트
       setSelectedStellarId(targetId); // 선택된 스텔라 아이디 업데이트
-      setSelectedObjectId('star_001'); // 선택된 오브젝트 아이디 업데이트 => 항성 기본값
+      setSelectedObjectId(data.star.id); // 선택된 오브젝트 아이디 업데이트 => 항성 기본값
       setTabValue('INFO'); // 스텔라 패널 > 탭 값 업데이트
       openSecondarySidebar('stellar'); // 스텔라 패널 오픈
       setTargetId(''); // 타겟 아이디 초기화

@@ -21,15 +21,24 @@ export default function Properties() {
   const { stellarStore, setStellarStore } = useStellarStore();
   const { selectedObjectId } = useSelectedObjectStore();
 
-  const isPlanet = selectedObjectId !== 'star_001';
+  const { star, planets } = stellarStore;
 
-  const starObj: Star | undefined = isPlanet ? undefined : stellarStore.star;
+  // 선택된 객체 찾기 (STAR 우선, 없으면 PLANET 검색)
+  const selection =
+    star && star.id === selectedObjectId
+      ? { kind: 'STAR' as const, obj: star }
+      : (() => {
+          const p = planets.find((o) => o.id === selectedObjectId);
+          return p ? { kind: 'PLANET' as const, obj: p } : null;
+        })();
 
-  const planetObj: Planet | undefined = isPlanet
-    ? stellarStore.planets.find((o) => o.id === selectedObjectId)
-    : undefined;
+  if (!selection) return null;
 
-  if (!starObj && !planetObj) return null;
+  const isPlanet = selection.kind === 'PLANET';
+  const starObj =
+    selection.kind === 'STAR' ? (selection.obj as Star) : undefined;
+  const planetObj =
+    selection.kind === 'PLANET' ? (selection.obj as Planet) : undefined;
 
   const properties = isPlanet ? planetObj?.properties : starObj?.properties;
   if (!properties) return null;

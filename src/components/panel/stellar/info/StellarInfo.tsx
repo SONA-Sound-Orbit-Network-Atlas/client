@@ -4,6 +4,9 @@ import TextInput from '@/components/common/TextInput';
 import { useSelectedObjectStore } from '@/stores/useSelectedObjectStore';
 import { useSelectedStellarStore } from '@/stores/useSelectedStellarStore';
 import { useStellarStore } from '@/stores/useStellarStore';
+import CloneStellarButton from './CloneStellarButton';
+import DeleteStellarButton from './DeleteStellarButton';
+import { useUserStore } from '@/stores/useUserStore';
 
 export default function StellarInfo({
   isStellarOwner,
@@ -13,6 +16,7 @@ export default function StellarInfo({
   const { stellarStore, setStellarStore } = useStellarStore();
   const { selectedObjectId } = useSelectedObjectStore();
   const { mode } = useSelectedStellarStore();
+  const { isLoggedIn } = useUserStore();
 
   // 1) 현재 선택이 스타인지 판별: 하드코딩 'star_001' 대신 실제 id 사용
   const starId = stellarStore.star?.id; // ''일 수 있음
@@ -40,10 +44,12 @@ export default function StellarInfo({
 
   return (
     <div>
+      {/* 타이틀 */}
       <PanelTitle fontSize="large" textColor="text-primary-300">
         행성 INFO
       </PanelTitle>
 
+      {/* INFO 카드 */}
       <Card className="space-y-4">
         {stellarInfoArr.map(([rawKey, value]) => {
           const key = rawKey.toLowerCase(); // ← 소문자로 통일
@@ -98,6 +104,14 @@ export default function StellarInfo({
           }
         })}
       </Card>
+
+      {/* CLONE 버튼 */}
+      {mode !== 'create' && !isStellarOwner && isLoggedIn && (
+        <CloneStellarButton />
+      )}
+
+      {/* DELETE 버튼 */}
+      {mode === 'view' && isStellarOwner && <DeleteStellarButton />}
     </div>
   );
 }

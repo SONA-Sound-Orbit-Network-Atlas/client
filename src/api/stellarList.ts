@@ -13,7 +13,7 @@ function adaptStellarList(res: StellarListResponse): StellarListPage {
     list: data,
     total: meta.total,
     page: meta.page,
-    hasNext: meta.hasNext,
+    limit: meta.limit,
   };
 }
 

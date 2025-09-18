@@ -17,6 +17,7 @@ export const endpoints = {
   stellarSystem: {
     base: `${API_PREFIX}/stellar-systems`,
     byId: (id: string) => `${API_PREFIX}/stellar-systems/${id}`,
+    clone: `${API_PREFIX}/stellar-systems/clone`,
   },
   follows: {
     base: `${API_PREFIX}/follows`,
@@ -30,5 +31,9 @@ export const endpoints = {
     password: `${API_PREFIX}/users/password`,
     base: `${API_PREFIX}/users`,
     profileById: (id: string) => `${API_PREFIX}/users/${id}/profile`,
+  },
+  likes: {
+    base: `${API_PREFIX}/likes`,
+    me: `${API_PREFIX}/likes/me`,
   },
 } as const;
