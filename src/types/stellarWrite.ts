@@ -6,7 +6,7 @@ import type { StarProperties } from '@/types/starProperties';
 export type StellarWritePayload = {
   title: string;
   galaxy_id: string;
-  position: [number, number, number];
+  // position: [number, number, number];
   star: {
     name: string;
     properties: StarProperties; // 스토어 값 그대로
@@ -36,7 +36,7 @@ export function toStellarWritePayload(
   return {
     title: system.title,
     galaxy_id: system.galaxy_id,
-    position: system.position,
+    // position: system.position,
     star: {
       name: system.star.name,
       properties: system.star.properties, // 그대로
