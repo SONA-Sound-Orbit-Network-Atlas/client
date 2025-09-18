@@ -3,14 +3,15 @@
 // SONA 지침: MELODY/LEAD 역할 - range 55..84, reverb_send ≤ 0.25, swing ≤ 25%
 
 import * as Tone from 'tone';
-import type { InstrumentRole, PlanetPhysicalProperties, MappedAudioParameters } from '../../types/audio';
-import { mapPlanetToAudio } from '../utils/mappers';
-import type { Instrument } from './InstrumentInterface';
+import type { MappedAudioParameters } from '../../types/audio';
+import { AudioEngine } from '../core/AudioEngine';
+import {
+  BaseInstrument,
+  type SimplifiedInstrumentMacros,
+  type ResolvedInstrumentContext,
+} from './InstrumentInterface';
 
-export class MelodyInstrument implements Instrument {
-  private id: string;
-  private role: InstrumentRole = 'MELODY';
-  private disposed = false;
+export class MelodyInstrument extends BaseInstrument {
   
   // 멜로디 전용 신스와 이펙트 체인
   private melodySynth!: Tone.MonoSynth;      // 메인 멜로디 신스 (MonoSynth - 단음 연주에 최적화)
@@ -19,12 +20,16 @@ export class MelodyInstrument implements Instrument {
   private chorus!: Tone.Chorus;              // 코러스로 풍부함 추가
   private compressor!: Tone.Compressor;      // 일정한 레벨 유지
   private distortion!: Tone.Distortion;      // 가벼운 드라이브 효과
+  private panner!: Tone.Panner;              // 팬
+  private stereo!: Tone.StereoWidener;       // 스테레오 폭
+  private sendRev!: Tone.Gain;               // 리버브 센드
+  private sendDly!: Tone.Gain;               // 딜레이 센드
   
   // 표현력 제어 상태
   private isLegato = false;                  // 레가토 모드 상태
 
   constructor(id: string = 'melody') {
-    this.id = id;
+    super('MELODY', id);
     this.initializeInstrument();
   }
 
@@ -88,33 +93,38 @@ export class MelodyInstrument implements Instrument {
       oversample: '4x'
     });
 
-    // 신호 체인 연결: melodySynth → compressor → distortion → melodyFilter → vibrato → chorus → destination
+    // 추가 유틸 노드
+    this.panner = new Tone.Panner(0);
+    this.stereo = new Tone.StereoWidener(0.5);
+    this.sendRev = new Tone.Gain(0);
+    this.sendDly = new Tone.Gain(0);
+
+    // 전역 이펙트 버스와 연결
+    const fx = AudioEngine.instance.getEffectNodes();
+    this.sendRev.connect(fx.reverb!);
+    this.sendDly.connect(fx.delay!);
+
+    // 신호 체인 연결: melodySynth → compressor → distortion → melodyFilter → vibrato → chorus → (dry + sends)
     this.melodySynth.chain(
       this.compressor,
       this.distortion,
       this.melodyFilter,
       this.vibrato,
       this.chorus,
+      this.panner,
+      this.stereo,
       Tone.Destination
     );
+
+    // 센드: 코러스 이후의 신호를 리버브/딜레이로 분기
+    this.chorus.connect(this.sendRev);
+    this.chorus.connect(this.sendDly);
 
     // 이펙트 시작
     // Vibrato는 자동으로 작동하므로 별도 start 불필요
     this.chorus.start();
 
     console.log('🎵 MelodyInstrument 초기화 완료:', this.id);
-  }
-
-  // Instrument 인터페이스 구현
-  getId(): string { return this.id; }
-  getRole(): InstrumentRole { return this.role; }
-  isDisposed(): boolean { return this.disposed; }
-
-  updateFromPlanet(props: PlanetPhysicalProperties): void {
-    if (this.disposed) return;
-    
-    const mappedParams = mapPlanetToAudio(this.role, props);
-    this.applyParams(mappedParams);
   }
 
   public triggerAttackRelease(
@@ -232,7 +242,11 @@ export class MelodyInstrument implements Instrument {
   }
 
   // SONA 매핑된 파라미터 적용
-  private applyParams(params: MappedAudioParameters): void {
+  protected handleParameterUpdate(
+    params: MappedAudioParameters,
+    _macros: SimplifiedInstrumentMacros,
+    _context: ResolvedInstrumentContext
+  ): void {
     if (this.disposed) return;
 
     // 필터 컷오프 조절 - 멜로디는 밝은 톤 유지
@@ -265,6 +279,14 @@ export class MelodyInstrument implements Instrument {
       const chorusRate = 1 + (params.tremDepth * 2);
       this.chorus.frequency.rampTo(Math.max(0.5, Math.min(4, chorusRate)), 0.08);
     }
+
+    // 팬/스테레오
+    if (this.panner) this.panner.pan.rampTo(params.pan ?? 0, 0.05);
+    if (this.stereo) this.stereo.width.rampTo(Math.max(0, Math.min(1, params.stereoWidth ?? 0.5)), 0.08);
+
+    // 리버브/딜레이 센드 레벨
+    if (this.sendRev) this.sendRev.gain.rampTo(Math.max(0, Math.min(0.9, params.reverbSend ?? 0)), 0.08);
+    if (this.sendDly) this.sendDly.gain.rampTo(Math.max(0, Math.min(0.9, (params.delayFeedback ?? 0) * 0.8)), 0.08);
     
     // 디스토션 조절
     if (this.distortion) {
@@ -293,6 +315,11 @@ export class MelodyInstrument implements Instrument {
     // SONA 지침: MELODY reverb_send ≤ 0.25 적용 (전역 이펙트에서 처리)
   }
 
+  protected applyOscillatorType(type: Tone.ToneOscillatorType): void {
+    if (this.disposed) return;
+    this.melodySynth?.set({ oscillator: { type } } as any);
+  }
+
   public dispose(): void {
     if (this.disposed) return;
     
@@ -304,7 +331,7 @@ export class MelodyInstrument implements Instrument {
     this.compressor?.dispose();
     this.distortion?.dispose();
     
-    this.disposed = true;
+    super.dispose();
     console.log(`🗑️ MelodyInstrument ${this.id} disposed`);
   }
 }

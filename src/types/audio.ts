@@ -32,7 +32,7 @@ export interface PatternParameters {
 // 매핑된 저수준 오디오 파라미터 묶음 - 오디오 시스템 전용
 export interface MappedAudioParameters {
   // 오실레이터 타입
-  oscType: number;        // 0-7 (오실레이터 타입: sine, saw, square, etc.)
+  oscType: string;        // 오실레이터 타입 식별자
   harmonicity: number;    // 0.5-4.0 (FM/AM 하모니시티)
   
   // Color → 음색

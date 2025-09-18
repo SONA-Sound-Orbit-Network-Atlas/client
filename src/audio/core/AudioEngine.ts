@@ -113,6 +113,16 @@ export class AudioEngine {
     }
   }
 
+  // 이펙트 버스가 필요할 때 항상 존재하도록 보장
+  private ensureEffects(): void {
+    if (!this.reverb) {
+      this.reverb = new Tone.Reverb({ decay: 3, wet: 0.3 }).toDestination();
+    }
+    if (!this.delay) {
+      this.delay = new Tone.FeedbackDelay('8n', 0.25).toDestination();
+    }
+  }
+
   private applyToneCharacter(toneCharacter: number): void {
     // toneCharacter 0-100을 전역 음색 특성으로 변환
     // 0-30: Warm/Dark, 30-70: Balanced, 70-100: Bright/Sharp
@@ -142,6 +152,7 @@ export class AudioEngine {
 
   // 이펙트 노드 반환 (악기에서 사용)
   getEffectNodes() {
+    this.ensureEffects();
     return { reverb: this.reverb, delay: this.delay };
   }
 }

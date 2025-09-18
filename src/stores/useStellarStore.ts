@@ -10,6 +10,10 @@ import type { StarProperties } from '@/types/starProperties';
 import type { PlanetProperties } from '@/types/planetProperties';
 import { useUserStore } from '@/stores/useUserStore';
 import { createDefaultProperties } from '@/types/planetProperties';
+import {
+  getDefaultSynthType,
+  getDefaultOscillatorType,
+} from '@/audio/instruments/InstrumentInterface';
 
 /***** 1) 기본 프로퍼티 디폴트 *****/
 const defaultStarProps: StarProperties = {
@@ -98,13 +102,17 @@ export const useStellarStore = create<StellarStore>((set) => ({
       const prev = state.stellarStore;
 
       // 새 planet 1개 추가
+      const role: InstrumentRole = 'DRUM';
+      const defaultSynth = getDefaultSynthType(role);
       const newPlanet: Planet = {
         id: 'planet_' + (prev.planets.length + 1),
         object_type: 'PLANET',
         system_id: prev.id || '', // 아직 없을 수 있음
         name: `NEW PLANET ${prev.planets.length + 1}`,
-        role: 'DRUM' as InstrumentRole,
+        role,
         properties: { ...defaultPlanetProps },
+        synthType: defaultSynth,
+        oscillatorType: getDefaultOscillatorType(role, defaultSynth),
         created_at: '',
         updated_at: new Date().toISOString(),
       };

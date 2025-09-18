@@ -3,14 +3,14 @@
 // SONA 지침: CHORD 역할 - 화음 연주에 특화된 설정
 
 import * as Tone from 'tone';
-import type { InstrumentRole, PlanetPhysicalProperties, MappedAudioParameters } from '../../types/audio';
-import { mapPlanetToAudio } from '../utils/mappers';
-import type { Instrument } from './InstrumentInterface';
+import type { MappedAudioParameters } from '../../types/audio';
+import {
+  BaseInstrument,
+  type SimplifiedInstrumentMacros,
+  type ResolvedInstrumentContext,
+} from './InstrumentInterface';
 
-export class ChordInstrument implements Instrument {
-  private id: string;
-  private role: InstrumentRole = 'CHORD';
-  private disposed = false;
+export class ChordInstrument extends BaseInstrument {
   
   // 화음 전용 신스와 이펙트 체인
   private chordSynth!: Tone.PolySynth;       // 메인 화음 신스 (PolySynth - 다성 연주)
@@ -22,7 +22,7 @@ export class ChordInstrument implements Instrument {
   private distortion!: Tone.Distortion;     // 가벼운 디스토션 - 화음 압축과 따뜻함
 
   constructor(id: string = 'chord') {
-    this.id = id;
+    super('CHORD', id);
     this.initializeInstrument();
   }
 
@@ -108,18 +108,6 @@ export class ChordInstrument implements Instrument {
     this.stereoChorus.start();
 
     console.log('🎹 ChordInstrument 초기화 완료:', this.id);
-  }
-
-  // Instrument 인터페이스 구현
-  getId(): string { return this.id; }
-  getRole(): InstrumentRole { return this.role; }
-  isDisposed(): boolean { return this.disposed; }
-
-  updateFromPlanet(props: PlanetPhysicalProperties): void {
-    if (this.disposed) return;
-    
-    const mappedParams = mapPlanetToAudio(this.role, props);
-    this.applyParams(mappedParams);
   }
 
   public triggerAttackRelease(
@@ -337,7 +325,11 @@ export class ChordInstrument implements Instrument {
   }
 
   // SONA 매핑된 파라미터 적용
-  private applyParams(params: MappedAudioParameters): void {
+  protected handleParameterUpdate(
+    params: MappedAudioParameters,
+    _macros: SimplifiedInstrumentMacros,
+    _context: ResolvedInstrumentContext
+  ): void {
     if (this.disposed) return;
 
     // 필터 컷오프 조절 - 화음의 밝기
@@ -406,6 +398,11 @@ export class ChordInstrument implements Instrument {
     }
   }
 
+  protected applyOscillatorType(type: Tone.ToneOscillatorType): void {
+    if (this.disposed) return;
+    this.chordSynth?.set({ oscillator: { type } } as any);
+  }
+
   public dispose(): void {
     if (this.disposed) return;
     
@@ -418,7 +415,7 @@ export class ChordInstrument implements Instrument {
     this.eq?.dispose();
     this.distortion?.dispose();
     
-    this.disposed = true;
+    super.dispose();
     console.log(`🗑️ ChordInstrument ${this.id} disposed`);
   }
 }

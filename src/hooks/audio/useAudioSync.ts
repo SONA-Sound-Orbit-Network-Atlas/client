@@ -7,6 +7,12 @@ import { StellarSystem } from '@/audio/core/StellarSystem';
 import { useStellarStore } from '@/stores/useStellarStore';
 import type { StarProperties } from '@/types/starProperties';
 import type { PlanetProperties, InstrumentRole } from '@/types/planetProperties';
+import {
+  getDefaultSynthType,
+  getDefaultOscillatorType,
+  type SynthTypeId,
+  type OscillatorTypeId,
+} from '@/audio/instruments/InstrumentInterface';
 
 // 간단한 참조 동등성 비교 유틸 (얕은 비교)
 function shallowEqual<T extends object>(a: T, b: T): boolean {
@@ -26,15 +32,38 @@ export function useAudioSync() {
   // 이전 상태 메모
   const prevStarPropsRef = useRef<StarProperties | undefined>(stellarStore.star?.properties);
   const prevPlanetIdsRef = useRef<string[]>(stellarStore.planets.map(p => p.id));
-  type PlanetSnapshot = { role: InstrumentRole; properties: PlanetProperties };
+  type PlanetSnapshot = {
+    role: InstrumentRole;
+    properties: PlanetProperties;
+    synthType: SynthTypeId;
+    oscillatorType: OscillatorTypeId;
+  };
   const prevPlanetPropsRef = useRef<Record<string, PlanetSnapshot>>({});
 
-  // 초기화: 기존 행성들의 속성 스냅샷 저장
+  // 초기화: 기존 행성들을 오디오 시스템으로 동기화 + 스냅샷 저장
   useEffect(() => {
-  const snap: Record<string, PlanetSnapshot> = {};
-  stellarStore.planets.forEach(p => { snap[p.id] = { role: p.role, properties: p.properties }; });
+    const snap: Record<string, PlanetSnapshot> = {};
+    const currentIds: string[] = [];
+
+    stellarStore.planets.forEach((p) => {
+      const synthType = p.synthType ?? getDefaultSynthType(p.role);
+      const oscillatorType =
+        p.oscillatorType ?? getDefaultOscillatorType(p.role, synthType);
+
+      // 오디오 시스템에 행성이 없다면 생성 후 속성 반영
+      if (!system.getPlanet(p.id)) {
+        system.createPlanet(p.role, p.id, { synthType, oscillatorType });
+        system.updatePlanetProperties(p.id, p.properties as PlanetProperties);
+        system.updatePlanetSynthSettings(p.id, { synthType, oscillatorType });
+      }
+
+      snap[p.id] = { role: p.role, properties: p.properties, synthType, oscillatorType };
+      currentIds.push(p.id);
+    });
+
     prevPlanetPropsRef.current = snap;
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    prevPlanetIdsRef.current = currentIds;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Star 전역 속성 → 오디오 전역 상태 동기화
@@ -63,11 +92,21 @@ export function useAudioSync() {
     added.forEach(async (id) => {
       const p = stellarStore.planets.find(pp => pp.id === id);
       if (!p) return;
+
+      const synthType = p.synthType ?? getDefaultSynthType(p.role);
+      const oscillatorType =
+        p.oscillatorType ?? getDefaultOscillatorType(p.role, synthType);
       
       // store의 planet id를 오디오 코어의 id로 그대로 사용
-      system.createPlanet(p.role, p.id);
+      system.createPlanet(p.role, p.id, { synthType, oscillatorType });
       system.updatePlanetProperties(p.id, p.properties as PlanetProperties);
-      prevPlanetPropsRef.current[id] = { role: p.role, properties: p.properties };
+      system.updatePlanetSynthSettings(p.id, { synthType, oscillatorType });
+      prevPlanetPropsRef.current[id] = {
+        role: p.role,
+        properties: p.properties,
+        synthType,
+        oscillatorType,
+      };
       
       // 다른 행성이 이미 재생 중이면 새 행성도 자동으로 시작
       const playingPlanets = system.getPlayingPlanetsCount();
@@ -90,19 +129,47 @@ export function useAudioSync() {
     // 속성 변경 처리
     stellarStore.planets.forEach(p => {
       const prev = prevPlanetPropsRef.current[p.id];
+      const synthType = p.synthType ?? getDefaultSynthType(p.role);
+      const oscillatorType =
+        p.oscillatorType ?? getDefaultOscillatorType(p.role, synthType);
       // 역할(Role) 변경 감지: 인스트루먼트 재구성 필요
       if (prev && p.role !== prev.role) {
         system.removePlanet(p.id);
-        system.createPlanet(p.role, p.id);
+        system.createPlanet(p.role, p.id, { synthType, oscillatorType });
         system.updatePlanetProperties(p.id, p.properties as PlanetProperties);
-        prevPlanetPropsRef.current[p.id] = { role: p.role, properties: p.properties };
+        system.updatePlanetSynthSettings(p.id, { synthType, oscillatorType });
+        prevPlanetPropsRef.current[p.id] = {
+          role: p.role,
+          properties: p.properties,
+          synthType,
+          oscillatorType,
+        };
+        return;
+      }
+
+      if (
+        prev &&
+        (prev.synthType !== synthType || prev.oscillatorType !== oscillatorType)
+      ) {
+        system.updatePlanetSynthSettings(p.id, { synthType, oscillatorType });
+        prevPlanetPropsRef.current[p.id] = {
+          role: p.role,
+          properties: p.properties,
+          synthType,
+          oscillatorType,
+        };
         return;
       }
 
       if (!prev || !shallowEqual(p.properties as PlanetProperties, prev.properties)) {
         console.log(`🔄 행성 ${p.role} 속성 변경 감지:`, p.properties);
         system.updatePlanetProperties(p.id, p.properties as PlanetProperties);
-        prevPlanetPropsRef.current[p.id] = { role: p.role, properties: p.properties };
+        prevPlanetPropsRef.current[p.id] = {
+          role: p.role,
+          properties: p.properties,
+          synthType,
+          oscillatorType,
+        };
       }
     });
 

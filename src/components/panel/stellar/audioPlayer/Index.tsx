@@ -3,7 +3,7 @@ import Play from './Play';
 import Volume from './Volume';
 import { AudioEngine } from '@/audio/core/AudioEngine';
 import { StellarSystem } from '@/audio/core/StellarSystem';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useState } from 'react';
 import { useAudioSync } from '@/hooks/audio/useAudioSync';
 
 interface AudioPlayerProps {
@@ -17,38 +17,40 @@ export default function AudioPlayer({ className }: AudioPlayerProps) {
   useAudioSync();
 
   const [ready, setReady] = useState(engine.isReady());
+  const [initializing, setInitializing] = useState(false);
 
-  // 초기 1회: 시스템 준비
-  useEffect(() => {
-    // 패널이 마운트 되어 있을 때, 필요시 엔진 초기화
-    if (!engine.isReady()) {
-      // 전역 상태는 Star에 의해 결정되므로, 시스템이 알아서 전달
-      system.initialize().then(() => setReady(true));
-    } else {
-      setReady(true);
+  const handleTogglePlay = useCallback(async (nextIsPlaying: boolean) => {
+    // Play 컴포넌트는 토글 후 상태를 전달함
+    const willPlay = nextIsPlaying;
+    if (!ready) {
+      if (!willPlay) return;
+      if (initializing) return;
+      setInitializing(true);
+      try {
+        await system.initialize();
+        setReady(true);
+      } catch (error) {
+        console.error('오디오 시스템 초기화 실패:', error);
+        setInitializing(false);
+        return;
+      }
+      setInitializing(false);
     }
-  }, [engine, system]);
 
-  const handleTogglePlay = useCallback(async (isPlaying: boolean) => {
-    // Play 컴포넌트는 토글 전 상태를 전달하므로 반전 해석
-    const willPlay = !isPlaying;
-    if (!ready) return;
-    
     if (willPlay) {
       const planets = system.getPlanets();
       
-      // 행성이 없으면 데모용 MELODY 하나 추가
+      // 행성이 없으면 아무 소리도 내지 않음 (데모 행성 생성 제거)
       if (planets.length === 0) {
-        const id = system.createPlanet('MELODY');
-        await system.startPlanetPattern(id);
-        console.log('🎵 데모용 MELODY 행성 추가 및 재생 시작');
-      } else {
-        // 모든 행성의 패턴을 시작
-        for (const planet of planets) {
-          if (!planet.isPlaying) {
-            await system.startPlanetPattern(planet.id);
-            console.log(`🎵 ${planet.name} 패턴 재생 시작`);
-          }
+        console.log('▶️ 재생 요청: 행성이 없어 소리를 내지 않습니다.');
+        return;
+      }
+
+      // 모든 행성의 패턴을 시작
+      for (const planet of planets) {
+        if (!planet.isPlaying) {
+          await system.startPlanetPattern(planet.id);
+          console.log(`🎵 ${planet.name} 패턴 재생 시작`);
         }
       }
     } else {
@@ -56,7 +58,7 @@ export default function AudioPlayer({ className }: AudioPlayerProps) {
       system.stopAllPatterns();
       console.log('⏹️ 모든 패턴 정지');
     }
-  }, [ready, system]);
+  }, [initializing, ready, system]);
 
   const handleVolumeChange = useCallback((v: number) => {
     engine.setMasterVolume(v);

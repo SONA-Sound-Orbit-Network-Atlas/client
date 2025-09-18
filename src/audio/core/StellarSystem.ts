@@ -3,7 +3,7 @@
 
 import type { InstrumentRole, PlanetPhysicalProperties } from '../../types/audio';
 import { Star } from './Star';
-import { Planet } from './Planet';
+import { Planet, type PlanetSynthConfig } from './Planet';
 import { AudioEngine } from './AudioEngine';
 
 export class StellarSystem {
@@ -76,8 +76,8 @@ export class StellarSystem {
   // === 행성(Planet) 관리 ===
   
   // 새 행성 추가
-  addPlanet(role: InstrumentRole, customId?: string): string {
-    const planet = new Planet(role, this.star, customId); // Star 인스턴스 주입
+  addPlanet(role: InstrumentRole, customId?: string, config?: PlanetSynthConfig): string {
+    const planet = new Planet(role, this.star, customId, config); // Star 인스턴스 주입
     const planetId = planet.getId();
     
     this.planets.set(planetId, planet);
@@ -87,8 +87,8 @@ export class StellarSystem {
   }
 
   // 새 행성 생성 (addPlanet의 별칭)
-  createPlanet(role: InstrumentRole, customId?: string): string {
-    return this.addPlanet(role, customId);
+  createPlanet(role: InstrumentRole, customId?: string, config?: PlanetSynthConfig): string {
+    return this.addPlanet(role, customId, config);
   }
 
   // 항성 전역 상태 업데이트
@@ -132,6 +132,17 @@ export class StellarSystem {
     }
     
     planet.updateProperties(props);
+    return true;
+  }
+
+  updatePlanetSynthSettings(planetId: string, settings: PlanetSynthConfig): boolean {
+    const planet = this.planets.get(planetId);
+    if (!planet) {
+      console.warn(`행성을 찾을 수 없습니다: ${planetId}`);
+      return false;
+    }
+
+    planet.updateSynthSettings(settings);
     return true;
   }
   
@@ -203,13 +214,17 @@ export class StellarSystem {
     role: InstrumentRole;
     properties: PlanetPhysicalProperties;
     isPlaying: boolean;
+    synthType: string;
+    oscillatorType: string;
   }> {
     return Array.from(this.planets.values()).map(planet => ({
       id: planet.getId(),
       name: planet.getName(),
       role: planet.getRole(),
       properties: planet.getProperties(),
-      isPlaying: planet.getIsPlaying()
+      isPlaying: planet.getIsPlaying(),
+      synthType: planet.getSynthSettings().synthType,
+      oscillatorType: planet.getSynthSettings().oscillatorType,
     }));
   }
   
@@ -223,7 +238,9 @@ export class StellarSystem {
       name: planet.getName(),
       role: planet.getRole(),
       properties: planet.getProperties(),
-      isPlaying: planet.getIsPlaying()
+      isPlaying: planet.getIsPlaying(),
+      synthType: planet.getSynthSettings().synthType,
+      oscillatorType: planet.getSynthSettings().oscillatorType,
     };
   }
   

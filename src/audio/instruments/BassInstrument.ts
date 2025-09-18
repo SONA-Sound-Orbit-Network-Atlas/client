@@ -3,14 +3,15 @@
 // SONA 지침: BASS 역할 - range 28..52, cutoff ≤ 3kHz, stereo_width ≤ 0.4, reverb_send ≤ 0.15
 
 import * as Tone from 'tone';
-import type { InstrumentRole, PlanetPhysicalProperties, MappedAudioParameters } from '../../types/audio';
-import { mapPlanetToAudio } from '../utils/mappers';
-import type { Instrument } from './InstrumentInterface';
+import type { MappedAudioParameters } from '../../types/audio';
+import { AudioEngine } from '../core/AudioEngine';
+import {
+  BaseInstrument,
+  type SimplifiedInstrumentMacros,
+  type ResolvedInstrumentContext,
+} from './InstrumentInterface';
 
-export class BassInstrument implements Instrument {
-  private id: string;
-  private role: InstrumentRole = 'BASS';
-  private disposed = false;
+export class BassInstrument extends BaseInstrument {
   
   // 베이스 전용 신스와 이펙트 체인
   private bassSynth!: Tone.MonoSynth;        // 메인 베이스 신스 (MonoSynth - 단음 연주에 최적화)
@@ -18,9 +19,13 @@ export class BassInstrument implements Instrument {
   private bassFilter!: Tone.Filter;          // 로우패스 필터 (따뜻한 베이스 톤)
   private compressor!: Tone.Compressor;      // 컴프레서 (펀치있는 사운드)
   private distortion!: Tone.Distortion;      // 가벼운 디스토션 (따뜻한 새추레이션)
+  private panner!: Tone.Panner;              // 팬
+  private stereo!: Tone.StereoWidener;       // 스테레오 폭(베이스는 낮게)
+  private sendRev!: Tone.Gain;               // 리버브 센드
+  private sendDly!: Tone.Gain;               // 딜레이 센드
 
   constructor(id: string = 'bass') {
-    this.id = id;
+    super('BASS', id);
     this.initializeInstrument();
   }
 
@@ -75,26 +80,26 @@ export class BassInstrument implements Instrument {
       oversample: '4x'    // 고품질 오버샘플링
     });
 
-    // 신호 체인 연결: bassSynth → compressor → bassFilter → distortion → destination
-    this.bassSynth.chain(this.compressor, this.bassFilter, this.distortion, Tone.Destination);
+    // 추가 유틸 노드 및 버스 연결
+    this.panner = new Tone.Panner(0);
+    this.stereo = new Tone.StereoWidener(0.2);
+    this.sendRev = new Tone.Gain(0);
+    this.sendDly = new Tone.Gain(0);
+
+    const fx = AudioEngine.instance.getEffectNodes();
+    this.sendRev.connect(fx.reverb!);
+    this.sendDly.connect(fx.delay!);
+
+    // 신호 체인 연결: bassSynth → compressor → bassFilter → distortion → panner → stereo → destination
+    this.bassSynth.chain(this.compressor, this.bassFilter, this.distortion, this.panner, this.stereo, Tone.Destination);
     
-    // 서브 오실레이터도 같은 이펙트 체인을 거쳐서 출력
-    this.subOscillator.chain(this.compressor, this.bassFilter, Tone.Destination);
+    // 서브 오실레이터도 같은 체인 경로로 출력
+    this.subOscillator.chain(this.compressor, this.bassFilter, this.panner, this.stereo, Tone.Destination);
+
+    // 센드 분기(디스토션 전의 타이트한 신호를 선호하면 위치 조절 가능)
+    this.bassFilter.connect(this.sendRev);
 
     console.log('🎸 BassInstrument 초기화 완료:', this.id);
-  }
-
-  // Instrument 인터페이스 구현
-  getId(): string { return this.id; }
-  getRole(): InstrumentRole { return this.role; }
-  isDisposed(): boolean { return this.disposed; }
-
-  updateFromPlanet(props: PlanetPhysicalProperties): void {
-    if (this.disposed) return;
-    
-    // 행성 속성을 오디오 파라미터로 변환
-    const mappedParams = mapPlanetToAudio(this.role, props);
-    this.applyParams(mappedParams);
   }
 
   public triggerAttackRelease(
@@ -175,7 +180,11 @@ export class BassInstrument implements Instrument {
   }
 
   // SONA 매핑된 파라미터 적용
-  private applyParams(params: MappedAudioParameters): void {
+  protected handleParameterUpdate(
+    params: MappedAudioParameters,
+    _macros: SimplifiedInstrumentMacros,
+    _context: ResolvedInstrumentContext
+  ): void {
     if (this.disposed) return;
 
     // 필터 컷오프 조절 (SONA 지침: BASS cutoff ≤ 3kHz)
@@ -201,6 +210,12 @@ export class BassInstrument implements Instrument {
       const subVolume = -12 + (params.outGainDb * 0.4); // 서브 오실레이터 볼륨 증가
       this.subOscillator.volume.rampTo(Math.max(-18, Math.min(-6, subVolume)), 0.08); // 범위 조정
     }
+
+    // 팬/스테레오/버스 센드(베이스는 제한적)
+    if (this.panner) this.panner.pan.rampTo(Math.max(-0.35, Math.min(0.35, params.pan ?? 0)), 0.05);
+    if (this.stereo) this.stereo.width.rampTo(Math.max(0, Math.min(0.45, params.stereoWidth ?? 0.3)), 0.08);
+    if (this.sendRev) this.sendRev.gain.rampTo(Math.max(0, Math.min(0.2, params.reverbSend ?? 0)), 0.12);
+    if (this.sendDly) this.sendDly.gain.rampTo(Math.max(0, Math.min(0.2, (params.delayFeedback ?? 0) * 0.6)), 0.12);
     
     // 엔벨로프 어택 조절
     if (this.bassSynth) {
@@ -218,6 +233,14 @@ export class BassInstrument implements Instrument {
     // (전역 이펙트에서 처리)
   }
 
+  protected applyOscillatorType(type: Tone.ToneOscillatorType): void {
+    if (this.disposed) return;
+    this.bassSynth?.set({ oscillator: { type } } as any);
+    if (this.subOscillator) {
+      this.subOscillator.type = type as Tone.ToneOscillatorType;
+    }
+  }
+
   public dispose(): void {
     if (this.disposed) return;
     
@@ -228,7 +251,7 @@ export class BassInstrument implements Instrument {
     this.compressor?.dispose();
     this.distortion?.dispose();
     
-    this.disposed = true;
+    super.dispose();
     console.log(`🗑️ BassInstrument ${this.id} disposed`);
   }
 }
