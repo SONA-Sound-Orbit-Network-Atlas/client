@@ -2,7 +2,7 @@ import { useMemo, useRef, Suspense } from 'react';
 import { useFrame } from '@react-three/fiber';
 import { Points, PointMaterial } from '@react-three/drei';
 import * as THREE from 'three';
-import * as random from 'maath/random/dist/maath-random.esm';
+import * as random from 'maath/random';
 
 function StarsContent() {
   // 별 포인트 생성 (1000개의 별)
@@ -40,7 +40,7 @@ function StarsContent() {
       {/* 첫 번째 별 레이어 - 가장 큰 별들 */}
       <Points
         ref={starsRef}
-        positions={positions}
+        positions={positions as Float32Array}
         stride={3}
         frustumCulled={false}
       >
@@ -58,7 +58,7 @@ function StarsContent() {
       {/* 두 번째 별 레이어 - 중간 크기 별들 */}
       <Points
         ref={starsRef2}
-        positions={positions}
+        positions={positions as Float32Array}
         stride={3}
         frustumCulled={false}
       >
@@ -76,7 +76,7 @@ function StarsContent() {
       {/* 세 번째 별 레이어 - 작은 별들로 깊이감 추가 */}
       <Points
         ref={starsRef3}
-        positions={positions}
+        positions={positions as Float32Array}
         stride={3}
         frustumCulled={false}
       >
