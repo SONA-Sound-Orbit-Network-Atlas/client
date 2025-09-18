@@ -58,14 +58,14 @@ export function SliderInput({
         className={mergeClassNames(
           // 트랙(회색 바)
           'relative grow overflow-hidden rounded-full',
-          'data-[orientation=horizontal]:h-3 data-[orientation=horizontal]:w-full',
-          'bg-[#E5E7EB] dark:bg-[#4D4D4D] border border-[#CCCCCC]/60'
+          'data-[orientation=horizontal]:h-2.5 data-[orientation=horizontal]:w-full',
+          'bg-[#4D4D4D]'
         )}
       >
         <SliderPrimitive.Range
           data-slot="slider-range"
           className={mergeClassNames(
-            rangeColor ?? 'bg-tertiary-200',
+            rangeColor ?? 'bg-primary-300',
             'absolute data-[orientation=horizontal]:h-full'
           )}
           style={rangeColor ? { backgroundColor: rangeColor } : undefined}
@@ -76,9 +76,9 @@ export function SliderInput({
       <SliderPrimitive.Thumb
         data-slot="slider-thumb"
         className={mergeClassNames(
-          'block size-5 shrink-0 rounded-full cursor-pointer',
+          'block size-4 shrink-0 rounded-full cursor-pointer',
           'bg-tertiary-200 shadow-sm ring-ring/50',
-          'transition-[box-shadow] hover:ring-4 focus-visible:ring-4 focus-visible:outline-hidden',
+          'transition-[color,box-shadow] hover:ring-2 focus-visible:ring-2 focus-visible:outline-hidden',
           'disabled:pointer-events-none disabled:opacity-50'
         )}
         aria-label="Value"
