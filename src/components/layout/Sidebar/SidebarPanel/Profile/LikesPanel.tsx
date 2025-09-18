@@ -52,7 +52,7 @@ export default function LikesPanel() {
     );
   }
 
-  // 에러 상태 - 재시도 기능 포함
+  // 에러 상태
   if (error) {
     return (
       <>
@@ -95,22 +95,8 @@ export default function LikesPanel() {
               TOTAL LIKES ({totalCount})
             </p>
 
-            {/* 로딩 상태 */}
-            {isLoading && (
-              <div className="text-center py-4">
-                <p className="text-text-muted">Loading...</p>
-              </div>
-            )}
-
-            {/* 에러 상태 */}
-            {error && (
-              <div className="text-center py-4">
-                <p className="text-red-400">Failed to load likes</p>
-              </div>
-            )}
-
             {/* 좋아요 목록 */}
-            {!isLoading && !error && allItems.length > 0 && (
+            {allItems.length > 0 && (
               <div className="space-y-3">
                 {allItems.map((item) => (
                   <CardItem
@@ -125,7 +111,7 @@ export default function LikesPanel() {
             )}
 
             {/* Load More 버튼 */}
-            {hasMore && !error && allItems.length > 0 && (
+            {hasMore && allItems.length > 0 && (
               <div className="flex justify-center mt-6">
                 <Button
                   onClick={loadMore}
@@ -148,7 +134,7 @@ export default function LikesPanel() {
             )}
 
             {/* 빈 상태 */}
-            {!isLoading && !error && allItems.length === 0 && (
+            {allItems.length === 0 && (
               <div className="text-center py-4">
                 <p className="text-text-muted">No liked stellar systems.</p>
               </div>
