@@ -16,7 +16,7 @@ export interface SignupFormData {
 }
 
 export interface LoginFormData {
-  email: string;
+  identifier: string;
   password: string;
 }
 
@@ -114,6 +114,16 @@ export const validateSignupForm = (
 };
 
 /**
+ * identifier 검증 (email 또는 username)
+ */
+export const validateIdentifier = (identifier: string): string | null => {
+  if (!identifier) {
+    return '이메일 또는 사용자명을 입력해주세요.';
+  }
+  return null;
+};
+
+/**
  * 로그인 폼 전체 검증
  */
 export const validateLoginForm = (
@@ -121,9 +131,8 @@ export const validateLoginForm = (
 ): Record<string, string> => {
   const errors: Record<string, string> = {};
 
-  // 이메일 검증
-  const emailError = validateEmail(formData.email);
-  if (emailError) errors.email = emailError;
+  const identifierError = validateIdentifier(formData.identifier);
+  if (identifierError) errors.identifier = identifierError;
 
   // 비밀번호 검증 (로그인에서는 길이 제한 없이 필수만 체크)
   if (!formData.password) {
@@ -165,8 +174,8 @@ export const validateLoginField = (
   value: string
 ): string | null => {
   switch (field) {
-    case 'email':
-      return validateEmail(value);
+    case 'identifier':
+      return validateIdentifier(value);
     case 'password':
       return !value ? VALIDATION_MESSAGES.PASSWORD.REQUIRED : null;
     default:
