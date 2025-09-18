@@ -30,10 +30,7 @@ export default function Planet({ planet, isSelectable = false }: PlanetProps) {
     return planet.properties[key] ?? defaultValue;
   };
 
-  const cloudTexture = useLoader(
-    THREE.TextureLoader,
-    'public/assets/Clouds2.png'
-  );
+  const cloudTexture = useLoader(THREE.TextureLoader, '/assets/Clouds2.png');
 
   // 필요한 속성들 추출
   const planetSize = getPropertyValue('planetSize', 0.3);
