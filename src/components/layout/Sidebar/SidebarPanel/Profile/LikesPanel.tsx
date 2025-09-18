@@ -69,16 +69,10 @@ export default function LikesPanel() {
                 <h3 className="text-white text-lg font-semibold mb-2">
                   Failed to load likes
                 </h3>
-                <p className="text-text-muted text-sm mb-6 max-w-sm">
+                <p className="text-text-muted text-sm max-w-sm">
                   Unable to load your liked stellar systems. Please check your
                   connection and try again.
                 </p>
-                <button
-                  onClick={() => window.location.reload()}
-                  className="px-4 py-2 bg-primary-500 hover:bg-primary-600 text-white rounded-lg transition-colors"
-                >
-                  Try Again
-                </button>
               </div>
             </div>
           </ScrollArea>

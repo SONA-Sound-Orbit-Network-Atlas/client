@@ -126,6 +126,7 @@ export function useGetMyLikesInfinite(options: { limit?: number } = {}) {
     isFetchingNextPage,
     isLoading,
     error,
+    refetch,
   } = useInfiniteQuery<
     StellarListPage,
     Error,
@@ -197,6 +198,7 @@ export function useGetMyLikesInfinite(options: { limit?: number } = {}) {
     error,
     loadMore,
     totalCount: data?.pages?.[0]?.total || 0,
+    refetch,
   };
 }
 
