@@ -61,22 +61,21 @@ export function useLogout() {
   return useMutation({
     mutationKey: ['auth', 'logout'],
     mutationFn: () => authAPI.logout(),
-    onSuccess: async () => {
+    onSuccess: () => {
+      console.log('로그아웃 성공');
+    },
+    onError: (error: AxiosError) => {
+      console.warn('로그아웃 API 호출 실패:', error);
+    },
+    onSettled: async () => {
       // localStorage에서 accessToken과 userInfo 제거
       localStorage.removeItem('accessToken');
       localStorage.removeItem('userInfo');
 
-      queryClient.setQueryData(['session'], null); // 즉시 비로그인으로 반영
-      await queryClient.invalidateQueries({ queryKey: ['galaxyMyList'] });
-      clearUserStore(); // 사용자 스토어 완전 초기화
-    },
-    onError: async (error: AxiosError) => {
-      console.warn('로그아웃 API 호출 실패:', error);
+      // 사용자 스토어 완전 초기화
+      clearUserStore();
 
-      // 서버 응답과 관계없이 로컬 상태 정리
-      localStorage.removeItem('accessToken');
-      localStorage.removeItem('userInfo');
-      clearUserStore(); // 사용자 스토어 완전 초기화
+      // React Query 캐시 정리
       queryClient.setQueryData(['session'], null);
       await queryClient.invalidateQueries({ queryKey: ['galaxyMyList'] });
     },
