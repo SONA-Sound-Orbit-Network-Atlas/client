@@ -1,7 +1,5 @@
-import type { GalaxyMyData } from '@/types/galaxyMy';
-
 // 더미 데이터 : Galaxy My 리스트
-const galaxyDummy: GalaxyMyData = {
+const galaxyDummy = {
   totalCount: 6,
   list: [
     {
