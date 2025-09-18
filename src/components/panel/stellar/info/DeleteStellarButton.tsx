@@ -17,7 +17,7 @@ export default function DeleteStellarButton() {
   return (
     <Button
       color="transparent"
-      className="w-full text-text-muted mt-3 text-xs"
+      className="w-full text-text-muted mt-3 text-xs hover:text-error/80"
       disabled={isPending}
       onClick={() => {
         const confirm = window.confirm('DEACTIVATE ACCOUNT');
@@ -38,7 +38,7 @@ export default function DeleteStellarButton() {
         }
       }}
     >
-      DEACTIVATE ACCOUNT
+      DEACTIVATE STELLAR
     </Button>
   );
 }

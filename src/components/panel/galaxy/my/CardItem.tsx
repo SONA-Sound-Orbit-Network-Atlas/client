@@ -2,6 +2,7 @@ import Card from '@/components/common/Card/Card';
 import { IoPlanetOutline } from 'react-icons/io5';
 import { FaRegHeart } from 'react-icons/fa';
 import type { StellarListItem } from '@/types/stellarList';
+import { formatDateToYMD } from '@/utils/formatDateToYMD';
 
 interface CardItemProps extends StellarListItem {
   onClick: () => void;
@@ -15,14 +16,14 @@ export default function CardItem({
   onClick,
 }: CardItemProps) {
   return (
-    <Card onClick={onClick} role="button">
+    <Card onClick={onClick} role="button" className="hover:cursor-pointer">
       <div className="flex items-center justify-between min-w-0">
         <div className="flex-1 min-w-0">
           <div className="flex items-center text-[14px] font-bold min-w-0">
             <strong className="text-white w-0 flex-1 truncate">{title}</strong>
           </div>
           <div className="mt-3 flex flex-col items-start gap-1 text-[12px] text-text-muted">
-            <span>{updated_at}</span>
+            <span>{formatDateToYMD(updated_at)}</span>
           </div>
         </div>
       </div>

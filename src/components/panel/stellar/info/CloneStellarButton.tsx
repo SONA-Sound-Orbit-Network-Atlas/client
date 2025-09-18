@@ -1,10 +1,10 @@
 import Button from '@/components/common/Button';
 import { useCloneStellar } from '@/hooks/api/useStellar';
 import { useSidebarStore } from '@/stores/useSidebarStore';
-import { useSelectedObjectStore } from '@/stores/useSelectedObjectStore';
+import { useSelectedStellarStore } from '@/stores/useSelectedStellarStore';
 
 export default function CloneStellarButton() {
-  const { selectedObjectId } = useSelectedObjectStore();
+  const { selectedStellarId } = useSelectedStellarStore();
   const { mutate: cloneStellar, isPending } = useCloneStellar();
   const { openSecondarySidebar } = useSidebarStore();
 
@@ -18,7 +18,7 @@ export default function CloneStellarButton() {
       className="w-full mt-6"
       disabled={isPending}
       onClick={() => {
-        cloneStellar(selectedObjectId, {
+        cloneStellar(selectedStellarId, {
           onSuccess: () => {
             openSecondarySidebar('galaxy');
           },
