@@ -1,32 +1,24 @@
-import { Grid} from '@react-three/drei';
-import * as THREE from 'three';
-import QuarterViewControls from "./controllers/QuarterViewControls";
-import Galaxy from "./cosmos/Galaxy";
+import Galaxy from './cosmos/Galaxy';
+import MainCamera from './systems/MainCamera';
+import BackgroundStars from './cosmos/BackgroundStars';
 
 // 화면 표시
 export default function Scene() {
+  return (
+    <>
+      {/* 조명 설정 */}
+      <ambientLight intensity={0.2} />
+      <directionalLight position={[10, 10, 10]} intensity={1} />
 
-    const axesHelper = new THREE.AxesHelper(5);
-    return (
-      <>
-        {/* 조명 설정 */}
-        <ambientLight intensity={0.4} />
-        <directionalLight 
-          position={[10, 10, 5]} 
-          intensity={1} 
-          castShadow
-        />
-        {/* 별자리 시스템 */}
+      {/* 별자리 시스템 */}
+      <group layers={0}>
         <Galaxy />
-        
-        
-        {/* 그리드 헬퍼 (공간감을 위해) */}
-        <Grid args={[20, 20]} />
-        
-        {/* 축 헬퍼 */}
-        <primitive object = {axesHelper}/>
-       
-        <QuarterViewControls />
-      </>
-    )
-  }
+      </group>
+
+      <MainCamera />
+
+      {/* 배경 */}
+      <BackgroundStars />
+    </>
+  );
+}

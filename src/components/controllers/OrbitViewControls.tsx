@@ -1,34 +1,51 @@
-import { OrbitControls } from "@react-three/drei";
-import * as THREE from "three";
+import { OrbitControls } from '@react-three/drei';
+import type { OrbitControls as OrbitControlsImpl } from 'three-stdlib';
+import { useRef, useCallback, useState } from 'react';
+import { useSmoothCameraMove } from '@/hooks/camera/useSmoothCameraMove';
+import { VIEW_MODE_CONFIG } from '@/constants/viewModeConfig';
+import { useSceneStore } from '@/stores/useSceneStore';
+import { useSelectedStellarStore } from '@/stores/useSelectedStellarStore';
 
 /**
  * X,Z축 이동
  * y축 이동 제한
- * 쿼터뷰 이동방식 구현 
+ * 쿼터뷰 이동방식 구현
  * @returns 카메라 및 이동 제어 컴포넌트
  */
 
-
-
 export default function OrbitViewControls() {
-    return (
-      <OrbitControls
-        enableRotate={false}
-        enablePan={true}
-        screenSpacePanning={false}
-        enableZoom={true}
-        mouseButtons={{
-          LEFT: THREE.MOUSE.PAN,
-          MIDDLE: THREE.MOUSE.DOLLY,
-          RIGHT: THREE.MOUSE.ROTATE
-        }}
-        // 추가 커스터마이징
-        panSpeed={0.8}           // 패닝 속도
-        zoomSpeed={1.2}          // 줌 속도
-        minDistance={2}          // 최소 줌 거리
-        maxDistance={50}         // 최대 줌 거리
-        maxPolarAngle={Math.PI / 2.5}  // 최대 수직 각도 (쿼터뷰 제한)
-        minPolarAngle={Math.PI / 6}    // 최소 수직 각도
-      />
-    );
-  }
+  const controls = useRef<OrbitControlsImpl>(null);
+  const { cameraIsMoving } = useSceneStore();
+  const { mode } = useSelectedStellarStore();
+  const [controlsReady, setControlsReady] = useState(false);
+
+  // OrbitControls ref 콜백
+  const controlsRefCallback = useCallback((node: OrbitControlsImpl | null) => {
+    if (node) {
+      controls.current = node;
+      setControlsReady(true);
+    }
+  }, []);
+
+  // controlsRef가 준비된 후에만 useSmoothCameraMove 실행
+  const shouldRunAnimation = controlsReady && controls.current;
+
+  // 카메라 이동 로직
+  useSmoothCameraMove({
+    controlsRef: shouldRunAnimation ? controls.current : null,
+    duration: VIEW_MODE_CONFIG.transition.galaxyToStellar.duration,
+  });
+
+  return (
+    <OrbitControls
+      ref={controlsRefCallback}
+      enabled={mode === 'view' || mode === 'create'}
+      enableDamping={!cameraIsMoving} // 카메라 이동 중에는 damping 비활성화
+      dampingFactor={0.05}
+      enableRotate={!cameraIsMoving} // 카메라 이동 중에는 회전 비활성화
+      enableZoom={!cameraIsMoving} // 카메라 이동 중에는 줌 비활성화
+      enablePan={false}
+      maxDistance={VIEW_MODE_CONFIG.thresholds.maxStellarZoomDistance}
+    />
+  );
+}

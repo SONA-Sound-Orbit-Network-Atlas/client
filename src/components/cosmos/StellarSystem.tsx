@@ -1,59 +1,43 @@
-import { useRef } from "react";
-import Star from "./Star"
-import Planet from "./Planet"
-import { useThree, useFrame } from "@react-three/fiber";
-import * as THREE from "three";
+import { useRef } from 'react';
+import * as THREE from 'three';
+import Star from './Star';
+import Planet from './Planet';
+import { useStellarStore } from '@/stores/useStellarStore';
+import { useSelectedStellarStore } from '@/stores/useSelectedStellarStore';
 
-//항성계 컴포넌트 
+// 순수한 디테일 스텔라 시스템 컴포넌트
+// 선택된 스텔라만 렌더링하므로 조건부 로직 불필요
+export default function StellarSystem({
+  id,
+  visible = true,
+}: {
+  id: string;
+  visible?: boolean;
+}) {
+  const { stellarStore } = useStellarStore();
+  const { selectedStellarId } = useSelectedStellarStore();
+  const { mode } = useSelectedStellarStore();
+  const ref = useRef<THREE.Group>(null);
 
+  // 선택된 스텔라가 아니면 렌더링하지 않음
+  if (selectedStellarId !== id && mode !== 'create') {
+    return null;
+  }
+  const position = stellarStore.position;
 
-export default function StellarSystem({StellarSysyemPos }: { 
-    StellarSysyemPos: [number, number, number]
-  }) {
-    const ref = useRef<THREE.Group>(null);
-    const detailGroupRef = useRef<THREE.Group>(null);
-    const lowDetailMesh = useRef<THREE.Mesh>(null);
-    const { camera } = useThree();
+  return (
+    <group ref={ref} position={position} visible={visible}>
+      {/* 항성 렌더링 */}
+      {stellarStore.star && (
+        <Star star={stellarStore.star} position={[0, 0, 0]} />
+      )}
 
-    useFrame(()=>{
-        if(!ref.current || !detailGroupRef.current || !lowDetailMesh.current) return;
-
-        const systemPos = new THREE.Vector3(...StellarSysyemPos);
-        const distance = camera.position.distanceTo(systemPos);
-
-        //factor 값을 계산
-        const minDistance = 20;        // 거리가 20 이하면 완전히 보임
-        const fadeRange = 10;          // 20~30 거리에서 페이드 아웃
-        const maxOpacity = 1;          // 최대 투명도
-        const minOpacity = 0;          // 최소 투명도
-        
-        const factor = maxOpacity - Math.min(Math.max((distance - minDistance) / fadeRange, minOpacity), maxOpacity);
-
-        //메시 스케일 조정정
-        detailGroupRef.current.scale.set(factor, factor, factor);
-        lowDetailMesh.current.scale.set(1-factor, 1-factor, 1-factor);
-
-
-    });
-
-    return (
-    <group ref={ref} position={StellarSysyemPos}>
-       <group ref={detailGroupRef} >
-        <Star position={[0, 0, 0]} color="#ff6b6b" size={1.5} />
-        <Planet position={[3, 2, 0]} color="#4ecdc4" size={1} />
-        <Planet position={[-3, -1, 2]} color="#45b7d1" size={0.8} />
-        <Planet position={[0, 3, -2]} color="#96ceb4" size={1.2} />
-        <Planet position={[4, -2, 1]} color="#feca57" size={0.6} />
-        <Planet position={[-4, 1, -1]} color="#ff9ff3" size={0.9} />
-       </group>
-       <mesh ref={lowDetailMesh} >
-                <sphereGeometry args={[1.5, 16, 16]} />
-                <meshStandardMaterial color="#ff6b6b"
-                    emissive="#ffffff"
-                    emissiveIntensity={0.5}
-                    toneMapped={false} />
-        </mesh>
-       
-       </group>
-    )
+      {/* 행성들 렌더링 */}
+      {stellarStore.planets &&
+        Array.isArray(stellarStore.planets) &&
+        stellarStore.planets.map((planet) => (
+          <Planet key={planet.id} planet={planet} isSelectable={true} />
+        ))}
+    </group>
+  );
 }
