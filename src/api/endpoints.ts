@@ -33,5 +33,6 @@ export const endpoints = {
   },
   likes: {
     base: `${API_PREFIX}/likes`,
+    me: `${API_PREFIX}/likes/me`,
   },
 } as const;
