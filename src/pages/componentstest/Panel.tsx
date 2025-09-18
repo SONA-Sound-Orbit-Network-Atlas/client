@@ -25,7 +25,7 @@ const Panel: React.FC = () => {
           <h2 className="text-2xl font-semibold mb-4 text-foreground">
             System INFO 컴포넌트
           </h2>
-          <Info />
+          <Info isStellarOwner={true} />
         </section>
 
         {/* System PLANETS 컴포넌트 */}

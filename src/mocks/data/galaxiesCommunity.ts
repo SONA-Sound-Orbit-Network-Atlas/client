@@ -1,10 +1,4 @@
-// src/mocks/data/galaxiesCommunity.ts
-import type {
-  GalaxyCommunityItem,
-  GalaxyCommunityResponse,
-} from '@/types/stellarList';
-
-const data: GalaxyCommunityItem[] = [
+const data = [
   {
     id: 'sys-001',
     title: 'Galaxy 1', // ← galaxyName → title
@@ -80,7 +74,7 @@ const data: GalaxyCommunityItem[] = [
 ];
 
 // 백엔드 원형 응답 형태로 export
-const galaxiesCommunity: GalaxyCommunityResponse = {
+const galaxiesCommunity = {
   data,
   meta: {
     page: 1,

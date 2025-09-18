@@ -16,11 +16,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuLabel,
   DropdownMenuGroup,
-  DropdownMenuSub,
-  DropdownMenuSubTrigger,
-  DropdownMenuSubContent,
-  DropdownMenuRadioGroup,
-  DropdownMenuRadioItem,
 } from '@/components/common/DropdownMenu';
 import { ChevronDown, Settings, User, CreditCard, LogOut } from 'lucide-react';
 import Button from '@/components/common/Button';
@@ -35,9 +30,7 @@ import Iconframe from '@/components/common/Iconframe';
 import { SkeletonCard } from '@/components/common/Card/SkeletonCard';
 
 const Common: React.FC = () => {
-  const [checkboxState, setCheckboxState] = useState(false);
   const [sliderValue, setSliderValue] = useState([50]);
-  const [dropdownOpen, setDropdownOpen] = useState(false);
 
   return (
     <div className="min-h-screen bg-background p-8">
