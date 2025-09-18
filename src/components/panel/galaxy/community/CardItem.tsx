@@ -6,6 +6,7 @@ import type { StellarListItem } from '@/types/stellarList';
 import { useState } from 'react';
 import { useCreateLike, useDeleteLike } from '@/hooks/api/useLikes';
 import { useUserStore } from '@/stores/useUserStore';
+import { formatDateToYMD } from '@/utils/formatDateToYMD';
 
 interface CardItemProps extends StellarListItem {
   onClick: () => void;
@@ -15,15 +16,16 @@ export default function CardItem({
   id,
   rank,
   title,
-  creator_id,
+  // creator_id,
+  creator_name,
   updated_at,
   planet_count,
   like_count,
   is_liked,
   onClick,
 }: CardItemProps) {
+  console.log('creator_name', creator_name);
   const { isLoggedIn } = useUserStore();
-  console.log('isLoggedIn', isLoggedIn);
   const [favoriteActive, setFavoriteActive] = useState(is_liked);
   // 좋아요 hook
   const { mutate: createLike } = useCreateLike();
@@ -57,7 +59,7 @@ export default function CardItem({
   };
 
   return (
-    <Card onClick={onClick} role="button">
+    <Card onClick={onClick} role="button" className="hover:cursor-pointer">
       <div className="flex items-center justify-between min-w-0 w-full max-w-full">
         {/* ← 왼쪽 영역: 줄어들 수 있게 basis-0 grow min-w-0 */}
         <div className="basis-0 grow min-w-0">
@@ -76,12 +78,12 @@ export default function CardItem({
               className="min-w-0 w-full"
             >
               <span>BY</span>
-              <span className="truncate text-primary-300">{creator_id}</span>
+              <span className="truncate text-primary-300">{creator_name}</span>
             </div>
 
             {/* 날짜 */}
             <div className="grid grid-cols-[auto,1fr] gap-1 min-w-0 w-full">
-              <span className="truncate">{updated_at}</span>
+              <span className="truncate">{formatDateToYMD(updated_at)}</span>
             </div>
           </div>
         </div>

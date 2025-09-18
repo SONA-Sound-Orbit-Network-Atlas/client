@@ -43,9 +43,9 @@ function ObjectsContent() {
       <div className="space-y-3">
         {objectsInfo.length > 0 ? (
           objectsInfo.map((data) => {
-            const title =
+            const name =
               data.object_type === 'STAR'
-                ? stellarStore.title
+                ? stellarStore.star.name
                 : (data.name ?? 'UNTITLED');
 
             return (
@@ -58,7 +58,7 @@ function ObjectsContent() {
                 }}
                 active={selectedObjectId === data.id}
                 className="cursor-pointer"
-                title={title}
+                name={name}
               />
             );
           })
