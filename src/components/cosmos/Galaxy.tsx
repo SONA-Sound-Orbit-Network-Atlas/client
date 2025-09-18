@@ -11,6 +11,9 @@ import type { simpleStellar } from '@/types/galaxy';
 interface GalaxyProps {
   galaxyId?: string;
 }
+const GALAXY_LOADING_TEXT = '...LOADING GALAXY...';
+const GALAXY_ERROR_TEXT = '...OCCURRED ERROR...';
+const GALAXY_EMPTY_TEXT = '...NO STARS IN GALAXY...';
 
 export default function Galaxy({ galaxyId = 'gal_abc123' }: GalaxyProps) {
   const {
@@ -40,25 +43,23 @@ export default function Galaxy({ galaxyId = 'gal_abc123' }: GalaxyProps) {
 
   // 로딩 상태 처리
   if (isLoading) {
-    return <LoadingStellarSystem text="갤럭시 데이터를 불러오는 중..." />;
+    return <LoadingStellarSystem text={GALAXY_LOADING_TEXT} />;
   }
 
   // 에러 상태 처리
   if (error) {
     console.error('Galaxy: Error loading stellar data:', error);
-    return (
-      <LoadingStellarSystem text="데이터를 불러오는 중 오류가 발생했습니다." />
-    );
+    return <LoadingStellarSystem text={GALAXY_ERROR_TEXT} />;
   }
 
   // 데이터가 아직 로드되지 않은 상태 (undefined)
   if (galaxyStellarListData === undefined) {
-    return <LoadingStellarSystem text="갤럭시 데이터를 준비하는 중..." />;
+    return <LoadingStellarSystem text={GALAXY_LOADING_TEXT} />;
   }
 
   // 빈 상태 처리
   if (!stellarSystems.length) {
-    return <LoadingStellarSystem text="표시할 스텔라 시스템이 없습니다." />;
+    return <LoadingStellarSystem text={GALAXY_EMPTY_TEXT} />;
   }
 
   return (
