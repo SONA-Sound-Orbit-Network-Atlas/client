@@ -5,14 +5,17 @@ import { useSelectedStellarStore } from '@/stores/useSelectedStellarStore';
 import { useStellarStore } from '@/stores/useStellarStore';
 import { useUserStore } from '@/stores/useUserStore';
 import { useSidebarStore } from '@/stores/useSidebarStore';
+import { useState } from 'react';
 
 export default function SaveButton() {
+  const [saveConfirm, setSaveConfirm] = useState(false);
+
   const { mutate: createStellar, isPending: isCreatePending } =
     useCreateStellar();
   const { mutate: updateStellar, isPending: isUpdatePending } =
     useUpdateStellar();
-  const { mode, setIdle } = useSelectedStellarStore();
-  const { stellarStore, setInitialStellarStore } = useStellarStore();
+  const { mode } = useSelectedStellarStore();
+  const { stellarStore } = useStellarStore();
   const { userStore, isLoggedIn } = useUserStore();
   const { openSecondarySidebar } = useSidebarStore();
 
@@ -28,13 +31,9 @@ export default function SaveButton() {
     // 1. (생성) create 모드
     // 완료 시 => selectedStellarStore 초기화 & stellarStore 초기화 & 갤럭시 패널 이동
     if (mode === 'create') {
-      console.log('create모드 => save버튼 클릭 => 생성');
       createStellar(stellarStore, {
         onSuccess: () => {
-          // 그대로 두는 방식으로 변경
-          // setIdle();
-          // setInitialStellarStore();
-          // openSecondarySidebar('galaxy');
+          setSaveConfirm(false);
         },
         onError: () => {
           alert('CREATE failed');
@@ -43,7 +42,6 @@ export default function SaveButton() {
     }
     // 2. (수정) view 모드, 선택된 stellar 스토어의 userId와 현재 로그인한 userId가 같을 때
     if (mode === 'view' && stellarStore.creator_id === userStore.id) {
-      console.log('view모드 & 작성자 일치 => save버튼 클릭 => 수정');
       updateStellar(
         { stellarId: stellarStore.id, stellarData: stellarStore },
         {
@@ -59,18 +57,35 @@ export default function SaveButton() {
   };
 
   return (
-    <Button
-      color="tertiary"
-      size="sm"
-      onClick={onSaveHandler}
-      disabled={isCreatePending || isUpdatePending}
-    >
-      <FiSave className="w-4 h-4" />
-      {isCreatePending
-        ? 'CREATING...'
-        : isUpdatePending
-          ? 'UPDATING...'
-          : 'SAVE'}
-    </Button>
+    <div>
+      {saveConfirm ? (
+        <div className="flex gap-2">
+          <Button size="sm" color="secondary" onClick={onSaveHandler}>
+            Confirm
+          </Button>
+          <Button
+            size="sm"
+            color="tertiary"
+            onClick={() => setSaveConfirm(false)}
+          >
+            Cancel
+          </Button>
+        </div>
+      ) : (
+        <Button
+          color="tertiary"
+          size="sm"
+          onClick={() => setSaveConfirm(true)}
+          disabled={isCreatePending || isUpdatePending}
+        >
+          <FiSave className="w-4 h-4" />
+          {isCreatePending
+            ? 'CREATING...'
+            : isUpdatePending
+              ? 'UPDATING...'
+              : 'SAVE'}
+        </Button>
+      )}
+    </div>
   );
 }

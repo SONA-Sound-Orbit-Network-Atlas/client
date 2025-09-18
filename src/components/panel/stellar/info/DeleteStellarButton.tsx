@@ -5,8 +5,10 @@ import { useSelectedStellarStore } from '@/stores/useSelectedStellarStore';
 import { useSidebarStore } from '@/stores/useSidebarStore';
 import { useStellarStore } from '@/stores/useStellarStore';
 import { useStellarTabStore } from '@/stores/useStellarTabStore';
+import { useState } from 'react';
 
 export default function DeleteStellarButton() {
+  const [deleteConfirm, setDeleteConfirm] = useState(false);
   const { mutate: deleteStellar, isPending } = useDeleteStellar();
   const { selectedStellarId } = useSelectedStellarStore();
   const { openSecondarySidebar } = useSidebarStore();
@@ -14,31 +16,49 @@ export default function DeleteStellarButton() {
   const { setIdle } = useSelectedStellarStore();
   const { setSelectedObjectId } = useSelectedObjectStore();
   const { setTabValue } = useStellarTabStore();
+
+  const onDeleteHandler = () => {
+    deleteStellar(selectedStellarId, {
+      onSuccess: () => {
+        setDeleteConfirm(false);
+        openSecondarySidebar('galaxy');
+        setInitialStellarStore();
+        setIdle();
+        setSelectedObjectId('');
+        setTabValue('INFO');
+      },
+      onError: () => {
+        alert('DELETE failed');
+      },
+    });
+  };
   return (
-    <Button
-      color="transparent"
-      className="w-full text-text-muted mt-3 text-xs hover:text-error/80"
-      disabled={isPending}
-      onClick={() => {
-        const confirm = window.confirm('DEACTIVATE ACCOUNT');
-        if (confirm) {
-          deleteStellar(selectedStellarId, {
-            onSuccess: () => {
-              alert('DEACTIVATE ACCOUNT success');
-              openSecondarySidebar('galaxy');
-              setInitialStellarStore();
-              setIdle();
-              setSelectedObjectId('');
-              setTabValue('INFO');
-            },
-            onError: () => {
-              alert('DEACTIVATE ACCOUNT failed');
-            },
-          });
-        }
-      }}
-    >
-      DEACTIVATE STELLAR
-    </Button>
+    <div className="w-full mt-3">
+      {deleteConfirm ? (
+        <div className="flex justify-center gap-2">
+          <Button size="sm" color="secondary" onClick={onDeleteHandler}>
+            Confirm
+          </Button>
+          <Button
+            size="sm"
+            color="tertiary"
+            onClick={() => setDeleteConfirm(false)}
+          >
+            Cancel
+          </Button>
+        </div>
+      ) : (
+        <Button
+          color="transparent"
+          className="w-full text-text-muted text-xs hover:text-error/80"
+          disabled={isPending}
+          onClick={() => {
+            setDeleteConfirm(true);
+          }}
+        >
+          DEACTIVATE STELLAR
+        </Button>
+      )}
+    </div>
   );
 }

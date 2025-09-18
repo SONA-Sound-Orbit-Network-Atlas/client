@@ -101,7 +101,7 @@ function LoadingComp() {
 function ErrorComp({ resetErrorBoundary }: FallbackProps) {
   return (
     <div className="p-4">
-      <p className="mb-2">에러 발생</p>
+      <p className="mb-2">Error occurred</p>
       <Button color="tertiary" onClick={resetErrorBoundary}>
         다시 시도
       </Button>

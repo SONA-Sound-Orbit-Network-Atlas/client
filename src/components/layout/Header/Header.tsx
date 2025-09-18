@@ -14,7 +14,7 @@ interface HeaderProps {
 
 export default function Header({ className, children }: HeaderProps) {
   const { isLoggedIn } = useUserStore();
-  const { setIdle } = useSelectedStellarStore();
+  const { mode, setIdle } = useSelectedStellarStore();
   return (
     <header
       className={mergeClassNames(
@@ -37,26 +37,19 @@ export default function Header({ className, children }: HeaderProps) {
       <nav className="flex-1 flex items-center justify-center">{children}</nav>
 
       {/* 우측 사용자 메뉴 영역 - 로그인 상태일 때만 표시 */}
-      {isLoggedIn && (
-        <div className="flex items-center gap-3">
-          {/* 항성계 정보 텍스트 => 기획에서 제거됨 */}
-          {/* <div className="text-right mr-2">
-            <div className="text-white text-[14px] font-medium leading-tight">
-              항성계 이름
-            </div>
-            <div className="text-text-muted text-[12px] leading-tight">
-              by {userStore.username || '제작자명'}
-            </div>
-          </div> */}
+      {isLoggedIn && <SaveButton />}
 
-          <SaveButton />
-
-          {/* BACK TO GALAXY 버튼 */}
-          <Button color="tertiary" size="sm" onClick={() => setIdle()}>
-            <FiArrowLeft className="w-4 h-4" />
-            BACK TO GALAXY
-          </Button>
-        </div>
+      {/* BACK TO GALAXY 버튼 */}
+      {mode !== 'idle' && (
+        <Button
+          className="ml-2"
+          color="tertiary"
+          size="sm"
+          onClick={() => setIdle()}
+        >
+          <FiArrowLeft className="w-4 h-4" />
+          BACK TO GALAXY
+        </Button>
       )}
     </header>
   );
