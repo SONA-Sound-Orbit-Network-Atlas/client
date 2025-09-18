@@ -37,6 +37,8 @@ export class Star {
   
   // 클락 이벤트 콜백
   private onClockTick?: (beat: number, bar: number, sixteenth: number) => void;
+  // BPM change listeners
+  private bpmListeners: Set<(bpm: number) => void> = new Set();
   
   // === Seed 기반 랜덤 관리 ===
   private seed: number | string | null = null;
@@ -216,6 +218,13 @@ export class Star {
     }
     
     console.log(`⭐ Star ${property} → ${value} | Global State:`, this.globalState);
+    // BPM 변경이 있었는지 알림
+    if (property === 'spin') {
+      console.log(`⭐ Star: spin 변경 → BPM 알림 ${this.globalState.bpm}`);
+      this.bpmListeners.forEach((cb) => {
+        try { cb(this.globalState.bpm); } catch (e) { console.warn('bpm listener error', e); }
+      });
+    }
   }
   
   // 전체 속성 업데이트
@@ -249,6 +258,17 @@ export class Star {
     }
     
     console.log(`⭐ Star Global State 직접 업데이트:`, this.globalState);
+    if ('bpm' in newState) {
+      this.bpmListeners.forEach((cb) => {
+        try { cb(this.globalState.bpm); } catch (e) { console.warn('bpm listener error', e); }
+      });
+    }
+  }
+
+  // 외부에서 BPM 변경을 구독
+  addBpmListener(cb: (bpm: number) => void): () => void {
+    this.bpmListeners.add(cb);
+    return () => this.bpmListeners.delete(cb);
   }
   
   // SONA 매핑에 따른 전역 상태 계산

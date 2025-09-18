@@ -8,6 +8,7 @@ import {
   BaseInstrument,
   type SimplifiedInstrumentMacros,
   type ResolvedInstrumentContext,
+  clamp01,
 } from './InstrumentInterface';
 
 export class DrumInstrument extends BaseInstrument {
@@ -21,6 +22,9 @@ export class DrumInstrument extends BaseInstrument {
   // 드럼 전용 이펙트
   private drumCompressor!: Tone.Compressor;  // 펀치있는 드럼 사운드를 위한 컴프레서
   private drumEQ!: Tone.EQ3;                 // 드럼 전용 3밴드 EQ
+  private drumReverb!: Tone.Reverb;          // 드럼에 대한 리버브(병렬 send)
+  private drumDelay!: Tone.FeedbackDelay;    // 드럼에 대한 딜레이(병렬 send)
+  private drumWide!: Tone.StereoWidener;    // 드럼 스테레오 와이드 컨트롤
 
   constructor(id: string = 'drum') {
     super('DRUM', id);
@@ -99,11 +103,39 @@ export class DrumInstrument extends BaseInstrument {
       high: 2                     // 고음 약간 부스트 (하이햇 강화)
     });
 
-    // 신호 체인 연결: 각 드럼 → 컴프레서 → EQ → destination
-    this.kickSynth.chain(this.drumCompressor, this.drumEQ, Tone.Destination);
-    this.snareSynth.chain(this.drumCompressor, this.drumEQ, Tone.Destination);
-    this.hihatSynth.chain(this.drumCompressor, this.drumEQ, Tone.Destination);
-    this.tomSynth.chain(this.drumCompressor, this.drumEQ, Tone.Destination);
+    // 드럼 리버브/딜레이/스테레오 와이드 (send 스타일)
+    this.drumReverb = new Tone.Reverb({
+      decay: 1.2,
+      preDelay: 0.01,
+      wet: 0,
+    });
+
+    this.drumDelay = new Tone.FeedbackDelay({
+      delayTime: 0.25,
+      feedback: 0.25,
+      wet: 0,
+    });
+
+    this.drumWide = new Tone.StereoWidener({
+      width: 0.3,
+    });
+
+  // 신호 체인 연결: 각 드럼 → 컴프레서 → EQ → (스테레오 와이드 → destination)
+  // additionally connect EQ to reverb/delay as parallel sends
+  this.kickSynth.connect(this.drumCompressor);
+  this.snareSynth.connect(this.drumCompressor);
+  this.hihatSynth.connect(this.drumCompressor);
+  this.tomSynth.connect(this.drumCompressor);
+
+  this.drumCompressor.connect(this.drumEQ);
+  // 메인 체인
+  this.drumEQ.connect(this.drumWide);
+  this.drumWide.toDestination();
+  // sends (병렬) - EQ 출력에서 리버브/딜레이로 보내어 wet로 제어
+  this.drumEQ.connect(this.drumReverb);
+  this.drumEQ.connect(this.drumDelay);
+  this.drumReverb.toDestination();
+  this.drumDelay.toDestination();
 
     console.log('🥁 DrumInstrument 초기화 완료:', this.id);
   }
@@ -252,6 +284,9 @@ export class DrumInstrument extends BaseInstrument {
     _context: ResolvedInstrumentContext
   ): void {
     if (this.disposed) return;
+    // _macros, _context는 현재 구현에서 사용하지 않음(향후 확장용)
+    void _macros;
+    void _context;
 
     // 킥 드럼 파라미터 조절
     if (this.kickSynth) {
@@ -298,11 +333,36 @@ export class DrumInstrument extends BaseInstrument {
       const threshold = -15 + (params.outGainDb * 0.3);
       this.drumCompressor.threshold.rampTo(Math.max(-25, Math.min(-5, threshold)), 0.08);
     }
+
+    // 드럼 리버브/딜레이/와이드 업데이트 (send 기반)
+    if (this.drumReverb) {
+      // reverbSend는 0..1 범위라고 가정, wet 값으로 직접 맵핑
+      const wet = clamp01(params.reverbSend);
+      this.drumReverb.wet.rampTo(Math.max(0, Math.min(1, wet)), 0.12);
+      // reverb 사이즈는 재사용된 값
+      this.drumReverb.decay = Math.max(0.2, Math.min(3.0, params.reverbSize ?? 1.2));
+    }
+
+    if (this.drumDelay) {
+      const dt = Math.max(0.01, Math.min(1.2, params.delayTime ?? 0.25));
+      const fb = Math.max(0, Math.min(0.95, params.delayFeedback ?? 0.25));
+      this.drumDelay.delayTime.rampTo(dt, 0.08);
+      this.drumDelay.feedback.rampTo(fb, 0.08);
+      this.drumDelay.wet.rampTo(Math.max(0, Math.min(0.9, params.delayFeedback ?? 0.0)), 0.12);
+    }
+
+    if (this.drumWide) {
+      const w = Math.max(0, Math.min(1.2, params.stereoWidth ?? 0.3));
+      // StereoWidener.width는 직접 할당이 제한적일 수 있으므로 set을 사용
+      this.drumWide.set({ width: w });
+    }
   }
 
   protected applyOscillatorType(type: Tone.ToneOscillatorType): void {
     if (this.disposed) return;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     this.kickSynth?.set({ oscillator: { type } } as any);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     this.tomSynth?.set({ oscillator: { type } } as any);
   }
 
