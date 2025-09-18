@@ -20,7 +20,7 @@ export default function Galaxy({ galaxyId = 'gal_abc123' }: GalaxyProps) {
   } = useStellarList(galaxyId);
   const { selectedStellarId } = useSelectedStellarStore();
   const { selectStellar } = useStellarSystemSelection();
-
+  const { mode } = useSelectedStellarStore();
   // 스텔라 리스트 가져오기 - 안전한 데이터 처리
   const stellarSystems: simpleStellar[] = useMemo(() => {
     // 데이터가 없거나 배열이 아닌 경우 빈 배열 반환
@@ -63,10 +63,13 @@ export default function Galaxy({ galaxyId = 'gal_abc123' }: GalaxyProps) {
 
   return (
     <group>
-      {/* 선택된 스텔라만 디테일 렌더링 */}
-      {selectedStellarId && (
-        <StellarSystem key={selectedStellarId} id={selectedStellarId} />
-      )}
+      {/* 선택된 스텔라 또는 생성 모드일 때 디테일 렌더링 */}
+
+      <StellarSystem
+        key={selectedStellarId}
+        id={selectedStellarId}
+        visible={selectedStellarId !== '' || mode === 'create'}
+      />
 
       {/* 모든 스텔라를 심플 포인트로 렌더링 */}
       {stellarSystems.map((stellar: simpleStellar) => (
