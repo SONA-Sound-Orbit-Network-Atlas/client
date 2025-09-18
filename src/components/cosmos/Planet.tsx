@@ -90,7 +90,10 @@ export default function Planet({ planet, isSelectable = false }: PlanetProps) {
     setIsHovered(false);
   };
 
-  const color = new THREE.Color(valueToColor(planetColor, 0, 360));
+  // const color = new THREE.Color(valueToColor(planetColor, 0, 360));
+  const color = useMemo(() => {
+    return new THREE.Color(valueToColor(planetColor, 0, 360));
+  }, [planetColor]);
   // Atmosphere + Cloud Shader
   const atmosphereMaterial = useMemo(() => {
     return new THREE.ShaderMaterial({

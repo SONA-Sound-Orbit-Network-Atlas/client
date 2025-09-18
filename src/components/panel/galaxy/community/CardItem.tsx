@@ -5,6 +5,7 @@ import { FaRegHeart } from 'react-icons/fa';
 import type { StellarListItem } from '@/types/stellarList';
 import { likeUtils } from '@/utils/likeUtils';
 import { useLikeToggle } from '@/hooks/api/useLikes';
+import { formatDateToYMD } from '@/utils/formatDateToYMD';
 
 interface CardItemProps extends StellarListItem {
   onClick: () => void;
@@ -14,7 +15,7 @@ export default function CardItem({
   id,
   rank,
   title,
-  creator_id,
+  creator_name,
   updated_at,
   planet_count,
   like_count,
@@ -44,12 +45,12 @@ export default function CardItem({
               className="min-w-0 w-full"
             >
               <span>BY</span>
-              <span className="truncate text-primary-300">{creator_id}</span>
+              <span className="truncate text-primary-300">{creator_name}</span>
             </div>
 
             {/* 날짜 */}
             <div className="grid grid-cols-[auto,1fr] gap-1 min-w-0 w-full">
-              <span className="truncate">{updated_at}</span>
+              <span className="truncate">{formatDateToYMD(updated_at)}</span>
             </div>
           </div>
         </div>

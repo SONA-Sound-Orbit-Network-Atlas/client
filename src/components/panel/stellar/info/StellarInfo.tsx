@@ -7,6 +7,7 @@ import { useStellarStore } from '@/stores/useStellarStore';
 import CloneStellarButton from './CloneStellarButton';
 import DeleteStellarButton from './DeleteStellarButton';
 import { useUserStore } from '@/stores/useUserStore';
+import { formatDateToYMD } from '@/utils/formatDateToYMD';
 
 export default function StellarInfo({
   isStellarOwner,
@@ -29,9 +30,10 @@ export default function StellarInfo({
 
   // 3) 스타 정보 (표시용)
   const starInfo = {
-    NAME: stellarStore.title,
-    CREATOR: stellarStore.author_id,
-    AUTHOR: stellarStore.create_source_id,
+    STELLAR_TITLE: stellarStore.title,
+    STAR_NAME: stellarStore.star.name,
+    CREATOR: stellarStore.creator_name,
+    AUTHOR: stellarStore.author_name,
     ['CREATE SOURCE']: 'ORIGINAL COMPOSITION',
     ['ORIGINAL SOURCE']: 'SONA STUDIO',
   };
@@ -46,7 +48,7 @@ export default function StellarInfo({
     <div>
       {/* 타이틀 */}
       <PanelTitle fontSize="large" textColor="text-primary-300">
-        행성 INFO
+        {isStarSelected ? 'STAR INFO' : 'PLANET INFO'}
       </PanelTitle>
 
       {/* INFO 카드 */}
@@ -61,34 +63,90 @@ export default function StellarInfo({
             case 'object_type':
               return null;
 
-            case 'name':
+            case 'stellar_title':
               return (
                 <div key={rawKey}>
-                  <PanelTitle className="font-normal mb-1">NAME</PanelTitle>
+                  <PanelTitle className="font-normal mb-1">
+                    STELLAR TITLE
+                  </PanelTitle>
                   {isStellarOwner || mode === 'create' ? (
+                    // 스텔라 Title
                     <TextInput
                       className="text-sm"
                       value={String(value)}
                       onChange={(e) => {
-                        const nextName = e.target.value;
-
-                        if (isStarSelected || !planetInfo) {
-                          setStellarStore({ ...stellarStore, title: nextName });
-                        } else {
-                          setStellarStore({
-                            ...stellarStore,
-                            planets: stellarStore.planets.map((planet) =>
-                              planet.id === selectedObjectId
-                                ? { ...planet, name: nextName }
-                                : planet
-                            ),
-                          });
-                        }
+                        const nextTitle = e.target.value;
+                        setStellarStore({
+                          ...stellarStore,
+                          title: nextTitle,
+                        });
                       }}
                     />
                   ) : (
                     <p className="text-text-secondary">{String(value)}</p>
                   )}
+                </div>
+              );
+            case 'star_name':
+              return (
+                <div key={rawKey}>
+                  <PanelTitle className="font-normal mb-1">
+                    STAR NAME
+                  </PanelTitle>
+                  {isStellarOwner || mode === 'create' ? (
+                    // STAR Name
+                    <TextInput
+                      className="text-sm"
+                      value={String(value)}
+                      onChange={(e) => {
+                        const nextName = e.target.value;
+                        setStellarStore({
+                          ...stellarStore,
+                          star: { ...stellarStore.star, name: nextName },
+                        });
+                      }}
+                    />
+                  ) : (
+                    <p className="text-text-secondary">{String(value)}</p>
+                  )}
+                </div>
+              );
+            case 'name':
+              return (
+                <div key={rawKey}>
+                  <PanelTitle className="font-normal mb-1">NAME</PanelTitle>
+                  {isStellarOwner || mode === 'create' ? (
+                    // PLANET Name
+                    <TextInput
+                      className="text-sm"
+                      value={String(value)}
+                      onChange={(e) => {
+                        const nextName = e.target.value;
+                        setStellarStore({
+                          ...stellarStore,
+                          planets: stellarStore.planets.map((planet) =>
+                            planet.id === selectedObjectId
+                              ? { ...planet, name: nextName }
+                              : planet
+                          ),
+                        });
+                      }}
+                    />
+                  ) : (
+                    <p className="text-text-secondary">{String(value)}</p>
+                  )}
+                </div>
+              );
+            case 'updated_at':
+            case 'created_at':
+              return (
+                <div key={rawKey}>
+                  <PanelTitle className="font-normal mb-1">
+                    {rawKey.toUpperCase().replace('_', ' ')}
+                  </PanelTitle>
+                  <p className="text-text-secondary">
+                    {formatDateToYMD(String(value))}
+                  </p>
                 </div>
               );
 

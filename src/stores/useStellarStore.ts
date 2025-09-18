@@ -14,6 +14,7 @@ import {
   getDefaultSynthType,
   getDefaultOscillatorType,
 } from '@/audio/instruments/InstrumentInterface';
+import { formatDateToYMD } from '@/utils/formatDateToYMD';
 
 /***** 1) 기본 프로퍼티 디폴트 *****/
 const defaultStarProps: StarProperties = {
@@ -37,6 +38,10 @@ export const initialStellarStore: StellarSystem = {
   created_via: 'MANUAL',
   created_at: '',
   updated_at: '',
+  author_name: '',
+  creator_name: '',
+  create_source_name: '',
+  original_source_name: '',
 
   star: {
     id: 'star_001',
@@ -51,12 +56,7 @@ export const initialStellarStore: StellarSystem = {
   position: [0, 0, 0],
 };
 
-/***** 3) 유틸: 임시 ID 생성 *****/
-// function genId(prefix: string = 'tmp'): string {
-//   return `${prefix}_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
-// }
-
-/***** 4) 스토어 타입 *****/
+/***** 3) 스토어 타입 *****/
 interface StellarStore {
   stellarStore: StellarSystem;
   setStellarStore: (stellarStore: StellarSystem) => void;
@@ -68,14 +68,26 @@ interface StellarStore {
 export const useStellarStore = create<StellarStore>((set) => ({
   stellarStore: initialStellarStore,
 
-  setStellarStore: (stellarStore) => set({ stellarStore }),
+  setStellarStore: (stellarStore) =>
+    set(() => {
+      console.log('stellarStore', stellarStore);
+      return {
+        stellarStore: {
+          ...stellarStore,
+          updated_at: formatDateToYMD(),
+        },
+      };
+    }),
 
   setInitialStellarStore: () =>
     set(() => {
       // 작성자/소유자 계열 필드를 userId 기반으로 세팅 => 비로그인 경우 '' 빈 값
       // 훅 호출하지 않고, 스토어 인스턴스의 getState() 사용
       const userId = useUserStore.getState().userStore.id ?? '';
-      const now = new Date().toISOString();
+      const now = formatDateToYMD();
+      const userName = useUserStore.getState().userStore.username ?? '';
+      console.log('userName', userName);
+
       return {
         stellarStore: {
           ...initialStellarStore,
@@ -85,6 +97,11 @@ export const useStellarStore = create<StellarStore>((set) => ({
           original_source_id: userId,
           created_at: now,
           updated_at: now,
+          author_name: userName,
+          creator_name: userName,
+          create_source_name: userName,
+          original_source_name: userName,
+
           star: {
             ...(initialStellarStore.star as Star),
             system_id: '',
@@ -114,7 +131,7 @@ export const useStellarStore = create<StellarStore>((set) => ({
         synthType: defaultSynth,
         oscillatorType: getDefaultOscillatorType(role, defaultSynth),
         created_at: '',
-        updated_at: new Date().toISOString(),
+        updated_at: formatDateToYMD(),
       };
 
       const nextPlanets = [...prev.planets, newPlanet];
@@ -124,7 +141,7 @@ export const useStellarStore = create<StellarStore>((set) => ({
         stellarStore: {
           ...prev,
           planets: nextPlanets,
-          updated_at: new Date().toISOString(),
+          updated_at: formatDateToYMD(),
         },
       };
     });

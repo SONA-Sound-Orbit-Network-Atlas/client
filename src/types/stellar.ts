@@ -28,6 +28,12 @@ export interface StellarSystem {
   title: string; // 스텔라(항성계) 이름
   galaxy_id: string; // 소속 갤럭시 ID 추가
 
+  // 추가된 name 필드
+  author_name: string; // 최초 생성자
+  creator_name: string; // 현재 소유자
+  create_source_name: string; // 클론한 스텔라
+  original_source_name: string; // 최초 스텔라
+
   // 원작자 추적 정보 (새로운 필드명 사용)
   creator_id: string; // 현재 소유자
   author_id: string; // 최초 생성자 (원작자)

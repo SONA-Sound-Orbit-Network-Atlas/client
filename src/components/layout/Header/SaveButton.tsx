@@ -31,9 +31,10 @@ export default function SaveButton() {
       console.log('create모드 => save버튼 클릭 => 생성');
       createStellar(stellarStore, {
         onSuccess: () => {
-          setIdle();
-          setInitialStellarStore();
-          openSecondarySidebar('galaxy');
+          // 그대로 두는 방식으로 변경
+          // setIdle();
+          // setInitialStellarStore();
+          // openSecondarySidebar('galaxy');
         },
         onError: () => {
           alert('CREATE failed');

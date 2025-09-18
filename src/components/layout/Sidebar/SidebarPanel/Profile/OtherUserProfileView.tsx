@@ -70,7 +70,7 @@ export default function OtherUserProfileView({
                   <div className="w-16 h-16 rounded-full overflow-hidden mb-[16px] border-2 border-tertiary-300">
                     <img
                       src={profile.image}
-                      alt={`${profile.username}의 프로필 이미지`}
+                      alt={`${profile.username} profile image`}
                       className="w-full h-full object-cover"
                     />
                   </div>

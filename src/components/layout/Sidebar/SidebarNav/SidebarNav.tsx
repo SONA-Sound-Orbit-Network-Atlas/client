@@ -32,7 +32,7 @@ export default function PrimarySidebar() {
       </div>
 
       {/* 하단 섹션 */}
-      <div className="flex flex-col gap-3">
+      {/* <div className="flex flex-col gap-3">
         {bottomMenuItems.map((item) => (
           <SidebarItem
             key={item.id}
@@ -44,7 +44,7 @@ export default function PrimarySidebar() {
             onClick={toggleSecondarySidebar}
           />
         ))}
-      </div>
+      </div> */}
     </div>
   );
 }
