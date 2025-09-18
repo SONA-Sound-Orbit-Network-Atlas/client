@@ -7,7 +7,7 @@ export default function PrimarySidebar() {
   const { toggleSecondarySidebar, selectedMenu } = useSidebarStore();
 
   const topMenuItems = menuItems.slice(0, 3); // 처음 3개 (사람, 행성, 우주)
-  const bottomMenuItems = menuItems.slice(3); // 나머지 3개 (알람, 설정, 헬프)
+  // const bottomMenuItems = menuItems.slice(3); // 나머지 3개 (알람, 설정, 헬프) - 현재 사용하지 않음
 
   return (
     <div
