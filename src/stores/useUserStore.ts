@@ -34,21 +34,38 @@ export const useUserStore = create<UserStore>((set) => ({
   },
   initializeAuth: async () => {
     const token = localStorage.getItem('accessToken');
+    if (!token) {
+      return;
+    }
 
-    if (token) {
-      // 토큰이 있으면 로그인 상태로 복원 (실제 유효성 검증은 API 호출 시에만)
-      // localStorage에서 사용자 정보도 복원
-      const userInfo = localStorage.getItem('userInfo');
-      if (userInfo) {
-        try {
-          const user = JSON.parse(userInfo);
+    const userInfoString = localStorage.getItem('userInfo');
+    if (userInfoString) {
+      try {
+        const user = JSON.parse(userInfoString);
+        // user 객체의 구조가 유효한지 검증
+        if (
+          user &&
+          typeof user.id === 'string' &&
+          typeof user.email === 'string' &&
+          typeof user.username === 'string'
+        ) {
           set({ userStore: user, isLoggedIn: true });
-        } catch (error) {
-          set({ isLoggedIn: true }); // 토큰만으로라도 로그인 상태 유지
+          return;
+        } else {
+          console.warn(
+            'localStorage의 userInfo가 유효하지 않은 형식입니다:',
+            user
+          );
+          localStorage.removeItem('userInfo');
         }
-      } else {
-        set({ isLoggedIn: true });
+      } catch (error) {
+        console.error('localStorage의 userInfo 파싱 실패:', error);
+        // 손상된 데이터는 삭제
+        localStorage.removeItem('userInfo');
       }
     }
+
+    // 토큰은 있지만 userInfo가 없거나 손상된 경우
+    set({ isLoggedIn: true });
   },
 }));
