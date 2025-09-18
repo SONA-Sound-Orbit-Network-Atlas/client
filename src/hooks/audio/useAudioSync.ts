@@ -2,7 +2,7 @@
 // - Star/Planet 속성 변경을 감지하여 StellarSystem에 전달
 // - Planet 추가/삭제를 감지하여 오디오 측에도 반영
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useCallback } from 'react';
 import { StellarSystem } from '@/audio/core/StellarSystem';
 import { AudioEngine } from '@/audio/core/AudioEngine';
 import { useStellarStore } from '@/stores/useStellarStore';
@@ -44,7 +44,7 @@ export function useAudioSync() {
   const isInitializedRef = useRef(false);
   const isResettingRef = useRef(false);
 
-  const syncPlanets = (allowDuringInit = false) => {
+  const syncPlanets = useCallback((allowDuringInit = false) => {
     if (!allowDuringInit && !isInitializedRef.current) return;
     if (isResettingRef.current) return;
 
@@ -99,7 +99,7 @@ export function useAudioSync() {
     });
 
     prevPlanetIdsRef.current = currentIds;
-  };
+  }, [stellarStore.planets, stellarStore.id, system]);
 
   // 초기화: 기존 행성들을 오디오 시스템으로 동기화 + 스냅샷 저장
   useEffect(() => {
@@ -143,7 +143,7 @@ export function useAudioSync() {
           engine.beginTransition();
           isResettingRef.current = true;
 
-          await system.resetForNewSystem(0.6);
+          await system.resetImmediate();
           console.log('🔄 오디오 시스템 리셋 완료');
 
           engine.endTransition();
@@ -161,11 +161,11 @@ export function useAudioSync() {
     }
 
     prevSystemIdRef.current = currentSystemId;
-  }, [stellarStore.id, system]);
+  }, [stellarStore.id, system, syncPlanets]);
 
   // Planet 목록 변화(추가/삭제) 및 속성 변경 동기화
   useEffect(() => {
     if (!isInitializedRef.current || isResettingRef.current) return;
     syncPlanets();
-  }, [stellarStore.planets, stellarStore.id]);
+  }, [syncPlanets, stellarStore.planets, stellarStore.id]);
 }

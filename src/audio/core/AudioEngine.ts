@@ -19,6 +19,7 @@ export class AudioEngine {
   private delay: Tone.FeedbackDelay | null = null;
   private _transitioning = false;
   private transitionListeners: Set<(transitioning: boolean) => void> = new Set();
+  private volumeListeners: Set<(volume: number) => void> = new Set();
 
   private constructor() {}
 
@@ -112,6 +113,7 @@ export class AudioEngine {
     } else {
       // 초기화 전에는 값만 기억하고, init 시 반영
     }
+    this.emitVolumeChange();
   }
 
   getMasterVolume(): number {
@@ -178,50 +180,54 @@ export class AudioEngine {
     return { reverb: this.reverb, delay: this.delay };
   }
 
-  // 부드럽게 페이드아웃 후 트랜스포트 정지 (강화된 버전)
-  async fadeOutAndStop(rampSeconds: number = 0.6): Promise<void> {
-    if (!this._initialized) return;
-    
-    console.log('🔊 AudioEngine 페이드아웃 시작...');
-    
-    try {
-      // 볼륨을 먼저 페이드아웃
-      Tone.Destination.volume.rampTo(-60, rampSeconds);
-      await new Promise((resolve) => setTimeout(resolve, Math.max(0, rampSeconds) * 1000));
-    } catch (error) {
-      console.warn('볼륨 페이드아웃 중 오류:', error);
-    }
-    
-    try {
-      // Transport 완전히 정지 및 모든 스케줄 취소
-      Tone.Transport.stop();
-      Tone.Transport.cancel(0);
-      
-      // 모든 활성 소스들 강제 정지 (추가된 강력한 정리)
-      const context = Tone.getContext();
-      if (context.state === 'running') {
-        // 모든 활성 소스를 찾아서 정지
-        try {
-          // Tone.js의 내부 스케줄러에서 모든 이벤트 제거
-          Tone.Transport.scheduleRepeat(() => {}, '1m'); // 임시 스케줄 추가 후
-          Tone.Transport.cancel(0); // 즉시 모든 스케줄 취소
-          
-          console.log('🔊 모든 스케줄된 이벤트 강제 취소됨');
-        } catch (error) {
-          console.warn('스케줄 취소 중 오류:', error);
+  
+    async fadeOutAndStop(rampSeconds: number = 0.6): Promise<void> {
+      console.log(`\ud83d\udd0a AudioEngine.fadeOutAndStop 시작 (rampSeconds=${rampSeconds})`);
+
+      // 가능한 경우 항상 페이드를 시도합니다. 초기화 여부에 따라 건너뛰지 않도록 안전하게 처리합니다.
+      try {
+        if (typeof Tone !== 'undefined' && Tone.Destination && Tone.Destination.volume && typeof Tone.Destination.volume.rampTo === 'function') {
+          try {
+            Tone.Destination.volume.rampTo(-60, rampSeconds);
+            // ramp가 적용되는 시간을 기다립니다.
+            await new Promise((resolve) => setTimeout(resolve, Math.max(0, rampSeconds) * 1000));
+          } catch (err) {
+            console.warn('AudioEngine: Tone.Destination.volume.rampTo 실패:', err);
+          }
+        } else {
+          // Tone이 준비되지 않은 경우에도 잠시 지연을 두어 UX 상 갑작스러운 끊김을 완화합니다.
+          await new Promise((resolve) => setTimeout(resolve, Math.max(0, rampSeconds) * 250));
         }
+      } catch (error) {
+        console.warn('AudioEngine 페이드 처리 중 오류:', error);
       }
-      
-      // Transport의 모든 이벤트 리스너도 제거
-      Tone.Transport.off('start');
-      Tone.Transport.off('stop');
-      Tone.Transport.off('pause');
-      
-      console.log('🔊 AudioEngine Transport 완전히 정지됨');
-    } catch (error) {
-      console.warn('Transport 정지 중 오류:', error);
+
+      // 페이드 후 Transport 및 Tone 자원을 정리합니다.
+      try {
+        Tone.Transport.stop();
+        Tone.Transport.cancel(0);
+
+        const context = Tone.getContext?.();
+        if (context && context.state === 'running') {
+          try {
+            // Transport 내부 스케줄을 초기화하기 위해 한 번 더 예약 후 취소합니다.
+            Tone.Transport.scheduleRepeat(() => {}, '1m');
+            Tone.Transport.cancel(0);
+            console.log('\ud83d\udd0a AudioEngine: Transport 스케줄 초기화 완료');
+          } catch (err) {
+            console.warn('AudioEngine Transport 스케줄 초기화 실패:', err);
+          }
+        }
+
+        Tone.Transport.off('start');
+        Tone.Transport.off('stop');
+        Tone.Transport.off('pause');
+
+        console.log('\ud83d\udd0a AudioEngine: Transport 정리 완료');
+      } catch (error) {
+        console.warn('Transport 정리 중 오류:', error);
+      }
     }
-  }
 
   // 전환 상태 관리 (구독 가능)
   beginTransition(): void {
@@ -243,6 +249,26 @@ export class AudioEngine {
   onTransition(cb: (transitioning: boolean) => void): () => void {
     this.transitionListeners.add(cb);
     return () => this.transitionListeners.delete(cb);
+  }
+
+  private emitVolumeChange(): void {
+    this.volumeListeners.forEach((cb) => {
+      try {
+        cb(this._masterVolume);
+      } catch (error) {
+        console.error('Volume listener error:', error);
+      }
+    });
+  }
+
+  onVolumeChange(cb: (volume: number) => void): () => void {
+    this.volumeListeners.add(cb);
+    try {
+      cb(this._masterVolume);
+    } catch (error) {
+      console.error('Volume listener error (initial):', error);
+    }
+    return () => this.volumeListeners.delete(cb);
   }
 
   // 다른 스텔라로 이동/새 생성 시 오디오 상태 초기화 (강화된 버전)
@@ -293,6 +319,8 @@ export class AudioEngine {
     } catch (error) {
       console.warn('볼륨 복원 중 오류:', error);
     }
+
+    this.emitVolumeChange();
 
     // 초기화 플래그 해제: 다음 재생 시 init 재호출
     this._initialized = false;

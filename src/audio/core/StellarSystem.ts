@@ -1,7 +1,6 @@
 // StellarSystem - 항성계 관리 클래스
 // Star(항성)와 Planet(행성)들을 통합 관리합니다.
 
-import * as Tone from 'tone';
 import type { InstrumentRole, PlanetPhysicalProperties } from '../../types/audio';
 import { Star } from './Star';
 import { Planet, type PlanetSynthConfig } from './Planet';
@@ -239,72 +238,39 @@ export class StellarSystem {
     this.emitPlayState();
   }
 
-  // 다른 스텔라로 이동/새 생성 모드 진입 시 전체 오디오 상태 초기화 (부드러운 페이드아웃 포함) - 강화된 버전
-  async resetForNewSystem(rampSeconds: number = 0.6): Promise<void> {
-    console.log('🌌 StellarSystem 전체 리셋 시작...');
-    
-    // 1. 오디오 엔진 전환 상태로 설정
+
+  // 즉시 초기화(짧은 페이드 적용) - 컴포넌트 언마운트 등에서 사용
+  async resetImmediate(): Promise<void> {
+    console.log('🌌 StellarSystem 즉시 리셋(짧은 페이드) 시작');
     this.audioEngine.beginTransition();
-    
-    // 2. 부드러운 페이드아웃 및 완전한 오디오 정지
-    await this.audioEngine.fadeOutAndStop(rampSeconds);
-    console.log('🌌 페이드아웃 완료');
 
-    // 3. 모든 행성 패턴 정지 (각 행성에서 Star 클락 리스너 제거)
-    this.stopAllPatterns();
-    console.log('🌌 모든 패턴 정지됨');
-    
-    // 4. 모든 행성 완전히 dispose 및 정리
-    const planetCount = this.planets.size;
-    Array.from(this.planets.values()).forEach(planet => {
-      try {
-        // 먼저 패턴을 확실히 정지
-        if (planet.getIsPlaying()) {
-          planet.stopPattern();
-        }
-        // 그 다음 dispose (이중 안전장치)
-        planet.dispose();
-      } catch (error) {
-        console.warn(`행성 ${planet.getName()} dispose 중 오류:`, error);
-      }
-    });
-    this.planets.clear();
-    console.log(`🌌 ${planetCount}개 행성 완전히 정리됨`);
-
-    // 5. Tone.js Transport에서 남은 스케줄들 추가 정리
     try {
-      // 혹시 남아있을 수 있는 모든 Tone.js Loop나 Part들을 정리
-      Tone.Transport.cancel(0); // 다시 한 번 확실히
-      
-      // 약간의 대기 시간 후 다시 한 번 취소 (비동기 스케줄 대응)
-      setTimeout(() => {
+      // 아주 짧은 페이드로 어색함을 줄임
+      try {
+        await this.audioEngine.fadeOutAndStop(1.0);
+      } catch (err) {
+        console.warn('페이드(1s) 중 오류:', err);
+      }
+
+      this.stopAllPatterns();
+      Array.from(this.planets.values()).forEach((planet) => {
         try {
-          Tone.Transport.cancel(0);
-          console.log('🌌 지연된 스케줄 취소 완료');
+          if (planet.getIsPlaying()) {
+            planet.stopPattern();
+          }
+          planet.dispose();
         } catch (error) {
-          console.warn('지연된 스케줄 취소 중 오류:', error);
+          console.warn('행성 dispose 중 오류:', error);
         }
-      }, 100); // 100ms 후 추가 정리
-      
-    } catch (error) {
-      console.warn('추가 스케줄 정리 중 오류:', error);
+      });
+      this.planets.clear();
+
+      this.star.clearAllClockListeners();
+      this.audioEngine.reset();
+    } finally {
+      this.audioEngine.endTransition();
+      console.log('🌌 StellarSystem 즉시 리셋(짧은 페이드) 완료');
     }
-
-    // 5. 항성 클락 시스템 완전히 초기화 (리스너 제거 + 클락 재생성)
-    this.star.clearAllClockListeners();
-    console.log('🌌 항성 클락 시스템 초기화됨');
-
-    // 6. 오디오 엔진 완전히 리셋 (Transport + 이펙트 체인 + 볼륨 복원)
-    this.audioEngine.reset();
-    console.log('🌌 오디오 엔진 리셋됨');
-    
-    // 7. 재생 상태 이벤트 전송 (UI 동기화)
-    this.emitPlayState();
-    
-    // 8. 전환 상태 해제
-    this.audioEngine.endTransition();
-    
-    console.log('🌌 StellarSystem 전체 리셋 완료');
   }
   
   // === 조회 메서드 ===
