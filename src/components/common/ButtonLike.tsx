@@ -3,6 +3,7 @@ import { FaHeart, FaRegHeart } from 'react-icons/fa';
 import { mergeClassNames } from '@/utils/mergeClassNames';
 import { FaHeartCirclePlus } from 'react-icons/fa6';
 import { FaHeartCrack } from 'react-icons/fa6';
+import { useUserStore } from '@/stores/useUserStore';
 
 interface ButtonLikeProps {
   className?: string;
@@ -15,10 +16,17 @@ export default function ButtonLike({
   active,
   onClick,
 }: ButtonLikeProps) {
+  const { isLoggedIn } = useUserStore();
+
   const onClickHandle = (e: React.MouseEvent) => {
     e.stopPropagation();
     onClick?.();
   };
+
+  // 로그인하지 않았을 때는 버튼을 렌더링하지 않음
+  if (!isLoggedIn) {
+    return null;
+  }
 
   return (
     <Button
