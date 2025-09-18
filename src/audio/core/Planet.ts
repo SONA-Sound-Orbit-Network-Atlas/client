@@ -4,6 +4,12 @@ import type {
   PatternParameters,
 } from '../../types/audio';
 import type { Instrument } from '../instruments/InstrumentInterface';
+import {
+  getDefaultSynthType,
+  getDefaultOscillatorType,
+  type SynthTypeId,
+  type OscillatorTypeId,
+} from '../instruments/InstrumentInterface';
 import { BassInstrument } from '../instruments/BassInstrument';
 import { DrumInstrument } from '../instruments/DrumInstrument';
 import { ChordInstrument } from '../instruments/ChordInstrument';
@@ -16,6 +22,11 @@ import {
   initializePropertiesFromConfig
 } from '../utils/parameterConfig';
 
+export type PlanetSynthConfig = {
+  synthType?: SynthTypeId;
+  oscillatorType?: OscillatorTypeId;
+};
+
 export class Planet {
   private id: string;
   private name: string;
@@ -27,12 +38,22 @@ export class Planet {
   private patternParams: PatternParameters | null = null;
   private lastPatternUpdate = 0;
   private properties!: PlanetPhysicalProperties;
+  private synthType: SynthTypeId;
+  private oscillatorType: OscillatorTypeId;
 
-  constructor(role: InstrumentRole, star: Star, customId?: string) {
+  constructor(
+    role: InstrumentRole,
+    star: Star,
+    customId?: string,
+    config?: PlanetSynthConfig
+  ) {
     this.id = customId || `planet-${role}-${Date.now()}`;
     this.name = `${role} Planet`;
     this.role = role;
     this.star = star;
+    const resolvedSynth = config?.synthType ?? getDefaultSynthType(role);
+    this.synthType = resolvedSynth;
+    this.oscillatorType = config?.oscillatorType ?? getDefaultOscillatorType(role, resolvedSynth);
     this.instrument = this.createInstrumentForRole(role);
     this.initializeProperties();
     this.updateInstrument();
@@ -78,10 +99,45 @@ export class Planet {
     
     // 새로운 파라미터 시스템 직접 사용 (레거시 변환 없이)
     try {
-      this.instrument.updateFromPlanet(this.properties);
+      console.log(`🎵 ${this.name} 악기 속성 업데이트:`, this.properties);
+      this.instrument.updateFromPlanet(this.properties, {
+        synthType: this.synthType,
+        oscillatorType: this.oscillatorType,
+      });
     } catch (error) {
       console.error(`❌ ${this.name} 인스트루먼트 업데이트 실패:`, error);
     }
+  }
+
+  public updateSynthSettings(settings: PlanetSynthConfig): void {
+    let changed = false;
+
+    if (settings.synthType && settings.synthType !== this.synthType) {
+      this.synthType = settings.synthType;
+      this.oscillatorType = settings.oscillatorType
+        ? settings.oscillatorType
+        : getDefaultOscillatorType(this.role, this.synthType);
+      changed = true;
+    }
+
+    if (
+      settings.oscillatorType &&
+      settings.oscillatorType !== this.oscillatorType
+    ) {
+      this.oscillatorType = settings.oscillatorType;
+      changed = true;
+    }
+
+    if (changed) {
+      this.updateInstrument();
+    }
+  }
+
+  public getSynthSettings(): Required<PlanetSynthConfig> {
+    return {
+      synthType: this.synthType,
+      oscillatorType: this.oscillatorType,
+    };
   }
 
   async startPattern(): Promise<void> {
@@ -103,15 +159,15 @@ export class Planet {
       accents: generatedPattern.accents,
     };
 
-    this.star.addClockListener(this.id, (beat, bar, sixteenth) => {
-      this.onClockTick(beat, bar, sixteenth);
+    this.star.addClockListener(this.id, (beat, bar, sixteenth, time) => {
+      this.onClockTick(beat, bar, sixteenth, time);
     });
 
     this.star.startClock();
     this.isPlaying = true;
   }
 
-  private onClockTick(_beat: number, bar: number, sixteenth: number): void {
+  private onClockTick(_beat: number, bar: number, sixteenth: number, time: number): void {
     if (!this.isPlaying || !this.currentPattern || this.instrument.isDisposed()) {
       return;
     }
@@ -131,8 +187,7 @@ export class Planet {
         const velocity = this.calculateVelocity(isAccent);
         const duration = this.getNoteDuration();
         const quantizedNote = this.quantizeNote(note);
-
-        this.instrument.triggerAttackRelease(quantizedNote, duration, undefined, velocity);
+        this.instrument.triggerAttackRelease(quantizedNote, duration, time, velocity);
       }
     } catch (error) {
       console.error(`${this.name} 클락 틱 오류:`, error);
@@ -157,20 +212,28 @@ export class Planet {
   }
 
   private calculatePatternParams(): PatternParameters {
+    // 안전한 기본값을 사용해 타입 오류 및 런타임 예외를 방지합니다.
+    const orbitSpeed = this.properties.orbitSpeed ?? 0.5;
+    const inclination = this.properties.inclination ?? 0;
+    const eccentricity = this.properties.eccentricity ?? 0;
+    const distanceFromStar = this.properties.distanceFromStar ?? 10.5;
+    const tilt = this.properties.tilt ?? 0;
+
     return {
-      pulses: Math.floor(2 + this.properties.orbitSpeed * 14),
+      pulses: Math.floor(2 + orbitSpeed * 14),
       steps: 16,
-      rotation: Math.floor((this.properties.inclination + 180) / 360 * 16),
-      swingPct: this.properties.eccentricity * 100,
-      accentDb: this.properties.eccentricity * 2,
-      gateLen: 0.35 + (this.properties.distanceFromStar - 1.0) / (20.0 - 1.0) * 0.5,
-      phase: this.properties.tilt,
-      eccentricity: this.properties.eccentricity * 100,
+      rotation: Math.floor(((inclination + 180) / 360) * 16),
+      swingPct: eccentricity * 100,
+      accentDb: eccentricity * 2,
+      gateLen: 0.35 + ((distanceFromStar - 1.0) / (20.0 - 1.0)) * 0.5,
+      phase: tilt,
+      eccentricity: eccentricity * 100,
     };
   }
 
   private calculateVelocity(isAccent: boolean): number {
-    const accentDb = (this.properties.eccentricity / 0.9) * 2;
+  const ecc = this.properties.eccentricity ?? 0;
+  const accentDb = (ecc / 0.9) * 2;
     const baseVelocity = isAccent ? 0.8 : 0.6;
     const accentBoost = isAccent ? accentDb / 10 : 0;
     return Math.min(1.0, baseVelocity + accentBoost);
@@ -192,7 +255,8 @@ export class Planet {
     };
 
     const baseMidi = baseMidiByRole[this.role];
-    const octaveShift = Math.floor((this.properties.inclination + 180) / 180) - 1;
+  const inclination = this.properties.inclination ?? 0;
+  const octaveShift = Math.floor((inclination + 180) / 180) - 1;
     const center = baseMidi + 12 * octaveShift;
 
     const chordProgression = [[0, 2, 4], [4, 6, 1], [5, 0, 2], [3, 5, 0]];
@@ -212,13 +276,17 @@ export class Planet {
         noteIndex = currentChord[stepIdx % 3];
         rawMidi = center + scaleNotes[noteIndex % scaleNotes.length];
         break;
-      case 'MELODY':
-        noteIndex = this.properties.planetColor % 100 < 70 
+      case 'MELODY': {
+        // 색상과 틸트 기본값 처리
+        const planetColor = this.properties.planetColor ?? 0;
+        const tilt = this.properties.tilt ?? 0;
+        noteIndex = planetColor % 100 < 70 
           ? currentChord[stepIdx % 3]
-          : (stepIdx + Math.floor(this.properties.tilt / 45)) % scaleNotes.length;
+          : (stepIdx + Math.floor(tilt / 45)) % scaleNotes.length;
         rawMidi = center + scaleNotes[noteIndex % scaleNotes.length];
         rawMidi = Math.max(55, Math.min(84, rawMidi));
         break;
+      }
       case 'ARPEGGIO': {
         const arpPattern = [...currentChord, ...currentChord.slice().reverse()];
         noteIndex = arpPattern[stepIdx % arpPattern.length];

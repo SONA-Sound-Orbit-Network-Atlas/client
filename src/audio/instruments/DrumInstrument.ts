@@ -3,14 +3,14 @@
 // SONA 지침: DRUM 역할 - range 미적용(채널 고정), family는 Backbeat/Clave/Dense16/Sparse 우선
 
 import * as Tone from 'tone';
-import type { InstrumentRole, PlanetPhysicalProperties, MappedAudioParameters } from '../../types/audio';
-import { mapPlanetToAudio } from '../utils/mappers';
-import type { Instrument } from './InstrumentInterface';
+import type { MappedAudioParameters } from '../../types/audio';
+import {
+  BaseInstrument,
+  type SimplifiedInstrumentMacros,
+  type ResolvedInstrumentContext,
+} from './InstrumentInterface';
 
-export class DrumInstrument implements Instrument {
-  private id: string;
-  private role: InstrumentRole = 'DRUM';
-  private disposed = false;
+export class DrumInstrument extends BaseInstrument {
   
   // 드럼 전용 신스들 - 각각 다른 드럼 사운드 담당
   private kickSynth!: Tone.MembraneSynth;    // 킥 드럼 - 멤브레인 신스로 깊고 펀치있는 사운드
@@ -23,7 +23,7 @@ export class DrumInstrument implements Instrument {
   private drumEQ!: Tone.EQ3;                 // 드럼 전용 3밴드 EQ
 
   constructor(id: string = 'drum') {
-    this.id = id;
+    super('DRUM', id);
     this.initializeInstrument();
   }
 
@@ -106,18 +106,6 @@ export class DrumInstrument implements Instrument {
     this.tomSynth.chain(this.drumCompressor, this.drumEQ, Tone.Destination);
 
     console.log('🥁 DrumInstrument 초기화 완료:', this.id);
-  }
-
-  // Instrument 인터페이스 구현
-  getId(): string { return this.id; }
-  getRole(): InstrumentRole { return this.role; }
-  isDisposed(): boolean { return this.disposed; }
-
-  updateFromPlanet(props: PlanetPhysicalProperties): void {
-    if (this.disposed) return;
-    
-    const mappedParams = mapPlanetToAudio(this.role, props);
-    this.applyParams(mappedParams);
   }
 
   public triggerAttackRelease(
@@ -258,7 +246,11 @@ export class DrumInstrument implements Instrument {
   }
 
   // SONA 매핑된 파라미터 적용
-  private applyParams(params: MappedAudioParameters): void {
+  protected handleParameterUpdate(
+    params: MappedAudioParameters,
+    _macros: SimplifiedInstrumentMacros,
+    _context: ResolvedInstrumentContext
+  ): void {
     if (this.disposed) return;
 
     // 킥 드럼 파라미터 조절
@@ -308,6 +300,12 @@ export class DrumInstrument implements Instrument {
     }
   }
 
+  protected applyOscillatorType(type: Tone.ToneOscillatorType): void {
+    if (this.disposed) return;
+    this.kickSynth?.set({ oscillator: { type } } as any);
+    this.tomSynth?.set({ oscillator: { type } } as any);
+  }
+
   public dispose(): void {
     if (this.disposed) return;
     
@@ -319,7 +317,7 @@ export class DrumInstrument implements Instrument {
     this.drumCompressor?.dispose();
     this.drumEQ?.dispose();
     
-    this.disposed = true;
+    super.dispose();
     console.log(`🗑️ DrumInstrument ${this.id} disposed`);
   }
 }

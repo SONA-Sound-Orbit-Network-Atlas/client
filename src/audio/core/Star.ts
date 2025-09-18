@@ -29,7 +29,7 @@ export class Star {
   
   // === 중앙 클락 시스템 ===
   private globalClock: Tone.Loop | null = null;
-  private clockListeners: Map<string, (beat: number, bar: number, sixteenth: number) => void> = new Map();
+  private clockListeners: Map<string, (beat: number, bar: number, sixteenth: number, time: number) => void> = new Map();
   private currentBeat = 0;       // 현재 박자 (1박 = quarter note)
   private currentBar = 0;        // 현재 마디 
   private currentSixteenth = 0;  // 현재 16분음표 (0-15)
@@ -73,7 +73,7 @@ export class Star {
   
   // 클락 초기화 (16분음표 기준으로 정확한 타이밍 제공)
   private initializeClock(): void {
-    this.globalClock = new Tone.Loop(() => {
+    this.globalClock = new Tone.Loop((time) => {
       // 16분음표마다 호출됨 (가장 세밀한 타이밍 단위)
       this.currentSixteenth = (this.currentSixteenth + 1) % 16;
       
@@ -90,7 +90,7 @@ export class Star {
       // 등록된 모든 리스너에게 클락 이벤트 전송
       this.clockListeners.forEach((callback) => {
         try {
-          callback(this.currentBeat, this.currentBar, this.currentSixteenth);
+          callback(this.currentBeat, this.currentBar, this.currentSixteenth, time);
         } catch (error) {
           console.error('🕐 클락 리스너 오류:', error);
         }
@@ -137,7 +137,7 @@ export class Star {
   }
   
   // 클락 리스너 등록 (Planet에서 사용)
-  addClockListener(id: string, callback: (beat: number, bar: number, sixteenth: number) => void): void {
+  addClockListener(id: string, callback: (beat: number, bar: number, sixteenth: number, time: number) => void): void {
     this.clockListeners.set(id, callback);
     console.log(`🕐 클락 리스너 등록: ${id} (총 ${this.clockListeners.size}개)`);
   }

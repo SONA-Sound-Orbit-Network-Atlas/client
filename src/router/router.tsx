@@ -5,7 +5,6 @@ import PanelComponent from '@/pages/componentstest/Panel';
 import NotFoundPage from '@/pages/NotFoundPage';
 import ComponentTestPage from '@/pages/componentstest/Index';
 import CommonComponent from '@/pages/componentstest/Common';
-import AudioTestPage from '@/pages/AudioTestPage';
 
 const router = createBrowserRouter([
   {
@@ -33,14 +32,6 @@ const router = createBrowserRouter([
         element: <PanelComponent />,
       },
     ],
-  },
-  {
-    path: '/audio-test',
-    element: <AudioTestPage />,
-  },
-  {
-    path: '/audio-test',
-    element: <AudioTestPage />,
   },
   {
     path: '*',

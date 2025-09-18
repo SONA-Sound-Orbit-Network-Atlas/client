@@ -1,10 +1,13 @@
 // SONA 오디오 시스템 전용 타입 정의
 // 행성 속성 관련은 planetProperties.ts에서 가져와 사용
 
-import type { InstrumentRole } from './planetProperties';
+import type { InstrumentRole, PlanetProperties } from './planetProperties';
 
 // 악기 역할 재내보내기 (하위 호환성)
 export type { InstrumentRole };
+
+// 행성 물리 속성 타입 별칭 (오디오 코어에서 사용하는 명칭과 통일)
+export type PlanetPhysicalProperties = Required<PlanetProperties>;
 
 // 전역 스케일/키 정의 (항성에서 관리)
 export type ScaleName = 'Major' | 'Minor' | 'Dorian' | 'Mixolydian' | 'Lydian' | 'Phrygian' | 'Locrian';
@@ -29,7 +32,7 @@ export interface PatternParameters {
 // 매핑된 저수준 오디오 파라미터 묶음 - 오디오 시스템 전용
 export interface MappedAudioParameters {
   // 오실레이터 타입
-  oscType: number;        // 0-7 (오실레이터 타입: sine, saw, square, etc.)
+  oscType: string;        // 오실레이터 타입 식별자
   harmonicity: number;    // 0.5-4.0 (FM/AM 하모니시티)
   
   // Color → 음색

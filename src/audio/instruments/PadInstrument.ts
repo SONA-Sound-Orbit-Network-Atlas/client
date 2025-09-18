@@ -3,14 +3,15 @@
 // SONA 지침: PAD 역할 - pulses 2..6, gate 0.70..0.95, reverb_size 0.4..0.9
 
 import * as Tone from 'tone';
-import type { InstrumentRole, PlanetPhysicalProperties, MappedAudioParameters } from '../../types/audio';
-import { mapPlanetToAudio } from '../utils/mappers';
-import type { Instrument } from './InstrumentInterface';
+import type { MappedAudioParameters } from '../../types/audio';
+import {
+  BaseInstrument,
+  type SimplifiedInstrumentMacros,
+  type ResolvedInstrumentContext,
+} from './InstrumentInterface';
+import { AudioEngine } from '../core/AudioEngine';
 
-export class PadInstrument implements Instrument {
-  private id: string;
-  private role: InstrumentRole = 'PAD';
-  private disposed = false;
+export class PadInstrument extends BaseInstrument {
   
   // 패드 전용 신스와 이펙트 체인
   private padSynth!: Tone.PolySynth;         // 메인 패드 신스 (PolySynth - 화음 연주 가능)
@@ -19,9 +20,13 @@ export class PadInstrument implements Instrument {
   private padChorus!: Tone.Chorus;           // 풍부함을 위한 코러스
   private padDelay!: Tone.FeedbackDelay;     // 추가 공간감을 위한 딜레이
   private compressor!: Tone.Compressor;      // 부드러운 다이나믹스를 위한 컴프레서
+  private panner!: Tone.Panner;              // 팬
+  private stereo!: Tone.StereoWidener;       // 스테레오 폭
+  private sendRev!: Tone.Gain;               // 리버브 센드
+  private sendDly!: Tone.Gain;               // 딜레이 센드
 
   constructor(id: string = 'pad') {
-    this.id = id;
+    super('PAD', id);
     this.initializeInstrument();
   }
 
@@ -78,35 +83,39 @@ export class PadInstrument implements Instrument {
       release: 0.5                // 적당한 릴리즈
     });
 
+    // 추가 유틸 노드 및 버스 연결
+    this.panner = new Tone.Panner(0);
+    this.stereo = new Tone.StereoWidener(0.6);
+    this.sendRev = new Tone.Gain(0);
+    this.sendDly = new Tone.Gain(0);
+
+    const fx = AudioEngine.instance.getEffectNodes();
+    this.sendRev.connect(fx.reverb!);
+    this.sendDly.connect(fx.delay!);
+
     // 리버브 초기화 대기 (비동기 처리)
     await this.padReverb.generate();
 
-    // 신호 체인 연결: padSynth → compressor → padFilter → padChorus → padDelay → padReverb → destination
+    // 신호 체인 연결: padSynth → compressor → padFilter → padChorus → padDelay → padReverb → panner → stereo → destination
     this.padSynth.chain(
       this.compressor,
       this.padFilter,
       this.padChorus,
       this.padDelay,
       this.padReverb,
+      this.panner,
+      this.stereo,
       Tone.Destination
     );
+
+    // 센드 분기
+    this.padReverb.connect(this.sendRev);
+    this.padDelay.connect(this.sendDly);
 
     // 코러스 시작
     this.padChorus.start();
 
     console.log('🌌 PadInstrument 초기화 완료:', this.id);
-  }
-
-  // Instrument 인터페이스 구현
-  getId(): string { return this.id; }
-  getRole(): InstrumentRole { return this.role; }
-  isDisposed(): boolean { return this.disposed; }
-
-  updateFromPlanet(props: PlanetPhysicalProperties): void {
-    if (this.disposed) return;
-    
-    const mappedParams = mapPlanetToAudio(this.role, props);
-    this.applyParams(mappedParams);
   }
 
   public triggerAttackRelease(
@@ -214,7 +223,11 @@ export class PadInstrument implements Instrument {
   }
 
   // SONA 매핑된 파라미터 적용 (안전한 null 처리)
-  private applyParams(params: MappedAudioParameters): void {
+  protected handleParameterUpdate(
+    params: MappedAudioParameters,
+    _macros: SimplifiedInstrumentMacros,
+    _context: ResolvedInstrumentContext
+  ): void {
     if (this.disposed) return;
 
     // 필터 컷오프 조절 - 패드는 부드러운 고음역 사용
@@ -272,6 +285,17 @@ export class PadInstrument implements Instrument {
       const volume = -12 + (params.outGainDb * 0.4);
       this.padSynth.volume.rampTo(Math.max(-20, Math.min(-4, volume)), 0.08);
     }
+
+    // 팬/스테레오/버스 센드
+    if (this.panner) this.panner.pan.rampTo(params.pan ?? 0, 0.08);
+    if (this.stereo) this.stereo.width.rampTo(Math.max(0, Math.min(1, params.stereoWidth ?? 0.7)), 0.1);
+    if (this.sendRev) this.sendRev.gain.rampTo(Math.max(0, Math.min(0.9, params.reverbSend ?? 0.3)), 0.12);
+    if (this.sendDly) this.sendDly.gain.rampTo(Math.max(0, Math.min(0.9, (params.delayFeedback ?? 0.3) * 0.8)), 0.12);
+  }
+
+  protected applyOscillatorType(type: Tone.ToneOscillatorType): void {
+    if (this.disposed) return;
+    this.padSynth?.set({ oscillator: { type } } as any);
   }
 
   public dispose(): void {
@@ -285,7 +309,7 @@ export class PadInstrument implements Instrument {
     this.padDelay?.dispose();
     this.compressor?.dispose();
     
-    this.disposed = true;
+    super.dispose();
     console.log(`🗑️ PadInstrument ${this.id} disposed`);
   }
 }

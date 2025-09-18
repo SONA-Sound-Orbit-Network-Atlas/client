@@ -3,14 +3,17 @@
 // SONA 지침: ARPEGGIO 역할 - pulses 6..16, rotation 2의 배수 스냅, trem_hz ≤ 6
 
 import * as Tone from 'tone';
-import type { InstrumentRole, PlanetPhysicalProperties, MappedAudioParameters } from '../../types/audio';
-import { mapPlanetToAudio } from '../utils/mappers';
-import type { Instrument } from './InstrumentInterface';
+import type { MappedAudioParameters } from '../../types/audio';
+import {
+  BaseInstrument,
+  type SimplifiedInstrumentMacros,
+  type ResolvedInstrumentContext,
+} from './InstrumentInterface';
 
-export class ArpeggioInstrument implements Instrument {
-  private id: string;
-  private role: InstrumentRole = 'ARPEGGIO';
-  private disposed = false;
+export class ArpeggioInstrument extends BaseInstrument {
+  // Tone.js는 같은 oscillator에 대해 start 시간이 반드시 이전 start보다 커야 함
+  // 루프 타이밍/재시작 경계에서 동일 시각이 들어오는 것을 방지하기 위한 가드
+  private lastTriggerTimeSec = 0;
   
   // 아르페지오 전용 신스와 이펙트 체인
   private arpSynth!: Tone.MonoSynth;         // 메인 아르페지오 신스 (MonoSynth - 빠른 단음 연주)
@@ -21,7 +24,7 @@ export class ArpeggioInstrument implements Instrument {
   private eq!: Tone.EQ3;                     // 3밴드 EQ로 톤 조절
 
   constructor(id: string = 'arpeggio') {
-    this.id = id;
+    super('ARPEGGIO', id);
     this.initializeInstrument();
   }
 
@@ -101,18 +104,6 @@ export class ArpeggioInstrument implements Instrument {
     console.log('🎹 ArpeggioInstrument 초기화 완료:', this.id);
   }
 
-  // Instrument 인터페이스 구현
-  getId(): string { return this.id; }
-  getRole(): InstrumentRole { return this.role; }
-  isDisposed(): boolean { return this.disposed; }
-
-  updateFromPlanet(props: PlanetPhysicalProperties): void {
-    if (this.disposed) return;
-    
-    const mappedParams = mapPlanetToAudio(this.role, props);
-    this.applyParams(mappedParams);
-  }
-
   public triggerAttackRelease(
     notes: string | string[], 
     duration: string | number, 
@@ -124,14 +115,20 @@ export class ArpeggioInstrument implements Instrument {
       return;
     }
 
-    const currentTime = time || Tone.now();
+    // 안전한 시간 보정: 동일/과거 시간 예약을 피하기 위해 아주 작은 epsilon 추가
+    const baseTime = (typeof time === 'number') ? time : Tone.now();
+    const epsilon = 1e-4; // 0.1ms
+    const safeTime = baseTime <= this.lastTriggerTimeSec
+      ? this.lastTriggerTimeSec + epsilon
+      : baseTime;
+    this.lastTriggerTimeSec = safeTime;
     const vel = velocity || 0.6; // 아르페지오는 적당한 벨로시티
     
     // 아르페지오는 단음 연주 (마지막 노트만 사용)
     const note = Array.isArray(notes) ? notes[notes.length - 1] : notes;
     
     try {
-      this.arpSynth.triggerAttackRelease(note, duration, currentTime, vel);
+      this.arpSynth.triggerAttackRelease(note, duration, safeTime, vel);
     } catch (error) {
       console.error('ArpeggioInstrument triggerAttackRelease 오류:', error);
     }
@@ -238,7 +235,11 @@ export class ArpeggioInstrument implements Instrument {
   }
 
   // SONA 매핑된 파라미터 적용 (안전한 null 처리)
-  private applyParams(params: MappedAudioParameters): void {
+  protected handleParameterUpdate(
+    params: MappedAudioParameters,
+    _macros: SimplifiedInstrumentMacros,
+    _context: ResolvedInstrumentContext
+  ): void {
     if (this.disposed) return;
 
     // 필터 컷오프 조절 - 아르페지오는 밝은 톤 유지
@@ -310,6 +311,11 @@ export class ArpeggioInstrument implements Instrument {
     // SONA 지침: ARPEGGIO pulses 6..16, rotation 2의 배수 스냅 적용 (패턴 생성 시)
   }
 
+  protected applyOscillatorType(type: Tone.ToneOscillatorType): void {
+    if (this.disposed) return;
+    this.arpSynth?.set({ oscillator: { type } } as any);
+  }
+
   public dispose(): void {
     if (this.disposed) return;
     
@@ -321,7 +327,7 @@ export class ArpeggioInstrument implements Instrument {
     this.compressor?.dispose();
     this.eq?.dispose();
     
-    this.disposed = true;
+    super.dispose();
     console.log(`🗑️ ArpeggioInstrument ${this.id} disposed`);
   }
 }

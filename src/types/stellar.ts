@@ -8,6 +8,10 @@ import type {
   UIProperty,
 } from './planetProperties';
 import type { StarProperties } from './starProperties';
+import type {
+  SynthTypeId,
+  OscillatorTypeId,
+} from '@/audio/instruments/InstrumentInterface';
 
 // 백엔드 호환을 위한 재내보내기
 export type {
@@ -71,6 +75,8 @@ export interface Planet {
   name: string; // 행성 이름
   role: InstrumentRole; // 악기 역할
   properties: PlanetProperties; // 개별 악기 속성
+  synthType?: SynthTypeId;
+  oscillatorType?: OscillatorTypeId;
   created_at?: string;
   updated_at?: string;
 }

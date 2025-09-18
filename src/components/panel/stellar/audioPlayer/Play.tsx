@@ -12,8 +12,9 @@ export default function Play({ className, onClick }: PlayButtonProps) {
   const [isPlaying, setIsPlaying] = useState(false);
 
   const handleClick = () => {
-    setIsPlaying(!isPlaying);
-    onClick?.(isPlaying);
+    const next = !isPlaying;
+    setIsPlaying(next);
+    onClick?.(next);
   };
 
   return (
