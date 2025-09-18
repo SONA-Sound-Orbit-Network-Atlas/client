@@ -1,5 +1,5 @@
 // hooks/api/useLikes.ts
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import {
   useMutation,
   useQuery,
@@ -202,6 +202,11 @@ export function useLikeToggle(system_id: string, initialLiked: boolean) {
   const [likeStatus, setLikeStatus] = useState<boolean>(initialLiked);
   const { mutate: createLike } = useCreateLike();
   const { mutate: deleteLike } = useDeleteLike();
+
+  // initialLiked prop이 변경될 때 likeStatus 상태를 동기화
+  useEffect(() => {
+    setLikeStatus(initialLiked);
+  }, [initialLiked]);
 
   const toggleLike = useCallback(() => {
     if (!isLoggedIn) {
