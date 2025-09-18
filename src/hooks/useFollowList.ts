@@ -33,10 +33,10 @@ export function useFollowList<T extends FollowUser>(
     (string | number | undefined)[],
     number
   >({
-    queryKey: [type, options.userId, options.limit],
+    queryKey: [type, options.targetId, options.limit],
     queryFn: ({ pageParam = 1 }) => {
       const params = {
-        userId: options.userId,
+        targetId: options.targetId,
         page: pageParam as number,
         limit: options.limit || 20,
       };
@@ -64,7 +64,7 @@ export function useFollowList<T extends FollowUser>(
 
       return hasMorePages ? currentPage + 1 : undefined;
     },
-    enabled: !!options.userId,
+    enabled: !!options.targetId,
     staleTime: 2 * 60 * 1000, // 2분간 캐시 유지
     gcTime: 5 * 60 * 1000, // 5분간 가비지 컬렉션 방지
     retry: (failureCount, error) => {

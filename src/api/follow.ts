@@ -28,10 +28,10 @@ export const followAPI = {
   getFollowers: async (
     params: GetFollowersParams
   ): Promise<FollowersResponse> => {
-    const { userId, page = 1, limit = 20 } = params;
+    const { targetId, page = 1, limit = 20 } = params;
 
     const response = await axiosInstance.get<FollowersResponse>(
-      endpoints.follows.followers(userId),
+      endpoints.follows.followers(targetId),
       {
         params: {
           page,
@@ -47,10 +47,10 @@ export const followAPI = {
   getFollowings: async (
     params: GetFollowingsParams
   ): Promise<FollowingsResponse> => {
-    const { userId, page = 1, limit = 20 } = params;
+    const { targetId, page = 1, limit = 20 } = params;
 
     const response = await axiosInstance.get<FollowingsResponse>(
-      endpoints.follows.followings(userId),
+      endpoints.follows.followings(targetId),
       {
         params: {
           page,

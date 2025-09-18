@@ -43,7 +43,7 @@ export default function FollowListPanel({
     loadMore,
     totalCount,
   } = useFollowList<FollowerUser | FollowingUser>(type, {
-    userId: targetUserId || '',
+    targetId: targetUserId || '',
     limit: 20,
   });
 
