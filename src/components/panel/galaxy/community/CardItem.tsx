@@ -3,9 +3,9 @@ import Card from '@/components/common/Card/Card';
 import { IoPlanetOutline } from 'react-icons/io5';
 import { FaRegHeart } from 'react-icons/fa';
 import type { StellarListItem } from '@/types/stellarList';
-import { likeUtils } from '@/utils/likeUtils';
 import { useLikeToggle } from '@/hooks/api/useLikes';
 import { formatDateToYMD } from '@/utils/formatDateToYMD';
+import { useUserStore } from '@/stores/useUserStore';
 
 interface CardItemProps extends StellarListItem {
   onClick: () => void;
@@ -22,6 +22,7 @@ export default function CardItem({
   is_liked,
   onClick,
 }: CardItemProps) {
+  const { isLoggedIn } = useUserStore();
   // 통합된 좋아요 훅 사용 - 중복 로직 제거
   const { likeStatus, toggleLike } = useLikeToggle(id, is_liked);
 
@@ -55,11 +56,13 @@ export default function CardItem({
           </div>
         </div>
 
-        <ButtonLike
-          className="flex-shrink-0 ml-3"
-          active={likeUtils.toBoolean(likeStatus)}
-          onClick={toggleLike}
-        />
+        {isLoggedIn && (
+          <ButtonLike
+            className="flex-shrink-0 ml-3"
+            active={likeStatus}
+            onClick={toggleLike}
+          />
+        )}
       </div>
 
       <div className="mt-3 flex gap-4">
