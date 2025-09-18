@@ -1,5 +1,4 @@
 import { FiUser, FiUserCheck } from 'react-icons/fi';
-import { IoPlanetOutline } from 'react-icons/io5';
 import { useProfileStore } from '@/stores/useProfileStore';
 import { navigateBack } from '@/utils/profileNavigation';
 import { useGetUserProfile } from '@/hooks/api/useUser';
@@ -7,7 +6,6 @@ import { useGetFollowCount } from '@/hooks/api/useFollow';
 import ProfileStateWrapper from './ProfileStateWrapper';
 import PanelHeader from '../PanelHeader';
 import Iconframe from '@/components/common/Iconframe';
-import Card from '@/components/common/Card/Card';
 import StatCard from '@/components/common/Card/StatCard';
 import { ScrollArea } from '@/components/common/Scrollarea';
 
@@ -18,7 +16,7 @@ interface OtherUserProfileViewProps {
 export default function OtherUserProfileView({
   userId,
 }: OtherUserProfileViewProps) {
-  const { setProfilePanelMode } = useProfileStore();
+  const { setProfilePanelMode, pushNavigationHistory } = useProfileStore();
 
   // 다른 유저의 프로필 데이터 조회
   const {
@@ -39,14 +37,12 @@ export default function OtherUserProfileView({
 
   const handleFollowersClick = () => {
     // 현재 상태를 히스토리에 저장
-    const { pushNavigationHistory } = useProfileStore.getState();
     pushNavigationHistory();
     setProfilePanelMode('otherUserFollowers');
   };
 
   const handleFollowingsClick = () => {
     // 현재 상태를 히스토리에 저장
-    const { pushNavigationHistory } = useProfileStore.getState();
     pushNavigationHistory();
     setProfilePanelMode('otherUserFollowings');
   };
