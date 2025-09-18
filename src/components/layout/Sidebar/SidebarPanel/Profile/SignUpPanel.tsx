@@ -9,6 +9,7 @@ import TextInput from '@/components/common/TextInput';
 import Button from '@/components/common/Button';
 import TextField from '@/components/common/TextField';
 import ErrorMessage from '@/components/common/ErrorMessage';
+import { ScrollArea } from '@/components/common/Scrollarea';
 import PanelHeader from '../PanelHeader';
 import type { SignupData } from '@/types/auth';
 
@@ -79,124 +80,128 @@ export default function SignUpPanel() {
         showBackButton={true}
         onBack={() => setProfilePanelMode('login')}
       />
-      <div className="text-center p-4">
-        <div className="flex flex-col items-center mb-[24px]">
-          <Iconframe color="secondary" size="medium" className="mb-[16px]">
-            <FiUserPlus />
-          </Iconframe>
-          <h3 className="text-white font-semibold text-base">JOIN SONA</h3>
-          <p className="text-text-muted text-sm">
-            CREATE YOUR ACCOUNT TO
-            <br />
-            START COMPOSING
-          </p>
-        </div>
-
-        {/* 에러 메시지 표시 */}
-        {errorMessage && (
-          <ErrorMessage
-            message={errorMessage}
-            onClose={() => setErrorMessage('')}
-          />
-        )}
-
-        <form onSubmit={handleSubmit}>
-          <div className="flex flex-col mt-[24px] text-left gap-[16px]">
-            <TextField label="Username" htmlFor="signup-username">
-              <TextInput
-                type="text"
-                placeholder="Enter your username"
-                id="signup-username"
-                value={formData.username}
-                onChange={(e) =>
-                  handleFormInputChange('username', e.target.value)
-                }
-                className={errors.username ? 'border-error' : ''}
-              />
-              {errors.username && (
-                <p className="text-error text-xs mt-1">{errors.username}</p>
-              )}
-            </TextField>
-
-            <TextField label="Email" htmlFor="signup-email">
-              <TextInput
-                type="email"
-                placeholder="Enter your email"
-                id="signup-email"
-                value={formData.email}
-                onChange={(e) => handleFormInputChange('email', e.target.value)}
-                className={errors.email ? 'border-error' : ''}
-              />
-              {errors.email && (
-                <p className="text-error text-xs mt-1">{errors.email}</p>
-              )}
-            </TextField>
-
-            <TextField label="Password" htmlFor="signup-password">
-              <TextInput
-                type="password"
-                placeholder="Enter your password"
-                id="signup-password"
-                value={formData.password}
-                onChange={(e) =>
-                  handleFormInputChange('password', e.target.value)
-                }
-                className={errors.password ? 'border-error' : ''}
-              />
-              {errors.password && (
-                <p className="text-error text-xs mt-1">{errors.password}</p>
-              )}
-            </TextField>
-
-            <TextField
-              label="Confirm Password"
-              htmlFor="signup-confirm-password"
-            >
-              <TextInput
-                type="password"
-                placeholder="Confirm your password"
-                id="signup-confirm-password"
-                value={formData.confirmPassword}
-                onChange={(e) =>
-                  handleFormInputChange('confirmPassword', e.target.value)
-                }
-                className={errors.confirmPassword ? 'border-error' : ''}
-              />
-              {errors.confirmPassword && (
-                <p className="text-error text-xs mt-1">
-                  {errors.confirmPassword}
-                </p>
-              )}
-            </TextField>
+      <ScrollArea className="h-full">
+        <div className="text-center p-4">
+          <div className="flex flex-col items-center mb-[24px]">
+            <Iconframe color="secondary" size="medium" className="mb-[16px]">
+              <FiUserPlus />
+            </Iconframe>
+            <h3 className="text-white font-semibold text-base">JOIN SONA</h3>
+            <p className="text-text-muted text-sm">
+              CREATE YOUR ACCOUNT TO
+              <br />
+              START COMPOSING
+            </p>
           </div>
 
-          <Button
-            type="submit"
-            color="primary"
-            size="lg"
-            className="w-full mt-[24px]"
-            disabled={signupMutation.isPending}
-          >
-            {signupMutation.isPending ? 'CREATING...' : 'CREATE ACCOUNT'}
-          </Button>
-        </form>
+          {/* 에러 메시지 표시 */}
+          {errorMessage && (
+            <ErrorMessage
+              message={errorMessage}
+              onClose={() => setErrorMessage('')}
+            />
+          )}
 
-        <div className="flex flex-col items-center border-t border-gray-border pt-[24px] mt-[24px]">
-          <p className="text-text-muted text-xs mb-[8px]">
-            ALREADY HAVE AN ACCOUNT?
-          </p>
-          <a
-            href="#"
-            onClick={(e) => {
-              e.preventDefault();
-              setProfilePanelMode('login');
-            }}
-            className="text-secondary-300 text-sm font-semibold hover:text-secondary-200 transition-colors cursor-pointer"
-          >
-            SIGN IN
-          </a>
+          <form onSubmit={handleSubmit}>
+            <div className="flex flex-col mt-[24px] text-left gap-[16px]">
+              <TextField label="Username" htmlFor="signup-username">
+                <TextInput
+                  type="text"
+                  placeholder="Enter your username"
+                  id="signup-username"
+                  value={formData.username}
+                  onChange={(e) =>
+                    handleFormInputChange('username', e.target.value)
+                  }
+                  className={errors.username ? 'border-error' : ''}
+                />
+                {errors.username && (
+                  <p className="text-error text-xs mt-1">{errors.username}</p>
+                )}
+              </TextField>
+
+              <TextField label="Email" htmlFor="signup-email">
+                <TextInput
+                  type="email"
+                  placeholder="Enter your email"
+                  id="signup-email"
+                  value={formData.email}
+                  onChange={(e) =>
+                    handleFormInputChange('email', e.target.value)
+                  }
+                  className={errors.email ? 'border-error' : ''}
+                />
+                {errors.email && (
+                  <p className="text-error text-xs mt-1">{errors.email}</p>
+                )}
+              </TextField>
+
+              <TextField label="Password" htmlFor="signup-password">
+                <TextInput
+                  type="password"
+                  placeholder="Enter your password"
+                  id="signup-password"
+                  value={formData.password}
+                  onChange={(e) =>
+                    handleFormInputChange('password', e.target.value)
+                  }
+                  className={errors.password ? 'border-error' : ''}
+                />
+                {errors.password && (
+                  <p className="text-error text-xs mt-1">{errors.password}</p>
+                )}
+              </TextField>
+
+              <TextField
+                label="Confirm Password"
+                htmlFor="signup-confirm-password"
+              >
+                <TextInput
+                  type="password"
+                  placeholder="Confirm your password"
+                  id="signup-confirm-password"
+                  value={formData.confirmPassword}
+                  onChange={(e) =>
+                    handleFormInputChange('confirmPassword', e.target.value)
+                  }
+                  className={errors.confirmPassword ? 'border-error' : ''}
+                />
+                {errors.confirmPassword && (
+                  <p className="text-error text-xs mt-1">
+                    {errors.confirmPassword}
+                  </p>
+                )}
+              </TextField>
+            </div>
+
+            <Button
+              type="submit"
+              color="primary"
+              size="lg"
+              className="w-full mt-[24px]"
+              disabled={signupMutation.isPending}
+            >
+              {signupMutation.isPending ? 'CREATING...' : 'CREATE ACCOUNT'}
+            </Button>
+          </form>
+
+          <div className="flex flex-col items-center border-t border-gray-border pt-[24px] mt-[24px]">
+            <p className="text-text-muted text-xs mb-[8px]">
+              ALREADY HAVE AN ACCOUNT?
+            </p>
+            <a
+              href="#"
+              onClick={(e) => {
+                e.preventDefault();
+                setProfilePanelMode('login');
+              }}
+              className="text-secondary-300 text-sm font-semibold hover:text-secondary-200 transition-colors cursor-pointer"
+            >
+              SIGN IN
+            </a>
+          </div>
         </div>
-      </div>
+      </ScrollArea>
     </>
   );
 }
