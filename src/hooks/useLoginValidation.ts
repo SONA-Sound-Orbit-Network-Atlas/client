@@ -1,9 +1,5 @@
 import { useState, useCallback } from 'react';
-import {
-  validateLoginForm,
-  validateLoginField,
-  type LoginFormData,
-} from '@/utils/validation';
+import { validateLoginForm, type LoginFormData } from '@/utils/validation';
 
 export interface UseLoginValidationReturn {
   errors: Record<string, string>;
@@ -33,7 +29,7 @@ export const useLoginValidation = (): UseLoginValidationReturn => {
    * 입력 변경 시 에러 제거만 수행 (실시간 검증 제거)
    */
   const handleInputChange = useCallback(
-    (field: keyof LoginFormData, value: string) => {
+    (field: keyof LoginFormData, _value: string) => {
       // 입력 시 해당 필드 에러만 제거 (실시간 검증 없음)
       if (errors[field]) {
         setErrors((prev) => ({ ...prev, [field]: '' }));
