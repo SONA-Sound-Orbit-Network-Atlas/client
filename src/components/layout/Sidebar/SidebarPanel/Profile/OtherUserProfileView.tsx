@@ -101,20 +101,6 @@ export default function OtherUserProfileView({
               <p className="text-tertiary-200 text-sm font-semibold mb-[16px]">
                 STATISTICS
               </p>
-              <div className="mb-[24px]">
-                <p className="text-text-muted text-sm mb-[16px]">
-                  STELLAR SYSTEMS
-                </p>
-                <Card>
-                  <div className="flex items-center justify-center gap-2 mb-[16px]">
-                    <IoPlanetOutline className="text-tertiary-300 text-lg" />
-                    <p className="text-text-muted text-sm">CREATED</p>
-                  </div>
-                  <p className="text-white text-center text-[24px] font-semibold">
-                    3
-                  </p>
-                </Card>
-              </div>
               {/* 다른 유저 프로필에서는 Likes 섹션을 숨김 */}
               <div className="mb-[24px]">
                 <p className="text-text-muted text-sm mb-[16px]">SOCIALS</p>
@@ -135,6 +121,11 @@ export default function OtherUserProfileView({
                   />
                 </div>
               </div>
+              {/* <div className="mb-[24px]">
+                <p className="text-text-muted text-sm mb-[16px]">
+                  USER STELLAR SYSTEMS
+                </p>
+              </div> */}
             </div>
           </div>
         </ScrollArea>
