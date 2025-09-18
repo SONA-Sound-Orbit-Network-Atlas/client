@@ -4,7 +4,6 @@ import { useCreateStellar, useUpdateStellar } from '@/hooks/api/useStellar';
 import { useSelectedStellarStore } from '@/stores/useSelectedStellarStore';
 import { useStellarStore } from '@/stores/useStellarStore';
 import { useUserStore } from '@/stores/useUserStore';
-import { useSidebarStore } from '@/stores/useSidebarStore';
 import { useState } from 'react';
 
 export default function SaveButton() {
@@ -17,7 +16,6 @@ export default function SaveButton() {
   const { mode } = useSelectedStellarStore();
   const { stellarStore } = useStellarStore();
   const { userStore, isLoggedIn } = useUserStore();
-  const { openSecondarySidebar } = useSidebarStore();
 
   // save 버튼 동작 기준
   const onSaveHandler = () => {
@@ -25,9 +23,14 @@ export default function SaveButton() {
     console.log('stellarStore', stellarStore);
 
     if (!isLoggedIn) {
-      alert('login is required.');
-      return;
+      return alert('login is required.');
     }
+
+    // stellarStore의 planets 배열 length가 0일 때 return
+    if (stellarStore.planets.length === 0) {
+      return alert('planets are required.');
+    }
+
     // 1. (생성) create 모드
     // 완료 시 => selectedStellarStore 초기화 & stellarStore 초기화 & 갤럭시 패널 이동
     if (mode === 'create') {
@@ -46,7 +49,7 @@ export default function SaveButton() {
         { stellarId: stellarStore.id, stellarData: stellarStore },
         {
           onSuccess: () => {
-            openSecondarySidebar('galaxy');
+            setSaveConfirm(false);
           },
           onError: () => {
             alert('UPDATE failed');

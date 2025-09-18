@@ -24,7 +24,7 @@ export default function CardItem({
 }: CardItemProps) {
   const { isLoggedIn } = useUserStore();
   // 통합된 좋아요 훅 사용 - 중복 로직 제거
-  const { likeStatus, toggleLike } = useLikeToggle(id, is_liked);
+  const { likeStatus, toggleLike, isPending } = useLikeToggle(id, is_liked);
 
   return (
     <Card onClick={onClick} role="button">
@@ -61,6 +61,7 @@ export default function CardItem({
             className="flex-shrink-0 ml-3"
             active={likeStatus}
             onClick={toggleLike}
+            isPending={isPending}
           />
         )}
       </div>
