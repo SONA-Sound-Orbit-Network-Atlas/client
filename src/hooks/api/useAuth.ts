@@ -34,7 +34,8 @@ export function useLogin(data: LoginData) {
       });
       setIsLoggedIn(true);
 
-      console.log('로그인 성공:', { user, token: access_token });
+      // 사용자 정보를 localStorage에도 저장 (새로고침 시 복원용)
+      localStorage.setItem('userInfo', JSON.stringify(user));
     },
     onError: (error: AxiosError) => {
       console.error('로그인 실패:', error);
@@ -61,29 +62,23 @@ export function useLogout() {
     mutationKey: ['auth', 'logout'],
     mutationFn: () => authAPI.logout(),
     onSuccess: async () => {
-      // localStorage에서 accessToken 제거
+      // localStorage에서 accessToken과 userInfo 제거
       localStorage.removeItem('accessToken');
+      localStorage.removeItem('userInfo');
 
       queryClient.setQueryData(['session'], null); // 즉시 비로그인으로 반영
       await queryClient.invalidateQueries({ queryKey: ['galaxyMyList'] });
       setIsLoggedIn(false);
-      console.log('로그아웃 성공');
     },
     onError: async (error: AxiosError) => {
       console.warn('로그아웃 API 호출 실패:', error);
 
-      // 401 에러이거나 토큰이 만료된 경우에도 로컬 상태를 정리
-      if (error.response?.status === 401) {
-        console.log('토큰이 만료된 상태에서 로그아웃 - 로컬 상태만 정리');
-      }
-
       // 서버 응답과 관계없이 로컬 상태 정리
       localStorage.removeItem('accessToken');
+      localStorage.removeItem('userInfo');
       clearUserStore(); // 사용자 스토어 완전 초기화
       queryClient.setQueryData(['session'], null);
       await queryClient.invalidateQueries({ queryKey: ['galaxyMyList'] });
-
-      console.log('로그아웃 완료 (로컬 상태 정리)');
     },
   });
 }
