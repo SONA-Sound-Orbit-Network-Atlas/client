@@ -21,7 +21,7 @@ export default function Card({
         border-[1px] border-gray-border text-text-secondary text-[14px]
          focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50`,
         role === 'button'
-          ? 'hover:brightness-110 hover:bg-text-white/20 hover:text-white hover:[&_p]:text-white hover:[&_svg]:text-white'
+          ? 'hover:brightness-110 hover:bg-text-white/20 hover:text-white hover:[&_p]:text-white hover:[&_svg]:text-white hover:cursor-pointer'
           : '',
         className,
         clicked ? 'border-secondary-300' : ''
