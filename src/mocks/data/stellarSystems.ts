@@ -1,11 +1,8 @@
-import type { StellarSystem, Star, Planet } from '@/types/stellar';
 import type { StarProperties } from '@/types/starProperties';
 import type { PlanetProperties } from '@/types/planetProperties';
 
 // 목 데이터용 기본 항성 속성
-const createMockStarProperties = (
-  overrides: Partial<StarProperties> = {}
-): StarProperties => ({
+const createMockStarProperties = (overrides: Partial<StarProperties> = {}) => ({
   spin: 50,
   brightness: 75,
   color: 60,
@@ -30,7 +27,7 @@ const createMockPlanetProperties = (
 });
 
 // 목 데이터용 행성들 생성
-const createMockPlanets = (systemId: string): Planet[] => [
+const createMockPlanets = (systemId: string) => [
   {
     id: `${systemId}-planet-1`,
     object_type: 'PLANET',
@@ -110,7 +107,7 @@ const createMockPlanets = (systemId: string): Planet[] => [
 ];
 
 // 목 데이터용 항성들 생성
-const createMockStars = (systemId: string): Star => ({
+const createMockStars = (systemId: string) => ({
   id: `${systemId}-star`,
   object_type: 'STAR',
   system_id: systemId,
@@ -126,7 +123,7 @@ const createMockStars = (systemId: string): Star => ({
 });
 
 // 새로운 StellarSystem 타입에 맞는 목 데이터
-const stellarSystemsMock: StellarSystem[] = [
+const stellarSystemsMock = [
   {
     id: 'sys-001',
     title: 'Stellar System 1',
@@ -227,24 +224,18 @@ const stellarSystemsMock: StellarSystem[] = [
   },
 ];
 
-export const getStellarSystemMock = (
-  stellarId: string
-): StellarSystem | undefined => {
+export const getStellarSystemMock = (stellarId: string) => {
   return stellarSystemsMock.find((stellar) => stellar.id === stellarId);
 };
 
-export const getAllStellarSystemsMock = (): StellarSystem[] => {
+export const getAllStellarSystemsMock = () => {
   return stellarSystemsMock;
 };
 
-export const getStellarSystemsByGalaxyMock = (
-  galaxyId: string
-): StellarSystem[] => {
+export const getStellarSystemsByGalaxyMock = (galaxyId: string) => {
   return stellarSystemsMock.filter((stellar) => stellar.galaxy_id === galaxyId);
 };
 
-export const getStellarSystemsByUserMock = (
-  userId: string
-): StellarSystem[] => {
+export const getStellarSystemsByUserMock = (userId: string) => {
   return stellarSystemsMock.filter((stellar) => stellar.creator_id === userId);
 };
