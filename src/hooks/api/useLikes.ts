@@ -200,8 +200,10 @@ export function useGetMyLikesInfinite(options: { limit?: number } = {}) {
 export function useLikeToggle(system_id: string, initialLiked: boolean) {
   const { isLoggedIn } = useUserStore();
   const [likeStatus, setLikeStatus] = useState<boolean>(initialLiked);
-  const { mutate: createLike } = useCreateLike();
-  const { mutate: deleteLike } = useDeleteLike();
+  const { mutate: createLike, isPending: creating } = useCreateLike();
+  const { mutate: deleteLike, isPending: deleting } = useDeleteLike();
+
+  const isPending = creating || deleting;
 
   // initialLiked prop이 변경될 때 likeStatus 상태를 동기화
   useEffect(() => {
@@ -213,6 +215,8 @@ export function useLikeToggle(system_id: string, initialLiked: boolean) {
       alert('로그인 후 이용해주세요.');
       return;
     }
+
+    if (isPending) return; // 중복 클릭 차단
 
     if (likeStatus === true) {
       deleteLike(
@@ -241,7 +245,7 @@ export function useLikeToggle(system_id: string, initialLiked: boolean) {
         }
       );
     }
-  }, [isLoggedIn, likeStatus, system_id, createLike, deleteLike]);
+  }, [isLoggedIn, likeStatus, system_id, createLike, deleteLike, isPending]);
 
-  return { likeStatus, toggleLike };
+  return { likeStatus, toggleLike, isPending };
 }

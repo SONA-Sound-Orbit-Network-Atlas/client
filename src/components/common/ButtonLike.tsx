@@ -9,12 +9,14 @@ interface ButtonLikeProps {
   className?: string;
   active: boolean | null;
   onClick?: () => void;
+  isPending?: boolean;
 }
 
 export default function ButtonLike({
   className,
   active,
   onClick,
+  isPending,
 }: ButtonLikeProps) {
   const { isLoggedIn } = useUserStore();
 
@@ -35,6 +37,7 @@ export default function ButtonLike({
         'group relative grid place-items-center w-[30px] h-[40px] hover:cursor-pointer',
         className
       )}
+      disabled={isPending}
       onClick={onClickHandle}
     >
       {/* 기본 아이콘: 상태별로 다름 */}
