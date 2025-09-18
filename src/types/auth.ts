@@ -7,7 +7,7 @@ export interface SignupData {
 
 // 로그인 데이터
 export interface LoginData {
-  email: string;
+  identifier: string;
   password: string;
 }
 
