@@ -1,9 +1,10 @@
 import { IoIosVolumeMute } from 'react-icons/io';
 import { IoIosVolumeHigh } from 'react-icons/io';
 import { SliderInput } from '@/components/common/SliderInput';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { mergeClassNames } from '@/utils/mergeClassNames';
 import Button from '@/components/common/Button';
+import { AudioEngine } from '@/audio/core/AudioEngine';
 
 interface VolumeProps {
   className?: string;
@@ -11,11 +12,19 @@ interface VolumeProps {
 }
 
 export default function Volume({ className, onVolumeChange }: VolumeProps) {
-  const [volume, setVolume] = useState(50);
+  const audioEngine = AudioEngine.instance;
+  const [volume, setVolume] = useState(() => audioEngine.getMasterVolume());
 
   useEffect(() => {
-    onVolumeChange?.(volume);
-  }, [volume, onVolumeChange]);
+    return audioEngine.onVolumeChange((next) => {
+      setVolume(next);
+      onVolumeChange?.(next);
+    });
+  }, [audioEngine, onVolumeChange]);
+
+  const applyVolume = useCallback((next: number) => {
+    audioEngine.setMasterVolume(next);
+  }, [audioEngine]);
 
   return (
     <div
@@ -28,7 +37,7 @@ export default function Volume({ className, onVolumeChange }: VolumeProps) {
         iconOnly
         size="xxs"
         color="transparent"
-        onClick={() => setVolume(0)}
+        onClick={() => applyVolume(0)}
       >
         <IoIosVolumeMute />
       </Button>
@@ -37,7 +46,7 @@ export default function Volume({ className, onVolumeChange }: VolumeProps) {
         min={0}
         max={100}
         value={volume}
-        onValueChange={(vals) => setVolume(vals[0])}
+        onValueChange={(vals) => applyVolume(vals[0])}
         className="flex-1 h-[8px]"
       />
 
@@ -45,7 +54,7 @@ export default function Volume({ className, onVolumeChange }: VolumeProps) {
         iconOnly
         size="xxs"
         color="transparent"
-        onClick={() => setVolume(100)}
+        onClick={() => applyVolume(100)}
       >
         <IoIosVolumeHigh />
       </Button>

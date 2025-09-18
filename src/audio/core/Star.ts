@@ -37,6 +37,8 @@ export class Star {
   
   // 클락 이벤트 콜백
   private onClockTick?: (beat: number, bar: number, sixteenth: number) => void;
+  // BPM change listeners
+  private bpmListeners: Set<(bpm: number) => void> = new Set();
   
   // === Seed 기반 랜덤 관리 ===
   private seed: number | string | null = null;
@@ -153,6 +155,36 @@ export class Star {
       this.stopClock();
     }
   }
+
+  // 모든 리스너 제거 및 클락 전체 리셋 (스텔라 전환용) - 강화된 버전
+  clearAllClockListeners(): void {
+    console.log('🕐 Star 클락 시스템 완전 초기화 시작...');
+    
+    // 모든 클락 리스너 제거
+    this.clockListeners.clear();
+    console.log('🕐 모든 클락 리스너 제거됨');
+    
+    // 클락 완전히 정지
+    this.stopClock();
+    
+    // 글로벌 클락 재생성 (기존 Loop를 완전히 dispose하고 새로 생성)
+    if (this.globalClock) {
+      this.globalClock.dispose();
+      this.globalClock = null;
+      console.log('🕐 기존 글로벌 클락 dispose됨');
+    }
+    
+    // 클락 카운터 완전히 리셋
+    this.currentBeat = 0;
+    this.currentBar = 0;
+    this.currentSixteenth = 0;
+    this.isClockRunning = false;
+    
+    // 새로운 클락 재생성
+    this.initializeClock();
+    
+    console.log('🕐 Star 클락 시스템 완전 초기화 완료');
+  }
   
   // 현재 클락 상태 반환
   getClockState(): { beat: number; bar: number; sixteenth: number; isRunning: boolean } {
@@ -186,6 +218,13 @@ export class Star {
     }
     
     console.log(`⭐ Star ${property} → ${value} | Global State:`, this.globalState);
+    // BPM 변경이 있었는지 알림
+    if (property === 'spin') {
+      console.log(`⭐ Star: spin 변경 → BPM 알림 ${this.globalState.bpm}`);
+      this.bpmListeners.forEach((cb) => {
+        try { cb(this.globalState.bpm); } catch (e) { console.warn('bpm listener error', e); }
+      });
+    }
   }
   
   // 전체 속성 업데이트
@@ -219,6 +258,17 @@ export class Star {
     }
     
     console.log(`⭐ Star Global State 직접 업데이트:`, this.globalState);
+    if ('bpm' in newState) {
+      this.bpmListeners.forEach((cb) => {
+        try { cb(this.globalState.bpm); } catch (e) { console.warn('bpm listener error', e); }
+      });
+    }
+  }
+
+  // 외부에서 BPM 변경을 구독
+  addBpmListener(cb: (bpm: number) => void): () => void {
+    this.bpmListeners.add(cb);
+    return () => this.bpmListeners.delete(cb);
   }
   
   // SONA 매핑에 따른 전역 상태 계산

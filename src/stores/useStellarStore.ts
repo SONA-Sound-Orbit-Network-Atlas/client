@@ -43,6 +43,7 @@ export const initialStellarStore: StellarSystem = {
   create_source_name: '',
   original_source_name: '',
 
+  // 빈 항성 및 행성 배열로 초기화
   star: {
     id: 'star_001',
     object_type: 'STAR',
