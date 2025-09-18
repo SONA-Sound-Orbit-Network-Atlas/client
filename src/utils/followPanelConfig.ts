@@ -4,15 +4,15 @@ import type { FollowPanelType } from '@/types/follow';
 export const followPanelConfig = {
   followers: {
     title: 'FOLLOWERS',
-    emptyMessage: '팔로워가 없습니다.',
-    errorMessage: '팔로워 목록을 불러오는데 실패했습니다.',
-    loadCompleteMessage: '모든 팔로워를 불러왔습니다',
+    emptyMessage: 'no followers',
+    errorMessage: 'failed to load followers',
+    loadCompleteMessage: 'loaded all followers',
   },
   followings: {
     title: 'FOLLOWINGS',
-    emptyMessage: '팔로잉이 없습니다.',
-    errorMessage: '팔로잉 목록을 불러오는데 실패했습니다.',
-    loadCompleteMessage: '모든 팔로잉을 불러왔습니다',
+    emptyMessage: 'no followings',
+    errorMessage: 'failed to load followings',
+    loadCompleteMessage: 'loaded all followings',
   },
 } as const;
 
