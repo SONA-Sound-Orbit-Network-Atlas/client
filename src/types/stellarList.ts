@@ -1,8 +1,5 @@
 // src/types/StellarList.ts
 
-// 좋아요 상태를 명확하게 정의
-export type LikeStatus = 'liked' | 'not_liked' | 'unknown';
-
 export interface StellarListItem {
   id: string;
   title: string;
@@ -14,7 +11,7 @@ export interface StellarListItem {
   like_count: number;
   planet_count: number;
   rank: number;
-  is_liked: LikeStatus;
+  is_liked: boolean;
 }
 
 export interface StellarListMeta {

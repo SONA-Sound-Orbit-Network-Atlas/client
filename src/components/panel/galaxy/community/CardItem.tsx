@@ -3,7 +3,6 @@ import Card from '@/components/common/Card/Card';
 import { IoPlanetOutline } from 'react-icons/io5';
 import { FaRegHeart } from 'react-icons/fa';
 import type { StellarListItem } from '@/types/stellarList';
-import { likeUtils } from '@/utils/likeUtils';
 import { useLikeToggle } from '@/hooks/api/useLikes';
 import { formatDateToYMD } from '@/utils/formatDateToYMD';
 
@@ -57,7 +56,7 @@ export default function CardItem({
 
         <ButtonLike
           className="flex-shrink-0 ml-3"
-          active={likeUtils.toBoolean(likeStatus)}
+          active={likeStatus}
           onClick={toggleLike}
         />
       </div>

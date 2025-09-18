@@ -9,11 +9,7 @@ import {
   type QueryKey,
 } from '@tanstack/react-query';
 import { likesAPI } from '@/api/likes';
-import type {
-  StellarListPage,
-  LikeStatus,
-  StellarListItem,
-} from '@/types/stellarList';
+import type { StellarListPage, StellarListItem } from '@/types/stellarList';
 import { useUserStore } from '@/stores/useUserStore';
 
 // 무한스크롤 페이지 타입
@@ -33,7 +29,7 @@ function patchLike(
         item.id === system_id
           ? {
               ...item,
-              is_liked: nextLike ? 'liked' : 'not_liked',
+              is_liked: nextLike,
               like_count: Math.max(0, item.like_count + (nextLike ? 1 : -1)),
             }
           : item
@@ -75,14 +71,8 @@ function useLikeMutation(isCreate: boolean) {
       return { snapshots };
     },
 
-    // 성공 시 로그
-    onSuccess: (data, { system_id }) => {
-      const action = isCreate ? '생성' : '삭제';
-      console.log(`좋아요를 ${action}했습니다!`, { system_id, response: data });
-    },
-
     // 실패 시 롤백
-    onError: (_err, _vars, ctx) => {
+    onError: (_error, _vars, ctx) => {
       ctx?.snapshots?.forEach(([key, data]) => {
         qc.setQueryData(key, data);
       });
@@ -207,9 +197,9 @@ export function useGetMyLikesInfinite(options: { limit?: number } = {}) {
 }
 
 /** 통합된 좋아요 토글 훅 - 중복 로직 제거 */
-export function useLikeToggle(system_id: string, initialLiked: LikeStatus) {
+export function useLikeToggle(system_id: string, initialLiked: boolean) {
   const { isLoggedIn } = useUserStore();
-  const [likeStatus, setLikeStatus] = useState<LikeStatus>(initialLiked);
+  const [likeStatus, setLikeStatus] = useState<boolean>(initialLiked);
   const { mutate: createLike } = useCreateLike();
   const { mutate: deleteLike } = useDeleteLike();
 
@@ -218,23 +208,30 @@ export function useLikeToggle(system_id: string, initialLiked: LikeStatus) {
       alert('로그인 후 이용해주세요.');
       return;
     }
-    if (likeStatus === 'unknown') return;
 
-    if (likeStatus === 'liked') {
+    if (likeStatus === true) {
       deleteLike(
         { system_id },
         {
-          onSuccess: () => {
-            setLikeStatus('not_liked');
+          onSuccess: (data) => {
+            console.log('✅ 좋아요 삭제 성공:', { system_id, response: data });
+            setLikeStatus(false);
+          },
+          onError: (error) => {
+            console.error('좋아요 삭제 실패:', error);
           },
         }
       );
-    } else if (likeStatus === 'not_liked') {
+    } else {
       createLike(
         { system_id },
         {
-          onSuccess: () => {
-            setLikeStatus('liked');
+          onSuccess: (data) => {
+            console.log('✅ 좋아요 생성 성공:', { system_id, response: data });
+            setLikeStatus(true);
+          },
+          onError: (error) => {
+            console.error('좋아요 생성 실패:', error);
           },
         }
       );
