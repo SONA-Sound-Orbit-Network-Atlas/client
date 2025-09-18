@@ -56,7 +56,7 @@ export function useLogin(data: LoginData) {
 // 로그아웃
 export function useLogout() {
   const queryClient = useQueryClient();
-  const { setIsLoggedIn, clearUserStore } = useUserStore();
+  const { clearUserStore } = useUserStore();
 
   return useMutation({
     mutationKey: ['auth', 'logout'],
