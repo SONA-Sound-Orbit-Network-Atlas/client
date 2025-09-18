@@ -25,10 +25,8 @@ export default function FollowListPanel({
   const {
     handleFollow,
     handleUnfollow,
-    isMutualFollow,
-    isFollowBack,
-    isStillFollowing,
-    isStillMutualFollow,
+    getFollowerButtonState,
+    getFollowingButtonState,
     resetStates,
     isLoading: isActionLoading,
   } = useFollowActions();
@@ -109,30 +107,36 @@ export default function FollowListPanel({
             {/* 사용자 리스트 */}
             {!isLoading && !error && allUsers.length > 0 && (
               <div className="space-y-3">
-                {allUsers.map((user) => (
-                  <UserCard
-                    key={user.id}
-                    id={user.id}
-                    username={user.username}
-                    isFollowing={
-                      type === 'followers'
-                        ? isMutualFollow(user.isMutual)
-                        : isStillFollowing(user.id)
-                    }
-                    isMutualFollow={
-                      type === 'followers'
-                        ? isMutualFollow(user.isMutual)
-                        : isStillMutualFollow(user.id, user.isMutual)
-                    }
-                    isFollowBack={
-                      type === 'followers' ? isFollowBack(user.isMutual) : false
-                    }
-                    onFollow={type === 'followers' ? handleFollow : undefined}
-                    onUnfollow={handleUnfollow}
-                    onClick={handleUserClick}
-                    isLoading={isActionLoading}
-                  />
-                ))}
+                {allUsers.map((user) => {
+                  // 버튼 상태 결정
+                  const buttonState =
+                    type === 'followers'
+                      ? getFollowerButtonState(user)
+                      : getFollowingButtonState(user);
+
+                  return (
+                    <UserCard
+                      key={user.id}
+                      id={user.id}
+                      username={user.username}
+                      isFollowing={buttonState.action === 'unfollow'}
+                      isMutualFollow={buttonState.showMutualIcon}
+                      isFollowBack={buttonState.text === '팔로우백'}
+                      onFollow={
+                        buttonState.action === 'follow'
+                          ? handleFollow
+                          : undefined
+                      }
+                      onUnfollow={
+                        buttonState.action === 'unfollow'
+                          ? handleUnfollow
+                          : undefined
+                      }
+                      onClick={handleUserClick}
+                      isLoading={isActionLoading}
+                    />
+                  );
+                })}
               </div>
             )}
 
