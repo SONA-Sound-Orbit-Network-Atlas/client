@@ -9,7 +9,11 @@ import {
   type QueryKey,
 } from '@tanstack/react-query';
 import { likesAPI } from '@/api/likes';
-import type { StellarListPage, LikeStatus } from '@/types/stellarList';
+import type {
+  StellarListPage,
+  LikeStatus,
+  StellarListItem,
+} from '@/types/stellarList';
 import { useUserStore } from '@/stores/useUserStore';
 
 // 무한스크롤 페이지 타입
@@ -168,7 +172,7 @@ export function useGetMyLikesInfinite(options: { limit?: number } = {}) {
   });
 
   // 중복 제거 유틸리티 함수
-  const removeDuplicates = (items: any[]): any[] => {
+  const removeDuplicates = (items: StellarListItem[]): StellarListItem[] => {
     const seen = new Set<string>();
     return items.filter((item) => {
       if (seen.has(item.id)) {
