@@ -38,14 +38,20 @@ export function useSmoothCameraMove({
   onMoveEndRef.current = onMoveEnd;
 
   const offset = useMemo(() => new THREE.Vector3(5, 10, 6), []);
-  const targetCameraPosRef = useRef<THREE.Vector3 | undefined>(
-    targetPosition?.clone().add(offset)
-  );
+
+  // 시작 위치와 목표 위치를 저장
+  const startCameraPosRef = useRef<THREE.Vector3 | undefined>(undefined);
+  const startTargetPosRef = useRef<THREE.Vector3 | undefined>(undefined);
+  const targetCameraPosRef = useRef<THREE.Vector3 | undefined>(undefined);
 
   useEffect(() => {
     if (targetPosition && controlsRef) {
-      // 새로운 타겟 위치 업데이트
-      targetCameraPosRef.current?.copy(targetPosition.clone().add(offset));
+      // 시작 위치 저장 (현재 카메라 위치와 타겟 위치)
+      startCameraPosRef.current = camera.position.clone();
+      startTargetPosRef.current = controlsRef.target.clone();
+
+      // 목표 위치 설정
+      targetCameraPosRef.current = targetPosition.clone().add(offset);
 
       // 애니메이션 시작
       isMovingRef.current = true;
@@ -53,11 +59,13 @@ export function useSmoothCameraMove({
       setCameraIsMoving(true);
       onMoveStartRef.current?.();
     }
-  }, [targetPosition, offset, controlsRef, setCameraIsMoving]);
+  }, [targetPosition, offset, controlsRef, setCameraIsMoving, camera.position]);
 
   useFrame((_, deltaTime) => {
     if (
       targetPosition &&
+      startCameraPosRef.current &&
+      startTargetPosRef.current &&
       targetCameraPosRef.current &&
       isMovingRef.current &&
       controlsRef
@@ -66,22 +74,24 @@ export function useSmoothCameraMove({
       const progress = Math.min(startTimeRef.current / duration, 1.0);
       const easedProgress = easeInOutCubic(progress);
 
-      // 카메라 위치를 부드럽게 보간
-      camera.position.lerp(targetCameraPosRef.current!, easedProgress * 0.1);
+      // 시작 위치에서 목표 위치로 직접 보간
+      camera.position.lerpVectors(
+        startCameraPosRef.current,
+        targetCameraPosRef.current,
+        easedProgress
+      );
 
-      // 컨트롤 타겟도 부드럽게 보간
+      // 컨트롤 타겟도 시작에서 목표로 직접 보간
       if (controlsRef.target) {
-        controlsRef.target.lerp(targetPosition, easedProgress * 0.1);
+        controlsRef.target.lerpVectors(
+          startTargetPosRef.current,
+          targetPosition,
+          easedProgress
+        );
       }
 
-      // 애니메이션 완료 체크 (시간 기반으로만 체크)
+      // 애니메이션 완료 체크
       if (progress >= 1.0) {
-        // 정확한 위치로 설정
-        camera.position.copy(targetCameraPosRef.current!);
-        if (controlsRef.target) {
-          controlsRef.target.copy(targetPosition);
-        }
-
         isMovingRef.current = false;
         setCameraIsMoving(false);
         onMoveEndRef.current?.(); // 종료 콜백 호출
