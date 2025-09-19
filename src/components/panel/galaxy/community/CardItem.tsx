@@ -7,6 +7,8 @@ import { useLikeToggle } from '@/hooks/api/useLikes';
 import { formatDateToYMD } from '@/utils/formatDateToYMD';
 import { useUserStore } from '@/stores/useUserStore';
 import Button from '@/components/common/Button';
+import { navigateToOtherUserProfile } from '@/utils/profileNavigation';
+import { useSidebarStore } from '@/stores/useSidebarStore';
 
 interface CardItemProps extends StellarListItem {
   onClick: () => void;
@@ -25,6 +27,7 @@ export default function CardItem({
   onClick,
 }: CardItemProps) {
   const { isLoggedIn } = useUserStore();
+  const { openSecondarySidebar } = useSidebarStore();
   // 통합된 좋아요 훅 사용 - 중복 로직 제거
   const { likeStatus, toggleLike, isPending } = useLikeToggle(id, is_liked);
 
@@ -45,16 +48,7 @@ export default function CardItem({
           </div>
 
           <div className="mt-2 min-w-0 w-full space-y-1 text-text-muted">
-            <div
-              className="flex items-center min-w-0 w-full overflow-hidden"
-              // style={{
-              //   display: 'grid',
-              //   gridTemplateColumns: 'auto 1fr',
-              //   gap: '4px',
-              //   alignItems: 'center',
-              //   justifyContent: 'center',
-              // }}
-            >
+            <div className="flex items-center min-w-0 w-full overflow-hidden">
               <span className="text-sm inline-block">by</span>
               <Button
                 color="transparent"
@@ -64,7 +58,10 @@ export default function CardItem({
                   e.stopPropagation();
                   console.log('해당 유저의 프로필로 이동');
                   console.log('creator_id : ', creator_id);
-                  console.log('creator_name : ', creator_name);
+                  // 1. 프로필 컴포넌트를 유저id에 맞게 변경
+                  navigateToOtherUserProfile(creator_id);
+                  // 2. sideBarProfile 패널 열기
+                  openSecondarySidebar('profile');
                 }}
               >
                 <span className="inline-block max-w-[calc(147px-16px)] overflow-hidden text-ellipsis text-[14px] font-bold text-primary-300 hover:underline transition-all transition-duration-300 rounded-[2px]">

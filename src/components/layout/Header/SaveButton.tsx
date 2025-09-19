@@ -5,6 +5,7 @@ import { useSelectedStellarStore } from '@/stores/useSelectedStellarStore';
 import { useStellarStore } from '@/stores/useStellarStore';
 import { useUserStore } from '@/stores/useUserStore';
 import { useState } from 'react';
+import useStellarSystemSelection from '@/hooks/useStellarSystemSelection';
 
 export default function SaveButton() {
   const [saveConfirm, setSaveConfirm] = useState(false);
@@ -14,8 +15,10 @@ export default function SaveButton() {
   const { mutate: updateStellar, isPending: isUpdatePending } =
     useUpdateStellar();
   const { mode } = useSelectedStellarStore();
-  const { stellarStore, setStellarStore } = useStellarStore();
+  const { stellarStore } = useStellarStore();
   const { userStore, isLoggedIn } = useUserStore();
+
+  const { selectStellar } = useStellarSystemSelection();
 
   // save 버튼 동작 기준
   const onSaveHandler = () => {
@@ -37,7 +40,7 @@ export default function SaveButton() {
       createStellar(stellarStore, {
         onSuccess: (data) => {
           setSaveConfirm(false);
-          setStellarStore({ ...data, id: data.id });
+          selectStellar(data.id);
         },
         onError: () => {
           alert('CREATE failed');
