@@ -7,6 +7,7 @@ import { FaStar } from 'react-icons/fa';
 import { RiDeleteBinLine } from 'react-icons/ri';
 import { useStellarStore } from '@/stores/useStellarStore';
 import { useSelectedObjectStore } from '@/stores/useSelectedObjectStore';
+import { useUserStore } from '@/stores/useUserStore';
 
 interface StellarCardProps {
   data: Star | Planet;
@@ -25,6 +26,9 @@ export default function StellarCard({
 }: StellarCardProps) {
   const { deletePlanet, stellarStore } = useStellarStore();
   const { setSelectedObjectId } = useSelectedObjectStore();
+  const { userStore } = useUserStore();
+
+  const isMyStellar = userStore.id === stellarStore.creator_id;
 
   const description =
     data.object_type === 'PLANET' ? 'PLANET • ' + data.role : 'CENTRAL STAR';
@@ -68,27 +72,30 @@ export default function StellarCard({
           <p className="text-text-muted">{description}</p>
         </div>
 
-        {/* STAR 경우 : 별자리 아이콘 / PLANET 경우 : 삭제 버튼튼 */}
+        {/* STAR 경우 : 별자리 아이콘 / PLANET 경우 : 삭제 버튼 */}
         {data.object_type === 'STAR' ? (
           <div className="flex items-center justify-center w-[24px] h-[24px] shrink-0 text-[#FACC15]">
             <FaStar />
           </div>
         ) : (
-          <Button
-            color="transparent"
-            iconOnly
-            className="w-[24px] h-[24px] shrink-0 hover:[&_svg]:!text-error/80 hover:[&_svg]:!fill-error/80"
-            onClick={(e) => {
-              e.stopPropagation();
+          // 자신의 stellar인 경우 : 삭제 버튼 표시
+          isMyStellar && (
+            <Button
+              color="transparent"
+              iconOnly
+              className="w-[24px] h-[24px] shrink-0 hover:[&_svg]:!text-error/80 hover:[&_svg]:!fill-error/80"
+              onClick={(e) => {
+                e.stopPropagation();
 
-              // stellarStore에서 해당 planet 삭제
-              deletePlanet(data.id);
-              // 현재 선택된 stellar의 star의 id로 대체
-              setSelectedObjectId(stellarStore.star.id);
-            }}
-          >
-            <RiDeleteBinLine className="w-full h-full" />
-          </Button>
+                // stellarStore에서 해당 planet 삭제
+                deletePlanet(data.id);
+                // 현재 선택된 stellar의 star의 id로 대체
+                setSelectedObjectId(stellarStore.star.id);
+              }}
+            >
+              <RiDeleteBinLine className="w-full h-full" />
+            </Button>
+          )
         )}
       </div>
     </Card>

@@ -102,8 +102,8 @@ function ErrorComp({ resetErrorBoundary }: FallbackProps) {
   return (
     <div className="p-4">
       <p className="mb-2">Error occurred</p>
-      <Button color="tertiary" onClick={resetErrorBoundary}>
-        다시 시도
+      <Button color="tertiary" onClick={resetErrorBoundary} className="w-full">
+        retry
       </Button>
     </div>
   );
