@@ -74,9 +74,14 @@ export function useSmoothCameraMove({
         controlsRef.target.lerp(targetPosition, easedProgress * 0.1);
       }
 
-      // 애니메이션 완료 체크 (거리와 시간 모두 고려)
-      const distance = camera.position.distanceTo(targetCameraPosRef.current!);
-      if (distance < 0.1 || progress >= 1.0) {
+      // 애니메이션 완료 체크 (시간 기반으로만 체크)
+      if (progress >= 1.0) {
+        // 정확한 위치로 설정
+        camera.position.copy(targetCameraPosRef.current!);
+        if (controlsRef.target) {
+          controlsRef.target.copy(targetPosition);
+        }
+
         isMovingRef.current = false;
         setCameraIsMoving(false);
         onMoveEndRef.current?.(); // 종료 콜백 호출
