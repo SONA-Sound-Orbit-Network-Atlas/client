@@ -59,7 +59,7 @@ export function useSmoothCameraMove({
       setCameraIsMoving(true);
       onMoveStartRef.current?.();
     }
-  }, [targetPosition, offset, controlsRef, setCameraIsMoving, camera.position]);
+  }, [targetPosition, offset, controlsRef, setCameraIsMoving]);
 
   useFrame((_, deltaTime) => {
     if (
