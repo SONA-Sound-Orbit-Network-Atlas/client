@@ -6,6 +6,7 @@ import type { StellarListItem } from '@/types/stellarList';
 import { useLikeToggle } from '@/hooks/api/useLikes';
 import { formatDateToYMD } from '@/utils/formatDateToYMD';
 import { useUserStore } from '@/stores/useUserStore';
+import Button from '@/components/common/Button';
 
 interface CardItemProps extends StellarListItem {
   onClick: () => void;
@@ -15,6 +16,7 @@ export default function CardItem({
   id,
   rank,
   title,
+  creator_id,
   creator_name,
   updated_at,
   planet_count,
@@ -27,30 +29,52 @@ export default function CardItem({
   const { likeStatus, toggleLike, isPending } = useLikeToggle(id, is_liked);
 
   return (
-    <Card onClick={onClick} role="button">
+    <Card
+      onClick={onClick}
+      role="button"
+      className="hover:bg-white/10 hover:brightness-110"
+    >
       <div className="flex items-center justify-between min-w-0 w-full max-w-full">
         {/* ← 왼쪽 영역: 줄어들 수 있게 basis-0 grow min-w-0 */}
         <div className="basis-0 grow min-w-0">
-          <div className="flex items-center gap-2 min-w-0">
+          <div className="flex gap-2 min-w-0">
             <span className="text-text-muted flex-shrink-0">#{rank}</span>
-            <strong className="text-white w-0 flex-1 truncate">{title}</strong>
+            <strong className="text-white w-0 flex-1 line-clamp-2">
+              {title}
+            </strong>
           </div>
 
-          <div className="mt-3 min-w-0 w-full space-y-1 text-[12px] text-text-muted">
+          <div className="mt-2 min-w-0 w-full space-y-1 text-text-muted">
             <div
-              style={{
-                display: 'grid',
-                gridTemplateColumns: 'auto 1fr',
-                gap: '4px',
-              }}
-              className="min-w-0 w-full"
+              className="flex items-center min-w-0 w-full overflow-hidden"
+              // style={{
+              //   display: 'grid',
+              //   gridTemplateColumns: 'auto 1fr',
+              //   gap: '4px',
+              //   alignItems: 'center',
+              //   justifyContent: 'center',
+              // }}
             >
-              <span>BY</span>
-              <span className="truncate text-primary-300">{creator_name}</span>
+              <span className="text-sm inline-block">by</span>
+              <Button
+                color="transparent"
+                size="xxs"
+                className="p-1"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  console.log('해당 유저의 프로필로 이동');
+                  console.log('creator_id : ', creator_id);
+                  console.log('creator_name : ', creator_name);
+                }}
+              >
+                <span className="inline-block max-w-[calc(147px-16px)] overflow-hidden text-ellipsis text-[14px] font-bold text-primary-300 hover:underline transition-all transition-duration-300 rounded-[2px]">
+                  {creator_name}
+                </span>
+              </Button>
             </div>
 
             {/* 날짜 */}
-            <div className="grid grid-cols-[auto,1fr] gap-1 min-w-0 w-full">
+            <div className="grid grid-cols-[auto,1fr] gap-1 min-w-0 w-full text-xs mt-2">
               <span className="truncate">{formatDateToYMD(updated_at)}</span>
             </div>
           </div>
@@ -58,7 +82,7 @@ export default function CardItem({
 
         {isLoggedIn && (
           <ButtonLike
-            className="flex-shrink-0 ml-3"
+            className="flex-shrink-0"
             active={likeStatus}
             onClick={toggleLike}
             isPending={isPending}
@@ -66,7 +90,7 @@ export default function CardItem({
         )}
       </div>
 
-      <div className="mt-3 flex gap-4">
+      <div className="mt-2 flex gap-4">
         <div>
           <IoPlanetOutline className="inline-block w-[12px] h-[16px] mr-1" />
           {planet_count}

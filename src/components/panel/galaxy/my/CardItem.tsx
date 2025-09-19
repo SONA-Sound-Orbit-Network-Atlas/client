@@ -20,7 +20,9 @@ export default function CardItem({
       <div className="flex items-center justify-between min-w-0">
         <div className="flex-1 min-w-0">
           <div className="flex items-center text-[14px] font-bold min-w-0">
-            <strong className="text-white w-0 flex-1 truncate">{title}</strong>
+            <strong className="text-white w-0 flex-1 line-clamp-2">
+              {title}
+            </strong>
           </div>
           <div className="mt-3 flex flex-col items-start gap-1 text-[12px] text-text-muted">
             <span>{formatDateToYMD(updated_at)}</span>

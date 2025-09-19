@@ -4,6 +4,7 @@ import type { StarProperties } from '@/types/starProperties';
 
 // ⭐ 스텔라 스토어 -> 스텔라 백엔드 페이로드 변경해서 보냄
 export type StellarWritePayload = {
+  id: string;
   title: string;
   galaxy_id: string;
   // position: [number, number, number];
@@ -34,6 +35,7 @@ export function toStellarWritePayload(
   system: StellarSystem
 ): StellarWritePayload {
   return {
+    id: system.id,
     title: system.title,
     galaxy_id: system.galaxy_id,
     // position: system.position,
