@@ -36,15 +36,21 @@ export default function DeleteStellarButton() {
     <div className="w-full mt-3">
       {deleteConfirm ? (
         <div className="flex justify-center gap-2">
-          <Button size="sm" color="secondary" onClick={onDeleteHandler}>
-            Confirm
+          <Button
+            size="lg"
+            color="transparent"
+            onClick={onDeleteHandler}
+            className="text-xs hover:text-error/80"
+          >
+            DELETE
           </Button>
           <Button
-            size="sm"
-            color="tertiary"
+            size="lg"
+            color="transparent"
             onClick={() => setDeleteConfirm(false)}
+            className="text-xs hover:text-white"
           >
-            Cancel
+            CANCEL
           </Button>
         </div>
       ) : (
