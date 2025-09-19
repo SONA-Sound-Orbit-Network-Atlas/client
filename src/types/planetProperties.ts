@@ -180,7 +180,7 @@ export const PLANET_PROPERTIES: Record<string, PropertyDefinition> = {
     description: '중앙별에서의 거리',
     category: 'orbit',
     min: 1.0,
-    max: 20.0,
+    max: 60.0,
     step: 0.1,
     defaultValue: 10.5,
     controlType: 'slider',
