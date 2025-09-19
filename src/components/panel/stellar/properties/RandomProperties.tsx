@@ -10,7 +10,7 @@ interface RandomProps {
   target: Star | Planet;
 }
 
-export default function Random({ target }: RandomProps) {
+export default function RandomProperties({ target }: RandomProps) {
   const { stellarStore, setStellarStore } = useStellarStore();
 
   if (!target) return null;
