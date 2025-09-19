@@ -1,5 +1,5 @@
 // src/utils/randomProperties.ts
-import type { StarProperties } from '@/types/starProperties';
+import { STAR_PROPERTIES, type StarProperties } from '@/types/starProperties';
 import {
   PLANET_PROPERTIES,
   type PlanetProperties,
@@ -18,47 +18,27 @@ export function randStep(
   return precision != null ? +v.toFixed(precision) : v;
 }
 
-// Star용 정의(원하시면 별도 상수로 외부 분리 가능)
-const STAR_DEFS: Record<
-  keyof StarProperties,
-  { min: number; max: number; step?: number; precision?: number }
-> = {
-  spin: { min: 0, max: 100, step: 1 },
-  brightness: { min: 0, max: 100, step: 1 },
-  color: { min: 0, max: 360, step: 1 },
-  size: { min: 0.1, max: 2.0, step: 0.1, precision: 1 }, // 예: 소수1자리
-};
-
+/* =========================
+   STAR: 스키마 기반
+   ========================= */
 export function createRandomStarProperties(): StarProperties {
-  return {
-    spin: randStep(
-      STAR_DEFS.spin.min,
-      STAR_DEFS.spin.max,
-      STAR_DEFS.spin.step,
-      STAR_DEFS.spin.precision
-    ),
-    brightness: randStep(
-      STAR_DEFS.brightness.min,
-      STAR_DEFS.brightness.max,
-      STAR_DEFS.brightness.step,
-      STAR_DEFS.brightness.precision
-    ),
-    color: randStep(
-      STAR_DEFS.color.min,
-      STAR_DEFS.color.max,
-      STAR_DEFS.color.step,
-      STAR_DEFS.color.precision
-    ),
-    size: randStep(
-      STAR_DEFS.size.min,
-      STAR_DEFS.size.max,
-      STAR_DEFS.size.step,
-      STAR_DEFS.size.precision
-    ),
-  };
+  const out = {} as StarProperties;
+
+  (
+    Object.entries(STAR_PROPERTIES) as [
+      keyof StarProperties,
+      { min: number; max: number; step?: number }, // precision 없으면 생략
+    ][]
+  ).forEach(([key, def]) => {
+    (out as any)[key] = randStep(def.min, def.max, def.step ?? 1); // eslint-disable-line
+  });
+
+  return out;
 }
 
-// Planet용: PLANET_PROPERTIES 기반으로 전 필드 생성
+/* =========================
+   PLANET: 스키마 기반
+   ========================= */
 export function createRandomPlanetProperties(opts?: {
   clampInclination?: boolean;
 }): PlanetProperties {
@@ -79,6 +59,7 @@ export function createRandomPlanetProperties(opts?: {
       clampInclination && key === 'inclination'
         ? Math.min(def.max, 90)
         : def.max;
+
     (out as any)[key] = randStep(min, max, def.step ?? 1, def.precision); // eslint-disable-line
   });
 
