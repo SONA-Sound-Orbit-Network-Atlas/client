@@ -6,10 +6,11 @@ export function useFollowActions() {
   const createFollowMutation = useCreateFollow();
   const deleteFollowMutation = useDeleteFollow();
 
-  // 팔로우 상태를 위한 로컬 상태 관리 (팔로잉 패널용)
+  // 팔로우 상태를 위한 로컬 상태 관리
   const [unfollowedUsers, setUnfollowedUsers] = useState<Set<string>>(
     new Set()
   );
+  const [followedUsers, setFollowedUsers] = useState<Set<string>>(new Set());
 
   // 에러 상태 관리
   const [error, setError] = useState<string | null>(null);
@@ -21,7 +22,15 @@ export function useFollowActions() {
       { targetUserId: userId },
       {
         onSuccess: () => {
-          // 언팔로우 상태에서 제거
+          // 팔로잉 패널용 상태 업데이트
+          setUnfollowedUsers((prev) => {
+            const newSet = new Set(prev);
+            newSet.delete(userId);
+            return newSet;
+          });
+
+          // 팔로워 패널용 상태 업데이트
+          setFollowedUsers((prev) => new Set(prev).add(userId));
           setUnfollowedUsers((prev) => {
             const newSet = new Set(prev);
             newSet.delete(userId);
@@ -43,7 +52,15 @@ export function useFollowActions() {
       { targetUserId: userId },
       {
         onSuccess: () => {
-          // 언팔로우한 사용자를 로컬 상태에 추가
+          // 팔로잉 패널용 상태 업데이트
+          setUnfollowedUsers((prev) => new Set(prev).add(userId));
+
+          // 팔로워 패널용 상태 업데이트
+          setFollowedUsers((prev) => {
+            const newSet = new Set(prev);
+            newSet.delete(userId);
+            return newSet;
+          });
           setUnfollowedUsers((prev) => new Set(prev).add(userId));
         },
         onError: (error) => {
@@ -54,21 +71,28 @@ export function useFollowActions() {
     );
   };
 
-  // 팔로워 패널용 버튼 상태 확인
+  // 팔로워 패널용 버튼 상태 확인 (로컬 상태 고려)
   const getFollowerButtonState = (user: {
+    id: string;
     viewer_is_following: boolean;
     viewer_is_followed_by: boolean;
     isMutual: boolean;
   }) => {
-    if (user.viewer_is_following) {
+    // 로컬 상태 우선 확인
+    const isFollowed = followedUsers.has(user.id);
+    const isUnfollowed = unfollowedUsers.has(user.id);
+
+    // 팔로우한 상태 (로컬 상태 또는 API 데이터)
+    if (isFollowed || (user.viewer_is_following && !isUnfollowed)) {
       return {
         text: '언팔로우',
         action: 'unfollow' as const,
-        showMutualIcon: user.isMutual,
+        showMutualIcon: isFollowed || (user.isMutual && !isUnfollowed),
       };
     }
 
-    if (user.viewer_is_followed_by) {
+    // 팔로우백 가능 상태 (로컬 상태가 없고 API에서 팔로우받은 경우)
+    if (!isFollowed && !isUnfollowed && user.viewer_is_followed_by) {
       return {
         text: '팔로우백',
         action: 'follow' as const,
@@ -76,6 +100,7 @@ export function useFollowActions() {
       };
     }
 
+    // 일반 팔로우 상태
     return {
       text: '팔로우',
       action: 'follow' as const,
@@ -151,6 +176,7 @@ export function useFollowActions() {
   // 상태 초기화 (메모이제이션)
   const resetStates = useCallback(() => {
     setUnfollowedUsers(new Set());
+    setFollowedUsers(new Set());
     setError(null);
   }, []);
 
