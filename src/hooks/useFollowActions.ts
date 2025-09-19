@@ -91,8 +91,8 @@ export function useFollowActions() {
       };
     }
 
-    // 팔로우백 가능 상태 (로컬 상태가 없고 API에서 팔로우받은 경우)
-    if (!isFollowed && !isUnfollowed && user.viewer_is_followed_by) {
+    // 팔로우백 가능 상태 (언팔로우했지만 상대방이 나를 팔로우하는 경우)
+    if (isUnfollowed && user.viewer_is_followed_by) {
       return {
         text: '팔로우백',
         action: 'follow' as const,
@@ -101,6 +101,15 @@ export function useFollowActions() {
     }
 
     // 일반 팔로우 상태
+    if (user.viewer_is_followed_by) {
+      return {
+        text: '팔로우백',
+        action: 'follow' as const,
+        showMutualIcon: false,
+      };
+    }
+
+    // 기본 팔로우 상태
     return {
       text: '팔로우',
       action: 'follow' as const,
