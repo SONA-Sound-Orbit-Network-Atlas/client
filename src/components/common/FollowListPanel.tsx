@@ -8,6 +8,7 @@ import PanelHeader from '@/components/layout/Sidebar/SidebarPanel/PanelHeader';
 import UserCard from '@/components/common/Card/UserCard';
 import { ScrollArea } from '@/components/common/Scrollarea';
 import Button from '@/components/common/Button';
+import ErrorMessage from '@/components/common/ErrorMessage';
 import { useFollowList } from '@/hooks/useFollowList';
 import { useFollowActions } from '@/hooks/useFollowActions';
 import type {
@@ -28,6 +29,8 @@ export default function FollowListPanel({
     getFollowerButtonState,
     getFollowingButtonState,
     resetStates,
+    error: actionError,
+    clearError,
     isLoading: isActionLoading,
   } = useFollowActions();
 
@@ -90,6 +93,15 @@ export default function FollowListPanel({
               {config.title} ({totalCount})
             </p>
 
+            {/* 액션 에러 메시지 */}
+            {actionError && (
+              <ErrorMessage
+                message={actionError}
+                onClose={clearError}
+                className="mb-4"
+              />
+            )}
+
             {/* 로딩 상태 */}
             {isLoading && (
               <div className="text-center py-4">
@@ -99,9 +111,7 @@ export default function FollowListPanel({
 
             {/* 에러 상태 */}
             {error && (
-              <div className="text-center py-4">
-                <p className="text-red-400">{config.errorMessage}</p>
-              </div>
+              <ErrorMessage message={config.errorMessage} className="mb-4" />
             )}
 
             {/* 사용자 리스트 */}

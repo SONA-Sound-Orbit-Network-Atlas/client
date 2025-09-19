@@ -11,8 +11,12 @@ export function useFollowActions() {
     new Set()
   );
 
+  // 에러 상태 관리
+  const [error, setError] = useState<string | null>(null);
+
   // 팔로우 핸들러
   const handleFollow = (userId: string) => {
+    setError(null); // 에러 상태 초기화
     createFollowMutation.mutate(
       { targetUserId: userId },
       {
@@ -26,7 +30,7 @@ export function useFollowActions() {
         },
         onError: (error) => {
           console.error('팔로우 실패:', error);
-          // TODO: 토스트 메시지로 사용자에게 에러 알림
+          setError('팔로우 처리 중 오류가 발생했습니다.');
         },
       }
     );
@@ -34,6 +38,7 @@ export function useFollowActions() {
 
   // 언팔로우 핸들러
   const handleUnfollow = (userId: string) => {
+    setError(null); // 에러 상태 초기화
     deleteFollowMutation.mutate(
       { targetUserId: userId },
       {
@@ -43,7 +48,7 @@ export function useFollowActions() {
         },
         onError: (error) => {
           console.error('언팔로우 실패:', error);
-          // TODO: 토스트 메시지로 사용자에게 에러 알림
+          setError('언팔로우 처리 중 오류가 발생했습니다.');
         },
       }
     );
@@ -138,9 +143,15 @@ export function useFollowActions() {
     return user.isMutual && !unfollowedUsers.has(user.id);
   };
 
+  // 에러 상태 초기화
+  const clearError = useCallback(() => {
+    setError(null);
+  }, []);
+
   // 상태 초기화 (메모이제이션)
   const resetStates = useCallback(() => {
     setUnfollowedUsers(new Set());
+    setError(null);
   }, []);
 
   return {
@@ -156,6 +167,9 @@ export function useFollowActions() {
     isStillFollowing,
     isStillMutualFollow,
     resetStates,
+    // 에러 관련
+    error,
+    clearError,
     isLoading: createFollowMutation.isPending || deleteFollowMutation.isPending,
   };
 }
