@@ -4,7 +4,7 @@ import * as THREE from 'three';
 
 // 별 배치 설정
 const STAR_CONFIG = {
-  COUNT: 1000, // 별 개수
+  COUNT: 1500, // 별 개수
   SPREAD_X: 4000, // X축 방향 퍼짐 범위
   SPREAD_Y: 1000, // Y축 방향 퍼짐 범위
   SPREAD_Z: 4000, // Z축 방향 퍼짐 범위
@@ -14,7 +14,7 @@ const STAR_CONFIG = {
 const RENDER_CONFIG = {
   SIZE: 2, // 별 크기
   OPACITY: 0.8, // 투명도
-  ALPHA_TEST: 0.1, // 투명도 임계값 (선명도)
+  ALPHA_TEST: 0.01, // 투명도 임계값 (선명도)
 } as const;
 
 export default function BackgroundStars() {
@@ -63,6 +63,8 @@ export default function BackgroundStars() {
         alphaTest={RENDER_CONFIG.ALPHA_TEST} // 투명도 임계값으로 더 선명한 가장자리
         blending={THREE.AdditiveBlending} // 가산 블렌딩으로 더 부드럽게
         depthWrite={false} // 깊이 버퍼 쓰기 비활성화
+        map={undefined}
+        fog={false}
       />
     </points>
   );

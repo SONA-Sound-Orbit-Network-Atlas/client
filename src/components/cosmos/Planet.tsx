@@ -205,7 +205,7 @@ export default function Planet({ planet, isSelectable = false }: PlanetProps) {
           <FakeGlowMaterial
             falloff={glowFalloff}
             glowInternalRadius={6}
-            glowColor={valueToColor(planetColor, 0, 360)}
+            glowColor={color}
             glowSharpness={glowIntensity * 5}
             side={THREE.DoubleSide}
             depthTest={true}
