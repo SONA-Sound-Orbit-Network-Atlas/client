@@ -65,7 +65,7 @@ export default function AudioPlayer({ className }: AudioPlayerProps) {
 
       // 폴백: StellarSystem에 행성이 없을 경우 zustand 스토어에서 생성
       if (planets.length === 0 && stellarStore.planets.length > 0) {
-        console.log('▶️ system에 행성이 없어 스토어 기반으로 생성합니다...');
+  
         for (const p of stellarStore.planets) {
           const synthType = p.synthType ?? getDefaultSynthType(p.role);
           const oscillatorType = p.oscillatorType ?? getDefaultOscillatorType(p.role, synthType);
@@ -82,7 +82,6 @@ export default function AudioPlayer({ className }: AudioPlayerProps) {
 
       // 행성이 없으면 아무 소리도 내지 않음 (데모 행성 생성 제거)
       if (planets.length === 0) {
-        console.log('▶️ 재생 요청: 행성이 없어 소리를 내지 않습니다.');
         return;
       }
 
@@ -90,13 +89,12 @@ export default function AudioPlayer({ className }: AudioPlayerProps) {
       for (const planet of planets) {
         if (!planet.isPlaying) {
           await system.startPlanetPattern(planet.id);
-          console.log(`🎵 ${planet.name} 패턴 재생 시작`);
         }
       }
     } else {
       // 모든 패턴 정지
-      system.stopAllPatterns();
-      console.log('⏹️ 모든 패턴 정지');
+  system.stopAllPatterns();
+  console.debug('⏹️ 모든 패턴 정지');
     }
   }, [initializing, ready, system, engine, stellarStore.planets]);
 

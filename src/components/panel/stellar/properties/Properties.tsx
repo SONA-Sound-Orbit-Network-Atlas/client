@@ -94,13 +94,10 @@ export default function Properties() {
     try {
       const willPlay = await system.togglePlanetPattern(selectedObjectId);
       setIsPlanetPlaying(willPlay);
-      console.log(
-        `🎵 ${planetObj?.role || 'Planet'} ${willPlay ? '재생 시작' : '정지'}`
-      );
     } catch (error) {
       console.error('행성 패턴 토글 실패:', error);
     }
-  }, [isPlanet, selectedObjectId, system, planetObj?.role]);
+  }, [isPlanet, selectedObjectId, system]);
 
   const handleSynthTypeChange = useCallback(
     (nextSynth: SynthTypeId) => {
