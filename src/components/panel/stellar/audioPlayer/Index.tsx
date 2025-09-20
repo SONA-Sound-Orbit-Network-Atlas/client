@@ -48,6 +48,12 @@ export default function AudioPlayer({ className }: AudioPlayerProps) {
       if (initializing) return;
       setInitializing(true);
       try {
+        // 사용자 액션(Play 버튼)에서 반드시 Tone context를 시작합니다.
+        try {
+          await (await import('tone')).start();
+        } catch (err) {
+          console.debug('Tone.start() 호출 중 오류(무시 가능):', err);
+        }
         await system.initialize();
         setReady(true);
         // 최초 초기화 직후에도 현재 설정된 마스터 볼륨을 반드시 반영

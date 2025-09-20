@@ -111,8 +111,15 @@ export class PadInstrument extends AbstractInstrumentBase {
     this.padReverb.connect(this.sendRev);
     this.padDelay.connect(this.sendDly);
 
-    // 코러스 시작
-    this.padChorus.start();
+    // 코러스 시작 (AudioContext가 running 상태일 때만)
+    try {
+      const ctx = (Tone as unknown as { getContext?: () => { state?: string } }).getContext?.();
+      if (!ctx || ctx.state === 'running') {
+        this.padChorus.start();
+      }
+    } catch {
+      console.debug('PadInstrument: padChorus.start() 호출 불가');
+    }
 
     
   }
