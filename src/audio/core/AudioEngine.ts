@@ -14,7 +14,7 @@ export class AudioEngine {
   private static _instance: AudioEngine | null = null;
   private _initialized = false;
   // 마스터 볼륨(0~100)을 내부적으로 dB로 변환하여 Tone.Destination.volume에 적용
-  private _masterVolume = 60; // UI 기준 퍼센트 보관 (기본 60)
+  private _masterVolume = 80; // UI 기준 퍼센트 보관 (기본 70)
   
   // 이펙트 버스 (전역 공유)
   private reverb: Tone.Reverb | null = null;
@@ -51,8 +51,11 @@ export class AudioEngine {
       console.warn('초기화 중 Transport 정리 오류:', error);
     }
     
-    // 컨텍스트 시작 전 초기 볼륨을 직접 세팅해 첫 소리가 100%로 나오는 것을 방지
-    const initDb = -60 + (this._masterVolume / 100) * 60;
+  // 컨텍스트 시작 전 초기 볼륨을 직접 세팅해 첫 소리가 100%로 나오는 것을 방지
+  // 안전을 위해 출력 상한을 0dB에서 -6dB로 낮춥니다 (100% -> -6dB)
+  const minDb = -60;
+  const maxDb = -6; // reduce maximum to avoid clipping/distortion
+  const initDb = minDb + (this._masterVolume / 100) * (maxDb - minDb);
     Tone.Destination.volume.value = initDb;
     
     await Tone.start();
@@ -104,14 +107,16 @@ export class AudioEngine {
     this.applyToneCharacter(state.toneCharacter);
   }
 
-  // 마스터 볼륨 제어: 0~100(퍼센트) → dB(-60 ~ 0dB 권장)로 맵핑해 적용
+    // 마스터 볼륨 제어: 0~100(퍼센트) → dB(-60 ~ -6dB 권장)로 맵핑해 적용
   // 사용처: 패널의 Volume 슬라이더 → AudioEngine.setMasterVolume(percent)
   setMasterVolume(percent: number, rampSeconds: number = 0.15): void {
     // 0~100 클램프
     const p = Math.max(0, Math.min(100, percent));
     this._masterVolume = p;
-    // 단순 선형 맵핑: 0 → -60dB, 100 → 0dB
-    const db = -60 + (p / 100) * 60;
+    // 선형 맵핑: 0 → -60dB, 100 → -6dB (upper bound lowered to avoid clipping)
+    const minDb = -60;
+    const maxDb = -6;
+    const db = minDb + (p / 100) * (maxDb - minDb);
     if (this._initialized) {
       Tone.Destination.volume.rampTo(db, rampSeconds);
     } else {
@@ -318,7 +323,9 @@ export class AudioEngine {
 
     // 볼륨을 기본값으로 복원 (다음 시스템에서 정상 재생을 위해)
     try {
-      const initDb = -60 + (this._masterVolume / 100) * 60;
+      const minDb = -60;
+      const maxDb = -6;
+      const initDb = minDb + (this._masterVolume / 100) * (maxDb - minDb);
       Tone.Destination.volume.value = initDb;
   // Volume restored to default
     } catch (error) {

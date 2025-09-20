@@ -54,7 +54,8 @@ export default function Volume({ className, onVolumeChange }: VolumeProps) {
         iconOnly
         size="xxs"
         color="transparent"
-        onClick={() => applyVolume(100)}
+        // set to 90% as a safer quick-max to reduce chance of clipping/distortion
+        onClick={() => applyVolume(90)}
       >
         <IoIosVolumeHigh />
       </Button>
