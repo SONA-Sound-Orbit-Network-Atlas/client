@@ -6,8 +6,8 @@ export const followKeys = {
   followCount: (userId: string) => ['followCount', userId] as const,
 
   // 파라미터 포함 쿼리
-  followersList: (userId: string, page: number, limit: number) =>
-    ['followers', userId, page, limit] as const,
-  followingsList: (userId: string, page: number, limit: number) =>
-    ['followings', userId, page, limit] as const,
+  followersList: (targetId: string, page: number, limit: number) =>
+    ['followers', targetId, page, limit] as const,
+  followingsList: (targetId: string, page: number, limit: number) =>
+    ['followings', targetId, page, limit] as const,
 } as const;
