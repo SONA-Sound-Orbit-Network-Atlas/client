@@ -101,15 +101,17 @@ export class MelodyInstrument extends AbstractInstrumentBase {
     this.sendDly.connect(fx.delay!);
 
     // 신호 체인 연결: melodySynth → compressor → distortion → melodyFilter → vibrato → chorus → (dry + sends)
+    AudioEngine.instance.ensureMasterChain();
+    const dest = AudioEngine.instance.masterInput ?? Tone.getDestination();
     this.melodySynth.chain(
-  this.compressor,
-  this.distortion,
-  this.melodyFilter,
-  this.vibrato,
-  this.chorus,
-  this.panner,
-  this.stereo,
-  AudioEngine.instance.masterInput!
+      this.compressor,
+      this.distortion,
+      this.melodyFilter,
+      this.vibrato,
+      this.chorus,
+      this.panner,
+      this.stereo,
+      dest
     );
 
     // 센드: 코러스 이후의 신호를 리버브/딜레이로 분기

@@ -35,7 +35,7 @@ export default function Gauges({ target }: GaugesProps) {
   const toStarUI = (star: Star): UIProperty[] => {
     return Object.entries(STAR_PROPERTIES).map(([key, def]) => ({
       key,
-      label: key, // 영어, def.label 한글
+      label: def.label, // 영어, def.label 한글
       value: star.properties[key as keyof StarProperties] ?? def.defaultValue,
       min: def.min,
       max: def.max,
@@ -47,7 +47,7 @@ export default function Gauges({ target }: GaugesProps) {
   const toPlanetUI = (planet: Planet): UIProperty[] => {
     return Object.entries(PLANET_PROPERTIES).map(([key, def]) => ({
       key,
-      label: key, // 영어, def.label 한글
+      label: def.label,
       value:
         planet.properties[key as keyof PlanetProperties] ?? def.defaultValue,
       min: def.min,

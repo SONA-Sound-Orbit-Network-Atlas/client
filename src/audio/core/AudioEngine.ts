@@ -14,7 +14,7 @@ export class AudioEngine {
   private static _instance: AudioEngine | null = null;
   private _initialized = false;
   // 마스터 볼륨(0~100)을 내부적으로 dB로 변환하여 Tone.Destination.volume에 적용
-  private _masterVolume = 60; // UI 기준 퍼센트 보관 (기본 60)
+  private _masterVolume = 80; // UI 기준 퍼센트 보관 (기본 70)
   
   // 이펙트 버스 (전역 공유)
   private reverb: Tone.Reverb | null = null;
@@ -51,12 +51,58 @@ export class AudioEngine {
       console.warn('초기화 중 Transport 정리 오류:', error);
     }
     
-    // 컨텍스트 시작 전 초기 볼륨을 직접 세팅해 첫 소리가 100%로 나오는 것을 방지
-    const initDb = -60 + (this._masterVolume / 100) * 60;
+  // 컨텍스트 시작 전 초기 볼륨을 직접 세팅해 첫 소리가 100%로 나오는 것을 방지
+  // 안전을 위해 출력 상한을 0dB에서 -6dB로 낮춥니다 (100% -> -6dB)
+  const minDb = -60;
+  const maxDb = -6; // reduce maximum to avoid clipping/distortion
+  const initDb = minDb + (this._masterVolume / 100) * (maxDb - minDb);
     Tone.Destination.volume.value = initDb;
     
     await Tone.start();
   // Tone.js context started
+    // Safety patch: Tone's internal StateTimeline.getLastState can return undefined in some
+    // edge cases depending on how timelines were manipulated. Some environments then try to
+    // read `.time` from that undefined value which throws "undefined is not an object".
+    // We monkey-patch the method to return a safe fallback when nothing is found.
+    try {
+      const toneAny = Tone as unknown as Record<string, unknown>;
+      const coreObj = toneAny.core as unknown as Record<string, unknown> | undefined;
+      const ST = (toneAny.StateTimeline as unknown) || (coreObj && (coreObj.StateTimeline as unknown));
+      if (ST && typeof ST === 'function') {
+        type TimelineLike = { prototype: Record<string, unknown> };
+        const stCtor = ST as unknown as TimelineLike;
+        const proto = stCtor.prototype;
+  if (proto && !(proto as unknown as Record<string, unknown>).__patched_getLastState) {
+          // original function type: (state: string, time: number) => {state:string,time:number}|undefined
+          const orig = (proto.getLastState as unknown) as (s: unknown, t: unknown) => unknown;
+          proto.getLastState = (function (this: {
+            _search?: (t: unknown) => number;
+            _timeline?: Array<Record<string, unknown>>;
+            _initial?: unknown;
+          }, state: unknown, time: unknown) {
+            const res = orig.call(this, state, time) as unknown;
+            if (!res) {
+              try {
+                const idx = typeof this._search === 'function' ? this._search(time) : -1;
+                if (typeof idx === 'number' && idx >= 0 && Array.isArray(this._timeline)) {
+                  for (let i = idx; i >= 0; i--) {
+                    const entry = this._timeline![i] as Record<string, unknown> | undefined;
+                    if (entry && entry.state === state) return entry as unknown;
+                  }
+                }
+              } catch {
+                // ignore and fallback
+              }
+              return { state: this._initial ?? state, time: 0 } as unknown;
+            }
+            return res;
+          }) as unknown as typeof proto.getLastState;
+          (proto as unknown as Record<string, unknown>).__patched_getLastState = true;
+        }
+      }
+    } catch {
+      // avoid throwing during init; best-effort patch only
+    }
     
     // Transport 설정 (초기 상태가 있다면 적용)
     if (initialState) {
@@ -80,9 +126,18 @@ export class AudioEngine {
     // masterInput → masterEQ → masterFilter → Tone.Destination
     this.masterInput.chain(this.masterEQ, this.masterFilter, Tone.Destination);
 
-    // 이펙트 버스 생성 (리버브/딜레이는 기존대로 Destination에 연결)
-    this.reverb = new Tone.Reverb({ decay: 3, wet: 0.3 }).toDestination();
-    this.delay = new Tone.FeedbackDelay('8n', 0.25).toDestination();
+    // 이펙트 버스 생성 - 전역 이펙트는 master chain 안으로 연결하여 마스터 이펙트가 적용되도록 함
+    this.reverb = new Tone.Reverb({ decay: 3, wet: 0.3 });
+    this.delay = new Tone.FeedbackDelay('8n', 0.25);
+    // reverb/delay 출력은 masterInput을 통해 최종 출력으로 향하도록 연결
+    if (this.masterInput) {
+      this.reverb.connect(this.masterInput);
+      this.delay.connect(this.masterInput);
+    } else {
+      // 안전하게 폴백: Tone.Destination으로 연결
+      this.reverb.toDestination();
+      this.delay.toDestination();
+    }
     
     this._initialized = true;
     // AudioEngine initialization complete
@@ -104,14 +159,16 @@ export class AudioEngine {
     this.applyToneCharacter(state.toneCharacter);
   }
 
-  // 마스터 볼륨 제어: 0~100(퍼센트) → dB(-60 ~ 0dB 권장)로 맵핑해 적용
+    // 마스터 볼륨 제어: 0~100(퍼센트) → dB(-60 ~ -6dB 권장)로 맵핑해 적용
   // 사용처: 패널의 Volume 슬라이더 → AudioEngine.setMasterVolume(percent)
   setMasterVolume(percent: number, rampSeconds: number = 0.15): void {
     // 0~100 클램프
     const p = Math.max(0, Math.min(100, percent));
     this._masterVolume = p;
-    // 단순 선형 맵핑: 0 → -60dB, 100 → 0dB
-    const db = -60 + (p / 100) * 60;
+    // 선형 맵핑: 0 → -60dB, 100 → -6dB (upper bound lowered to avoid clipping)
+    const minDb = -60;
+    const maxDb = -6;
+    const db = minDb + (p / 100) * (maxDb - minDb);
     if (this._initialized) {
       Tone.Destination.volume.rampTo(db, rampSeconds);
     } else {
@@ -144,11 +201,25 @@ export class AudioEngine {
 
   // 이펙트 버스가 필요할 때 항상 존재하도록 보장
   private ensureEffects(): void {
+    // 전역 이펙트가 없으면 생성하고 master chain(또는 Destination)으로 연결
     if (!this.reverb) {
-      this.reverb = new Tone.Reverb({ decay: 3, wet: 0.3 }).toDestination();
+      this.reverb = new Tone.Reverb({ decay: 3, wet: 0.3 });
+      // ensure master chain exists so we can connect effects into it
+      this.ensureMasterChain();
+      if (this.masterInput) {
+        this.reverb.connect(this.masterInput);
+      } else {
+        this.reverb.toDestination();
+      }
     }
     if (!this.delay) {
-      this.delay = new Tone.FeedbackDelay('8n', 0.25).toDestination();
+      this.delay = new Tone.FeedbackDelay('8n', 0.25);
+      this.ensureMasterChain();
+      if (this.masterInput) {
+        this.delay.connect(this.masterInput);
+      } else {
+        this.delay.toDestination();
+      }
     }
   }
 
@@ -318,7 +389,9 @@ export class AudioEngine {
 
     // 볼륨을 기본값으로 복원 (다음 시스템에서 정상 재생을 위해)
     try {
-      const initDb = -60 + (this._masterVolume / 100) * 60;
+      const minDb = -60;
+      const maxDb = -6;
+      const initDb = minDb + (this._masterVolume / 100) * (maxDb - minDb);
       Tone.Destination.volume.value = initDb;
   // Volume restored to default
     } catch (error) {

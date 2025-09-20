@@ -108,7 +108,7 @@ export const PLANET_PROPERTIES: Record<string, PropertyDefinition> = {
   // === 시각적/궤도 속성 ===
   planetSize: {
     key: 'planetSize',
-    label: '행성 크기',
+  label: 'Planet Size',
     description: '행성의 크기 (반지름)',
     category: 'visual',
     min: 0.01,
@@ -126,7 +126,7 @@ export const PLANET_PROPERTIES: Record<string, PropertyDefinition> = {
 
   planetColor: {
     key: 'planetColor',
-    label: '행성 색상',
+  label: 'Planet Color',
     description: '행성의 색상 (색조)',
     category: 'visual',
     min: 0,
@@ -147,7 +147,7 @@ export const PLANET_PROPERTIES: Record<string, PropertyDefinition> = {
 
   planetBrightness: {
     key: 'planetBrightness',
-    label: '행성 밝기',
+  label: 'Planet Brightness',
     description: '행성의 밝기/자체발광',
     category: 'visual',
     min: 0.3,
@@ -169,7 +169,7 @@ export const PLANET_PROPERTIES: Record<string, PropertyDefinition> = {
 
   distanceFromStar: {
     key: 'distanceFromStar',
-    label: '항성으로부터 거리',
+  label: 'Distance from Star',
     description: '중앙별에서의 거리',
     category: 'orbit',
     min: 1.0,
@@ -187,7 +187,7 @@ export const PLANET_PROPERTIES: Record<string, PropertyDefinition> = {
 
   orbitSpeed: {
     key: 'orbitSpeed',
-    label: '공전 속도',
+  label: 'Orbit Speed',
     description: '궤도 운동 속도',
     category: 'orbit',
     min: 0.01,
@@ -204,7 +204,7 @@ export const PLANET_PROPERTIES: Record<string, PropertyDefinition> = {
 
   rotationSpeed: {
     key: 'rotationSpeed',
-    label: '자전 속도',
+  label: 'Rotation Speed',
     description: '자전 운동 속도',
     category: 'orbit',
     min: 0.01,
@@ -222,7 +222,7 @@ export const PLANET_PROPERTIES: Record<string, PropertyDefinition> = {
 
   inclination: {
     key: 'inclination',
-    label: '궤도 기울기',
+  label: 'Inclination',
     description: '궤도면의 기울기',
     category: 'orbit',
     min: 1,
@@ -235,7 +235,7 @@ export const PLANET_PROPERTIES: Record<string, PropertyDefinition> = {
 
   eccentricity: {
     key: 'eccentricity',
-    label: '궤도 이심률',
+  label: 'Eccentricity',
     description: '궤도의 찌그러짐 정도',
     category: 'orbit',
     min: 0.0,
@@ -253,7 +253,7 @@ export const PLANET_PROPERTIES: Record<string, PropertyDefinition> = {
 
   tilt: {
     key: 'tilt',
-    label: '축 기울기',
+  label: 'Axial Tilt',
     description: '자전축의 기울기',
     category: 'orbit',
     min: 0.0,

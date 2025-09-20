@@ -136,10 +136,10 @@ export class DrumInstrument extends AbstractInstrumentBase {
     this.drumWide.toDestination();
   }
   // sends (병렬) - EQ 출력에서 리버브/딜레이로 보내어 wet로 제어
+  // sends (병렬) - EQ 출력에서 리버브/딜레이로 보내어 wet로 제어
+  // 전역 이펙트는 AudioEngine의 effect bus로 연결되며, 해당 노드가 master chain을 통과하도록 AudioEngine에서 처리합니다.
   this.drumEQ.connect(this.drumReverb);
   this.drumEQ.connect(this.drumDelay);
-  this.drumReverb.toDestination();
-  this.drumDelay.toDestination();
 
   // DrumInstrument initialized: this.id
   }

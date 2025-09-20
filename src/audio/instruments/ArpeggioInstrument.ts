@@ -86,13 +86,15 @@ export class ArpeggioInstrument extends AbstractInstrumentBase {
     });
 
     // 신호 체인 연결: arpSynth → compressor → eq → arpFilter → tremolo → pingPongDelay → destination
+    AudioEngine.instance.ensureMasterChain();
+    const dest = AudioEngine.instance.masterInput ?? Tone.getDestination();
     this.arpSynth.chain(
-  this.compressor,
-  this.eq,
-  this.arpFilter,
-  this.tremolo,
-  this.pingPongDelay,
-  AudioEngine.instance.masterInput!
+      this.compressor,
+      this.eq,
+      this.arpFilter,
+      this.tremolo,
+      this.pingPongDelay,
+      dest
     );
 
     // 트레몰로 시작

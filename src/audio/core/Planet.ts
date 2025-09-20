@@ -20,9 +20,7 @@ import { PadInstrument } from '../instruments/PadInstrument';
 import { Star } from '../core/Star';
 import { PLANET_PROPERTIES } from '../../types/planetProperties';
 import { generateAdvancedPattern } from '../utils/advancedPattern';
-import { 
-  initializePropertiesFromConfig
-} from '../utils/parameterConfig';
+// ...existing code... (parameterConfig import removed - Planet no longer auto-initializes properties)
 
 export type PlanetSynthConfig = {
   synthType?: SynthTypeId;
@@ -57,9 +55,10 @@ export class Planet {
     const resolvedSynth = config?.synthType ?? getDefaultSynthType(role);
     this.synthType = resolvedSynth;
     this.oscillatorType = config?.oscillatorType ?? getDefaultOscillatorType(role, resolvedSynth);
-    this.instrument = this.createInstrumentForRole(role);
-    this.initializeProperties();
-    this.updateInstrument();
+  this.instrument = this.createInstrumentForRole(role);
+  // 초기 프로퍼티는 외부(스토어)에서 전달될 수 있으므로 생성자에서
+  // 즉시 랜덤 생성하여 덮어쓰지 않습니다. 빈 객체로 초기화합니다.
+  this.properties = {} as PlanetPhysicalProperties;
     // Star BPM 구독: BPM 변경 시 패턴 파라미터 재계산
     this.star.addBpmListener((bpm) => {
       try {
@@ -78,15 +77,8 @@ export class Planet {
     
   }
 
-  private initializeProperties(): void {
-    const rng = this.star.getDomainRng(`planet-init-${this.role}`);
-    
-    // 새로운 설정 기반 시스템 사용
-    const configBasedProperties = initializePropertiesFromConfig(rng);
-    this.properties = configBasedProperties as unknown as PlanetPhysicalProperties;
-    
-    
-  }
+  // initializeProperties는 더 이상 생성자에서 자동 호출하지 않습니다.
+  // 필요 시 외부에서 명시적으로 호출하거나 updateProperties로 전달하세요.
 
   private createInstrumentForRole(role: InstrumentRole): Instrument {
     switch (role) {
@@ -100,13 +92,63 @@ export class Planet {
     }
   }
 
+  // 역할(role)을 런타임에 변경할 때 사용합니다.
+  // 기존 악기를 즉시 폐기(dispose)하고 새로운 악기를 생성하여 교체합니다.
+  // 패턴 재생 상태(isPlaying)는 유지되며, 패턴 스케줄러는 내부 instrument 참조를 통해 계속 노트를 트리거합니다.
+  public changeRole(newRole: InstrumentRole, config?: PlanetSynthConfig): void {
+    if (newRole === this.role) return;
+
+    const wasPlaying = this.isPlaying;
+
+    // 새 악기 생성
+    const newInstrument = this.createInstrumentForRole(newRole);
+
+    // 이전 악기를 안전하게 정리
+    try {
+      if (this.instrument && !this.instrument.isDisposed()) {
+        this.instrument.dispose();
+      }
+    } catch (err) {
+      console.warn(`${this.name} 이전 악기 dispose 중 오류:`, err);
+    }
+
+    // 상태 갱신
+    this.instrument = newInstrument;
+    this.role = newRole;
+    this.name = `${newRole} Planet`;
+
+    // synth/osc 설정이 전달되었으면 업데이트
+    if (config?.synthType) this.synthType = config.synthType;
+    if (config?.oscillatorType) this.oscillatorType = config.oscillatorType;
+
+    // 새 악기에게 현재 프로퍼티와 synth 설정을 적용
+    this.updateInstrument();
+
+    // 패턴 재생 상태는 유지합니다. (스케줄러는 this.instrument를 사용하기 때문에 별도 처리 불필요)
+    if (wasPlaying) {
+      // 소폭 지연 또는 페이드를 추가하려면 여기에 구현
+    }
+  }
+
   updateProperty(key: keyof PlanetPhysicalProperties, value: number): void {
+    if (!this.properties) this.properties = {} as PlanetPhysicalProperties;
     this.properties[key] = value;
     this.updateInstrument();
   }
 
   updateProperties(props: Partial<PlanetPhysicalProperties>): void {
-    Object.assign(this.properties, props);
+    if (!props) {
+      console.debug(`${this.name} updateProperties 호출 시 props가 null/undefined로 전달되었습니다. 무시합니다.`);
+      return;
+    }
+
+    if (!this.properties || Object.keys(this.properties).length === 0) {
+      // 외부에서 전달된 초기 props가 우선시되어야 하므로 빈 상태라면 그대로 할당
+      this.properties = { ...(props as PlanetPhysicalProperties) };
+    } else {
+      Object.assign(this.properties, props);
+    }
+
     this.updateInstrument();
   }
 

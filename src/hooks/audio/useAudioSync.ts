@@ -59,6 +59,14 @@ export function useAudioSync() {
     const currentIds = activePlanets.map((p) => p.id);
     const prevIds = prevPlanetIdsRef.current;
 
+    // 디버그: sync 시점에 전달되는 행성 ID와 StellarSystem 내부 맵 상태 확인
+    try {
+  const ss = system as unknown as { planets?: Map<string, unknown> };
+  console.debug('[useAudioSync] syncPlanets activeIds=', currentIds, 'stellarSystemPlanets=', Array.from(ss.planets?.keys?.() || []));
+    } catch (e) {
+      console.debug('[useAudioSync] syncPlanets debug failure', e);
+    }
+
     // 제거된 행성 처리
     const removed = prevIds.filter((id) => !currentIds.includes(id));
     removed.forEach((id) => {
@@ -74,12 +82,16 @@ export function useAudioSync() {
         planet.oscillatorType ?? getDefaultOscillatorType(planet.role, synthType);
 
       if (!prev) {
-        // 신규 행성
-        system.createPlanet(planet.role, planet.id, { synthType, oscillatorType });
+        // 신규 행성 (스토어의 랜덤 프로퍼티를 초기값으로 전달)
+        system.createPlanet(planet.role, planet.id, { synthType, oscillatorType }, planet.properties as PlanetProperties);
       } else if (prev.role !== planet.role) {
-        // 역할 변경 시 재생성
-        system.removePlanet(planet.id);
-        system.createPlanet(planet.role, planet.id, { synthType, oscillatorType });
+        // 역할 변경 시 StellarSystem의 changePlanetRole을 사용하여 역할을 안전하게 변경
+        const ok = system.changePlanetRole(planet.id, planet.role, { synthType, oscillatorType });
+        if (!ok) {
+          // 실패 시 fallback: recreate
+          system.removePlanet(planet.id);
+          system.createPlanet(planet.role, planet.id, { synthType, oscillatorType });
+        }
       }
 
       if (!prev || prev.synthType !== synthType || prev.oscillatorType !== oscillatorType) {
@@ -87,7 +99,14 @@ export function useAudioSync() {
       }
 
       if (!prev || !shallowEqual(planet.properties as PlanetProperties, prev.properties)) {
-        system.updatePlanetProperties(planet.id, planet.properties as PlanetProperties);
+        // StellarSystem에 해당 행성이 실제로 존재하는지 확인
+        const existing = system.getPlanet(planet.id);
+        if (!existing) {
+          console.debug(`[useAudioSync] syncPlanets: target planet missing in StellarSystem, recreating with initial properties: ${planet.id}`);
+          system.createPlanet(planet.role, planet.id, { synthType, oscillatorType }, planet.properties as PlanetProperties);
+        } else {
+          system.updatePlanetProperties(planet.id, planet.properties as PlanetProperties);
+        }
       }
 
       prevPlanetPropsRef.current[planet.id] = {
@@ -107,6 +126,24 @@ export function useAudioSync() {
 
     // useAudioSync initialization start: stellarId=%s, planetsCount=%d
 
+    // 먼저 스토어의 Star 프로퍼티가 있으면 오디오 시스템에 적용하고 시드를 설정합니다.
+    try {
+      const currStarProps = stellarStore.star?.properties as StarProperties | undefined;
+      if (currStarProps) {
+        system.updateStarProperties(currStarProps);
+        prevStarPropsRef.current = currStarProps;
+        try {
+          const seedStr = `${currStarProps.color}|${currStarProps.size}|${currStarProps.spin}|${currStarProps.brightness}`;
+          system.setSeed(seedStr);
+        } catch (err) {
+          console.debug('초기 스타 시드 설정 중 오류:', err);
+        }
+      }
+    } catch (err) {
+      console.debug('초기 스타 프로퍼티 오디오 동기화 중 오류:', err);
+    }
+
+    // 그 다음에 행성 동기화를 실행해 Planet 생성 시점에 시드가 이미 설정되도록 보장합니다.
     syncPlanets(true);
     prevSystemIdRef.current = stellarStore.id;
     isInitializedRef.current = true;

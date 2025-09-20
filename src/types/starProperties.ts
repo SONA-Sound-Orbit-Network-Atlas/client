@@ -16,7 +16,7 @@ export interface StarProperties {
 export const STAR_PROPERTIES: Record<string, PropertyDefinition> = {
   spin: {
     key: 'spin',
-    label: '항성 자전',
+    label: 'Star Spin',
     description: '항성의 자전 속도 (전체 BPM 결정)',
     category: 'pattern',
     min: 0,
@@ -32,7 +32,7 @@ export const STAR_PROPERTIES: Record<string, PropertyDefinition> = {
 
   brightness: {
     key: 'brightness',
-    label: '항성 밝기',
+    label: 'Star Brightness',
     description:
       '항성의 밝기 (전체 음색 특성 결정 - 어두우면 따뜻하고 부드러운 톤, 밝으면 선명하고 날카로운 톤)',
     category: 'audio',
@@ -46,7 +46,7 @@ export const STAR_PROPERTIES: Record<string, PropertyDefinition> = {
 
   color: {
     key: 'color',
-    label: '항성 색상',
+    label: 'Star Color',
     description: '항성의 색상 (Key/Scale 결정)',
     category: 'pitch',
     min: 0,
@@ -66,7 +66,7 @@ export const STAR_PROPERTIES: Record<string, PropertyDefinition> = {
 
   size: {
     key: 'size',
-    label: '항성 크기',
+    label: 'Star Size',
     description: '항성의 크기 (패턴 복잡도 결정)',
     category: 'pattern',
     min: 0,
