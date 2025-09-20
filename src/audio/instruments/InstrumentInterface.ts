@@ -411,72 +411,17 @@ export function macrosToAudioParameters(
   let pan = (motion.pan - 0.5) * 1.4;
   let padOutGainDb: number | undefined = undefined;
   // 로컬 변수로 params 필드들을 미리 선언: rawAudioTargets 블록에서 params가 아직 선언되기 전에 사용되므로
-  let delayFeedback = delayFeedbackBase;
-  let chorusDepth = lerp(0.1, 0.5, motion.space);
-  let tremDepth = lerp(0.1, 0.6, motion.movement);
-  let binaural = lerp(0, 0.22, motion.space);
-  let panSpread = (motion.movement - 0.5) * 0.9;
-  let ghostNotes = motion.density * 0.4;
-  let syncopation = motion.movement * 0.65;
+  const delayFeedback = delayFeedbackBase;
+  const chorusDepth = lerp(0.1, 0.5, motion.space);
+  const tremDepth = lerp(0.1, 0.6, motion.movement);
+  const binaural = lerp(0, 0.22, motion.space);
+  const panSpread = (motion.movement - 0.5) * 0.9;
+  const ghostNotes = motion.density * 0.4;
+  const syncopation = motion.movement * 0.65;
   // timing은 이후 params.timing에 의해 계산되므로 로컬 변수는 제거
-  let swingPct = motion.movement * 36;
-  let accentDb = lerp(0.5, 5, motion.accent);
+  const swingPct = motion.movement * 36;
+  const accentDb = lerp(0.5, 5, motion.accent);
 
-  if (rawAudioTargets) {
-    // 모든 주요 파라미터에 대해 clamp 적용 (0~1 또는 해당 파라미터 기대 범위)
-    if (typeof rawAudioTargets.filterCutoff === 'number') {
-      cutoffHz = Math.max(150, Math.min(14000, rawAudioTargets.filterCutoff));
-    }
-    if (typeof rawAudioTargets.stereoWidth === 'number') {
-      stereoWidth = Math.max(0, Math.min(1.5, rawAudioTargets.stereoWidth));
-    }
-    if (typeof rawAudioTargets.reverbSend === 'number') {
-      reverbSend = clamp01(rawAudioTargets.reverbSend);
-    }
-    if (typeof rawAudioTargets.outGainDb === 'number') {
-      padOutGainDb = Math.max(-30, Math.min(0, rawAudioTargets.outGainDb));
-    }
-    if (typeof rawAudioTargets.pan === 'number') {
-      pan = Math.max(-0.8, Math.min(0.8, rawAudioTargets.pan));
-    }
-    if (typeof rawAudioTargets.delayFeedback === 'number') {
-      // 딜레이 피드백: 0~1
-      delayFeedback = clamp01(rawAudioTargets.delayFeedback);
-    }
-    if (typeof rawAudioTargets.chorusDepth === 'number') {
-      // 코러스 깊이: 0~1
-      chorusDepth = clamp01(rawAudioTargets.chorusDepth);
-    }
-    if (typeof rawAudioTargets.tremDepth === 'number') {
-      // 트렘 깊이: 0~1
-      tremDepth = clamp01(rawAudioTargets.tremDepth);
-    }
-    if (typeof rawAudioTargets.binaural === 'number') {
-      // 바이노럴: 0~1
-      binaural = clamp01(rawAudioTargets.binaural);
-    }
-    if (typeof rawAudioTargets.panSpread === 'number') {
-      // 팬 스프레드: -1~1
-      panSpread = Math.max(-1, Math.min(1, rawAudioTargets.panSpread));
-    }
-    if (typeof rawAudioTargets.ghostNotes === 'number') {
-      // 고스트노트: 0~1
-      ghostNotes = clamp01(rawAudioTargets.ghostNotes);
-    }
-    if (typeof rawAudioTargets.syncopation === 'number') {
-      // 싱코페이션: 0~1
-      syncopation = clamp01(rawAudioTargets.syncopation);
-    }
-    // timing은 params 블록에서 덮어쓰기 처리하므로 여기서는 별도 처리하지 않음
-    if (typeof rawAudioTargets.swingPct === 'number') {
-      // 스윙: 0~100 → 0~1로 변환
-      swingPct = clamp01(rawAudioTargets.swingPct / 100);
-    }
-    if (typeof rawAudioTargets.accentDb === 'number') {
-      // 악센트: 0~6 → 0~1로 변환
-      accentDb = clamp01(rawAudioTargets.accentDb / 6);
-    }
-  }
 
   // PAD 악기일 때만 값 덮어쓰기 (macros 기반)
   if (role === 'PAD') {
