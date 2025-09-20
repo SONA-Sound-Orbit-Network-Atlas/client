@@ -34,8 +34,8 @@ export interface PaginationMeta {
   limit: number;
   total: number;
   totalPages: number;
-  hasNext: boolean;
-  hasPrev: boolean;
+  hasNext?: boolean; // 서버에서 제공하지 않을 수 있음
+  hasPrev?: boolean; // 서버에서 제공하지 않을 수 있음
 }
 
 // ===== 팔로우 사용자 타입 =====
