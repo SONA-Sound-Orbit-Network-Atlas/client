@@ -1,6 +1,5 @@
 import Galaxy from './cosmos/Galaxy';
 import MainCamera from './systems/MainCamera';
-import BackgroundStars from './cosmos/BackgroundStars';
 import BackgroundStarsVer2 from './cosmos/BackgroundStarsVer2';
 
 // 화면 표시
@@ -19,7 +18,6 @@ export default function Scene() {
       <MainCamera />
 
       {/* 배경 */}
-      {/* <BackgroundStars /> */}
       <BackgroundStarsVer2 />
     </>
   );
