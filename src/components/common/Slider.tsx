@@ -39,7 +39,7 @@ function Slider({
     <div className="w-full">
       {(label || showCurrentValue) && (
         <div className="flex justify-between items-center mb-1.5">
-          {label && <span className="text-base text-text-white">{label}</span>}
+          {label && <span className="text-sm text-text-white">{label}</span>}
           {showCurrentValue && (
             <span className="text-sm font-semibold text-text-secondary">
               {currentValue}
