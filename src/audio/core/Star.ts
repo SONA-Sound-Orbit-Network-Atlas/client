@@ -105,7 +105,7 @@ export class Star {
       
     }, '16n'); // 16분음표마다 실행
     
-    console.log('🕐 Star 중앙 클락 초기화 완료');
+  // Star clock initialized
   }
   
   // 클락 시작
@@ -120,7 +120,7 @@ export class Star {
     this.globalClock.start(0);
     this.isClockRunning = true;
     
-    console.log('▶️ Star 중앙 클락 시작');
+  // Star clock started
   }
   
   // 클락 정지
@@ -135,19 +135,19 @@ export class Star {
     this.currentBar = 0;
     this.currentSixteenth = 0;
     
-    console.log('⏹️ Star 중앙 클락 정지');
+  // Star clock stopped
   }
   
   // 클락 리스너 등록 (Planet에서 사용)
   addClockListener(id: string, callback: (beat: number, bar: number, sixteenth: number, time: number) => void): void {
     this.clockListeners.set(id, callback);
-    console.log(`🕐 클락 리스너 등록: ${id} (총 ${this.clockListeners.size}개)`);
+  // Clock listener registered: id=${id}
   }
   
   // 클락 리스너 제거
   removeClockListener(id: string): void {
     if (this.clockListeners.delete(id)) {
-      console.log(`🕐 클락 리스너 제거: ${id} (남은 ${this.clockListeners.size}개)`);
+  // Clock listener removed: id=${id}
     }
     
     // 모든 리스너가 제거되면 클락 정지
@@ -158,11 +158,11 @@ export class Star {
 
   // 모든 리스너 제거 및 클락 전체 리셋 (스텔라 전환용) - 강화된 버전
   clearAllClockListeners(): void {
-    console.log('🕐 Star 클락 시스템 완전 초기화 시작...');
+  // Star clock system full reset start
     
     // 모든 클락 리스너 제거
     this.clockListeners.clear();
-    console.log('🕐 모든 클락 리스너 제거됨');
+  // All clock listeners removed
     
     // 클락 완전히 정지
     this.stopClock();
@@ -171,7 +171,7 @@ export class Star {
     if (this.globalClock) {
       this.globalClock.dispose();
       this.globalClock = null;
-      console.log('🕐 기존 글로벌 클락 dispose됨');
+  // Existing global clock disposed
     }
     
     // 클락 카운터 완전히 리셋
@@ -183,7 +183,7 @@ export class Star {
     // 새로운 클락 재생성
     this.initializeClock();
     
-    console.log('🕐 Star 클락 시스템 완전 초기화 완료');
+  // Star clock system full reset complete
   }
   
   // 현재 클락 상태 반환
@@ -217,10 +217,10 @@ export class Star {
       }
     }
     
-    console.log(`⭐ Star ${property} → ${value} | Global State:`, this.globalState);
+  // Star property updated: ${property} -> ${value}
     // BPM 변경이 있었는지 알림
     if (property === 'spin') {
-      console.log(`⭐ Star: spin 변경 → BPM 알림 ${this.globalState.bpm}`);
+  // Star spin changed -> BPM notification: ${this.globalState.bpm}
       this.bpmListeners.forEach((cb) => {
         try { cb(this.globalState.bpm); } catch (e) { console.warn('bpm listener error', e); }
       });
@@ -257,7 +257,7 @@ export class Star {
       }
     }
     
-    console.log(`⭐ Star Global State 직접 업데이트:`, this.globalState);
+  // Star global state updated directly
     if ('bpm' in newState) {
       this.bpmListeners.forEach((cb) => {
         try { cb(this.globalState.bpm); } catch (e) { console.warn('bpm listener error', e); }
@@ -353,18 +353,12 @@ export class Star {
       this.globalClock = null;
     }
     
-    console.log('🗑️ Star 정리 완료');
+  // Star disposed
   }
   
   // 디버그 정보 출력
   debug(): void {
-    console.log('⭐ Star Debug Info:');
-    console.log('Properties:', this.properties);
-    console.log('Global State:', this.globalState);
-    console.log('Clock State:', this.getClockState());
-    console.log('Scale Notes:', this.getScaleNotes());
-    console.log('Key Root MIDI:', this.getKeyRoot());
-    console.log('Active Listeners:', this.clockListeners.size);
+  // Star debug info (removed verbose logs in production)
   }
   
   // === Seed 기반 랜덤 관리 ===
@@ -373,7 +367,7 @@ export class Star {
   setSeed(seed: number | string): void {
     this.seed = seed;
     this.randomManager.setSeed(seed);
-    console.log(`🌱 Star Seed 설정: ${seed}`);
+  // Star seed set: ${seed}
   }
   
   // 현재 시드 반환

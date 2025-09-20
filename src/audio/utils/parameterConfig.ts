@@ -11,6 +11,7 @@ import {
   mapPlanetToAudioParameters,
   generateInitialPlanetProperties,
 } from '../instruments/InstrumentInterface';
+import mapPlanetToAudioTargets from '../mapping/planetTransforms';
 
 export { clamp };
 
@@ -19,6 +20,14 @@ export function mapPlanetToAudio(
   props: PlanetPhysicalProperties
 ): MappedAudioParameters {
   return mapPlanetToAudioParameters(role, props);
+}
+
+// Raw planet properties -> audio-target physical values (직접적인 transform 결과)
+export function mapRawPropertiesToAudioTargets(
+  props: PlanetPhysicalProperties,
+  role?: InstrumentRole
+): Record<string, number> {
+  return mapPlanetToAudioTargets(props, role);
 }
 
 export function initializePropertiesFromConfig(

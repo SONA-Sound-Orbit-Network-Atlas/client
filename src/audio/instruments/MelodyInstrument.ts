@@ -5,13 +5,9 @@
 import * as Tone from 'tone';
 import type { MappedAudioParameters } from '../../types/audio';
 import { AudioEngine } from '../core/AudioEngine';
-import {
-  BaseInstrument,
-  type SimplifiedInstrumentMacros,
-  type ResolvedInstrumentContext,
-} from './InstrumentInterface';
+import { AbstractInstrumentBase } from './InstrumentInterface';
 
-export class MelodyInstrument extends BaseInstrument {
+export class MelodyInstrument extends AbstractInstrumentBase {
   
   // 멜로디 전용 신스와 이펙트 체인
   private melodySynth!: Tone.MonoSynth;      // 메인 멜로디 신스 (MonoSynth - 단음 연주에 최적화)
@@ -106,14 +102,14 @@ export class MelodyInstrument extends BaseInstrument {
 
     // 신호 체인 연결: melodySynth → compressor → distortion → melodyFilter → vibrato → chorus → (dry + sends)
     this.melodySynth.chain(
-      this.compressor,
-      this.distortion,
-      this.melodyFilter,
-      this.vibrato,
-      this.chorus,
-      this.panner,
-      this.stereo,
-      Tone.Destination
+  this.compressor,
+  this.distortion,
+  this.melodyFilter,
+  this.vibrato,
+  this.chorus,
+  this.panner,
+  this.stereo,
+  AudioEngine.instance.masterInput!
     );
 
     // 센드: 코러스 이후의 신호를 리버브/딜레이로 분기
@@ -124,7 +120,7 @@ export class MelodyInstrument extends BaseInstrument {
     // Vibrato는 자동으로 작동하므로 별도 start 불필요
     this.chorus.start();
 
-    console.log('🎵 MelodyInstrument 초기화 완료:', this.id);
+  // MelodyInstrument initialized: this.id
   }
 
   public triggerAttackRelease(
@@ -243,9 +239,7 @@ export class MelodyInstrument extends BaseInstrument {
 
   // SONA 매핑된 파라미터 적용
   protected handleParameterUpdate(
-    params: MappedAudioParameters,
-    _macros: SimplifiedInstrumentMacros,
-    _context: ResolvedInstrumentContext
+  params: MappedAudioParameters
   ): void {
     if (this.disposed) return;
 
@@ -317,7 +311,7 @@ export class MelodyInstrument extends BaseInstrument {
 
   protected applyOscillatorType(type: Tone.ToneOscillatorType): void {
     if (this.disposed) return;
-    this.melodySynth?.set({ oscillator: { type } } as any);
+  this.melodySynth?.set({ oscillator: { type } } as Partial<Tone.SynthOptions>);
   }
 
   public dispose(): void {
@@ -332,6 +326,6 @@ export class MelodyInstrument extends BaseInstrument {
     this.distortion?.dispose();
     
     super.dispose();
-    console.log(`🗑️ MelodyInstrument ${this.id} disposed`);
+  // MelodyInstrument disposed: this.id
   }
 }

@@ -1,16 +1,13 @@
+import { AudioEngine } from '../core/AudioEngine';
 // ArpeggioInstrument - 아르페지오 전용 악기 (독립 구현)
 // MonoSynth + 빠른 패턴 생성 기능으로 아르페지오와 시퀀스를 생성합니다.
 // SONA 지침: ARPEGGIO 역할 - pulses 6..16, rotation 2의 배수 스냅, trem_hz ≤ 6
 
 import * as Tone from 'tone';
 import type { MappedAudioParameters } from '../../types/audio';
-import {
-  BaseInstrument,
-  type SimplifiedInstrumentMacros,
-  type ResolvedInstrumentContext,
-} from './InstrumentInterface';
+import { AbstractInstrumentBase } from './InstrumentInterface';
 
-export class ArpeggioInstrument extends BaseInstrument {
+export class ArpeggioInstrument extends AbstractInstrumentBase {
   // Tone.js는 같은 oscillator에 대해 start 시간이 반드시 이전 start보다 커야 함
   // 루프 타이밍/재시작 경계에서 동일 시각이 들어오는 것을 방지하기 위한 가드
   private lastTriggerTimeSec = 0;
@@ -90,18 +87,18 @@ export class ArpeggioInstrument extends BaseInstrument {
 
     // 신호 체인 연결: arpSynth → compressor → eq → arpFilter → tremolo → pingPongDelay → destination
     this.arpSynth.chain(
-      this.compressor,
-      this.eq,
-      this.arpFilter,
-      this.tremolo,
-      this.pingPongDelay,
-      Tone.Destination
+  this.compressor,
+  this.eq,
+  this.arpFilter,
+  this.tremolo,
+  this.pingPongDelay,
+  AudioEngine.instance.masterInput!
     );
 
     // 트레몰로 시작
     this.tremolo.start();
 
-    console.log('🎹 ArpeggioInstrument 초기화 완료:', this.id);
+  // ArpeggioInstrument initialized: this.id
   }
 
   public triggerAttackRelease(
@@ -235,11 +232,7 @@ export class ArpeggioInstrument extends BaseInstrument {
   }
 
   // SONA 매핑된 파라미터 적용 (안전한 null 처리)
-  protected handleParameterUpdate(
-    params: MappedAudioParameters,
-    _macros: SimplifiedInstrumentMacros,
-    _context: ResolvedInstrumentContext
-  ): void {
+  protected handleParameterUpdate(params: MappedAudioParameters): void {
     if (this.disposed) return;
 
     // 필터 컷오프 조절 - 아르페지오는 밝은 톤 유지
@@ -313,7 +306,7 @@ export class ArpeggioInstrument extends BaseInstrument {
 
   protected applyOscillatorType(type: Tone.ToneOscillatorType): void {
     if (this.disposed) return;
-    this.arpSynth?.set({ oscillator: { type } } as any);
+  this.arpSynth?.set({ oscillator: { type } } as Partial<Tone.SynthOptions>);
   }
 
   public dispose(): void {
@@ -328,6 +321,6 @@ export class ArpeggioInstrument extends BaseInstrument {
     this.eq?.dispose();
     
     super.dispose();
-    console.log(`🗑️ ArpeggioInstrument ${this.id} disposed`);
+  // ArpeggioInstrument disposed: this.id
   }
 }

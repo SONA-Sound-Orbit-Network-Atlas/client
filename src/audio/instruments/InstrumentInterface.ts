@@ -4,6 +4,7 @@
 import * as Tone from 'tone';
 import type { InstrumentRole, PlanetPhysicalProperties, MappedAudioParameters } from '../../types/audio';
 import { PLANET_PROPERTIES } from '../../types/planetProperties';
+import { mapRawPropertiesToAudioTargets } from '../utils/parameterConfig';
 
 // === 타입 정의 ===
 
@@ -344,7 +345,9 @@ function computeMacros(
 export function macrosToAudioParameters(
   role: InstrumentRole,
   macros: SimplifiedInstrumentMacros,
-  context: ResolvedInstrumentContext
+  context: ResolvedInstrumentContext,
+  // 선택적: raw audio target 값을 외부에서 주입할 수 있음
+  rawAudioTargets?: Record<string, number>
 ): MappedAudioParameters {
   const { tone, motion, meta } = macros;
 
@@ -401,10 +404,60 @@ export function macrosToAudioParameters(
   const subdivision = motion.density > 0.75 ? 3 : motion.density > 0.4 ? 2 : 1;
   const rate = motion.density > 0.66 ? '16n' : motion.density > 0.33 ? '8n' : '4n';
 
+  // rawAudioTargets(planetTransforms 결과)가 주어지면 해당 값을 Tone.js 파라미터 기대 범위에 맞게 변환 및 clamp
   let cutoffHz = cutoffBase;
   let stereoWidth = stereoWidthBase;
   let reverbSend = reverbSendBase;
   let pan = (motion.pan - 0.5) * 1.4;
+  let padOutGainDb: number | undefined = undefined;
+  // 로컬 변수로 params 필드들을 미리 선언: rawAudioTargets 블록에서 params가 아직 선언되기 전에 사용되므로
+  const delayFeedback = delayFeedbackBase;
+  const chorusDepth = lerp(0.1, 0.5, motion.space);
+  const tremDepth = lerp(0.1, 0.6, motion.movement);
+  const binaural = lerp(0, 0.22, motion.space);
+  const panSpread = (motion.movement - 0.5) * 0.9;
+  const ghostNotes = motion.density * 0.4;
+  const syncopation = motion.movement * 0.65;
+  // timing은 이후 params.timing에 의해 계산되므로 로컬 변수는 제거
+  const swingPct = motion.movement * 36;
+  const accentDb = lerp(0.5, 5, motion.accent);
+
+
+  // PAD 악기일 때만 값 덮어쓰기 (macros 기반)
+  if (role === 'PAD') {
+    // PAD는 모든 주요 프로퍼티가 사운드에 크게 반영되도록 비선형 맵/가중치 강화
+    const padBrightness = clamp01(macros.tone.brightness);
+    const padSpace = clamp01(macros.motion.space);
+    const padTilt = clamp01(macros.meta.tilt ?? 0.5);
+    const padInclination = clamp01(macros.meta.inclination ?? 0.5);
+    const planetSizeNorm = macros.meta?.size !== undefined ? macros.meta.size : 0.5;
+
+    // 컷오프: brightness, tilt, inclination 모두 반영 (exp 맵 계수 증가)
+    const cutoffFromBrightness = mapExp(padBrightness, 400, 14000, 3.2);
+    const cutoffFromTilt = mapExp(padTilt, 400, 14000, 2.2);
+    const cutoffFromInclination = mapExp(padInclination, 400, 14000, 2.2);
+    cutoffHz = Math.max(200, Math.min(14000, (cutoffFromBrightness * 0.6 + cutoffFromTilt * 0.2 + cutoffFromInclination * 0.2)));
+
+    // stereoWidth: space, tilt 반영 (sigmoid 맵 계수 증가)
+    const stereoFromSpace = sigmoid(padSpace, 8) * 0.95;
+    const stereoFromTilt = sigmoid(padTilt, 6) * 0.7;
+    stereoWidth = Math.max(0, Math.min(0.95, (stereoFromSpace * 0.7 + stereoFromTilt * 0.3)));
+
+    // reverbSend: space, inclination 반영 (exp 맵 계수 증가)
+    const reverbFromSpace = Math.pow(padSpace, 2.2) * 0.8;
+    const reverbFromInclination = Math.pow(padInclination, 1.7) * 0.5;
+    reverbSend = Math.max(0, Math.min(0.8, (reverbFromSpace * 0.7 + reverbFromInclination * 0.3)));
+
+    // 볼륨: planetSizeNorm, brightness, tilt 모두 반영 (exp/sigmoid 맵 계수 증가)
+    const outGainBase = lerp(-30, 0, sigmoid(padBrightness, 8));
+    const outGainExp = mapExp(padBrightness, -30, 0, 2.8);
+    const outGainSize = lerp(-30, 0, Math.pow(planetSizeNorm, 2.2));
+    const outGainTilt = lerp(-30, 0, Math.pow(padTilt, 1.7));
+    padOutGainDb = Math.max(-30, Math.min(0, (outGainBase * 0.4 + outGainExp * 0.2 + outGainSize * 0.3 + outGainTilt * 0.1)));
+
+    // 로그로 변화 확인
+    
+  }
 
   // 역할별 sensitivity 적용 (드럼 우선)
   const sensitivity = ROLE_SENSITIVITY[role] ?? {};
@@ -439,18 +492,18 @@ export function macrosToAudioParameters(
     toneTint: tone.warmth,
     waveFold: lerp(0, 0.45, tone.texture),
     detune: lerp(-25, 25, tone.warmth),
-    cutoffHz,
+  cutoffHz,
     // outGainDb은 로그/시그모이드 맵을 사용해 더 자연스럽게 변화
-    outGainDb: lerp(-10, 0, sigmoid(tone.brightness, 6)),
+  outGainDb: padOutGainDb !== undefined ? padOutGainDb : lerp(-10, 0, sigmoid(tone.brightness, 6)),
     resonanceQ: resonanceBase,
     filterResonance: lerp(0.7, 7.5, tone.texture),
     reverbSend,
     delayTime: delayTimeBase,
-    delayFeedback: delayFeedbackBase,
+    delayFeedback: delayFeedback,
     spatialWidth: lerp(0.25, 1.1, motion.space),
-    panSpread: (motion.movement - 0.5) * 0.9,
-    chorusDepth: lerp(0.1, 0.5, motion.space),
-    binaural: lerp(0, 0.22, motion.space),
+    panSpread: panSpread,
+    chorusDepth: chorusDepth,
+    binaural: binaural,
     pitchSemitones: lerp(-6, 6, tone.warmth),
     rangeWidth: Math.round(6 + tone.texture * 18 - meta.size * 4),
     intervalVariation: lerp(0.1, 0.8, motion.movement),
@@ -459,16 +512,16 @@ export function macrosToAudioParameters(
     rate,
     pulses,
     subdivision,
-    syncopation: motion.movement * 0.65,
-    ghostNotes: motion.density * 0.4,
+    syncopation: syncopation,
+    ghostNotes: ghostNotes,
     tremHz: lerp(0.4, 8.5, motion.movement),
-    tremDepth: lerp(0.1, 0.6, motion.movement),
+    tremDepth: tremDepth,
     vibratoRate: lerp(2.5, 8.5, tone.texture),
     polyrhythm: clamp(Math.round(1 + motion.density * 3), 1, 4),
     patternEvolution: motion.accent * 0.6,
     crossRhythm: motion.movement * 0.4,
-    swingPct: motion.movement * 36,
-    accentDb: lerp(0.5, 5, motion.accent),
+    swingPct: swingPct,
+    accentDb: accentDb,
     timing: (motion.movement - 0.5) * 0.04,
     pan,
     stereoWidth,
@@ -486,6 +539,89 @@ export function macrosToAudioParameters(
     params.intervalVariation = Math.min(params.intervalVariation, 0.4);
   }
 
+  // === rawAudioTargets 값으로 덮어쓰기 및 clamp ===
+  if (rawAudioTargets) {
+    if (typeof rawAudioTargets.filterCutoff === 'number') {
+      params.cutoffHz = Math.max(150, Math.min(14000, rawAudioTargets.filterCutoff));
+    }
+    if (typeof rawAudioTargets.stereoWidth === 'number') {
+      params.stereoWidth = Math.max(0, Math.min(1.5, rawAudioTargets.stereoWidth));
+    }
+    if (typeof rawAudioTargets.reverbSend === 'number') {
+      params.reverbSend = clamp01(rawAudioTargets.reverbSend);
+    }
+    if (typeof rawAudioTargets.outGainDb === 'number') {
+      params.outGainDb = Math.max(-30, Math.min(0, rawAudioTargets.outGainDb));
+    }
+    if (typeof rawAudioTargets.pan === 'number') {
+      params.pan = Math.max(-0.8, Math.min(0.8, rawAudioTargets.pan));
+    }
+    if (typeof rawAudioTargets.delayFeedback === 'number') {
+      params.delayFeedback = clamp01(rawAudioTargets.delayFeedback);
+    }
+    if (typeof rawAudioTargets.chorusDepth === 'number') {
+      params.chorusDepth = clamp01(rawAudioTargets.chorusDepth);
+    }
+    if (typeof rawAudioTargets.tremDepth === 'number') {
+      params.tremDepth = clamp01(rawAudioTargets.tremDepth);
+    }
+    if (typeof rawAudioTargets.binaural === 'number') {
+      params.binaural = clamp01(rawAudioTargets.binaural);
+    }
+    if (typeof rawAudioTargets.panSpread === 'number') {
+      params.panSpread = Math.max(-1, Math.min(1, rawAudioTargets.panSpread));
+    }
+    if (typeof rawAudioTargets.ghostNotes === 'number') {
+      params.ghostNotes = clamp01(rawAudioTargets.ghostNotes);
+    }
+    if (typeof rawAudioTargets.syncopation === 'number') {
+      params.syncopation = clamp01(rawAudioTargets.syncopation);
+    }
+    if (typeof rawAudioTargets.timing === 'number') {
+      params.timing = Math.max(-1, Math.min(1, rawAudioTargets.timing));
+    }
+    if (typeof rawAudioTargets.swingPct === 'number') {
+      params.swingPct = clamp01(rawAudioTargets.swingPct / 100);
+    }
+    if (typeof rawAudioTargets.accentDb === 'number') {
+      params.accentDb = clamp01(rawAudioTargets.accentDb / 6);
+    }
+  }
+
+  // === 최종적으로 모든 파라미터에 대해 clamp 적용 ===
+  // 0~1 범위가 요구되는 파라미터는 clamp01, dB/Hz/pan 등은 별도 처리
+  // clampMap은 더 이상 사용하지 않으므로 제거
+  // 각 파라미터를 명시적으로 clamp
+  if (typeof params.reverbSend === 'number') {
+    const original = params.reverbSend;
+    params.reverbSend = Math.max(0, Math.min(0.7, original));
+    
+  }
+  if (typeof params.delayFeedback === 'number') {
+    const original = params.delayFeedback;
+    params.delayFeedback = Math.max(0, Math.min(1, original));
+    
+  }
+  if (typeof params.stereoWidth === 'number') {
+    const original = params.stereoWidth;
+    params.stereoWidth = Math.max(0, Math.min(0.85, original));
+    
+  }
+  if (typeof params.cutoffHz === 'number') {
+    const original = params.cutoffHz;
+    params.cutoffHz = Math.max(200, Math.min(14000, original));
+    
+  }
+  if (typeof params.pan === 'number') {
+    const original = params.pan;
+    params.pan = Math.max(-0.8, Math.min(0.8, original));
+    
+  }
+  if (typeof params.outGainDb === 'number') {
+    const original = params.outGainDb;
+    params.outGainDb = Math.max(-30, Math.min(0, original));
+    
+  }
   return params;
 }
 
@@ -496,7 +632,11 @@ export function mapPlanetToAudioParameters(
 ): MappedAudioParameters {
   const resolved = resolveInstrumentContext(role, context);
   const macros = computeMacros(role, props, resolved);
-  return macrosToAudioParameters(role, macros, resolved);
+  // planetTransforms에서 raw transform 결과를 가져와 macrosToAudioParameters에 전달
+  // mapRawPropertiesToAudioTargets는 audio/utils/parameterConfig에서 노출됨
+  // import 최소화를 위해 require로 동적 로드합니다.
+  const rawTargets = mapRawPropertiesToAudioTargets(props as PlanetPhysicalProperties, role);
+  return macrosToAudioParameters(role, macros, resolved, rawTargets);
 }
 
 export function mapPlanetToInstrumentMacros(
@@ -536,7 +676,7 @@ export interface Instrument {
   isDisposed(): boolean;
 }
 
-export abstract class BaseInstrument implements Instrument {
+export abstract class AbstractInstrumentBase implements Instrument {
   protected readonly role: InstrumentRole;
   protected readonly id: string;
   protected disposed: boolean;
@@ -578,7 +718,7 @@ export abstract class BaseInstrument implements Instrument {
 
     const macros = computeMacros(this.role, props, resolved);
     const params = macrosToAudioParameters(this.role, macros, resolved);
-    this.handleParameterUpdate(params, macros, resolved);
+    this.handleParameterUpdate(params);
     this.lastContext = resolved;
   }
 
@@ -586,13 +726,11 @@ export abstract class BaseInstrument implements Instrument {
     if (this.disposed) return;
     this.disposed = true;
     this.lastContext = null;
-    console.log(`🗑️ BaseInstrument ${this.id} (${this.role}) 기본 dispose 완료`);
+    
   }
 
   protected abstract handleParameterUpdate(
-    params: MappedAudioParameters,
-    macros: SimplifiedInstrumentMacros,
-    context: ResolvedInstrumentContext
+    params: MappedAudioParameters
   ): void;
 
   protected abstract applyOscillatorType(type: OscillatorTypeId): void;
@@ -610,3 +748,4 @@ export abstract class BaseInstrument implements Instrument {
     throw new Error('triggerAttackRelease must be implemented by concrete instrument classes.');
   }
 }
+

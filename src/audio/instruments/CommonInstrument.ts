@@ -3,7 +3,7 @@
 // 실제 구현은 InstrumentInterface.ts에 있습니다.
 
 export {
-  BaseInstrument,
+  AbstractInstrumentBase,
   getSynthProfilesForRole,
   getDefaultSynthType,
   getAvailableOscillatorOptions,
