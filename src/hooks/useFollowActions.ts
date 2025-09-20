@@ -61,7 +61,6 @@ export function useFollowActions() {
             newSet.delete(userId);
             return newSet;
           });
-          setUnfollowedUsers((prev) => new Set(prev).add(userId));
         },
         onError: (error) => {
           console.error('언팔로우 실패:', error);
