@@ -1,4 +1,4 @@
-// src/stores/useStellarSystemStore.ts
+// src/stores/useStellarStore.ts
 import { create } from 'zustand';
 import type {
   StellarSystem,
@@ -6,27 +6,90 @@ import type {
   Planet,
   InstrumentRole,
 } from '@/types/stellar';
-import type { StarProperties } from '@/types/starProperties';
-import type { PlanetProperties } from '@/types/planetProperties';
+import {
+  type StarProperties,
+  createDefaultStarProperties,
+} from '@/types/starProperties';
+import {
+  type PlanetProperties,
+  createDefaultProperties,
+} from '@/types/planetProperties';
 import { useUserStore } from '@/stores/useUserStore';
-import { createDefaultProperties } from '@/types/planetProperties';
 import {
   getDefaultSynthType,
   getDefaultOscillatorType,
+  type SynthTypeId,
+  type OscillatorTypeId,
 } from '@/audio/instruments/InstrumentInterface';
 import { formatDateToYMD } from '@/utils/formatDateToYMD';
+import { createPlanetId } from '@/utils/createStarPlantId';
+import {
+  createRandomPlanetProperties,
+  createRandomStarProperties,
+} from '@/utils/randomProperties';
+import { createRandomPlanetInstrument } from '@/utils/randomPlanetDetails';
 
-/***** 1) 기본 프로퍼티 디폴트 *****/
-const defaultStarProps: StarProperties = {
-  spin: 50,
-  brightness: 1,
-  color: 1,
-  size: 1.0, // 적절한 크기 범위 (0.1 ~ 2.0)
-};
+/***** 공통 상수/헬퍼 *****/
+const DEFAULT_ROLE: InstrumentRole = 'DRUM';
+const nowYMD = () => formatDateToYMD();
 
+/** 초기 Star 오브젝트(랜덤 프로퍼티 포함) 생성 */
+function makeInitStar(overrides?: Partial<Star>): Star {
+  const now = nowYMD();
+  return {
+    ...(initialStellarStore.star as Star),
+    system_id: '',
+    properties: createRandomStarProperties(),
+    updated_at: now,
+    ...overrides,
+  };
+}
+
+/** 초기 Planet 오브젝트(랜덤 프로퍼티 + PLANET DETAILS 포함) 생성 */
+function makeInitPlanet(params?: {
+  id?: string;
+  systemId?: string;
+  role?: InstrumentRole;
+  name?: string;
+  planetDetails?: {
+    role: InstrumentRole;
+    synthType: SynthTypeId;
+    oscillatorType: OscillatorTypeId;
+  };
+}): Planet {
+  const id = params?.id ?? createPlanetId();
+  const systemId = params?.systemId ?? '';
+  const name = params?.name ?? 'NEW PLANET';
+  const now = nowYMD();
+
+  // planetDetails가 주어지면 사용, 아니면 (role 또는 기본 역할) 기준으로 폴백
+  const chosenRole =
+    params?.planetDetails?.role ?? params?.role ?? DEFAULT_ROLE;
+  const synth =
+    params?.planetDetails?.synthType ?? getDefaultSynthType(chosenRole);
+  const oscillator =
+    params?.planetDetails?.oscillatorType ??
+    getDefaultOscillatorType(chosenRole, synth);
+
+  return {
+    id,
+    object_type: 'PLANET',
+    system_id: systemId,
+    name,
+    role: chosenRole,
+    properties: createRandomPlanetProperties(),
+    synthType: synth,
+    oscillatorType: oscillator,
+    created_at: now,
+    updated_at: now,
+  };
+}
+
+/***** 1) 기본 프로퍼티 디폴트 (템플릿 보존) *****/
+const defaultStarProps: StarProperties = createDefaultStarProperties();
 export const defaultPlanetProps: PlanetProperties = createDefaultProperties();
 
-/***** 2) 초기 스텔라 시스템 *****/
+/***** 2) 초기 스텔라 시스템 (템플릿) *****/
 export const initialStellarStore: StellarSystem = {
   id: '',
   title: 'NEW STELLAR SYSTEM',
@@ -42,13 +105,12 @@ export const initialStellarStore: StellarSystem = {
   creator_name: '',
   create_source_name: '',
   original_source_name: '',
-
   star: {
     id: 'star_001',
     object_type: 'STAR',
     system_id: '',
     name: 'Central Star',
-    properties: defaultStarProps,
+    properties: defaultStarProps, // 실제 초기화 시엔 makeInitStar가 랜덤으로 교체
     created_at: formatDateToYMD(),
     updated_at: formatDateToYMD(),
   },
@@ -62,31 +124,35 @@ interface StellarStore {
   setStellarStore: (stellarStore: StellarSystem) => void;
   setInitialStellarStore: () => void;
   addNewObjectAndReturnId: () => string;
+  deletePlanet: (planetId: string) => boolean;
 }
 
-// ===== 구현 =====
-export const useStellarStore = create<StellarStore>((set) => ({
+/***** 구현 *****/
+export const useStellarStore = create<StellarStore>((set, get) => ({
   stellarStore: initialStellarStore,
 
   setStellarStore: (stellarStore) =>
-    set(() => {
-      console.log('stellarStore', stellarStore);
-      return {
-        stellarStore: {
-          ...stellarStore,
-          updated_at: formatDateToYMD(),
-        },
-      };
-    }),
+    set(() => ({
+      stellarStore: { ...stellarStore, updated_at: nowYMD() },
+    })),
 
   setInitialStellarStore: () =>
-    set(() => {
-      // 작성자/소유자 계열 필드를 userId 기반으로 세팅 => 비로그인 경우 '' 빈 값
-      // 훅 호출하지 않고, 스토어 인스턴스의 getState() 사용
+    set((state) => {
       const userId = useUserStore.getState().userStore.id ?? '';
-      const now = formatDateToYMD();
       const userName = useUserStore.getState().userStore.username ?? '';
-      console.log('userName', userName);
+      const now = nowYMD();
+
+      // STAR/첫 번째 PLANET 생성
+      const star = makeInitStar();
+
+      // ✅ 요청: planetDetails 변수 사용 (랜덤 악기 구성)
+      const planetDetails = createRandomPlanetInstrument();
+      const firstPlanetId = createPlanetId();
+      const firstPlanet = makeInitPlanet({
+        id: firstPlanetId,
+        name: 'NEW PLANET',
+        planetDetails,
+      });
 
       return {
         stellarStore: {
@@ -99,53 +165,54 @@ export const useStellarStore = create<StellarStore>((set) => ({
           updated_at: now,
           author_name: userName,
           creator_name: userName,
-          create_source_name: userName,
-          original_source_name: userName,
-
-          star: {
-            ...(initialStellarStore.star as Star),
-            system_id: '',
-            properties: { ...defaultStarProps },
-            updated_at: now,
-          },
-          planets: [],
+          // 기존 로직 유지
+          create_source_name: state.stellarStore.title,
+          original_source_name: state.stellarStore.title,
+          star,
+          planets: [firstPlanet],
         },
       };
     }),
 
   addNewObjectAndReturnId: () => {
-    let createdIndex = 0;
+    const newPlanetId = createPlanetId();
+
     set((state) => {
       const prev = state.stellarStore;
 
-      // 새 planet 1개 추가
-      const role: InstrumentRole = 'DRUM';
-      const defaultSynth = getDefaultSynthType(role);
-      const newPlanet: Planet = {
-        id: 'planet_' + (prev.planets.length + 1),
-        object_type: 'PLANET',
-        system_id: prev.id || '', // 아직 없을 수 있음
-        name: `NEW PLANET ${prev.planets.length + 1}`,
-        role,
-        properties: { ...defaultPlanetProps },
-        synthType: defaultSynth,
-        oscillatorType: getDefaultOscillatorType(role, defaultSynth),
-        created_at: formatDateToYMD(),
-        updated_at: formatDateToYMD(),
-      };
-
-      const nextPlanets = [...prev.planets, newPlanet];
-      createdIndex = nextPlanets.length;
+      // ✅ 요청: planetDetails 변수 사용 (랜덤 악기 구성)
+      const planetDetails = createRandomPlanetInstrument();
+      const newPlanet = makeInitPlanet({
+        id: newPlanetId,
+        systemId: prev.id || '',
+        name: 'NEW PLANET',
+        planetDetails,
+      });
 
       return {
         stellarStore: {
           ...prev,
-          planets: nextPlanets,
-          updated_at: formatDateToYMD(),
+          planets: [...prev.planets, newPlanet],
+          updated_at: nowYMD(),
         },
       };
     });
 
-    return 'planet_' + createdIndex;
+    return newPlanetId;
+  },
+
+  deletePlanet: (planetId) => {
+    const prev = get().stellarStore;
+    const nextPlanets = prev.planets.filter((p) => p.id !== planetId);
+    if (nextPlanets.length === 0) return false; // 규칙 유지: 최소 1개 보장
+
+    set({
+      stellarStore: {
+        ...prev,
+        planets: nextPlanets,
+        updated_at: nowYMD(),
+      },
+    });
+    return true;
   },
 }));

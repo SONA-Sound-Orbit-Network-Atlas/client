@@ -14,18 +14,18 @@ import { useSelectedStellarStore } from '@/stores/useSelectedStellarStore';
 import SelectRequired from './SelectRequired';
 import { ScrollArea } from '@/components/common/Scrollarea';
 import AudioPlayer from './audioPlayer/Index';
+import { useSelectedObjectStore } from '@/stores/useSelectedObjectStore';
+import { getObjectNameById } from '@/utils/getObjectName';
 
 export default function StellarIndex() {
-  // isStellarOwner : 현재 선택된 Stellar의 creator_id 가 현재 로그인된 userId와 일치하는가? => true 수정 모드 / false 관람 모드
   const { stellarStore } = useStellarStore();
   const { userStore } = useUserStore();
+  const { mode } = useSelectedStellarStore();
+  const { tabValue, setTabValue } = useStellarTabStore();
+  const { selectedObjectId } = useSelectedObjectStore();
   const isStellarOwner = stellarStore.creator_id === userStore.id;
 
-  // 현재 선택된 Stellar의 모드 : 수정,관람 모드와 관계 없는 모드
-  const { mode } = useSelectedStellarStore();
-
-  // Stellar 패널 Tab value 스토어
-  const { tabValue, setTabValue } = useStellarTabStore();
+  const selectedObjectName = getObjectNameById(selectedObjectId);
 
   return (
     <>
@@ -57,6 +57,11 @@ export default function StellarIndex() {
               </TabsTrigger>
             </TabsList>
             <div className="flex-1 min-h-0">
+              <p className="px-4 ">
+                <span className="text-sm text-text-muted">
+                  {selectedObjectName}
+                </span>
+              </p>
               <ScrollArea className="h-full">
                 <TabsContent value="INFO" className="p-4">
                   <Info isStellarOwner={isStellarOwner} />

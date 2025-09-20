@@ -12,6 +12,7 @@ export class StellarSystem {
   private star: Star;
   private planets = new Map<string, Planet>();
   private audioEngine: AudioEngine;
+  private playStateListeners: Set<(isPlaying: boolean) => void> = new Set();
   
   private constructor() {
     this.star = Star.instance;
@@ -24,6 +25,31 @@ export class StellarSystem {
       this._instance = new StellarSystem();
     }
     return this._instance;
+  }
+
+  // === 재생 상태 이벤트 ===
+  private emitPlayState(): void {
+    const isPlaying = this.getPlayingPlanetsCount() > 0;
+    console.log(`🎵 StellarSystem 재생 상태 변경: ${isPlaying ? '재생' : '정지'} (행성 ${this.getPlayingPlanetsCount()}개)`);
+    this.playStateListeners.forEach((cb) => {
+      try { 
+        cb(isPlaying); 
+      } catch (error) {
+        console.warn('재생 상태 리스너 오류:', error);
+      }
+    });
+  }
+
+  onPlayStateChange(cb: (isPlaying: boolean) => void): () => void {
+    this.playStateListeners.add(cb);
+    // 즉시 현재 상태 알림
+    const currentState = this.getPlayingPlanetsCount() > 0;
+    try { 
+      cb(currentState); 
+    } catch (error) {
+      console.warn('재생 상태 리스너 초기 호출 오류:', error);
+    }
+    return () => this.playStateListeners.delete(cb);
   }
 
   // === 랜덤 시드 관리 ===
@@ -83,6 +109,7 @@ export class StellarSystem {
     this.planets.set(planetId, planet);
     
     console.log(`🪐 행성 추가됨: ${planet.getName()} (${planetId})`);
+    this.emitPlayState();
     return planetId;
   }
 
@@ -108,6 +135,7 @@ export class StellarSystem {
     this.planets.delete(planetId);
     
     console.log(`🗑️ 행성 제거됨: ${planet.getName()}`);
+    this.emitPlayState();
     return true;
   }
   
@@ -158,6 +186,7 @@ export class StellarSystem {
     
     try {
       await planet.startPattern();
+      this.emitPlayState();
       return true;
     } catch (error) {
       console.error(`행성 패턴 시작 실패 (${planetId}):`, error);
@@ -174,6 +203,7 @@ export class StellarSystem {
     }
     
     planet.stopPattern();
+    this.emitPlayState();
     return true;
   }
   
@@ -187,10 +217,12 @@ export class StellarSystem {
     
     if (planet.getIsPlaying()) {
       planet.stopPattern();
+      this.emitPlayState();
       return false; // 정지됨
     } else {
       try {
         await planet.startPattern();
+        this.emitPlayState();
         return true; // 시작됨
       } catch (error) {
         console.error(`행성 패턴 토글 실패 (${planetId}):`, error);
@@ -203,6 +235,42 @@ export class StellarSystem {
   stopAllPatterns(): void {
     Array.from(this.planets.values()).forEach(planet => planet.stopPattern());
     console.log('⏹️ 모든 행성 패턴 정지');
+    this.emitPlayState();
+  }
+
+
+  // 즉시 초기화(짧은 페이드 적용) - 컴포넌트 언마운트 등에서 사용
+  async resetImmediate(): Promise<void> {
+    console.log('🌌 StellarSystem 즉시 리셋(짧은 페이드) 시작');
+    this.audioEngine.beginTransition();
+
+    try {
+      // 아주 짧은 페이드로 어색함을 줄임
+      try {
+        await this.audioEngine.fadeOutAndStop(1.0);
+      } catch (err) {
+        console.warn('페이드(1s) 중 오류:', err);
+      }
+
+      this.stopAllPatterns();
+      Array.from(this.planets.values()).forEach((planet) => {
+        try {
+          if (planet.getIsPlaying()) {
+            planet.stopPattern();
+          }
+          planet.dispose();
+        } catch (error) {
+          console.warn('행성 dispose 중 오류:', error);
+        }
+      });
+      this.planets.clear();
+
+      this.star.clearAllClockListeners();
+      this.audioEngine.reset();
+    } finally {
+      this.audioEngine.endTransition();
+      console.log('🌌 StellarSystem 즉시 리셋(짧은 페이드) 완료');
+    }
   }
   
   // === 조회 메서드 ===

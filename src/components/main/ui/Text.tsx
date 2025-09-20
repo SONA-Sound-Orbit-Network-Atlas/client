@@ -18,7 +18,7 @@ export function TitleText({ children }: TitleTextProps) {
 
 export function BodyText({ children }: BodyTextProps) {
   return (
-    <p className="text-[clamp(1rem,2.5vw,1.5rem)] leading-relaxed text-gray-300 max-w-[600px]">
+    <p className="text-[clamp(1rem,4vw,1.6rem)] leading-relaxed text-gray-300 font-light max-w-[600px]">
       {children}
     </p>
   );

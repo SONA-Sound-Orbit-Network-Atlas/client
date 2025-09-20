@@ -43,7 +43,7 @@ export class PadInstrument extends BaseInstrument {
         release: 2.0              // 긴 릴리즈 - 자연스러운 페이드아웃
       },
       // PolySynth에는 filterEnvelope 직접 설정 불가 - 개별 Voice에서 처리
-      volume: -8                  // 패드는 배경음이므로 볼륨 낮게
+      volume: -4                  // 패드 기본 볼륨을 올려 더 잘 들리게 함
     });
 
     // 패드 전용 로우패스 필터 - 부드러운 톤
@@ -57,14 +57,15 @@ export class PadInstrument extends BaseInstrument {
     // 패드 전용 리버브 - 공간감과 깊이
     this.padReverb = new Tone.Reverb({
       decay: 3,                   // 리버브 지속 시간
-      preDelay: 0.1               // 프리 딜레이로 공간감 생성
+      preDelay: 0.1,              // 프리 딜레이로 공간감 생성
+      wet: 0.35                   // 기본 wet을 올려 공간감을 더 명확히 함
     });
 
     // 패드 전용 코러스 - 풍부하고 따뜻한 사운드
     this.padChorus = new Tone.Chorus({
       frequency: 1.5,             // 느린 모듈레이션
       delayTime: 5,               // 깊은 코러스
-      depth: 0.6,                 // 적당한 모듈레이션 깊이
+      depth: 0.7,                 // 깊이를 증가시켜 더 풍성한 질감
       spread: 180                 // 넓은 스테레오 이미지
     });
 
@@ -72,7 +73,7 @@ export class PadInstrument extends BaseInstrument {
     this.padDelay = new Tone.FeedbackDelay({
       delayTime: '8n',            // 8분음표 딜레이
       feedback: 0.3,              // 적당한 피드백
-      wet: 0.2                    // 적당한 딜레이 믹스
+      wet: 0.28                   // 딜레이 wet을 약간 높여 잔향 강조
     });
 
     // 패드 전용 컴프레서 - 부드러운 다이나믹스
@@ -229,6 +230,9 @@ export class PadInstrument extends BaseInstrument {
     _context: ResolvedInstrumentContext
   ): void {
     if (this.disposed) return;
+    // 사용하지 않는 매개변수에 대한 표시 (lint 방지)
+    void _macros;
+    void _context;
 
     // 필터 컷오프 조절 - 패드는 부드러운 고음역 사용
     if (this.padFilter && typeof params.cutoffHz === 'number' && !isNaN(params.cutoffHz)) {
@@ -295,7 +299,8 @@ export class PadInstrument extends BaseInstrument {
 
   protected applyOscillatorType(type: Tone.ToneOscillatorType): void {
     if (this.disposed) return;
-    this.padSynth?.set({ oscillator: { type } } as any);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  this.padSynth?.set({ oscillator: { type } } as any);
   }
 
   public dispose(): void {

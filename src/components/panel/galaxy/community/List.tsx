@@ -1,4 +1,4 @@
-import { Suspense, useEffect } from 'react';
+import { Suspense } from 'react';
 import { useGetStellarList } from '@/hooks/api/useGalaxy';
 import CardItem from './CardItem';
 import {
@@ -36,9 +36,6 @@ export default function List({ sort }: { sort: SortLabel }) {
 function ContentComp({ sort }: { sort: SortLabel }) {
   const { selectStellar } = useStellarSystemSelection();
 
-  useEffect(() => {
-    console.log('toSortValue(sort) : ', toSortValue(sort));
-  }, [sort]);
   // 갤럭시 리스트 데이터
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage } =
     useGetStellarList({
@@ -48,7 +45,6 @@ function ContentComp({ sort }: { sort: SortLabel }) {
     });
   // 평탄화 된 list 데이터
   const galaxyCommunityList = data?.list ?? [];
-  console.log('galaxyCommunityList : ', galaxyCommunityList);
 
   if (galaxyCommunityList.length === 0) {
     return <div>No data</div>;
@@ -58,6 +54,11 @@ function ContentComp({ sort }: { sort: SortLabel }) {
     <div className="w-full">
       {/* 은하 리스트 */}
       <div className="space-y-3 w-full">
+        {galaxyCommunityList.length === 0 && (
+          <div className="text-center text-text-muted">
+            <p>NO COMMUNITY STELLAR</p>
+          </div>
+        )}
         {galaxyCommunityList.map((galaxySystem: StellarListItem) => (
           <CardItem
             key={galaxySystem.id}
@@ -102,8 +103,8 @@ function ErrorComp({ resetErrorBoundary }: FallbackProps) {
   return (
     <div className="p-4">
       <p className="mb-2">Error occurred</p>
-      <Button color="tertiary" onClick={resetErrorBoundary}>
-        다시 시도
+      <Button color="tertiary" onClick={resetErrorBoundary} className="w-full">
+        retry
       </Button>
     </div>
   );

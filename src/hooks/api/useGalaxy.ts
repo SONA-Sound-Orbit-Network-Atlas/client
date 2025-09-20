@@ -10,6 +10,7 @@ import type {
   FlattenedStellarList,
   ParamsGetStellarList,
 } from '@/types/stellarList';
+import { galaxyKeys } from './queryKeys/galaxyKeys';
 
 // COMMUNITY 리스트
 export function useGetStellarList(params: ParamsGetStellarList) {
@@ -20,7 +21,7 @@ export function useGetStellarList(params: ParamsGetStellarList) {
     QueryKey,
     number // pageParam
   >({
-    queryKey: ['stellarList', params.limit, params.rank_type],
+    queryKey: galaxyKeys.stellarListCommunity(params),
     initialPageParam: 1,
     queryFn: ({ pageParam }) =>
       stellarListAPI.getStellarListList({
@@ -49,7 +50,7 @@ export function useGetStellarMyList(params: ParamsGetStellarList) {
     QueryKey,
     number
   >({
-    queryKey: ['stellarMyList', params.limit, params.page],
+    queryKey: galaxyKeys.stellarListMy(params),
     initialPageParam: 1,
     queryFn: ({ pageParam }) =>
       stellarListAPI.getStellarMyList({
@@ -63,7 +64,6 @@ export function useGetStellarMyList(params: ParamsGetStellarList) {
         : undefined,
     select: (data) => {
       const list = data.pages.flatMap((p) => p.list ?? []);
-      console.log('=================data.pages', data.pages);
       const totalCount = data.pages[0]?.total ?? 0;
       return { list, totalCount };
     },
@@ -73,7 +73,7 @@ export function useGetStellarMyList(params: ParamsGetStellarList) {
 // 전체 스텔라 리스트 조회 (pagination 없음)
 export const useStellarList = (galaxyId: string) => {
   return useQuery({
-    queryKey: ['stellarListAll', galaxyId],
+    queryKey: galaxyKeys.stellarListAll(galaxyId),
     queryFn: () => stellarListAPI.getAllStellarList({ galaxyId: galaxyId }),
     enabled: !!galaxyId,
     staleTime: 5 * 60 * 1000, // 5분
