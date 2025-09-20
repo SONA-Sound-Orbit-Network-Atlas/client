@@ -3,12 +3,15 @@ export { default as TextSection } from './TextSection';
 export { default as CTASection } from './CTASection';
 
 // 섹션 데이터 정의
-export interface SectionData {
-  type: 'intro' | 'text' | 'cta';
-  title?: string;
-  description?: string;
-  alignment?: 'left' | 'center' | 'right';
-}
+export type SectionData =
+  | { type: 'intro' }
+  | {
+      type: 'text';
+      title: string;
+      description: string;
+      alignment: 'left' | 'center' | 'right';
+    }
+  | { type: 'cta' };
 
 export const mainSections: SectionData[] = [
   { type: 'intro' },

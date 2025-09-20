@@ -70,7 +70,7 @@ export function useUpdateUserProfile() {
 
       // 모든 userProfile 관련 쿼리 무효화
       queryClient.invalidateQueries({
-        queryKey: userKeys.all,
+        queryKey: userKeys.userProfile(updatedUser.id),
       });
     },
     onError: (error: AxiosError) => {
