@@ -56,8 +56,6 @@ export default function CardItem({
                 className="p-1"
                 onClick={(e) => {
                   e.stopPropagation();
-                  console.log('해당 유저의 프로필로 이동');
-                  console.log('creator_id : ', creator_id);
                   // 1. 프로필 컴포넌트를 유저id에 맞게 변경
                   navigateToOtherUserProfile(creator_id);
                   // 2. sideBarProfile 패널 열기

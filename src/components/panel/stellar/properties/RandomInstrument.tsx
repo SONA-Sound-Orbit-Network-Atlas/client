@@ -3,17 +3,21 @@ import Button from '@/components/common/Button';
 import { useStellarStore } from '@/stores/useStellarStore';
 import { createRandomPlanetInstrument } from '@/utils/randomPlanetDetails';
 
+interface RandomInstrumentProps {
+  planetId: string | null;
+  /** true면 현재 role은 유지하고 synth/osc만 랜덤 */
+  lockRole?: boolean;
+}
+
 export default function RandomInstrument({
   planetId,
   lockRole = false,
-}: {
-  planetId: string;
-  /** true면 현재 role은 유지하고 synth/osc만 랜덤 */
-  lockRole?: boolean;
-}) {
+}: RandomInstrumentProps) {
   const { stellarStore, setStellarStore } = useStellarStore();
 
   const handleClick = () => {
+    if (!planetId) return;
+
     const curr = stellarStore.planets.find((p) => p.id === planetId);
     if (!curr) return;
 

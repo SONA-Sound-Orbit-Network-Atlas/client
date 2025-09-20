@@ -36,6 +36,11 @@ function ContentComp() {
     <div>
       {/* 내 갤럭시 리스트 */}
       <div className="space-y-3">
+        {myGalaxyList.length === 0 && (
+          <div className="text-center text-text-muted">
+            <p>MAKE YOUR FIRST STELLAR</p>
+          </div>
+        )}
         {myGalaxyList.map((galaxySystem: StellarListItem) => (
           <CardItem
             key={galaxySystem.id}

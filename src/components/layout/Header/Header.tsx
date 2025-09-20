@@ -6,6 +6,8 @@ import { FiArrowLeft } from 'react-icons/fi';
 import { useUserStore } from '@/stores/useUserStore';
 import { useSelectedStellarStore } from '@/stores/useSelectedStellarStore';
 import SaveButton from './SaveButton';
+import { useNavigate } from 'react-router-dom';
+import { useStellarStore } from '@/stores/useStellarStore';
 
 interface HeaderProps {
   className?: string;
@@ -13,8 +15,13 @@ interface HeaderProps {
 }
 
 export default function Header({ className, children }: HeaderProps) {
-  const { isLoggedIn } = useUserStore();
+  const navigate = useNavigate();
   const { mode, setIdle } = useSelectedStellarStore();
+  const { userStore } = useUserStore();
+  const { stellarStore } = useStellarStore();
+  const isOwner = userStore.id === stellarStore.creator_id;
+  const isEditMode = mode === 'view' && isOwner;
+
   return (
     <header
       className={mergeClassNames(
@@ -25,7 +32,10 @@ export default function Header({ className, children }: HeaderProps) {
       )}
     >
       {/* 좌측 로고 영역 */}
-      <div className="flex items-center">
+      <div
+        className="flex items-center cursor-pointer"
+        onClick={() => navigate('/')}
+      >
         <img
           src={sonaLogo}
           alt="SONA Logo"
@@ -36,8 +46,8 @@ export default function Header({ className, children }: HeaderProps) {
       {/* 중앙 네비게이션 영역 */}
       <nav className="flex-1 flex items-center justify-center">{children}</nav>
 
-      {/* 우측 사용자 메뉴 영역 - 로그인 상태일 때만 표시 */}
-      {isLoggedIn && <SaveButton />}
+      {/* 우측 사용자 메뉴 영역 - 편집, 생성 모드일 때만 표시 */}
+      {(mode === 'create' || isEditMode) && <SaveButton />}
 
       {/* BACK TO GALAXY 버튼 */}
       {mode !== 'idle' && (

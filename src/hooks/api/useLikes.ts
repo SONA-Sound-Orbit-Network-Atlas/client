@@ -11,6 +11,7 @@ import {
 import { likesAPI } from '@/api/likes';
 import type { StellarListPage, StellarListItem } from '@/types/stellarList';
 import { useUserStore } from '@/stores/useUserStore';
+import { likesKeys } from './queryKeys/likesKeys';
 
 // 무한스크롤 페이지 타입
 type StellarInfinite = InfiniteData<StellarListPage>;
@@ -21,6 +22,11 @@ function patchLike(
   system_id: string,
   nextLike: boolean
 ): StellarInfinite {
+  // pages가 없거나 배열이 아닌 경우 안전하게 처리
+  if (!prev?.pages || !Array.isArray(prev.pages)) {
+    return prev;
+  }
+
   return {
     ...prev,
     pages: prev.pages.map((page) => ({
@@ -38,7 +44,7 @@ function patchLike(
   };
 }
 
-const LIST_QUERY_KEY: QueryKey = ['stellarList'];
+const LIST_QUERY_KEY: QueryKey = likesKeys.stellarList();
 
 /** 공통 좋아요 뮤테이션 로직 - 중복 제거 */
 function useLikeMutation(isCreate: boolean) {
@@ -81,9 +87,12 @@ function useLikeMutation(isCreate: boolean) {
     // 성공/실패 무관 재검증
     onSettled: () => {
       qc.invalidateQueries({ queryKey: LIST_QUERY_KEY, refetchType: 'active' });
-      qc.invalidateQueries({ queryKey: ['myLikes'], refetchType: 'active' });
       qc.invalidateQueries({
-        queryKey: ['myLikesInfinite'],
+        queryKey: likesKeys.myLikes(),
+        refetchType: 'active',
+      });
+      qc.invalidateQueries({
+        queryKey: likesKeys.myLikesInfinite(),
         refetchType: 'active',
       });
     },
@@ -103,7 +112,7 @@ export function useDeleteLike() {
 /** 내가 좋아요 한 항성계 목록 조회 */
 export function useGetMyLikes(params: { page?: number; limit?: number }) {
   const query = useQuery({
-    queryKey: ['myLikes', params.page, params.limit], // 파라미터를 포함하여 캐시 분리
+    queryKey: likesKeys.myLikes(params.page, params.limit), // 파라미터를 포함하여 캐시 분리
     queryFn: () => likesAPI.getMyLikes(params),
     staleTime: 5 * 60 * 1000, // 5분
   });
@@ -128,7 +137,7 @@ export function useGetMyLikesInfinite(options: { limit?: number } = {}) {
     (string | number | undefined)[],
     number
   >({
-    queryKey: ['myLikesInfinite', options.limit],
+    queryKey: [...likesKeys.myLikesInfinite(options.limit)],
     queryFn: ({ pageParam = 1 }) => {
       const params = {
         page: pageParam as number,
