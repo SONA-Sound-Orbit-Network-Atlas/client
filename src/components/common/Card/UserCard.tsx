@@ -13,6 +13,7 @@ interface UserCardProps {
   onUnfollow?: (userId: string) => void;
   onClick?: (userId: string) => void;
   isLoading?: boolean;
+  hideFollowButton?: boolean; // 팔로우 버튼을 숨길지 여부
 }
 
 export default function UserCard({
@@ -25,6 +26,7 @@ export default function UserCard({
   onUnfollow,
   onClick,
   isLoading = false,
+  hideFollowButton = false,
 }: UserCardProps) {
   const handleFollowClick = (e: React.MouseEvent) => {
     e.stopPropagation(); // 이벤트 버블링 방지
@@ -51,14 +53,20 @@ export default function UserCard({
               <FiUsers className="w-4 h-4 text-primary-300" title="맞팔로우" />
             )}
           </div>
-          <Button
-            color={isFollowing ? 'secondary' : 'primary'}
-            size="sm"
-            onClick={handleFollowClick}
-            disabled={isLoading}
-          >
-            {isFollowing ? 'Unfollow' : isFollowBack ? 'Follow Back' : 'Follow'}
-          </Button>
+          {!hideFollowButton && (
+            <Button
+              color={isFollowing ? 'secondary' : 'primary'}
+              size="sm"
+              onClick={handleFollowClick}
+              disabled={isLoading}
+            >
+              {isFollowing
+                ? 'Unfollow'
+                : isFollowBack
+                  ? 'Follow Back'
+                  : 'Follow'}
+            </Button>
+          )}
         </div>
       </div>
     </Card>

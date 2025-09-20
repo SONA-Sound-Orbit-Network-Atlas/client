@@ -11,6 +11,7 @@ import Button from '@/components/common/Button';
 import ErrorMessage from '@/components/common/ErrorMessage';
 import { useFollowList } from '@/hooks/useFollowList';
 import { useFollowActions } from '@/hooks/useFollowActions';
+import { useUserStore } from '@/stores/useUserStore';
 import type {
   FollowerUser,
   FollowingUser,
@@ -22,6 +23,9 @@ export default function FollowListPanel({
   targetUserId,
   onBack = navigateBack,
 }: FollowListPanelProps) {
+  // 현재 로그인한 사용자 정보
+  const { userStore } = useUserStore();
+
   // 팔로우 액션 훅
   const {
     handleFollow,
@@ -118,6 +122,9 @@ export default function FollowListPanel({
             {!isLoading && !error && allUsers.length > 0 && (
               <div className="space-y-3">
                 {allUsers.map((user) => {
+                  // 현재 로그인한 사용자인지 확인
+                  const isCurrentUser = user.id === userStore.id;
+
                   // 버튼 상태 결정
                   const buttonState =
                     type === 'followers'
@@ -133,17 +140,18 @@ export default function FollowListPanel({
                       isMutualFollow={buttonState.showMutualIcon}
                       isFollowBack={buttonState.text === '팔로우백'}
                       onFollow={
-                        buttonState.action === 'follow'
+                        !isCurrentUser && buttonState.action === 'follow'
                           ? handleFollow
                           : undefined
                       }
                       onUnfollow={
-                        buttonState.action === 'unfollow'
+                        !isCurrentUser && buttonState.action === 'unfollow'
                           ? handleUnfollow
                           : undefined
                       }
                       onClick={handleUserClick}
                       isLoading={isActionLoading}
+                      hideFollowButton={isCurrentUser}
                     />
                   );
                 })}
