@@ -83,9 +83,18 @@ export class AudioEngine {
     // masterInput → masterEQ → masterFilter → Tone.Destination
     this.masterInput.chain(this.masterEQ, this.masterFilter, Tone.Destination);
 
-    // 이펙트 버스 생성 (리버브/딜레이는 기존대로 Destination에 연결)
-    this.reverb = new Tone.Reverb({ decay: 3, wet: 0.3 }).toDestination();
-    this.delay = new Tone.FeedbackDelay('8n', 0.25).toDestination();
+    // 이펙트 버스 생성 - 전역 이펙트는 master chain 안으로 연결하여 마스터 이펙트가 적용되도록 함
+    this.reverb = new Tone.Reverb({ decay: 3, wet: 0.3 });
+    this.delay = new Tone.FeedbackDelay('8n', 0.25);
+    // reverb/delay 출력은 masterInput을 통해 최종 출력으로 향하도록 연결
+    if (this.masterInput) {
+      this.reverb.connect(this.masterInput);
+      this.delay.connect(this.masterInput);
+    } else {
+      // 안전하게 폴백: Tone.Destination으로 연결
+      this.reverb.toDestination();
+      this.delay.toDestination();
+    }
     
     this._initialized = true;
     // AudioEngine initialization complete
@@ -149,11 +158,25 @@ export class AudioEngine {
 
   // 이펙트 버스가 필요할 때 항상 존재하도록 보장
   private ensureEffects(): void {
+    // 전역 이펙트가 없으면 생성하고 master chain(또는 Destination)으로 연결
     if (!this.reverb) {
-      this.reverb = new Tone.Reverb({ decay: 3, wet: 0.3 }).toDestination();
+      this.reverb = new Tone.Reverb({ decay: 3, wet: 0.3 });
+      // ensure master chain exists so we can connect effects into it
+      this.ensureMasterChain();
+      if (this.masterInput) {
+        this.reverb.connect(this.masterInput);
+      } else {
+        this.reverb.toDestination();
+      }
     }
     if (!this.delay) {
-      this.delay = new Tone.FeedbackDelay('8n', 0.25).toDestination();
+      this.delay = new Tone.FeedbackDelay('8n', 0.25);
+      this.ensureMasterChain();
+      if (this.masterInput) {
+        this.delay.connect(this.masterInput);
+      } else {
+        this.delay.toDestination();
+      }
     }
   }
 
