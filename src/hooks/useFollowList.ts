@@ -68,17 +68,6 @@ export function useFollowList<T extends FollowUser>(
       // 더 불러올 페이지가 있는지 확인
       const hasMorePages = !isLastPage && !isPartialPage;
 
-      console.log('페이지네이션 계산:', {
-        currentPage,
-        totalPages,
-        isLastPage,
-        isPartialPage,
-        hasMorePages,
-        totalItems: lastPage.meta.total,
-        itemsPerPage: lastPage.meta.limit,
-        currentPageItems: lastPage.items.length,
-      });
-
       return hasMorePages ? currentPage + 1 : undefined;
     },
     enabled: !!options.targetId,
