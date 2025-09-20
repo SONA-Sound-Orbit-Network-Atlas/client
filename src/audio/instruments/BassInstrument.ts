@@ -87,10 +87,12 @@ export class BassInstrument extends AbstractInstrumentBase {
     this.sendDly.connect(fx.delay!);
 
     // 신호 체인 연결: bassSynth → compressor → bassFilter → distortion → panner → stereo → destination
-  this.bassSynth.chain(this.compressor, this.bassFilter, this.distortion, this.panner, this.stereo, AudioEngine.instance.masterInput!);
+    AudioEngine.instance.ensureMasterChain();
+    const dest = AudioEngine.instance.masterInput ?? Tone.getDestination();
+    this.bassSynth.chain(this.compressor, this.bassFilter, this.distortion, this.panner, this.stereo, dest);
     
     // 서브 오실레이터도 같은 체인 경로로 출력
-  this.subOscillator.chain(this.compressor, this.bassFilter, this.panner, this.stereo, AudioEngine.instance.masterInput!);
+    this.subOscillator.chain(this.compressor, this.bassFilter, this.panner, this.stereo, dest);
 
     // 센드 분기(디스토션 전의 타이트한 신호를 선호하면 위치 조절 가능)
     this.bassFilter.connect(this.sendRev);

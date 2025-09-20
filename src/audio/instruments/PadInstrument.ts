@@ -94,15 +94,17 @@ export class PadInstrument extends AbstractInstrumentBase {
     await this.padReverb.generate();
 
     // 신호 체인 연결: padSynth → compressor → padFilter → padChorus → padDelay → padReverb → panner → stereo → destination
+    AudioEngine.instance.ensureMasterChain();
+    const dest = AudioEngine.instance.masterInput ?? Tone.getDestination();
     this.padSynth.chain(
-  this.compressor,
-  this.padFilter,
-  this.padChorus,
-  this.padDelay,
-  this.padReverb,
-  this.panner,
-  this.stereo,
-  AudioEngine.instance.masterInput!
+      this.compressor,
+      this.padFilter,
+      this.padChorus,
+      this.padDelay,
+      this.padReverb,
+      this.panner,
+      this.stereo,
+      dest
     );
 
     // 센드 분기
