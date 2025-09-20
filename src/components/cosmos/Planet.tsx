@@ -1,7 +1,7 @@
 // 행성들 ( 악기들)
 
 import { useFrame, useLoader } from '@react-three/fiber';
-import { useEffect, useRef, useState, useMemo } from 'react';
+import { useEffect, useRef, useState, useMemo, useCallback } from 'react';
 import * as THREE from 'three';
 import type { Planet } from '@/types/stellar';
 import { calculateOrbitPosition } from '@/utils/orbitCalculations';
@@ -75,17 +75,19 @@ export default function Planet({ planet, isSelectable = false }: PlanetProps) {
     setIsSelected(selectedObjectId === planet.id);
   }, [selectedObjectId, planet.id]);
 
-  const onPlanetClicked = () => {
+  const onPlanetClicked = useCallback(() => {
     if (isSelectable) {
       setSelectedObjectId(planet.id);
     }
-  };
-  const onPlanetPointerOver = () => {
+  }, [isSelectable, setSelectedObjectId, planet.id]);
+
+  const onPlanetPointerOver = useCallback(() => {
     setIsHovered(true);
-  };
-  const onPlanetPointerOut = () => {
+  }, []);
+
+  const onPlanetPointerOut = useCallback(() => {
     setIsHovered(false);
-  };
+  }, []);
 
   // const color = new THREE.Color(valueToColor(planetColor, 0, 360));
   const color = useMemo(() => {
