@@ -4,7 +4,7 @@ import type { Star } from '@/types/stellar';
 import { FakeGlowMaterial } from './materials/FakeGlowMaterial';
 import { Outlines, Sphere } from '@react-three/drei';
 import * as THREE from 'three';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useSelectedObjectStore } from '@/stores/useSelectedObjectStore';
 import { normalizeStarProperties } from '@/utils/display/propertiesNormalization';
 
@@ -30,15 +30,17 @@ export default function Star({ star, position = [0, 0, 0] }: StarProps) {
   const glowIntensity = Math.min(brightness * 0.3, 1.0); // 0.09 ~ 1.0
   const glowFalloff = Math.max(0.1, 1.0 - brightness * 0.2); // 0.1 ~ 0.9
 
-  const onStarPointerOver = () => {
+  const onStarPointerOver = useCallback(() => {
     setIsHovered(true);
-  };
-  const onStarPointerOut = () => {
+  }, []);
+
+  const onStarPointerOut = useCallback(() => {
     setIsHovered(false);
-  };
-  const onClick = () => {
+  }, []);
+
+  const onClick = useCallback(() => {
     setSelectedObjectId(star.id);
-  };
+  }, [setSelectedObjectId, star.id]);
   useEffect(() => {
     setIsSelected(selectedObjectId === star.id);
   }, [selectedObjectId, star.id]);
