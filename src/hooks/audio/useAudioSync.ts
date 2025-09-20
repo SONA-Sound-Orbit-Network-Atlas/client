@@ -105,16 +105,13 @@ export function useAudioSync() {
   useEffect(() => {
     if (isInitializedRef.current) return;
 
-    console.log('🔍 useAudioSync 초기화 시작', {
-      stellarId: stellarStore.id,
-      planetsCount: stellarStore.planets.length,
-    });
+    // useAudioSync initialization start: stellarId=%s, planetsCount=%d
 
     syncPlanets(true);
     prevSystemIdRef.current = stellarStore.id;
     isInitializedRef.current = true;
 
-    console.log('🔍 useAudioSync 초기화 완료');
+  // useAudioSync initialization complete
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -135,7 +132,7 @@ export function useAudioSync() {
     if (!isInitializedRef.current) return;
 
     if (prevSystemIdRef.current && prevSystemIdRef.current !== currentSystemId) {
-      console.log(`🔄 스텔라 시스템 변경: ${prevSystemIdRef.current} → ${currentSystemId}`);
+  // Stellar system change detected: ${prevSystemIdRef.current} -> ${currentSystemId}
 
       (async () => {
         try {
@@ -144,7 +141,7 @@ export function useAudioSync() {
           isResettingRef.current = true;
 
           await system.resetImmediate();
-          console.log('🔄 오디오 시스템 리셋 완료');
+          // Audio system reset complete
 
           engine.endTransition();
 

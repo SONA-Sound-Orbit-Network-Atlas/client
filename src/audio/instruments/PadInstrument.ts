@@ -112,7 +112,7 @@ export class PadInstrument extends AbstractInstrumentBase {
     // 코러스 시작
     this.padChorus.start();
 
-    console.log('🌌 PadInstrument 초기화 완료:', this.id);
+    
   }
 
   public triggerAttackRelease(
@@ -256,11 +256,11 @@ export class PadInstrument extends AbstractInstrumentBase {
     if (this.padFilter) {
       this.padFilter.frequency.rampTo(cutoff, 0.04);
       this.padFilter.Q.rampTo(resonance, 0.04);
-      console.log(`[PAD] cutoffHz 적용:`, cutoff);
+      
     }
     if (this.padReverb) {
       this.padReverb.decay = reverbDecay;
-      console.log(`[PAD] reverbDecay 적용:`, reverbDecay);
+      
     }
     if (this.padChorus) {
       this.padChorus.depth = clamp01(chorusDepth);
@@ -273,12 +273,12 @@ export class PadInstrument extends AbstractInstrumentBase {
     if (this.padSynth) {
       this.padSynth.set({ envelope: { attack } });
       this.padSynth.volume.rampTo(outGainDb, 0.08);
-      console.log(`[PAD] volume(dB) 적용:`, outGainDb);
+      
     }
     if (this.panner) this.panner.pan.rampTo(pan, 0.08);
     if (this.stereo) {
       this.stereo.width.rampTo(Math.max(0, Math.min(1.5, stereoWidth)), 0.1);
-      console.log(`[PAD] stereoWidth 적용:`, stereoWidth);
+      
     }
     if (this.sendRev) this.sendRev.gain.rampTo(clamp01(Math.max(0, Math.min(0.9, reverbSend))), 0.12);
     if (this.sendDly) this.sendDly.gain.rampTo(clamp01(Math.max(0, Math.min(0.9, feedback * 0.8))), 0.12);
@@ -301,6 +301,6 @@ export class PadInstrument extends AbstractInstrumentBase {
     this.compressor?.dispose();
     
     super.dispose();
-    console.log(`🗑️ PadInstrument ${this.id} disposed`);
+    
   }
 }

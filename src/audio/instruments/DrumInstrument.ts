@@ -141,7 +141,7 @@ export class DrumInstrument extends AbstractInstrumentBase {
   this.drumReverb.toDestination();
   this.drumDelay.toDestination();
 
-    console.log('🥁 DrumInstrument 초기화 완료:', this.id);
+  // DrumInstrument initialized: this.id
   }
 
   public triggerAttackRelease(
@@ -375,6 +375,6 @@ export class DrumInstrument extends AbstractInstrumentBase {
     this.drumEQ?.dispose();
     
     super.dispose();
-    console.log(`🗑️ DrumInstrument ${this.id} disposed`);
+  // DrumInstrument disposed: this.id
   }
 }

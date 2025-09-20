@@ -95,7 +95,7 @@ export class BassInstrument extends AbstractInstrumentBase {
     // 센드 분기(디스토션 전의 타이트한 신호를 선호하면 위치 조절 가능)
     this.bassFilter.connect(this.sendRev);
 
-    console.log('🎸 BassInstrument 초기화 완료:', this.id);
+  // BassInstrument initialized: this.id
   }
 
   public triggerAttackRelease(
@@ -246,6 +246,6 @@ export class BassInstrument extends AbstractInstrumentBase {
     this.distortion?.dispose();
     
     super.dispose();
-    console.log(`🗑️ BassInstrument ${this.id} disposed`);
+  // BassInstrument disposed: this.id
   }
 }

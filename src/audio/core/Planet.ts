@@ -65,7 +65,7 @@ export class Planet {
       try {
         // 기준 BPM 120으로 나눈 배수를 사용
         this.tempoMultiplier = bpm / 120;
-        console.log(`🪐 ${this.name} BPM 리스너 수신: bpm=${bpm} tempoMultiplier=${this.tempoMultiplier.toFixed(2)}`);
+        
         if (this.isPlaying) {
           // 재계산: 패턴 파라미터 재생성 및 타이밍 업데이트
           this.patternParams = this.calculatePatternParams();
@@ -75,7 +75,7 @@ export class Planet {
         console.warn('Planet BPM listener error', err);
       }
     });
-    console.log(`🪐 ${this.name} 생성됨 (ID: ${this.id})`);
+    
   }
 
   private initializeProperties(): void {
@@ -85,7 +85,7 @@ export class Planet {
     const configBasedProperties = initializePropertiesFromConfig(rng);
     this.properties = configBasedProperties as unknown as PlanetPhysicalProperties;
     
-    console.log(`🪐 ${this.name} 초기 속성 (설정 기반):`, this.properties);
+    
   }
 
   private createInstrumentForRole(role: InstrumentRole): Instrument {
@@ -117,7 +117,7 @@ export class Planet {
     
     // 새로운 파라미터 시스템 직접 사용 (레거시 변환 없이)
     try {
-      console.log(`🎵 ${this.name} 악기 속성 업데이트:`, this.properties);
+      
       this.instrument.updateFromPlanet(this.properties, {
         synthType: this.synthType,
         oscillatorType: this.oscillatorType,
@@ -270,7 +270,7 @@ export class Planet {
   stopPattern(): void {
     if (!this.isPlaying) return;
     
-    console.log(`🛑 ${this.name} 패턴 정지 시작...`);
+    
     
     // 1. Star에서 클락 리스너 제거
     this.star.removeClockListener(this.id);
@@ -290,11 +290,11 @@ export class Planet {
         // releaseAll 메서드가 있으면 사용
         if (instrumentWithRelease.releaseAll) {
           instrumentWithRelease.releaseAll(now);
-          console.log(`🛑 ${this.name} releaseAll 호출됨`);
+          
         } else if (instrumentWithRelease.triggerRelease) {
           // releaseAll이 없으면 triggerRelease 사용
           instrumentWithRelease.triggerRelease(now);
-          console.log(`🛑 ${this.name} triggerRelease 호출됨`);
+          
         }
       } catch (error) {
         console.warn(`${this.name} 악기 강제 정지 중 오류:`, error);
@@ -306,7 +306,7 @@ export class Planet {
     this.currentPattern = null;
     this.patternParams = null;
     
-    console.log(`🛑 ${this.name} 패턴 정지 완료`);
+    
   }
 
   private generateNoteForStep(stepIdx: number): string {
@@ -407,7 +407,7 @@ export class Planet {
   }
 
   dispose(): void {
-    console.log(`🗑️ ${this.name} dispose 시작...`);
+    
     
     // 1. 패턴이 재생 중이면 완전히 정지
     if (this.isPlaying) {
@@ -428,12 +428,12 @@ export class Planet {
     if (this.instrument && !this.instrument.isDisposed()) {
       try {
         this.instrument.dispose();
-        console.log(`🗑️ ${this.name} 악기 dispose 완료`);
+        
       } catch (error) {
         console.warn(`${this.name} 악기 dispose 중 오류:`, error);
       }
     }
     
-    console.log(`🗑️ ${this.name} dispose 완료`);
+    
   }
 }

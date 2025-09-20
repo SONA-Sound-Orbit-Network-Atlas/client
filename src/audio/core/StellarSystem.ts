@@ -30,7 +30,7 @@ export class StellarSystem {
   // === 재생 상태 이벤트 ===
   private emitPlayState(): void {
     const isPlaying = this.getPlayingPlanetsCount() > 0;
-    console.log(`🎵 StellarSystem 재생 상태 변경: ${isPlaying ? '재생' : '정지'} (행성 ${this.getPlayingPlanetsCount()}개)`);
+  // StellarSystem play state changed: isPlaying=%s, playingCount=%d
     this.playStateListeners.forEach((cb) => {
       try { 
         cb(isPlaying); 
@@ -55,7 +55,7 @@ export class StellarSystem {
   // === 랜덤 시드 관리 ===
   setSeed(seed: number | string): void {
     this.star.setSeed(seed);
-    console.log(`🌱 StellarSystem Seed 설정 (Star로 위임): ${seed}`);
+  // StellarSystem seed delegated to Star: ${seed}
     // 재생 중인 행성 패턴 재생성하여 동일 결과 보장
     Array.from(this.planets.values()).forEach(planet => {
       if (planet.getIsPlaying()) {
@@ -75,7 +75,7 @@ export class StellarSystem {
       await this.audioEngine.init(this.star.getGlobalState());
     }
     
-    console.log('🌌 StellarSystem 초기화 완료');
+  // StellarSystem initialized
   }
   
   // === 항성(Star) 관리 ===
@@ -108,7 +108,7 @@ export class StellarSystem {
     
     this.planets.set(planetId, planet);
     
-    console.log(`🪐 행성 추가됨: ${planet.getName()} (${planetId})`);
+  // Planet added: ${planet.getName()} (${planetId})
     this.emitPlayState();
     return planetId;
   }
@@ -134,7 +134,7 @@ export class StellarSystem {
     planet.dispose();
     this.planets.delete(planetId);
     
-    console.log(`🗑️ 행성 제거됨: ${planet.getName()}`);
+  // Planet removed: ${planet.getName()}
     this.emitPlayState();
     return true;
   }
@@ -234,14 +234,14 @@ export class StellarSystem {
   // 모든 행성 패턴 정지
   stopAllPatterns(): void {
     Array.from(this.planets.values()).forEach(planet => planet.stopPattern());
-    console.log('⏹️ 모든 행성 패턴 정지');
+  // All planet patterns stopped
     this.emitPlayState();
   }
 
 
   // 즉시 초기화(짧은 페이드 적용) - 컴포넌트 언마운트 등에서 사용
   async resetImmediate(): Promise<void> {
-    console.log('🌌 StellarSystem 즉시 리셋(짧은 페이드) 시작');
+  // StellarSystem immediate reset (short fade) start
     this.audioEngine.beginTransition();
 
     try {
@@ -269,7 +269,7 @@ export class StellarSystem {
       this.audioEngine.reset();
     } finally {
       this.audioEngine.endTransition();
-      console.log('🌌 StellarSystem 즉시 리셋(짧은 페이드) 완료');
+  // StellarSystem immediate reset complete
     }
   }
   
@@ -331,22 +331,11 @@ export class StellarSystem {
     Array.from(this.planets.values()).forEach(planet => planet.dispose());
     
     this.planets.clear();
-    console.log('🌌 StellarSystem 정리됨');
+  // StellarSystem disposed
   }
   
   // 시스템 상태 디버깅
   debug(): void {
-    console.log('🌌 StellarSystem Debug Info:');
-    console.log('📊 통계:');
-    console.log(`  - 총 행성 수: ${this.getTotalPlanetsCount()}`);
-    console.log(`  - 재생 중인 행성: ${this.getPlayingPlanetsCount()}`);
-    
-    console.log('⭐ 항성 상태:');
-    this.star.debug();
-    
-    console.log('🪐 행성 목록:');
-    Array.from(this.planets.values()).forEach(planet => {
-      console.log(`  - ${planet.getName()} (${planet.getId()}): ${planet.getIsPlaying() ? '재생중' : '정지'}`);
-    });
+    // StellarSystem debug info removed to reduce console noise
   }
 }

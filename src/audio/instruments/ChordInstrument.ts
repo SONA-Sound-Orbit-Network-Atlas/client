@@ -129,7 +129,7 @@ export class ChordInstrument extends AbstractInstrumentBase {
       console.debug('ChordInstrument: stereoChorus.start() 호출 불가');
     }
 
-    console.log('🎹 ChordInstrument 초기화 완료:', this.id);
+    
   }
 
   public triggerAttackRelease(
@@ -451,6 +451,6 @@ export class ChordInstrument extends AbstractInstrumentBase {
     this.distortion?.dispose();
     
     super.dispose();
-    console.log(`🗑️ ChordInstrument ${this.id} disposed`);
+    
   }
 }

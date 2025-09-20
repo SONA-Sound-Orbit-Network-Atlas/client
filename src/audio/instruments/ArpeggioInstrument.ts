@@ -98,7 +98,7 @@ export class ArpeggioInstrument extends AbstractInstrumentBase {
     // 트레몰로 시작
     this.tremolo.start();
 
-    console.log('🎹 ArpeggioInstrument 초기화 완료:', this.id);
+  // ArpeggioInstrument initialized: this.id
   }
 
   public triggerAttackRelease(
@@ -321,6 +321,6 @@ export class ArpeggioInstrument extends AbstractInstrumentBase {
     this.eq?.dispose();
     
     super.dispose();
-    console.log(`🗑️ ArpeggioInstrument ${this.id} disposed`);
+  // ArpeggioInstrument disposed: this.id
   }
 }

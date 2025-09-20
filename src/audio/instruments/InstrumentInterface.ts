@@ -511,7 +511,7 @@ export function macrosToAudioParameters(
     padOutGainDb = Math.max(-30, Math.min(0, (outGainBase * 0.4 + outGainExp * 0.2 + outGainSize * 0.3 + outGainTilt * 0.1)));
 
     // 로그로 변화 확인
-    console.log('[PAD] meta.size:', macros.meta?.size, 'brightness:', padBrightness, 'space:', padSpace, 'tilt:', padTilt, 'inclination:', padInclination, 'outGainDb:', padOutGainDb, 'cutoffHz:', cutoffHz, 'stereoWidth:', stereoWidth, 'reverbSend:', reverbSend);
+    
   }
 
   // 역할별 sensitivity 적용 (드럼 우선)
@@ -650,32 +650,32 @@ export function macrosToAudioParameters(
   if (typeof params.reverbSend === 'number') {
     const original = params.reverbSend;
     params.reverbSend = Math.max(0, Math.min(0.7, original));
-    console.log('[Clamp] reverbSend:', original, '→', params.reverbSend);
+    
   }
   if (typeof params.delayFeedback === 'number') {
     const original = params.delayFeedback;
     params.delayFeedback = Math.max(0, Math.min(1, original));
-    console.log('[Clamp] delayFeedback:', original, '→', params.delayFeedback);
+    
   }
   if (typeof params.stereoWidth === 'number') {
     const original = params.stereoWidth;
     params.stereoWidth = Math.max(0, Math.min(0.85, original));
-    console.log('[Clamp] stereoWidth:', original, '→', params.stereoWidth);
+    
   }
   if (typeof params.cutoffHz === 'number') {
     const original = params.cutoffHz;
     params.cutoffHz = Math.max(200, Math.min(14000, original));
-    console.log('[Clamp] cutoffHz:', original, '→', params.cutoffHz);
+    
   }
   if (typeof params.pan === 'number') {
     const original = params.pan;
     params.pan = Math.max(-0.8, Math.min(0.8, original));
-    console.log('[Clamp] pan:', original, '→', params.pan);
+    
   }
   if (typeof params.outGainDb === 'number') {
     const original = params.outGainDb;
     params.outGainDb = Math.max(-30, Math.min(0, original));
-    console.log('[Clamp] outGainDb:', original, '→', params.outGainDb);
+    
   }
   return params;
 }
@@ -781,7 +781,7 @@ export abstract class AbstractInstrumentBase implements Instrument {
     if (this.disposed) return;
     this.disposed = true;
     this.lastContext = null;
-    console.log(`🗑️ AbstractInstrumentBase ${this.id} (${this.role}) 기본 dispose 완료`);
+    
   }
 
   protected abstract handleParameterUpdate(

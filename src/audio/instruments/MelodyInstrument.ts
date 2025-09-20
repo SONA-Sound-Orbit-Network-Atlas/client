@@ -120,7 +120,7 @@ export class MelodyInstrument extends AbstractInstrumentBase {
     // Vibrato는 자동으로 작동하므로 별도 start 불필요
     this.chorus.start();
 
-    console.log('🎵 MelodyInstrument 초기화 완료:', this.id);
+  // MelodyInstrument initialized: this.id
   }
 
   public triggerAttackRelease(
@@ -326,6 +326,6 @@ export class MelodyInstrument extends AbstractInstrumentBase {
     this.distortion?.dispose();
     
     super.dispose();
-    console.log(`🗑️ MelodyInstrument ${this.id} disposed`);
+  // MelodyInstrument disposed: this.id
   }
 }
