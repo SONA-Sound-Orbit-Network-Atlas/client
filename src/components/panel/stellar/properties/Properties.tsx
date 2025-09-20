@@ -161,7 +161,7 @@ export default function Properties() {
                 onClick={handleTogglePlanetPattern}
                 className="text-xs"
               >
-                {isPlanetPlaying ? '⏸️ STOP' : '▶️ PLAY'}
+                {isPlanetPlaying ? 'STOP' : 'PLAY'}
               </Button>
             </div>
 
