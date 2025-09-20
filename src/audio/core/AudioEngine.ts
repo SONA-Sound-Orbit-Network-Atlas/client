@@ -60,6 +60,49 @@ export class AudioEngine {
     
     await Tone.start();
   // Tone.js context started
+    // Safety patch: Tone's internal StateTimeline.getLastState can return undefined in some
+    // edge cases depending on how timelines were manipulated. Some environments then try to
+    // read `.time` from that undefined value which throws "undefined is not an object".
+    // We monkey-patch the method to return a safe fallback when nothing is found.
+    try {
+      const toneAny = Tone as unknown as Record<string, unknown>;
+      const coreObj = toneAny.core as unknown as Record<string, unknown> | undefined;
+      const ST = (toneAny.StateTimeline as unknown) || (coreObj && (coreObj.StateTimeline as unknown));
+      if (ST && typeof ST === 'function') {
+        type TimelineLike = { prototype: Record<string, unknown> };
+        const stCtor = ST as unknown as TimelineLike;
+        const proto = stCtor.prototype;
+  if (proto && !(proto as unknown as Record<string, unknown>).__patched_getLastState) {
+          // original function type: (state: string, time: number) => {state:string,time:number}|undefined
+          const orig = (proto.getLastState as unknown) as (s: unknown, t: unknown) => unknown;
+          proto.getLastState = (function (this: {
+            _search?: (t: unknown) => number;
+            _timeline?: Array<Record<string, unknown>>;
+            _initial?: unknown;
+          }, state: unknown, time: unknown) {
+            const res = orig.call(this, state, time) as unknown;
+            if (!res) {
+              try {
+                const idx = typeof this._search === 'function' ? this._search(time) : -1;
+                if (typeof idx === 'number' && idx >= 0 && Array.isArray(this._timeline)) {
+                  for (let i = idx; i >= 0; i--) {
+                    const entry = this._timeline![i] as Record<string, unknown> | undefined;
+                    if (entry && entry.state === state) return entry as unknown;
+                  }
+                }
+              } catch {
+                // ignore and fallback
+              }
+              return { state: this._initial ?? state, time: 0 } as unknown;
+            }
+            return res;
+          }) as unknown as typeof proto.getLastState;
+          (proto as unknown as Record<string, unknown>).__patched_getLastState = true;
+        }
+      }
+    } catch {
+      // avoid throwing during init; best-effort patch only
+    }
     
     // Transport 설정 (초기 상태가 있다면 적용)
     if (initialState) {
