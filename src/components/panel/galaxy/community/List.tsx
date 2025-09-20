@@ -1,4 +1,4 @@
-import { Suspense, useEffect } from 'react';
+import { Suspense } from 'react';
 import { useGetStellarList } from '@/hooks/api/useGalaxy';
 import CardItem from './CardItem';
 import {
@@ -36,7 +36,6 @@ export default function List({ sort }: { sort: SortLabel }) {
 function ContentComp({ sort }: { sort: SortLabel }) {
   const { selectStellar } = useStellarSystemSelection();
 
-  useEffect(() => {}, [sort]);
   // 갤럭시 리스트 데이터
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage } =
     useGetStellarList({

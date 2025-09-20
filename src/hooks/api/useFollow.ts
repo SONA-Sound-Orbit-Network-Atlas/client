@@ -10,6 +10,7 @@ import type {
 } from '@/types/follow';
 import type { AxiosError } from 'axios';
 import { followKeys } from './queryKeys/followKeys';
+import { userKeys } from './queryKeys/userKeys';
 
 // 팔로우 생성
 export function useCreateFollow() {
@@ -30,7 +31,7 @@ export function useCreateFollow() {
 
       // 내 프로필과 팔로잉 목록 무효화
       queryClient.invalidateQueries({
-        queryKey: followKeys.userProfile(myUserId),
+        queryKey: userKeys.userProfile(myUserId),
       });
       queryClient.invalidateQueries({
         queryKey: followKeys.followings(myUserId),
@@ -44,7 +45,7 @@ export function useCreateFollow() {
         queryKey: followKeys.followCount(targetUserId),
       });
       queryClient.invalidateQueries({
-        queryKey: followKeys.userProfile(targetUserId),
+        queryKey: userKeys.userProfile(targetUserId),
       });
     },
     onError: (error: AxiosError) => {
@@ -72,7 +73,7 @@ export function useDeleteFollow() {
 
       // 내 프로필과 팔로잉 목록 무효화
       queryClient.invalidateQueries({
-        queryKey: followKeys.userProfile(myUserId),
+        queryKey: userKeys.userProfile(myUserId),
       });
       queryClient.invalidateQueries({
         queryKey: followKeys.followings(myUserId),
@@ -86,7 +87,7 @@ export function useDeleteFollow() {
         queryKey: followKeys.followCount(targetUserId),
       });
       queryClient.invalidateQueries({
-        queryKey: followKeys.userProfile(targetUserId),
+        queryKey: userKeys.userProfile(targetUserId),
       });
     },
     onError: (error: AxiosError) => {

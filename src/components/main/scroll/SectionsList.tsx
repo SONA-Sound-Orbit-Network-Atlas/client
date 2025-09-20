@@ -17,9 +17,9 @@ export default function SectionsList() {
             return (
               <TextSection
                 key={`text-${index}`}
-                title={section.title!}
-                description={section.description!}
-                alignment={section.alignment!}
+                title={section.title}
+                description={section.description}
+                alignment={section.alignment}
               />
             );
 
