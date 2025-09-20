@@ -100,6 +100,44 @@ export class Planet {
     }
   }
 
+  // 역할(role)을 런타임에 변경할 때 사용합니다.
+  // 기존 악기를 즉시 폐기(dispose)하고 새로운 악기를 생성하여 교체합니다.
+  // 패턴 재생 상태(isPlaying)는 유지되며, 패턴 스케줄러는 내부 instrument 참조를 통해 계속 노트를 트리거합니다.
+  public changeRole(newRole: InstrumentRole, config?: PlanetSynthConfig): void {
+    if (newRole === this.role) return;
+
+    const wasPlaying = this.isPlaying;
+
+    // 새 악기 생성
+    const newInstrument = this.createInstrumentForRole(newRole);
+
+    // 이전 악기를 안전하게 정리
+    try {
+      if (this.instrument && !this.instrument.isDisposed()) {
+        this.instrument.dispose();
+      }
+    } catch (err) {
+      console.warn(`${this.name} 이전 악기 dispose 중 오류:`, err);
+    }
+
+    // 상태 갱신
+    this.instrument = newInstrument;
+    this.role = newRole;
+    this.name = `${newRole} Planet`;
+
+    // synth/osc 설정이 전달되었으면 업데이트
+    if (config?.synthType) this.synthType = config.synthType;
+    if (config?.oscillatorType) this.oscillatorType = config.oscillatorType;
+
+    // 새 악기에게 현재 프로퍼티와 synth 설정을 적용
+    this.updateInstrument();
+
+    // 패턴 재생 상태는 유지합니다. (스케줄러는 this.instrument를 사용하기 때문에 별도 처리 불필요)
+    if (wasPlaying) {
+      // 소폭 지연 또는 페이드를 추가하려면 여기에 구현
+    }
+  }
+
   updateProperty(key: keyof PlanetPhysicalProperties, value: number): void {
     this.properties[key] = value;
     this.updateInstrument();

@@ -173,6 +173,24 @@ export class StellarSystem {
     planet.updateSynthSettings(settings);
     return true;
   }
+
+  // 역할(role)을 런타임에 변경합니다. 내부 Planet.changeRole을 호출해 재생 중단을 최소화합니다.
+  changePlanetRole(planetId: string, newRole: InstrumentRole, config?: PlanetSynthConfig): boolean {
+    const planet = this.planets.get(planetId);
+    if (!planet) {
+      console.warn(`행성을 찾을 수 없습니다: ${planetId}`);
+      return false;
+    }
+
+    try {
+      // Planet 클래스에 추가된 changeRole 메서드를 호출
+      planet.changeRole(newRole, config);
+      return true;
+    } catch (err) {
+      console.error(`행성 역할 변경 실패 (${planetId}):`, err);
+      return false;
+    }
+  }
   
   // === 패턴 재생 관리 ===
   

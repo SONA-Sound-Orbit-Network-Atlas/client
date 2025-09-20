@@ -77,9 +77,13 @@ export function useAudioSync() {
         // 신규 행성
         system.createPlanet(planet.role, planet.id, { synthType, oscillatorType });
       } else if (prev.role !== planet.role) {
-        // 역할 변경 시 재생성
-        system.removePlanet(planet.id);
-        system.createPlanet(planet.role, planet.id, { synthType, oscillatorType });
+        // 역할 변경 시 StellarSystem의 changePlanetRole을 사용하여 역할을 안전하게 변경
+        const ok = system.changePlanetRole(planet.id, planet.role, { synthType, oscillatorType });
+        if (!ok) {
+          // 실패 시 fallback: recreate
+          system.removePlanet(planet.id);
+          system.createPlanet(planet.role, planet.id, { synthType, oscillatorType });
+        }
       }
 
       if (!prev || prev.synthType !== synthType || prev.oscillatorType !== oscillatorType) {
