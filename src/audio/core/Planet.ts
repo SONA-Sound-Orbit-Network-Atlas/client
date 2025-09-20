@@ -20,9 +20,7 @@ import { PadInstrument } from '../instruments/PadInstrument';
 import { Star } from '../core/Star';
 import { PLANET_PROPERTIES } from '../../types/planetProperties';
 import { generateAdvancedPattern } from '../utils/advancedPattern';
-import { 
-  initializePropertiesFromConfig
-} from '../utils/parameterConfig';
+// ...existing code... (parameterConfig import removed - Planet no longer auto-initializes properties)
 
 export type PlanetSynthConfig = {
   synthType?: SynthTypeId;
@@ -57,9 +55,10 @@ export class Planet {
     const resolvedSynth = config?.synthType ?? getDefaultSynthType(role);
     this.synthType = resolvedSynth;
     this.oscillatorType = config?.oscillatorType ?? getDefaultOscillatorType(role, resolvedSynth);
-    this.instrument = this.createInstrumentForRole(role);
-    this.initializeProperties();
-    this.updateInstrument();
+  this.instrument = this.createInstrumentForRole(role);
+  // 초기 프로퍼티는 외부(스토어)에서 전달될 수 있으므로 생성자에서
+  // 즉시 랜덤 생성하여 덮어쓰지 않습니다. 빈 객체로 초기화합니다.
+  this.properties = {} as PlanetPhysicalProperties;
     // Star BPM 구독: BPM 변경 시 패턴 파라미터 재계산
     this.star.addBpmListener((bpm) => {
       try {
@@ -78,15 +77,8 @@ export class Planet {
     
   }
 
-  private initializeProperties(): void {
-    const rng = this.star.getDomainRng(`planet-init-${this.role}`);
-    
-    // 새로운 설정 기반 시스템 사용
-    const configBasedProperties = initializePropertiesFromConfig(rng);
-    this.properties = configBasedProperties as unknown as PlanetPhysicalProperties;
-    
-    
-  }
+  // initializeProperties는 더 이상 생성자에서 자동 호출하지 않습니다.
+  // 필요 시 외부에서 명시적으로 호출하거나 updateProperties로 전달하세요.
 
   private createInstrumentForRole(role: InstrumentRole): Instrument {
     switch (role) {
@@ -139,12 +131,24 @@ export class Planet {
   }
 
   updateProperty(key: keyof PlanetPhysicalProperties, value: number): void {
+    if (!this.properties) this.properties = {} as PlanetPhysicalProperties;
     this.properties[key] = value;
     this.updateInstrument();
   }
 
   updateProperties(props: Partial<PlanetPhysicalProperties>): void {
-    Object.assign(this.properties, props);
+    if (!props) {
+      console.debug(`${this.name} updateProperties 호출 시 props가 null/undefined로 전달되었습니다. 무시합니다.`);
+      return;
+    }
+
+    if (!this.properties || Object.keys(this.properties).length === 0) {
+      // 외부에서 전달된 초기 props가 우선시되어야 하므로 빈 상태라면 그대로 할당
+      this.properties = { ...(props as PlanetPhysicalProperties) };
+    } else {
+      Object.assign(this.properties, props);
+    }
+
     this.updateInstrument();
   }
 

@@ -69,13 +69,7 @@ export default function AudioPlayer({ className }: AudioPlayerProps) {
         for (const p of stellarStore.planets) {
           const synthType = p.synthType ?? getDefaultSynthType(p.role);
           const oscillatorType = p.oscillatorType ?? getDefaultOscillatorType(p.role, synthType);
-          system.createPlanet(p.role, p.id, { synthType, oscillatorType });
-          // 안전하게 속성 적용
-          try {
-            system.updatePlanetProperties(p.id, p.properties as PlanetProperties);
-          } catch (err) {
-            console.warn('스토어 기반 행성 속성 적용 실패:', err);
-          }
+          system.createPlanet(p.role, p.id, { synthType, oscillatorType }, p.properties as PlanetProperties);
         }
         planets = system.getPlanets();
       }
