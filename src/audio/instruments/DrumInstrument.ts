@@ -1,17 +1,13 @@
+import { AudioEngine } from '../core/AudioEngine';
 // DrumInstrument - 드럼/퍼커션 전용 악기 (독립 구현)
 // MembraneSynth + NoiseSynth + MetalSynth로 다양한 드럼 사운드를 생성합니다.
 // SONA 지침: DRUM 역할 - range 미적용(채널 고정), family는 Backbeat/Clave/Dense16/Sparse 우선
 
 import * as Tone from 'tone';
 import type { MappedAudioParameters } from '../../types/audio';
-import {
-  BaseInstrument,
-  type SimplifiedInstrumentMacros,
-  type ResolvedInstrumentContext,
-  clamp01,
-} from './InstrumentInterface';
+import { AbstractInstrumentBase, clamp01 } from './InstrumentInterface';
 
-export class DrumInstrument extends BaseInstrument {
+export class DrumInstrument extends AbstractInstrumentBase {
   
   // 드럼 전용 신스들 - 각각 다른 드럼 사운드 담당
   private kickSynth!: Tone.MembraneSynth;    // 킥 드럼 - 멤브레인 신스로 깊고 펀치있는 사운드
@@ -120,7 +116,7 @@ export class DrumInstrument extends BaseInstrument {
       width: 0.3,
     });
 
-  // 신호 체인 연결: 각 드럼 → 컴프레서 → EQ → (스테레오 와이드 → destination)
+  // 신호 체인 연결: 각 드럼 → 컴프레서 → EQ → (스테레오 와이드 → masterInput)
   // additionally connect EQ to reverb/delay as parallel sends
   this.kickSynth.connect(this.drumCompressor);
   this.snareSynth.connect(this.drumCompressor);
@@ -130,7 +126,15 @@ export class DrumInstrument extends BaseInstrument {
   this.drumCompressor.connect(this.drumEQ);
   // 메인 체인
   this.drumEQ.connect(this.drumWide);
-  this.drumWide.toDestination();
+  // masterInput이 보장되도록 ensureMasterChain 호출
+  AudioEngine.instance.ensureMasterChain();
+  if (AudioEngine.instance.masterInput) {
+    this.drumWide.connect(AudioEngine.instance.masterInput);
+  } else {
+    // 만약 예상치 못하게 마스터 인풋이 없다면 Tone.Destination으로 폴백
+    console.warn('DrumInstrument: masterInput가 존재하지 않아 Destination으로 연결합니다.');
+    this.drumWide.toDestination();
+  }
   // sends (병렬) - EQ 출력에서 리버브/딜레이로 보내어 wet로 제어
   this.drumEQ.connect(this.drumReverb);
   this.drumEQ.connect(this.drumDelay);
@@ -279,14 +283,9 @@ export class DrumInstrument extends BaseInstrument {
 
   // SONA 매핑된 파라미터 적용
   protected handleParameterUpdate(
-    params: MappedAudioParameters,
-    _macros: SimplifiedInstrumentMacros,
-    _context: ResolvedInstrumentContext
+  params: MappedAudioParameters
   ): void {
     if (this.disposed) return;
-    // _macros, _context는 현재 구현에서 사용하지 않음(향후 확장용)
-    void _macros;
-    void _context;
 
     // 킥 드럼 파라미터 조절
     if (this.kickSynth) {
@@ -360,10 +359,8 @@ export class DrumInstrument extends BaseInstrument {
 
   protected applyOscillatorType(type: Tone.ToneOscillatorType): void {
     if (this.disposed) return;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    this.kickSynth?.set({ oscillator: { type } } as any);
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    this.tomSynth?.set({ oscillator: { type } } as any);
+  this.kickSynth?.set({ oscillator: { type } } as Partial<Tone.SynthOptions>);
+  this.tomSynth?.set({ oscillator: { type } } as Partial<Tone.SynthOptions>);
   }
 
   public dispose(): void {

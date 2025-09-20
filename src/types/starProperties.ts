@@ -25,7 +25,8 @@ export const STAR_PROPERTIES: Record<string, PropertyDefinition> = {
     defaultValue: 50,
     controlType: 'slider',
     audioTargets: [
-      { name: 'bpm', weight: 1.0, transform: (n) => 60 + n * 120 }, // 60-180 BPM
+      // transform은 audio 레이어에서 처리합니다. 여기서는 선언적 매핑만 유지합니다n
+      { name: 'bpm', weight: 1.0 }, // 60-180 BPM (transform applied in audio layer)
     ],
   },
 
@@ -40,9 +41,7 @@ export const STAR_PROPERTIES: Record<string, PropertyDefinition> = {
     step: 1,
     defaultValue: 75,
     controlType: 'slider',
-    audioTargets: [
-      { name: 'toneCharacter', weight: 1.0, transform: (n) => n }, // 0-100 Tone Character
-    ],
+    audioTargets: [{ name: 'toneCharacter', weight: 1.0 }],
   },
 
   color: {
@@ -56,11 +55,11 @@ export const STAR_PROPERTIES: Record<string, PropertyDefinition> = {
     defaultValue: 60,
     controlType: 'slider',
     audioTargets: [
-      { name: 'key', weight: 1.0, transform: (n) => Math.floor(n / 30) }, // 0-11 (12 keys)
+  { name: 'key', weight: 1.0 }, // 0-11 (12 keys) - transform handled in audio layer
       {
         name: 'scale',
         weight: 1.0,
-        transform: (n) => Math.floor((n % 60) / 8.57),
+  // transform handled in audio layer
       }, // 0-6 (7 scales)
     ],
   },
@@ -76,11 +75,7 @@ export const STAR_PROPERTIES: Record<string, PropertyDefinition> = {
     defaultValue: 50,
     controlType: 'slider',
     audioTargets: [
-      {
-        name: 'complexity',
-        weight: 1.0,
-        transform: (n) => Math.floor(n / 33.33) + 1,
-      }, // 1-3 Complexity
+      { name: 'complexity', weight: 1.0 }, // 1-3 Complexity (transform in audio layer)
     ],
   },
 };
@@ -139,11 +134,10 @@ export function mapStarPropertiesToAudio(
     );
 
     def.audioTargets.forEach((target) => {
-      const mappedValue = target.transform
-        ? target.transform(normalizedValue)
-        : normalizedValue;
-
-      result[target.name] = mappedValue * target.weight;
+      const weight = target.weight ?? 1.0;
+      // transform은 audio 레이어에서 처리되므로 여기서는 정규화 값에 가중치만 적용
+      const mappedValue = normalizedValue * weight;
+      result[target.name] = mappedValue;
     });
   });
 

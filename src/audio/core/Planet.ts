@@ -18,6 +18,7 @@ import { MelodyInstrument } from '../instruments/MelodyInstrument';
 import { ArpeggioInstrument } from '../instruments/ArpeggioInstrument';
 import { PadInstrument } from '../instruments/PadInstrument';
 import { Star } from '../core/Star';
+import { PLANET_PROPERTIES } from '../../types/planetProperties';
 import { generateAdvancedPattern } from '../utils/advancedPattern';
 import { 
   initializePropertiesFromConfig
@@ -240,7 +241,10 @@ export class Planet {
     // tempoMultiplier를 적용하여 pulses 및 gateLen 등의 타이밍 관련 파라미터를 보정
     const basePulses = Math.floor(2 + orbitSpeed * 14);
     const pulses = Math.max(1, Math.round(basePulses * this.tempoMultiplier));
-    const baseGate = 0.35 + ((distanceFromStar - 1.0) / (20.0 - 1.0)) * 0.5;
+  // distanceFromStar 범위는 중앙의 PLANET_PROPERTIES에서 정의된 값을 사용합니다.
+  const minD = PLANET_PROPERTIES.distanceFromStar.min;
+  const maxD = PLANET_PROPERTIES.distanceFromStar.max;
+  const baseGate = 0.35 + ((distanceFromStar - minD) / (maxD - minD)) * 0.5;
     const gateLen = Math.max(0.05, Math.min(0.95, baseGate / this.tempoMultiplier));
 
     return {

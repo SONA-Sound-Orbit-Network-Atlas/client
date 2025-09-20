@@ -9,6 +9,8 @@ import { quantizeToScale } from '../utils/scale';
 import type { StarGlobalState, KeyName, ScaleName } from '../../types/audio';
 
 export class AudioEngine {
+  // 마스터 입력 버스 (모든 악기 출력이 여기에 연결됨)
+  public masterInput: Tone.Gain | null = null;
   private static _instance: AudioEngine | null = null;
   private _initialized = false;
   // 마스터 볼륨(0~100)을 내부적으로 dB로 변환하여 Tone.Destination.volume에 적용
@@ -72,12 +74,15 @@ export class AudioEngine {
     Tone.Transport.swing = 0; // 기본 스윙 0
     Tone.Transport.swingSubdivision = '16n';
     
-    // 이펙트 버스 생성
-    this.reverb = new Tone.Reverb({
-      decay: 3,
-      wet: 0.3
-    }).toDestination();
-    
+    // 마스터 입력 버스 및 체인 생성
+    this.masterInput = new Tone.Gain();
+    this.masterEQ = new Tone.EQ3({ low: 0, mid: 0, high: 0 });
+    this.masterFilter = new Tone.Filter({ type: 'lowpass', frequency: 18000, rolloff: -24 });
+    // masterInput → masterEQ → masterFilter → Tone.Destination
+    this.masterInput.chain(this.masterEQ, this.masterFilter, Tone.Destination);
+
+    // 이펙트 버스 생성 (리버브/딜레이는 기존대로 Destination에 연결)
+    this.reverb = new Tone.Reverb({ decay: 3, wet: 0.3 }).toDestination();
     this.delay = new Tone.FeedbackDelay('8n', 0.25).toDestination();
     
     this._initialized = true;
@@ -124,17 +129,18 @@ export class AudioEngine {
   private masterFilter: Tone.Filter | null = null;
   private masterEQ: Tone.EQ3 | null = null;
 
-  private ensureMasterChain(): void {
-    // 전역 마스터 체인을 한번만 구성 (Filter → EQ → Destination)
-    if (!this.masterFilter) {
-      this.masterFilter = new Tone.Filter({ type: 'lowpass', frequency: 18000, rolloff: -24 }).toDestination();
+  public ensureMasterChain(): void {
+    // masterInput → masterEQ → masterFilter → Tone.Destination
+    if (!this.masterInput) {
+      this.masterInput = new Tone.Gain();
     }
     if (!this.masterEQ) {
       this.masterEQ = new Tone.EQ3({ low: 0, mid: 0, high: 0 });
-      // Destination 앞단에 체인 구성: Source(각 악기) → Destination
-      // 여기서는 Destination.volume만 제어하고, 전역 체인은 버스 개념으로만 사용.
-      // 필요 시 각 인스트루먼트가 send 가능한 버스를 별도로 구성할 수 있음.
     }
+    if (!this.masterFilter) {
+      this.masterFilter = new Tone.Filter({ type: 'lowpass', frequency: 18000, rolloff: -24 });
+    }
+    this.masterInput.chain(this.masterEQ, this.masterFilter, Tone.Destination);
   }
 
   // 이펙트 버스가 필요할 때 항상 존재하도록 보장

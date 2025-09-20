@@ -5,13 +5,9 @@
 import * as Tone from 'tone';
 import type { MappedAudioParameters } from '../../types/audio';
 import { AudioEngine } from '../core/AudioEngine';
-import {
-  BaseInstrument,
-  type SimplifiedInstrumentMacros,
-  type ResolvedInstrumentContext,
-} from './InstrumentInterface';
+import { AbstractInstrumentBase } from './InstrumentInterface';
 
-export class BassInstrument extends BaseInstrument {
+export class BassInstrument extends AbstractInstrumentBase {
   
   // 베이스 전용 신스와 이펙트 체인
   private bassSynth!: Tone.MonoSynth;        // 메인 베이스 신스 (MonoSynth - 단음 연주에 최적화)
@@ -91,10 +87,10 @@ export class BassInstrument extends BaseInstrument {
     this.sendDly.connect(fx.delay!);
 
     // 신호 체인 연결: bassSynth → compressor → bassFilter → distortion → panner → stereo → destination
-    this.bassSynth.chain(this.compressor, this.bassFilter, this.distortion, this.panner, this.stereo, Tone.Destination);
+  this.bassSynth.chain(this.compressor, this.bassFilter, this.distortion, this.panner, this.stereo, AudioEngine.instance.masterInput!);
     
     // 서브 오실레이터도 같은 체인 경로로 출력
-    this.subOscillator.chain(this.compressor, this.bassFilter, this.panner, this.stereo, Tone.Destination);
+  this.subOscillator.chain(this.compressor, this.bassFilter, this.panner, this.stereo, AudioEngine.instance.masterInput!);
 
     // 센드 분기(디스토션 전의 타이트한 신호를 선호하면 위치 조절 가능)
     this.bassFilter.connect(this.sendRev);
@@ -181,9 +177,7 @@ export class BassInstrument extends BaseInstrument {
 
   // SONA 매핑된 파라미터 적용
   protected handleParameterUpdate(
-    params: MappedAudioParameters,
-    _macros: SimplifiedInstrumentMacros,
-    _context: ResolvedInstrumentContext
+  params: MappedAudioParameters
   ): void {
     if (this.disposed) return;
 
@@ -235,7 +229,7 @@ export class BassInstrument extends BaseInstrument {
 
   protected applyOscillatorType(type: Tone.ToneOscillatorType): void {
     if (this.disposed) return;
-    this.bassSynth?.set({ oscillator: { type } } as any);
+  this.bassSynth?.set({ oscillator: { type } } as Partial<Tone.SynthOptions>);
     if (this.subOscillator) {
       this.subOscillator.type = type as Tone.ToneOscillatorType;
     }

@@ -1,7 +1,7 @@
 import Button from '@/components/common/Button';
 import { BsFillPlayFill } from 'react-icons/bs';
 import { BsFillPauseFill } from 'react-icons/bs';
-import { useState } from 'react';
+// useState is not used in this component
 
 interface PlayButtonProps {
   className?: string;
