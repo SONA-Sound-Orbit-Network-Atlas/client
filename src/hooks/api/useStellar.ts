@@ -4,11 +4,13 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { stellarAPI } from '@/api/stellar';
 import type { StellarSystem } from '@/types/stellar';
 import { toStellarWritePayload } from '@/types/stellarWrite';
+import { stellarKeys } from './queryKeys/stellarKeys';
+import { galaxyKeys } from './queryKeys/galaxyKeys';
 
 // 조회
 export function useGetStellar(stellarId: string) {
   return useQuery({
-    queryKey: ['stellar', stellarId],
+    queryKey: stellarKeys.detail(stellarId),
     queryFn: () => stellarAPI.getStellar(stellarId),
     enabled: !!stellarId,
   });
@@ -24,11 +26,11 @@ export function useCreateStellar() {
       return stellarAPI.createStellar(payload);
     },
     onSuccess: () => {
-      // 목록/상위 캐시 무효화
-      qc.invalidateQueries({ queryKey: ['stellar'] });
-      qc.invalidateQueries({ queryKey: ['stellarList'] });
-      qc.invalidateQueries({ queryKey: ['stellarMyList'] });
-      qc.invalidateQueries({ queryKey: ['stellarListAll'] });
+      // stellar 관련 캐시 무효화
+      qc.invalidateQueries({ queryKey: stellarKeys.all });
+
+      // galaxy 관련 리스트 캐시 무효화 (COMMUNITY, MY, 전체 스텔라 리스트)
+      qc.invalidateQueries({ queryKey: galaxyKeys.all }); // 'stellar*' 시작하는 모든 쿼리 무효화
     },
   });
 }
@@ -48,12 +50,13 @@ export function useUpdateStellar() {
     },
     onSuccess: (data, { stellarId }) => {
       // 상세 캐시 갱신
-      queryClient.setQueryData(['stellar', stellarId], data);
-      // 목록 등 연관 캐시 무효화
-      queryClient.invalidateQueries({ queryKey: ['stellar'] });
-      queryClient.invalidateQueries({ queryKey: ['stellarList'] });
-      queryClient.invalidateQueries({ queryKey: ['stellarMyList'] });
-      queryClient.invalidateQueries({ queryKey: ['stellarListAll'] });
+      queryClient.setQueryData(stellarKeys.detail(stellarId), data);
+
+      // stellar 관련 캐시 무효화
+      queryClient.invalidateQueries({ queryKey: stellarKeys.all });
+
+      // galaxy 관련 리스트 캐시 무효화 (COMMUNITY, MY, 전체 스텔라 리스트)
+      queryClient.invalidateQueries({ queryKey: galaxyKeys.all }); // 'stellar*' 시작하는 모든 쿼리 무효화
     },
   });
 }
@@ -65,10 +68,11 @@ export function useDeleteStellar() {
   return useMutation({
     mutationFn: (stellarId: string) => stellarAPI.deleteStellar(stellarId),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['stellar'] });
-      queryClient.invalidateQueries({ queryKey: ['stellarList'] });
-      queryClient.invalidateQueries({ queryKey: ['stellarMyList'] });
-      queryClient.invalidateQueries({ queryKey: ['stellarListAll'] });
+      // stellar 관련 캐시 무효화
+      queryClient.invalidateQueries({ queryKey: stellarKeys.all });
+
+      // galaxy 관련 리스트 캐시 무효화 (COMMUNITY, MY, 전체 스텔라 리스트)
+      queryClient.invalidateQueries({ queryKey: galaxyKeys.all }); // 'stellar*' 시작하는 모든 쿼리 무효화
     },
   });
 }
@@ -80,9 +84,11 @@ export function useCloneStellar() {
   return useMutation({
     mutationFn: (stellarId: string) => stellarAPI.cloneStellar(stellarId),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['stellarList'] });
-      queryClient.invalidateQueries({ queryKey: ['stellarMyList'] });
-      queryClient.invalidateQueries({ queryKey: ['stellarListAll'] });
+      // stellar 관련 캐시 무효화
+      queryClient.invalidateQueries({ queryKey: stellarKeys.all });
+
+      // galaxy 관련 리스트 캐시 무효화 (COMMUNITY, MY, 전체 스텔라 리스트)
+      queryClient.invalidateQueries({ queryKey: galaxyKeys.all }); // 'stellar*' 시작하는 모든 쿼리 무효화
     },
   });
 }
