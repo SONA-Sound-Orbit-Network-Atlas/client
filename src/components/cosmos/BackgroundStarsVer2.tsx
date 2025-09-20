@@ -3,7 +3,7 @@ import { useRef } from 'react';
 import * as THREE from 'three';
 import { Stars } from '@react-three/drei';
 
-export default function BackgroundStarsVer2() {
+export default function BackgroundStars() {
   const { camera } = useThree();
   const starsRef = useRef<THREE.Points>(null);
 
