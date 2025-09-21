@@ -68,7 +68,12 @@ export function useUpdateUserProfile() {
         updatedUser
       );
 
-      // 모든 userProfile 관련 쿼리 무효화
+      // currentUserProfile 쿼리 무효화 (userStore 자동 업데이트)
+      queryClient.invalidateQueries({
+        queryKey: userKeys.currentUserProfile(),
+      });
+
+      // userProfile 쿼리 무효화
       queryClient.invalidateQueries({
         queryKey: userKeys.userProfile(updatedUser.id),
       });
