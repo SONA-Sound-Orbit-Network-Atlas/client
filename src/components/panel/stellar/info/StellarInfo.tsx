@@ -34,8 +34,8 @@ export default function StellarInfo({
     STAR_NAME: stellarStore.star.name,
     CREATOR: stellarStore.creator_name,
     AUTHOR: stellarStore.author_name,
-    ['CREATE SOURCE']: stellarStore.title,
-    ['ORIGINAL SOURCE']: stellarStore.title,
+    ['CREATE SOURCE']: stellarStore.create_source_name,
+    ['ORIGINAL SOURCE']: stellarStore.original_source_name,
   };
 
   // 4) 최종 표시 대상: 선택이 스타이거나, 매칭되는 플래닛이 없으면 스타로 fallback

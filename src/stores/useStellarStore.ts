@@ -92,7 +92,10 @@ export const defaultPlanetProps: PlanetProperties = createDefaultProperties();
 
 /***** 2) 초기 스텔라 시스템 (템플릿) *****/
 // 스토어에서 사용하는 순수 데이터 타입 (클래스 인스턴스가 아닌), Planet/Star 타입은 data-only
-type StellarStoreData = Omit<StellarSystemType, 'audioEngine' | 'playStateListeners' | 'emitPlayState' | 'onPlayStateChange'> & {
+type StellarStoreData = Omit<
+  StellarSystemType,
+  'audioEngine' | 'playStateListeners' | 'emitPlayState' | 'onPlayStateChange'
+> & {
   planets: Planet[];
 };
 
@@ -182,7 +185,7 @@ export const useStellarStore = create<StellarStore>((set, get) => ({
       // 스토어 갱신 후, 오디오 측에도 즉시 동일한 초기값을 적용합니다.
       // StellarSystem이 회색 상태라도 setSeed/updateStarProperties는 안전하게 동작해야 합니다.
       try {
-  const system = StellarSystem.instance;
+        const system = StellarSystem.instance;
         // 결정적 시드 생성
         const seedStr = `${star.properties.color}|${star.properties.size}|${star.properties.spin}|${star.properties.brightness}`;
         system.setSeed(seedStr);
@@ -193,7 +196,15 @@ export const useStellarStore = create<StellarStore>((set, get) => ({
           brightness: star.properties.brightness,
         });
         // 첫 행성도 오디오에 즉시 생성
-  system.createPlanet(firstPlanet.role, firstPlanet.id, { synthType: firstPlanet.synthType, oscillatorType: firstPlanet.oscillatorType }, firstPlanet.properties);
+        system.createPlanet(
+          firstPlanet.role,
+          firstPlanet.id,
+          {
+            synthType: firstPlanet.synthType,
+            oscillatorType: firstPlanet.oscillatorType,
+          },
+          firstPlanet.properties
+        );
       } catch (err) {
         // 실패해도 스토어 업데이트는 유지
         console.debug('스토어 초기화 후 오디오 동기화 중 오류:', err);
@@ -230,8 +241,8 @@ export const useStellarStore = create<StellarStore>((set, get) => ({
   },
 
   deletePlanet: (planetId) => {
-  const prev = get().stellarStore as StellarStoreData;
-  const nextPlanets = (prev.planets || []).filter((p) => p.id !== planetId);
+    const prev = get().stellarStore as StellarStoreData;
+    const nextPlanets = (prev.planets || []).filter((p) => p.id !== planetId);
     if (nextPlanets.length === 0) return false; // 규칙 유지: 최소 1개 보장
 
     set({
