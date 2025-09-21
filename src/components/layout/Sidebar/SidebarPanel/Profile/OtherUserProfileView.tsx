@@ -9,7 +9,6 @@ import {
   useGetFollowers,
 } from '@/hooks/api/useFollow';
 import { useFollowActions } from '@/hooks/useFollowActions';
-import { calculateFollowRelation } from '@/utils/followRelation';
 import ProfileStateWrapper from './ProfileStateWrapper';
 import PanelHeader from '../PanelHeader';
 import Iconframe from '@/components/common/Iconframe';
