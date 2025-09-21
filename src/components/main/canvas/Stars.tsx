@@ -5,12 +5,12 @@ import * as THREE from 'three';
 import * as random from 'maath/random';
 
 function StarsContent() {
-  // 별 포인트 생성 (1000개의 별)
   const starsRef = useRef<THREE.Points>(null!);
   const starsRef2 = useRef<THREE.Points>(null!);
   const starsRef3 = useRef<THREE.Points>(null!);
 
   const positions = useMemo(
+    // 별 포인트 개수 (3(x,y,z좌표값) * n 개의 별)
     () => random.inSphere(new Float32Array(3 * 1000), { radius: 2.4 }),
     []
   );
@@ -47,10 +47,10 @@ function StarsContent() {
         <PointMaterial
           transparent
           color="#ffffff" // 순백색으로 최대 밝기
-          size={0.04} // 살짝만 크기 증가 (0.03 → 0.04)
+          size={2} // 별 크기
           sizeAttenuation
           depthWrite={false}
-          opacity={1.0} // 완전 불투명으로 밝기 증가
+          opacity={0.3} // 별 밝기
           blending={THREE.AdditiveBlending} // 가산 블렌딩으로 네온 효과
         />
       </Points>
@@ -64,8 +64,8 @@ function StarsContent() {
       >
         <PointMaterial
           transparent
-          color="#87ceeb" // 밝은 하늘색으로 네온 효과
-          size={0.06} // 살짝만 크기 증가 (0.05 → 0.06)
+          color="#87ceeb"
+          size={2}
           sizeAttenuation
           depthWrite={false}
           opacity={0.9} // 밝기 증가
@@ -82,11 +82,11 @@ function StarsContent() {
       >
         <PointMaterial
           transparent
-          color="#dda0dd" // 밝은 연보라색으로 네온 효과
-          size={0.11} // 살짝만 크기 증가 (0.1 → 0.11)
+          color="#dda0dd"
+          size={1}
           sizeAttenuation
           depthWrite={false}
-          opacity={0.8} // 밝기 증가
+          opacity={0.9}
           blending={THREE.AdditiveBlending}
         />
       </Points>

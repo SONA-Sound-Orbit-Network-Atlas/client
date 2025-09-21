@@ -25,14 +25,14 @@ export default function ProfileView() {
 
   // 팔로워 수 조회
   const { data: followersData } = useGetFollowers({
-    userId: userStore.id || '',
+    targetId: userStore.id || '',
     page: 1,
     limit: 1, // 총 개수만 필요하므로 1개만 조회
   });
 
   // 팔로잉 수 조회
   const { data: followingsData } = useGetFollowings({
-    userId: userStore.id || '',
+    targetId: userStore.id || '',
     page: 1,
     limit: 1, // 총 개수만 필요하므로 1개만 조회
   });

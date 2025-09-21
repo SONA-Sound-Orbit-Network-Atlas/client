@@ -14,18 +14,14 @@ import { useSelectedStellarStore } from '@/stores/useSelectedStellarStore';
 import SelectRequired from './SelectRequired';
 import { ScrollArea } from '@/components/common/Scrollarea';
 import AudioPlayer from './audioPlayer/Index';
+import Breadcrumb from './breadcrumb/Breadcrumb';
 
 export default function StellarIndex() {
-  // isStellarOwner : 현재 선택된 Stellar의 creator_id 가 현재 로그인된 userId와 일치하는가? => true 수정 모드 / false 관람 모드
   const { stellarStore } = useStellarStore();
   const { userStore } = useUserStore();
-  const isStellarOwner = stellarStore.creator_id === userStore.id;
-
-  // 현재 선택된 Stellar의 모드 : 수정,관람 모드와 관계 없는 모드
   const { mode } = useSelectedStellarStore();
-
-  // Stellar 패널 Tab value 스토어
   const { tabValue, setTabValue } = useStellarTabStore();
+  const isStellarOwner = stellarStore.creator_id === userStore.id;
 
   return (
     <>
@@ -41,6 +37,7 @@ export default function StellarIndex() {
             value={tabValue}
             onValueChange={(v) => setTabValue(v as typeof tabValue)}
           >
+            {/* TabsList */}
             <TabsList className="grid w-full [grid-template-columns:repeat(3,minmax(max-content,1fr))] gap-0 shrink-0">
               <TabsTrigger value="INFO">INFO</TabsTrigger>
               <TabsTrigger
@@ -56,7 +53,12 @@ export default function StellarIndex() {
                 PROPERTIES
               </TabsTrigger>
             </TabsList>
+
+            {/* TabsContent */}
             <div className="flex-1 min-h-0">
+              {/* Breadcrumb */}
+              <Breadcrumb />
+
               <ScrollArea className="h-full">
                 <TabsContent value="INFO" className="p-4">
                   <Info isStellarOwner={isStellarOwner} />
@@ -70,6 +72,8 @@ export default function StellarIndex() {
               </ScrollArea>
             </div>
           </Tabs>
+
+          {/* AudioPlayer */}
           <AudioPlayer className="w-full h-[49px] border-t border-gray-border" />
         </div>
       )}

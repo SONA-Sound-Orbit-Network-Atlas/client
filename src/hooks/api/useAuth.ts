@@ -4,11 +4,12 @@ import type { LoginData, SignupData } from '@/types/auth';
 import { authAPI } from '@/api/auth';
 import type { User } from '@/types/user';
 import { useUserStore } from '@/stores/useUserStore';
+import { authKeys } from './queryKeys/authKeys';
 
 // 회원가입
 export function useSignup(data: SignupData) {
   return useMutation({
-    mutationKey: ['auth', 'signup'],
+    mutationKey: authKeys.signup(),
     mutationFn: () => authAPI.signup(data),
   });
 }
@@ -18,7 +19,7 @@ export function useLogin(data: LoginData) {
   const { setUserStore, setIsLoggedIn } = useUserStore();
 
   return useMutation({
-    mutationKey: ['auth', 'login', data.identifier],
+    mutationKey: authKeys.login(data.identifier),
     mutationFn: () => authAPI.login(data),
     onSuccess: (response) => {
       const { access_token, user } = response;
@@ -59,7 +60,7 @@ export function useLogout() {
   const { clearUserStore } = useUserStore();
 
   return useMutation({
-    mutationKey: ['auth', 'logout'],
+    mutationKey: authKeys.logout(),
     mutationFn: () => authAPI.logout(),
     onSuccess: () => {
       console.log('로그아웃 성공');
@@ -76,7 +77,7 @@ export function useLogout() {
       clearUserStore();
 
       // React Query 캐시 정리
-      queryClient.setQueryData(['session'], null);
+      queryClient.setQueryData(authKeys.session(), null);
       await queryClient.invalidateQueries({ queryKey: ['galaxyMyList'] });
     },
   });
@@ -85,7 +86,7 @@ export function useLogout() {
 // 로그인 유지 확인
 export function useGetSession() {
   return useQuery<User | null>({
-    queryKey: ['session'],
+    queryKey: authKeys.session(),
     queryFn: () => authAPI.getSession(),
     staleTime: 0,
     retry: false,

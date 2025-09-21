@@ -2,6 +2,10 @@ import { useProfileStore } from '@/stores/useProfileStore';
 import { useEditProfile } from '@/hooks/useEditProfile';
 import { useChangePassword } from '@/hooks/useChangePassword';
 import { useDeactivateAccount } from '@/hooks/useDeactivateAccount';
+import {
+  usePasswordValidation,
+  type ChangePasswordFormData,
+} from '@/hooks/usePasswordValidation';
 import PanelHeader from '../PanelHeader';
 import Iconframe from '@/components/common/Iconframe';
 import { FiUser } from 'react-icons/fi';
@@ -11,6 +15,7 @@ import Button from '@/components/common/Button';
 import { ScrollArea } from '@/components/common/Scrollarea';
 import Textarea from '@/components/common/Textarea';
 import ErrorMessage from '@/components/common/ErrorMessage';
+import PasswordField from '@/components/common/PasswordField';
 
 export default function EditProfilePanel() {
   const { setProfilePanelMode } = useProfileStore();
@@ -32,6 +37,13 @@ export default function EditProfilePanel() {
     },
   });
 
+  // 비밀번호 유효성 검사
+  const {
+    errors: passwordErrors,
+    validateForm: validatePasswordForm,
+    handleInputChange: handlePasswordInputChange,
+  } = usePasswordValidation();
+
   // 회원탈퇴 관련 로직
   const {
     showDeactivateForm,
@@ -52,6 +64,17 @@ export default function EditProfilePanel() {
 
   // 비밀번호 변경 핸들러
   const handlePasswordSubmit = async () => {
+    // 유효성 검사 먼저 수행
+    const changePasswordData = {
+      currentPassword: passwordFormData.currentPassword,
+      newPassword: passwordFormData.newPassword,
+      confirmPassword: passwordFormData.confirmPassword,
+    };
+
+    if (!validatePasswordForm(changePasswordData)) {
+      return;
+    }
+
     await handleChangePassword();
   };
 
@@ -69,13 +92,13 @@ export default function EditProfilePanel() {
               <Iconframe color="primary" size="large" className="mb-[16px]">
                 <FiUser />
               </Iconframe>
-              <p className="text-primary-300 text-sm text-center">
+              {/* <p className="text-primary-300 text-sm text-center">
                 CHANGE AVATAR
-              </p>
+              </p> */}
             </div>
             {/* EDIT PROFILE */}
             <div className="w-full border-b border-gray-border pb-[24px]">
-              <div className="w-full mt-[24px] gap-[20px] flex flex-col">
+              <div className="w-full gap-[20px] flex flex-col">
                 <TextField label="USERNAME" htmlFor="username">
                   <TextInput
                     type="text"
@@ -130,51 +153,60 @@ export default function EditProfilePanel() {
                 CHANGE PASSWORD
               </h3>
               <div className="w-full gap-[20px] flex flex-col">
-                <TextField label="CURRENT PASSWORD" htmlFor="current-password">
-                  <TextInput
-                    type="password"
-                    placeholder="Enter current password"
-                    id="current-password"
-                    value={passwordFormData.currentPassword}
-                    onChange={(e) =>
-                      setPasswordFormData((prev) => ({
-                        ...prev,
-                        currentPassword: e.target.value,
-                      }))
-                    }
-                  />
-                </TextField>
-                <TextField label="NEW PASSWORD" htmlFor="new-password">
-                  <TextInput
-                    type="password"
-                    placeholder="Enter new password"
-                    id="new-password"
-                    value={passwordFormData.newPassword}
-                    onChange={(e) =>
-                      setPasswordFormData((prev) => ({
-                        ...prev,
-                        newPassword: e.target.value,
-                      }))
-                    }
-                  />
-                </TextField>
-                <TextField
+                <PasswordField
+                  label="CURRENT PASSWORD"
+                  value={passwordFormData.currentPassword}
+                  onChange={(value) => {
+                    setPasswordFormData((prev) => ({
+                      ...prev,
+                      currentPassword: value,
+                    }));
+                    handlePasswordInputChange('currentPassword', value, {
+                      currentPassword: value,
+                      newPassword: passwordFormData.newPassword,
+                      confirmPassword: passwordFormData.confirmPassword,
+                    } as ChangePasswordFormData);
+                  }}
+                  placeholder="Enter current password"
+                  id="current-password"
+                  error={passwordErrors.currentPassword}
+                />
+                <PasswordField
+                  label="NEW PASSWORD"
+                  value={passwordFormData.newPassword}
+                  onChange={(value) => {
+                    setPasswordFormData((prev) => ({
+                      ...prev,
+                      newPassword: value,
+                    }));
+                    handlePasswordInputChange('newPassword', value, {
+                      currentPassword: passwordFormData.currentPassword,
+                      newPassword: value,
+                      confirmPassword: passwordFormData.confirmPassword,
+                    } as ChangePasswordFormData);
+                  }}
+                  placeholder="Enter new password"
+                  id="new-password"
+                  error={passwordErrors.newPassword}
+                />
+                <PasswordField
                   label="CONFIRM NEW PASSWORD"
-                  htmlFor="confirm-new-password"
-                >
-                  <TextInput
-                    type="password"
-                    placeholder="Confirm new password"
-                    id="confirm-new-password"
-                    value={passwordFormData.confirmPassword}
-                    onChange={(e) =>
-                      setPasswordFormData((prev) => ({
-                        ...prev,
-                        confirmPassword: e.target.value,
-                      }))
-                    }
-                  />
-                </TextField>
+                  value={passwordFormData.confirmPassword}
+                  onChange={(value) => {
+                    setPasswordFormData((prev) => ({
+                      ...prev,
+                      confirmPassword: value,
+                    }));
+                    handlePasswordInputChange('confirmPassword', value, {
+                      currentPassword: passwordFormData.currentPassword,
+                      newPassword: passwordFormData.newPassword,
+                      confirmPassword: value,
+                    } as ChangePasswordFormData);
+                  }}
+                  placeholder="Confirm new password"
+                  id="confirm-new-password"
+                  error={passwordErrors.confirmPassword}
+                />
               </div>
 
               {/* 비밀번호 변경 에러 메시지 */}

@@ -9,6 +9,7 @@ import TextInput from '@/components/common/TextInput';
 import Button from '@/components/common/Button';
 import TextField from '@/components/common/TextField';
 import ErrorMessage from '@/components/common/ErrorMessage';
+import PasswordField from '@/components/common/PasswordField';
 import { ScrollArea } from '@/components/common/Scrollarea';
 import PanelHeader from '../PanelHeader';
 import type { SignupData } from '@/types/auth';
@@ -136,42 +137,25 @@ export default function SignUpPanel() {
                 )}
               </TextField>
 
-              <TextField label="Password" htmlFor="signup-password">
-                <TextInput
-                  type="password"
-                  placeholder="Enter your password"
-                  id="signup-password"
-                  value={formData.password}
-                  onChange={(e) =>
-                    handleFormInputChange('password', e.target.value)
-                  }
-                  className={errors.password ? 'border-error' : ''}
-                />
-                {errors.password && (
-                  <p className="text-error text-xs mt-1">{errors.password}</p>
-                )}
-              </TextField>
+              <PasswordField
+                label="Password"
+                value={formData.password}
+                onChange={(value) => handleFormInputChange('password', value)}
+                placeholder="Enter your password"
+                id="signup-password"
+                error={errors.password}
+              />
 
-              <TextField
+              <PasswordField
                 label="Confirm Password"
-                htmlFor="signup-confirm-password"
-              >
-                <TextInput
-                  type="password"
-                  placeholder="Confirm your password"
-                  id="signup-confirm-password"
-                  value={formData.confirmPassword}
-                  onChange={(e) =>
-                    handleFormInputChange('confirmPassword', e.target.value)
-                  }
-                  className={errors.confirmPassword ? 'border-error' : ''}
-                />
-                {errors.confirmPassword && (
-                  <p className="text-error text-xs mt-1">
-                    {errors.confirmPassword}
-                  </p>
-                )}
-              </TextField>
+                value={formData.confirmPassword}
+                onChange={(value) =>
+                  handleFormInputChange('confirmPassword', value)
+                }
+                placeholder="Confirm your password"
+                id="signup-confirm-password"
+                error={errors.confirmPassword}
+              />
             </div>
 
             <Button

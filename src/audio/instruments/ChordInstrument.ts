@@ -1,16 +1,13 @@
+import { AudioEngine } from '../core/AudioEngine';
 // ChordInstrument - 화음 전용 악기 (독립 구현)
 // PolySynth + 화음 보이싱 기능으로 풍부한 화음을 연주합니다.
 // SONA 지침: CHORD 역할 - 화음 연주에 특화된 설정
 
 import * as Tone from 'tone';
 import type { MappedAudioParameters } from '../../types/audio';
-import {
-  BaseInstrument,
-  type SimplifiedInstrumentMacros,
-  type ResolvedInstrumentContext,
-} from './InstrumentInterface';
+import { AbstractInstrumentBase } from './InstrumentInterface';
 
-export class ChordInstrument extends BaseInstrument {
+export class ChordInstrument extends AbstractInstrumentBase {
   
   // 화음 전용 신스와 이펙트 체인
   private chordSynth!: Tone.PolySynth;       // 메인 화음 신스 (PolySynth - 다성 연주)
@@ -30,44 +27,44 @@ export class ChordInstrument extends BaseInstrument {
     // 화음 전용 PolySynth 설정 - 기본 설정으로 단순화
     this.chordSynth = new Tone.PolySynth(Tone.Synth, {
       oscillator: {
-        type: 'sawtooth'            // 톱니파 - 풍부한 하모닉스
+        type: 'triangle'            // 트라이앵글로 하모닉스 감소, 더 부드러운 톤
       },
       envelope: {
-        attack: 0.02,               // 부드러운 어택
-        decay: 0.3,                 // 적당한 디케이
-        sustain: 0.7,               // 높은 서스테인 - 화음 유지
-        release: 1.0                // 긴 릴리즈 - 자연스러운 감쇠
+        attack: 0.04,               // 어택을 늘려서 날카로움 완화
+        decay: 0.6,                 // 디케이 연장
+        sustain: 0.85,              // 더 높은 서스테인
+        release: 2.0                // 릴리즈 크게 늘려 자연스러운 코드 풀오프
       }
     });
 
     // 화음 전용 필터 - 따뜻한 톤
     this.chordFilter = new Tone.Filter({
-      frequency: 2500,              // 중간 고음역
+      frequency: 1400,              // 컷오프를 더 낮춰 날카로움 감소
       type: 'lowpass',
       rolloff: -24,                 // 부드러운 컷오프
-      Q: 1.2                        // 적당한 레조넌스
+      Q: 0.7                        // 레조넌스 더 줄여 뾰족함 완화
     });
 
     // 스테레오 코러스 - 화음의 공간감과 풍부함
     this.stereoChorus = new Tone.Chorus({
-      frequency: 0.8,               // 느린 모듈레이션
-      delayTime: 8,                 // 8ms 딜레이
-      depth: 0.6,                   // 깊은 모듈레이션
-      feedback: 0.1,                // 가벼운 피드백
-      spread: 180                   // 완전한 스테레오 스프레드
+      frequency: 0.5,               // 더 느린 모듈레이션
+      delayTime: 5,                 // 딜레이 소폭 감소
+      depth: 0.18,                  // 깊이 추가 축소
+      feedback: 0.03,               // 피드백 거의 없음
+      spread: 90                    // 스프레드 더 중앙 집중
     });
 
     // 자동 필터 - 리듬감 있는 화음 모듈레이션
     this.autoFilter = new Tone.AutoFilter({
-      frequency: '8n',              // 8분음표 주기
+      frequency: '4n',              // 느린 4분음표 주기으로 부드러움 강조
       type: 'sine',                 // 부드러운 사인파
-      depth: 0.3,                   // 적당한 깊이
-      baseFrequency: 1500,          // 기본 필터 주파수
-      octaves: 1.5,                 // 모듈레이션 범위
+      depth: 0.12,                  // 깊이 더 축소
+      baseFrequency: 1000,          // 기본 필터 주파수 더 낮춤
+      octaves: 0.8,                 // 모듈레이션 범위 축소
       filter: {
         type: 'lowpass',
         rolloff: -12,
-        Q: 1
+        Q: 0.7
       }
     });
 
@@ -81,8 +78,8 @@ export class ChordInstrument extends BaseInstrument {
 
     // 가벼운 디스토션 - 화음의 따뜻함과 압축
     this.distortion = new Tone.Distortion({
-      distortion: 0.15,             // 가벼운 디스토션
-      oversample: '2x'              // 오버샘플링으로 품질 향상
+      distortion: 0.02,             // 거의 느껴지지 않는 새추레이션
+      oversample: '2x'
     });
 
     // 3밴드 EQ - 화음 밸런스
@@ -92,22 +89,54 @@ export class ChordInstrument extends BaseInstrument {
       high: 1                       // 고음 약간 부스트
     });
 
-    // 신호 체인 연결: chordSynth → distortion → compressor → eq → chordFilter → autoFilter → stereoChorus → destination
-    this.chordSynth.chain(
-      this.distortion,
-      this.compressor,
-      this.eq,
-      this.chordFilter,
-      this.autoFilter,
-      this.stereoChorus,
-      Tone.Destination
-    );
+    // 신호 체인 연결: chordSynth → distortion → compressor → eq → chordFilter → autoFilter → stereoChorus → masterInput
+    // masterInput이 보장되도록 AudioEngine의 ensureMasterChain를 호출하고 안전하게 연결합니다.
+    AudioEngine.instance.ensureMasterChain();
+    if (AudioEngine.instance.masterInput) {
+      this.chordSynth.chain(
+        this.distortion,
+        this.compressor,
+        this.eq,
+        this.chordFilter,
+        this.autoFilter,
+        this.stereoChorus,
+        AudioEngine.instance.masterInput
+      );
+    } else {
+      // 비상시 Tone.Destination으로 폴백
+      console.warn('ChordInstrument: masterInput가 없어서 Destination으로 폴백 연결합니다.');
+      this.chordSynth.chain(
+        this.distortion,
+        this.compressor,
+        this.eq,
+        this.chordFilter,
+        this.autoFilter,
+        this.stereoChorus,
+        Tone.Destination
+      );
+    }
 
-    // 자동 필터와 코러스 시작
-    this.autoFilter.start();
-    this.stereoChorus.start();
+    // 자동 필터와 코러스 시작 (필요시)
+    try {
+      // Tone의 AudioContext가 running 상태일 때만 start 호출
+      const ctx = (Tone as unknown as { getContext?: () => { state?: string } }).getContext?.();
+      if (!ctx || ctx.state === 'running') {
+        this.autoFilter.start();
+      }
+    } catch {
+      // 일부 Tone 노드에서는 start가 없을 수 있으므로 안전하게 처리
+      console.debug('ChordInstrument: autoFilter.start() 호출 불가');
+    }
+    try {
+      const ctx2 = (Tone as unknown as { getContext?: () => { state?: string } }).getContext?.();
+      if (!ctx2 || ctx2.state === 'running') {
+        this.stereoChorus.start();
+      }
+    } catch {
+      console.debug('ChordInstrument: stereoChorus.start() 호출 불가');
+    }
 
-    console.log('🎹 ChordInstrument 초기화 완료:', this.id);
+    
   }
 
   public triggerAttackRelease(
@@ -326,81 +355,94 @@ export class ChordInstrument extends BaseInstrument {
 
   // SONA 매핑된 파라미터 적용
   protected handleParameterUpdate(
-    params: MappedAudioParameters,
-    _macros: SimplifiedInstrumentMacros,
-    _context: ResolvedInstrumentContext
+  params: MappedAudioParameters
   ): void {
     if (this.disposed) return;
 
+    // 방어적 파라미터 검증: undefined/NaN 방지
+    const safe = (n: unknown, fallback = 0) => {
+      const v = typeof n === 'number' && !isNaN(n as number) ? (n as number) : fallback;
+      return v;
+    };
+
+    const cutoffHz = Math.max(20, Math.min(22050, safe(params.cutoffHz, 2000)));
+    const resonanceQ = Math.max(0, Math.min(10, safe(params.resonanceQ, 1)));
+    const chorusDepth = Math.max(0, Math.min(1, safe(params.chorusDepth, 0.3)));
+    const tremHz = Math.max(0, safe(params.tremHz, 0.5));
+    const tremDepth = Math.max(0, Math.min(1, safe(params.tremDepth, 0.2)));
+    const outGainDb = safe(params.outGainDb, 0);
+    const reverbSend = Math.max(0, Math.min(1, safe(params.reverbSend, 0)));
+
     // 필터 컷오프 조절 - 화음의 밝기
     if (this.chordFilter) {
-      const cutoff = Math.max(1000, Math.min(6000, params.cutoffHz));
-      this.chordFilter.frequency.rampTo(cutoff, 0.04); // 40ms 스무딩
-    }
-    
-    // 필터 레조넌스 조절
-    if (this.chordFilter) {
-      const resonance = 0.8 + (params.resonanceQ * 1.5); // 0.8-2.3 범위
+      // cutoffHz와 resonanceQ는 이미 검증된 값 사용
+      this.chordFilter.frequency.rampTo(cutoffHz, 0.04); // 40ms 스무딩
+      const resonance = 0.8 + resonanceQ * 1.5;
       this.chordFilter.Q.rampTo(resonance, 0.04);
     }
     
     // 코러스 깊이 조절
     if (this.stereoChorus) {
-      const chorusDepth = 0.3 + (params.chorusDepth * 0.5); // 0.3-0.8 범위
-      this.stereoChorus.depth = chorusDepth;
-      
-      const chorusFreq = 0.5 + (params.tremHz * 0.3); // 0.5-2.9 Hz
+      // stereoChorus에 직접 할당보다는 set() 호출로 안전하게 적용
+      const desiredDepth = 0.3 + chorusDepth * 0.5; // 0.3-0.8 범위
+      this.stereoChorus.set({ depth: desiredDepth });
+      const chorusFreq = 0.5 + tremHz * 0.3; // 0.5-2.9 Hz
       this.stereoChorus.frequency.rampTo(chorusFreq, 0.06);
     }
     
     // 자동 필터 조절
     if (this.autoFilter) {
-      const filterDepth = 0.2 + (params.tremDepth * 0.4); // 0.2-0.6 범위
-      this.autoFilter.depth.rampTo(filterDepth, 0.02);
-      
-      const filterFreq = Math.max(0.5, params.tremHz * 2); // 최소 0.5Hz
+      const desiredDepth = 0.2 + tremDepth * 0.4; // 0.2-0.6 범위
+      // AutoFilter의 depth는 set으로 적용
+      try {
+        this.autoFilter.set({ depth: desiredDepth });
+      } catch {
+        // 일부 버전에서는 set 사용이 제한될 수 있음
+        this.autoFilter.depth.rampTo(desiredDepth, 0.02);
+      }
+
+      const filterFreq = Math.max(0.5, tremHz * 2); // 최소 0.5Hz
       this.autoFilter.frequency.rampTo(filterFreq + 'hz', 0.02);
     }
     
     // 디스토션 조절
     if (this.distortion) {
-      const distAmount = 0.05 + (params.chorusDepth * 0.25); // 0.05-0.3 범위
-      this.distortion.distortion = Math.max(0, Math.min(0.4, distAmount));
+      const distAmount = 0.05 + chorusDepth * 0.25; // 0.05-0.3 범위
+      this.distortion.set({ distortion: Math.max(0, Math.min(0.4, distAmount)) });
     }
     
     // EQ 조절
     if (this.eq) {
       // 고음 조절 (brightness 매핑)
-      const highGain = 0 + (params.outGainDb * 0.4);
+      const highGain = 0 + outGainDb * 0.4;
       this.eq.high.rampTo(Math.max(-3, Math.min(6, highGain)), 0.08);
-      
+
       // 중음 조절
-      const midGain = 1 + (params.cutoffHz / 3000);
+      const midGain = 1 + cutoffHz / 3000;
       this.eq.mid.rampTo(Math.max(-2, Math.min(4, midGain)), 0.08);
-      
+
       // 저음 조절
-      const lowGain = -1 + (params.reverbSend * 2);
+      const lowGain = -1 + reverbSend * 2;
       this.eq.low.rampTo(Math.max(-3, Math.min(2, lowGain)), 0.08);
     }
     
     // 어택/릴리즈 시간 조절
     if (this.chordSynth) {
-      const attack = 0.01 + (params.tremDepth * 0.05); // 0.01-0.06초
-      const release = 0.8 + (params.reverbSend * 0.4); // 0.8-1.2초
-      
-      // PolySynth의 각 보이스에 적용
-      this.chordSynth.set({
-        envelope: {
-          attack: attack,
-          release: release
-        }
-      });
+      const attack = 0.02 + tremDepth * 0.04; // 어택 소폭 증가
+      const release = 1.2 + reverbSend * 0.8; // 릴리즈를 연장하여 코드가 자연스럽게 풀리게 함
+
+      // PolySynth의 각 보이스에 적용 - 변경이 있을 때만 set 호출하도록 간단한 비교
+      try {
+        this.chordSynth.set({ envelope: { attack, release } });
+      } catch {
+        // PolySynth 구현에 따라 set이 제한될 수 있으므로 무시
+      }
     }
   }
 
   protected applyOscillatorType(type: Tone.ToneOscillatorType): void {
     if (this.disposed) return;
-    this.chordSynth?.set({ oscillator: { type } } as any);
+  this.chordSynth?.set({ oscillator: { type } } as Partial<Tone.SynthOptions>);
   }
 
   public dispose(): void {
@@ -416,6 +458,6 @@ export class ChordInstrument extends BaseInstrument {
     this.distortion?.dispose();
     
     super.dispose();
-    console.log(`🗑️ ChordInstrument ${this.id} disposed`);
+    
   }
 }

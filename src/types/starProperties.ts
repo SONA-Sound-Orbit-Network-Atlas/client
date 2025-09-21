@@ -16,7 +16,7 @@ export interface StarProperties {
 export const STAR_PROPERTIES: Record<string, PropertyDefinition> = {
   spin: {
     key: 'spin',
-    label: '항성 자전',
+    label: 'Star Spin',
     description: '항성의 자전 속도 (전체 BPM 결정)',
     category: 'pattern',
     min: 0,
@@ -25,13 +25,14 @@ export const STAR_PROPERTIES: Record<string, PropertyDefinition> = {
     defaultValue: 50,
     controlType: 'slider',
     audioTargets: [
-      { name: 'bpm', weight: 1.0, transform: (n) => 60 + n * 120 }, // 60-180 BPM
+      // transform은 audio 레이어에서 처리합니다. 여기서는 선언적 매핑만 유지합니다n
+      { name: 'bpm', weight: 1.0 }, // 60-180 BPM (transform applied in audio layer)
     ],
   },
 
   brightness: {
     key: 'brightness',
-    label: '항성 밝기',
+    label: 'Star Brightness',
     description:
       '항성의 밝기 (전체 음색 특성 결정 - 어두우면 따뜻하고 부드러운 톤, 밝으면 선명하고 날카로운 톤)',
     category: 'audio',
@@ -40,14 +41,12 @@ export const STAR_PROPERTIES: Record<string, PropertyDefinition> = {
     step: 1,
     defaultValue: 75,
     controlType: 'slider',
-    audioTargets: [
-      { name: 'toneCharacter', weight: 1.0, transform: (n) => n }, // 0-100 Tone Character
-    ],
+    audioTargets: [{ name: 'toneCharacter', weight: 1.0 }],
   },
 
   color: {
     key: 'color',
-    label: '항성 색상',
+    label: 'Star Color',
     description: '항성의 색상 (Key/Scale 결정)',
     category: 'pitch',
     min: 0,
@@ -56,18 +55,18 @@ export const STAR_PROPERTIES: Record<string, PropertyDefinition> = {
     defaultValue: 60,
     controlType: 'slider',
     audioTargets: [
-      { name: 'key', weight: 1.0, transform: (n) => Math.floor(n / 30) }, // 0-11 (12 keys)
+  { name: 'key', weight: 1.0 }, // 0-11 (12 keys) - transform handled in audio layer
       {
         name: 'scale',
         weight: 1.0,
-        transform: (n) => Math.floor((n % 60) / 8.57),
+  // transform handled in audio layer
       }, // 0-6 (7 scales)
     ],
   },
 
   size: {
     key: 'size',
-    label: '항성 크기',
+    label: 'Star Size',
     description: '항성의 크기 (패턴 복잡도 결정)',
     category: 'pattern',
     min: 0,
@@ -76,11 +75,7 @@ export const STAR_PROPERTIES: Record<string, PropertyDefinition> = {
     defaultValue: 50,
     controlType: 'slider',
     audioTargets: [
-      {
-        name: 'complexity',
-        weight: 1.0,
-        transform: (n) => Math.floor(n / 33.33) + 1,
-      }, // 1-3 Complexity
+      { name: 'complexity', weight: 1.0 }, // 1-3 Complexity (transform in audio layer)
     ],
   },
 };
@@ -139,11 +134,10 @@ export function mapStarPropertiesToAudio(
     );
 
     def.audioTargets.forEach((target) => {
-      const mappedValue = target.transform
-        ? target.transform(normalizedValue)
-        : normalizedValue;
-
-      result[target.name] = mappedValue * target.weight;
+      const weight = target.weight ?? 1.0;
+      // transform은 audio 레이어에서 처리되므로 여기서는 정규화 값에 가중치만 적용
+      const mappedValue = normalizedValue * weight;
+      result[target.name] = mappedValue;
     });
   });
 

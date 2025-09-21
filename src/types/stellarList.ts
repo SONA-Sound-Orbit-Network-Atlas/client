@@ -4,7 +4,7 @@ export interface StellarListItem {
   id: string;
   title: string;
   galaxy_id: string;
-  // creator_id: string;
+  creator_id: string;
   creator_name: string;
   created_at: string;
   updated_at: string;

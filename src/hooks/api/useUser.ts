@@ -10,13 +10,14 @@ import {
 import type { User } from '@/types/user';
 import { useUserStore } from '@/stores/useUserStore';
 import type { AxiosError } from 'axios';
+import { userKeys } from './queryKeys/userKeys';
 
 // 현재 사용자 프로필 조회 (userStore 업데이트 포함)
 export function useGetCurrentUserProfile() {
   const { setUserStore, userStore } = useUserStore();
 
   const query = useQuery<User>({
-    queryKey: ['currentUserProfile'],
+    queryKey: userKeys.currentUserProfile(),
     queryFn: () => userAPI.getUserProfile(userStore.id),
     enabled: !!userStore.id,
     staleTime: 5 * 60 * 1000, // 5분간 캐시 유지
@@ -35,7 +36,7 @@ export function useGetCurrentUserProfile() {
 // 다른 사용자 프로필 조회 (userStore 업데이트 없음)
 export function useGetUserProfile(userId: string) {
   const query = useQuery<User>({
-    queryKey: ['userProfile', userId],
+    queryKey: userKeys.userProfile(userId),
     queryFn: () => userAPI.getUserProfile(userId),
     enabled: !!userId, // userId가 있을 때만 실행
     staleTime: 5 * 60 * 1000, // 5분간 캐시 유지
@@ -61,13 +62,14 @@ export function useUpdateUserProfile() {
         updated_at: updatedUser.updated_at,
       });
 
-      // 캐시 업데이트 (서버에서 받은 최신 데이터로)
-      queryClient.setQueryData(['userProfile', updatedUser.id], updatedUser);
+      // currentUserProfile 쿼리 무효화 대신 setQueryData를 사용하여 즉시 업데이트
+      queryClient.setQueryData(userKeys.currentUserProfile(), updatedUser);
 
-      // 모든 userProfile 관련 쿼리 무효화
-      queryClient.invalidateQueries({
-        queryKey: ['userProfile'],
-      });
+      // userProfile 쿼리도 setQueryData로 직접 업데이트
+      queryClient.setQueryData(
+        userKeys.userProfile(updatedUser.id),
+        updatedUser
+      );
     },
     onError: (error: AxiosError) => {
       console.error('프로필 수정 실패:', error);
@@ -87,7 +89,7 @@ export function useUpdatePassword() {
 
       // 비밀번호 변경 성공 시 userProfile 쿼리를 무효화하여 자동 리페치 유도
       queryClient.invalidateQueries({
-        queryKey: ['userProfile', userStore.id],
+        queryKey: userKeys.userProfile(userStore.id),
       });
     },
     onError: (error: AxiosError) => {

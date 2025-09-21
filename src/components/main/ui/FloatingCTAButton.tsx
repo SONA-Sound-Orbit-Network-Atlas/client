@@ -23,7 +23,7 @@ export default function FloatingCTAButton({
         }`}
       onClick={() => navigate('/space')}
     >
-      go to Space
+      LAUNCH
     </button>
   );
 }

@@ -18,17 +18,32 @@ export interface FollowError {
   error: string;
 }
 
+// ===== API 에러 응답 =====
+export interface APIErrorResponse {
+  error: {
+    code: number;
+    message: string;
+  };
+  timestamp: string;
+  path: string;
+}
+
 // ===== 페이지네이션 =====
 export interface PaginationMeta {
   page: number;
   limit: number;
   total: number;
+  totalPages: number;
+  hasNext?: boolean; // 서버에서 제공하지 않을 수 있음
+  hasPrev?: boolean; // 서버에서 제공하지 않을 수 있음
 }
 
 // ===== 팔로우 사용자 타입 =====
 // 공통 팔로우 사용자 인터페이스
 export interface FollowUser extends User {
-  isMutual: boolean; // 상호 팔로우 여부
+  viewer_is_following: boolean; // 내가 상대방을 팔로우하고 있는지
+  viewer_is_followed_by: boolean; // 상대방이 나를 팔로우하고 있는지
+  isMutual: boolean; // 상호 팔로우 여부 (viewer_is_following && viewer_is_followed_by)
 }
 
 // 팔로워와 팔로잉은 동일한 구조이므로 별칭으로 정의
@@ -49,7 +64,7 @@ export type FollowingsResponse = FollowListResponse<FollowingUser>;
 // ===== API 파라미터 =====
 // 공통 API 파라미터 인터페이스
 export interface FollowListParams {
-  userId: string;
+  targetId: string;
   page?: number;
   limit?: number;
 }
@@ -60,7 +75,7 @@ export type GetFollowingsParams = FollowListParams;
 
 // ===== 훅 옵션 =====
 export interface UseFollowListOptions {
-  userId: string;
+  targetId: string;
   page?: number; // useInfiniteQuery에서는 page가 필요하지 않음
   limit?: number;
 }

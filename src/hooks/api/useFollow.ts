@@ -9,6 +9,8 @@ import type {
   FollowingsResponse,
 } from '@/types/follow';
 import type { AxiosError } from 'axios';
+import { followKeys } from './queryKeys/followKeys';
+import { userKeys } from './queryKeys/userKeys';
 
 // 팔로우 생성
 export function useCreateFollow() {
@@ -28,16 +30,22 @@ export function useCreateFollow() {
       const targetUserId = variables.targetUserId;
 
       // 내 프로필과 팔로잉 목록 무효화
-      queryClient.invalidateQueries({ queryKey: ['userProfile', myUserId] });
-      queryClient.invalidateQueries({ queryKey: ['followings', myUserId] });
-
-      // 상대방의 팔로워 목록과 통계 무효화
-      queryClient.invalidateQueries({ queryKey: ['followers', targetUserId] });
       queryClient.invalidateQueries({
-        queryKey: ['followCount', targetUserId],
+        queryKey: userKeys.userProfile(myUserId),
       });
       queryClient.invalidateQueries({
-        queryKey: ['userProfile', targetUserId],
+        queryKey: followKeys.followings(myUserId),
+      });
+
+      // 상대방의 팔로워 목록과 통계 무효화
+      queryClient.invalidateQueries({
+        queryKey: followKeys.followers(targetUserId),
+      });
+      queryClient.invalidateQueries({
+        queryKey: followKeys.followCount(targetUserId),
+      });
+      queryClient.invalidateQueries({
+        queryKey: userKeys.userProfile(targetUserId),
       });
     },
     onError: (error: AxiosError) => {
@@ -64,16 +72,22 @@ export function useDeleteFollow() {
       const targetUserId = variables.targetUserId;
 
       // 내 프로필과 팔로잉 목록 무효화
-      queryClient.invalidateQueries({ queryKey: ['userProfile', myUserId] });
-      queryClient.invalidateQueries({ queryKey: ['followings', myUserId] });
-
-      // 상대방의 팔로워 목록과 통계 무효화
-      queryClient.invalidateQueries({ queryKey: ['followers', targetUserId] });
       queryClient.invalidateQueries({
-        queryKey: ['followCount', targetUserId],
+        queryKey: userKeys.userProfile(myUserId),
       });
       queryClient.invalidateQueries({
-        queryKey: ['userProfile', targetUserId],
+        queryKey: followKeys.followings(myUserId),
+      });
+
+      // 상대방의 팔로워 목록과 통계 무효화
+      queryClient.invalidateQueries({
+        queryKey: followKeys.followers(targetUserId),
+      });
+      queryClient.invalidateQueries({
+        queryKey: followKeys.followCount(targetUserId),
+      });
+      queryClient.invalidateQueries({
+        queryKey: userKeys.userProfile(targetUserId),
       });
     },
     onError: (error: AxiosError) => {
@@ -85,9 +99,13 @@ export function useDeleteFollow() {
 // 팔로워 목록 조회
 export function useGetFollowers(params: GetFollowersParams) {
   return useQuery<FollowersResponse, AxiosError>({
-    queryKey: ['followers', params.userId, params.page, params.limit],
+    queryKey: followKeys.followersList(
+      params.targetId,
+      params.page || 1,
+      params.limit || 20
+    ),
     queryFn: () => followAPI.getFollowers(params),
-    enabled: !!params.userId,
+    enabled: !!params.targetId,
     staleTime: 2 * 60 * 1000, // 2분간 캐시 유지
     gcTime: 5 * 60 * 1000, // 5분간 가비지 컬렉션 방지
     placeholderData: (previousData) => previousData, // 페이지네이션 시 이전 데이터 유지
@@ -102,9 +120,13 @@ export function useGetFollowers(params: GetFollowersParams) {
 // 팔로잉 목록 조회
 export function useGetFollowings(params: GetFollowingsParams) {
   return useQuery<FollowingsResponse, AxiosError>({
-    queryKey: ['followings', params.userId, params.page, params.limit],
+    queryKey: followKeys.followingsList(
+      params.targetId,
+      params.page || 1,
+      params.limit || 20
+    ),
     queryFn: () => followAPI.getFollowings(params),
-    enabled: !!params.userId,
+    enabled: !!params.targetId,
     staleTime: 2 * 60 * 1000, // 2분간 캐시 유지
     gcTime: 5 * 60 * 1000, // 5분간 가비지 컬렉션 방지
     placeholderData: (previousData) => previousData, // 페이지네이션 시 이전 데이터 유지
@@ -119,7 +141,7 @@ export function useGetFollowings(params: GetFollowingsParams) {
 // 팔로우 통계 조회
 export function useGetFollowCount(userId: string) {
   return useQuery<FollowStats, AxiosError>({
-    queryKey: ['followCount', userId],
+    queryKey: followKeys.followCount(userId),
     queryFn: () => followAPI.getFollowCount(userId),
     enabled: !!userId,
     staleTime: 2 * 60 * 1000, // 2분간 캐시 유지

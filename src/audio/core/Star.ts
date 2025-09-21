@@ -37,6 +37,8 @@ export class Star {
   
   // 클락 이벤트 콜백
   private onClockTick?: (beat: number, bar: number, sixteenth: number) => void;
+  // BPM change listeners
+  private bpmListeners: Set<(bpm: number) => void> = new Set();
   
   // === Seed 기반 랜덤 관리 ===
   private seed: number | string | null = null;
@@ -103,7 +105,7 @@ export class Star {
       
     }, '16n'); // 16분음표마다 실행
     
-    console.log('🕐 Star 중앙 클락 초기화 완료');
+  // Star clock initialized
   }
   
   // 클락 시작
@@ -118,7 +120,7 @@ export class Star {
     this.globalClock.start(0);
     this.isClockRunning = true;
     
-    console.log('▶️ Star 중앙 클락 시작');
+  // Star clock started
   }
   
   // 클락 정지
@@ -133,25 +135,55 @@ export class Star {
     this.currentBar = 0;
     this.currentSixteenth = 0;
     
-    console.log('⏹️ Star 중앙 클락 정지');
+  // Star clock stopped
   }
   
   // 클락 리스너 등록 (Planet에서 사용)
   addClockListener(id: string, callback: (beat: number, bar: number, sixteenth: number, time: number) => void): void {
     this.clockListeners.set(id, callback);
-    console.log(`🕐 클락 리스너 등록: ${id} (총 ${this.clockListeners.size}개)`);
+  // Clock listener registered: id=${id}
   }
   
   // 클락 리스너 제거
   removeClockListener(id: string): void {
     if (this.clockListeners.delete(id)) {
-      console.log(`🕐 클락 리스너 제거: ${id} (남은 ${this.clockListeners.size}개)`);
+  // Clock listener removed: id=${id}
     }
     
     // 모든 리스너가 제거되면 클락 정지
     if (this.clockListeners.size === 0) {
       this.stopClock();
     }
+  }
+
+  // 모든 리스너 제거 및 클락 전체 리셋 (스텔라 전환용) - 강화된 버전
+  clearAllClockListeners(): void {
+  // Star clock system full reset start
+    
+    // 모든 클락 리스너 제거
+    this.clockListeners.clear();
+  // All clock listeners removed
+    
+    // 클락 완전히 정지
+    this.stopClock();
+    
+    // 글로벌 클락 재생성 (기존 Loop를 완전히 dispose하고 새로 생성)
+    if (this.globalClock) {
+      this.globalClock.dispose();
+      this.globalClock = null;
+  // Existing global clock disposed
+    }
+    
+    // 클락 카운터 완전히 리셋
+    this.currentBeat = 0;
+    this.currentBar = 0;
+    this.currentSixteenth = 0;
+    this.isClockRunning = false;
+    
+    // 새로운 클락 재생성
+    this.initializeClock();
+    
+  // Star clock system full reset complete
   }
   
   // 현재 클락 상태 반환
@@ -185,7 +217,14 @@ export class Star {
       }
     }
     
-    console.log(`⭐ Star ${property} → ${value} | Global State:`, this.globalState);
+  // Star property updated: ${property} -> ${value}
+    // BPM 변경이 있었는지 알림
+    if (property === 'spin') {
+  // Star spin changed -> BPM notification: ${this.globalState.bpm}
+      this.bpmListeners.forEach((cb) => {
+        try { cb(this.globalState.bpm); } catch (e) { console.warn('bpm listener error', e); }
+      });
+    }
   }
   
   // 전체 속성 업데이트
@@ -218,7 +257,18 @@ export class Star {
       }
     }
     
-    console.log(`⭐ Star Global State 직접 업데이트:`, this.globalState);
+  // Star global state updated directly
+    if ('bpm' in newState) {
+      this.bpmListeners.forEach((cb) => {
+        try { cb(this.globalState.bpm); } catch (e) { console.warn('bpm listener error', e); }
+      });
+    }
+  }
+
+  // 외부에서 BPM 변경을 구독
+  addBpmListener(cb: (bpm: number) => void): () => void {
+    this.bpmListeners.add(cb);
+    return () => this.bpmListeners.delete(cb);
   }
   
   // SONA 매핑에 따른 전역 상태 계산
@@ -303,18 +353,12 @@ export class Star {
       this.globalClock = null;
     }
     
-    console.log('🗑️ Star 정리 완료');
+  // Star disposed
   }
   
   // 디버그 정보 출력
   debug(): void {
-    console.log('⭐ Star Debug Info:');
-    console.log('Properties:', this.properties);
-    console.log('Global State:', this.globalState);
-    console.log('Clock State:', this.getClockState());
-    console.log('Scale Notes:', this.getScaleNotes());
-    console.log('Key Root MIDI:', this.getKeyRoot());
-    console.log('Active Listeners:', this.clockListeners.size);
+  // Star debug info (removed verbose logs in production)
   }
   
   // === Seed 기반 랜덤 관리 ===
@@ -323,7 +367,7 @@ export class Star {
   setSeed(seed: number | string): void {
     this.seed = seed;
     this.randomManager.setSeed(seed);
-    console.log(`🌱 Star Seed 설정: ${seed}`);
+  // Star seed set: ${seed}
   }
   
   // 현재 시드 반환

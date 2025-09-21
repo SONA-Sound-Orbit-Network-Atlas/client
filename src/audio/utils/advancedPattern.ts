@@ -221,16 +221,27 @@ export function generateAdvancedPattern(
   
   // 최종 파라미터 (역할별 가드레일 적용)
   const finalParams = applyRoleGuardrails(params, role);
-  
-  console.log(`🎼 고급 패턴 생성 [${role}]:`, {
+  // 보조 정보(생성된 패턴 기반)를 finalParams에 병합하여 반환
+  const derived = {
     pulses: steps.filter(x => x === 1).length,
     steps: steps.length,
     accents: accents.filter(x => x === 1).length,
     characteristics: characteristics
-  });
-  
+  };
+
+  // PatternParameters 타입과 충돌하지 않는 추가 정보를 포함시키기 위해
+  // finalParams을 복사하고 필요한 필드를 덧붙입니다.
+  const mergedParams = {
+    ...finalParams,
+    // 아래 필드들은 GeneratedPattern.params에서 유용하므로 포함시킵니다.
+    generatedPulses: derived.pulses,
+    generatedSteps: derived.steps,
+    generatedAccents: derived.accents,
+    characteristics: derived.characteristics
+  } as unknown as PatternParameters;
+
   return {
-    params: finalParams,
+    params: mergedParams,
     steps,
     accents
   };

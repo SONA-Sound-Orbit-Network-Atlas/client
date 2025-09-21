@@ -5,6 +5,7 @@ import { useSelectedStellarStore } from '@/stores/useSelectedStellarStore';
 import { useStellarStore } from '@/stores/useStellarStore';
 import { useUserStore } from '@/stores/useUserStore';
 import { useState } from 'react';
+import useStellarSystemSelection from '@/hooks/useStellarSystemSelection';
 
 export default function SaveButton() {
   const [saveConfirm, setSaveConfirm] = useState(false);
@@ -16,6 +17,8 @@ export default function SaveButton() {
   const { mode } = useSelectedStellarStore();
   const { stellarStore } = useStellarStore();
   const { userStore, isLoggedIn } = useUserStore();
+
+  const { selectStellar } = useStellarSystemSelection();
 
   // save 버튼 동작 기준
   const onSaveHandler = () => {
@@ -32,11 +35,12 @@ export default function SaveButton() {
     }
 
     // 1. (생성) create 모드
-    // 완료 시 => selectedStellarStore 초기화 & stellarStore 초기화 & 갤럭시 패널 이동
+    // 완료 시 => selectedStellarStore 초기화 & stellarStore 초기화 & 갤럭시 패널 이동 & id 추가(중복 생성 방지)
     if (mode === 'create') {
       createStellar(stellarStore, {
-        onSuccess: () => {
+        onSuccess: (data) => {
           setSaveConfirm(false);
+          selectStellar(data.id);
         },
         onError: () => {
           alert('CREATE failed');
