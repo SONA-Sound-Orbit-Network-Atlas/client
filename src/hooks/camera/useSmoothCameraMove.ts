@@ -37,7 +37,7 @@ export function useSmoothCameraMove({
   onMoveStartRef.current = onMoveStart;
   onMoveEndRef.current = onMoveEnd;
 
-  const offset = useMemo(() => new THREE.Vector3(5, 10, 6), []);
+  const offset = useMemo(() => new THREE.Vector3(16, 30, 20), []);
 
   // 시작 위치와 목표 위치를 저장
   const startCameraPosRef = useRef<THREE.Vector3 | undefined>(undefined);

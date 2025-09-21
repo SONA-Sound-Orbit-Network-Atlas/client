@@ -25,11 +25,13 @@ export default function LoginPanel() {
         'error' in error.response.data
       ) {
         const apiError = (error.response.data as any).error;
-        setErrorMessage(`로그인 실패: ${apiError.message}`);
+        setErrorMessage(`Login failed: ${apiError.message}`);
       } else if (error.response?.status === 401) {
-        setErrorMessage('이메일 또는 비밀번호가 올바르지 않습니다.');
+        setErrorMessage('Email or password is incorrect');
       } else {
-        setErrorMessage('로그인 중 오류가 발생했습니다. 다시 시도해주세요.');
+        setErrorMessage(
+          'An error occurred while logging in. Please try again.'
+        );
       }
     },
   });
