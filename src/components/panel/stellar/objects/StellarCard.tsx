@@ -42,7 +42,10 @@ export default function StellarCard({
         active ? 'border-secondary-300' : ''
       )}
     >
-      <div className="flex gap-3 items-center">
+      <div
+        className="grid justify-start items-center gap-3 w-full"
+        style={{ gridTemplateColumns: '24px 1fr 24px' }}
+      >
         {/* 색상 동그라미 */}
         <div
           className={`w-[24px] h-[24px] rounded-full border-[2px] border-[rgba(255,255,255,0.2)] shrink-0`}
@@ -57,9 +60,9 @@ export default function StellarCard({
           }}
         ></div>
         {/* 이름과 설명 */}
-        <div className="flex-1">
-          <strong
-            className="block text-text-white"
+        <div className="min-w-0 overflow-hidden">
+          <p
+            className="w-full text-text-white line-clamp-2 break-words"
             style={{
               display: '-webkit-box',
               WebkitLineClamp: 2,
@@ -68,13 +71,13 @@ export default function StellarCard({
             }}
           >
             {name}
-          </strong>
+          </p>
           <p className="text-text-muted">{description}</p>
         </div>
 
         {/* STAR 경우 : 별자리 아이콘 / PLANET 경우 : 삭제 버튼 */}
         {data.object_type === 'STAR' ? (
-          <div className="flex items-center justify-center w-[24px] h-[24px] shrink-0 text-[#FACC15]">
+          <div className="flex items-center justify-center w-[24px] h-[24px] shrink-0 text-[#FACC15] justify-self-end">
             <FaStar />
           </div>
         ) : (
@@ -83,7 +86,7 @@ export default function StellarCard({
             <Button
               color="transparent"
               iconOnly
-              className="w-[24px] h-[24px] shrink-0 hover:[&_svg]:!text-error/80 hover:[&_svg]:!fill-error/80"
+              className="w-[24px] h-[24px] shrink-0 hover:[&_svg]:!text-error/80 hover:[&_svg]:!fill-error/80 justify-self-end"
               onClick={(e) => {
                 e.stopPropagation();
 

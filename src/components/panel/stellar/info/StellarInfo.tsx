@@ -45,14 +45,14 @@ export default function StellarInfo({
   const stellarInfoArr = Object.entries(stellarInfo);
 
   return (
-    <div>
+    <div className="w-full">
       {/* 타이틀 */}
       <PanelTitle fontSize="large" textColor="text-primary-300">
         {isStarSelected ? 'STAR INFO' : 'PLANET INFO'}
       </PanelTitle>
 
       {/* INFO 카드 */}
-      <Card className="space-y-4">
+      <Card className="space-y-4 w-full">
         {stellarInfoArr.map(([rawKey, value]) => {
           const key = rawKey.toLowerCase(); // ← 소문자로 통일
 
@@ -154,11 +154,13 @@ export default function StellarInfo({
 
             default:
               return (
-                <div key={rawKey}>
+                <div key={rawKey} className="w-full">
                   <PanelTitle className="font-normal mb-1">
                     {rawKey.toUpperCase().replace('_', ' ')}
                   </PanelTitle>
-                  <p className="text-text-secondary">{String(value)}</p>
+                  <p className="text-text-secondary max-w-[187px] truncate">
+                    {String(value)}
+                  </p>
                 </div>
               );
           }

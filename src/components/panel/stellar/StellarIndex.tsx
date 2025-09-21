@@ -14,18 +14,14 @@ import { useSelectedStellarStore } from '@/stores/useSelectedStellarStore';
 import SelectRequired from './SelectRequired';
 import { ScrollArea } from '@/components/common/Scrollarea';
 import AudioPlayer from './audioPlayer/Index';
-import { useSelectedObjectStore } from '@/stores/useSelectedObjectStore';
-import { getObjectNameById } from '@/utils/getObjectName';
+import Breadcrumb from './breadcrumb/Breadcrumb';
 
 export default function StellarIndex() {
   const { stellarStore } = useStellarStore();
   const { userStore } = useUserStore();
   const { mode } = useSelectedStellarStore();
   const { tabValue, setTabValue } = useStellarTabStore();
-  const { selectedObjectId } = useSelectedObjectStore();
   const isStellarOwner = stellarStore.creator_id === userStore.id;
-
-  const selectedObjectName = getObjectNameById(selectedObjectId);
 
   return (
     <>
@@ -41,6 +37,7 @@ export default function StellarIndex() {
             value={tabValue}
             onValueChange={(v) => setTabValue(v as typeof tabValue)}
           >
+            {/* TabsList */}
             <TabsList className="grid w-full [grid-template-columns:repeat(3,minmax(max-content,1fr))] gap-0 shrink-0">
               <TabsTrigger value="INFO">INFO</TabsTrigger>
               <TabsTrigger
@@ -56,12 +53,12 @@ export default function StellarIndex() {
                 PROPERTIES
               </TabsTrigger>
             </TabsList>
+
+            {/* TabsContent */}
             <div className="flex-1 min-h-0">
-              <p className="px-4 ">
-                <span className="text-sm text-text-muted">
-                  {selectedObjectName}
-                </span>
-              </p>
+              {/* Breadcrumb */}
+              <Breadcrumb />
+
               <ScrollArea className="h-full">
                 <TabsContent value="INFO" className="p-4">
                   <Info isStellarOwner={isStellarOwner} />
@@ -75,6 +72,8 @@ export default function StellarIndex() {
               </ScrollArea>
             </div>
           </Tabs>
+
+          {/* AudioPlayer */}
           <AudioPlayer className="w-full h-[49px] border-t border-gray-border" />
         </div>
       )}
