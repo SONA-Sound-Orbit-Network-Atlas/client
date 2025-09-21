@@ -18,9 +18,12 @@ export const useSelectedStellarStore = create<SelectedStellarStore>((set) => ({
   mode: 'idle',
   selectedStellarId: '', // 초기 값 '' , 테스트아이디 sys-001 (이 스텔라의 userId는 testUser)
   setSelectedStellarId: (id) =>
-    set((state) => {
-      if (state.selectedStellarId !== id) {
+    set(() => {
+      // 항상 리셋을 호출하여 동일 스텔라 재선택 시에도 오디오 시스템을 초기화합니다.
+      try {
         StellarSystem.instance.resetImmediate();
+      } catch (err) {
+        console.debug('setSelectedStellarId: resetImmediate failed', err);
       }
       return { mode: 'view', selectedStellarId: id };
     }),

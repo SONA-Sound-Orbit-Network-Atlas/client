@@ -7,6 +7,8 @@ import { useUserStore } from '@/stores/useUserStore';
 import { useSelectedStellarStore } from '@/stores/useSelectedStellarStore';
 import SaveButton from './SaveButton';
 import { useNavigate } from 'react-router-dom';
+import { AudioEngine } from '@/audio/core/AudioEngine';
+import { StellarSystem } from '@/audio/core/StellarSystem';
 import { useStellarStore } from '@/stores/useStellarStore';
 
 interface HeaderProps {
@@ -34,7 +36,25 @@ export default function Header({ className, children }: HeaderProps) {
       {/* 좌측 로고 영역 */}
       <div
         className="flex items-center cursor-pointer"
-        onClick={() => navigate('/')}
+        onClick={async () => {
+          try {
+            const engine = AudioEngine.instance;
+            // 부드러운 페이드아웃을 시도
+            await engine.fadeOutAndStop(0.8);
+          } catch (err) {
+            // 페이드 실패시에도 강제로 정지
+            console.debug('Header: fadeOut failed', err);
+          }
+
+          try {
+            // 모든 패턴 정지 및 dispose 보호 호출
+            StellarSystem.instance.stopAllPatterns();
+          } catch (err) {
+            console.debug('Header: stopAllPatterns failed', err);
+          }
+
+          navigate('/');
+        }}
       >
         <img
           src={sonaLogo}

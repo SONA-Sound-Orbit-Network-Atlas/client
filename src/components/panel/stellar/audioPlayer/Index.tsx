@@ -40,6 +40,16 @@ export default function AudioPlayer({ className }: AudioPlayerProps) {
     return () => off();
   }, [system]);
 
+  // 추가 동기: 컴포넌트 마운트 또는 스텔라 변경 시 system 상태로 playing 동기화
+  useEffect(() => {
+    try {
+      const count = system.getPlayingPlanetsCount();
+      setPlaying(count > 0);
+    } catch (err) {
+      console.debug('AudioPlayer: initial playing sync failed', err);
+    }
+  }, [system, stellarStore.id]);
+
   const handleTogglePlay = useCallback(async (nextIsPlaying: boolean) => {
     // Play 컴포넌트는 토글 후 상태를 전달함
     const willPlay = nextIsPlaying;
@@ -85,10 +95,15 @@ export default function AudioPlayer({ className }: AudioPlayerProps) {
         return;
       }
 
-      // 모든 행성의 패턴을 시작
+      // 모든 행성의 패턴을 시작 (실시간 상태 재확인하여 중복 시작 방지)
       for (const planet of planets) {
-        if (!planet.isPlaying) {
-          await system.startPlanetPattern(planet.id);
+        try {
+          const latest = system.getPlanet(planet.id);
+          if (!latest || !latest.isPlaying) {
+            await system.startPlanetPattern(planet.id);
+          }
+        } catch (err) {
+          console.warn(`AudioPlayer: startPlanetPattern failed for ${planet.id}`, err);
         }
       }
     } else {
