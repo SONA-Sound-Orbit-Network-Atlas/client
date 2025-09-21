@@ -5,7 +5,7 @@ import { getObjectNameById } from '@/utils/getObjectName';
 export default function Breadcrumb() {
   const { stellarStore } = useStellarStore();
   const { selectedObjectId } = useSelectedObjectStore();
-  const selectedObjectName = getObjectNameById(selectedObjectId);
+  const selectedObjectName = getObjectNameById(selectedObjectId) ?? '';
   const selectedStellarTitle = stellarStore.title;
 
   return (

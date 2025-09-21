@@ -147,7 +147,7 @@ const TextType = ({
           setCurrentCharIndex(0);
 
           // 다음 문장 타이핑 전 대기
-          timeout = setTimeout(() => {}, pauseDuration);
+          timeout = setTimeout(executeTypingAnimation, pauseDuration);
         } else {
           // 한 글자씩 지우기
           timeout = setTimeout(() => {
