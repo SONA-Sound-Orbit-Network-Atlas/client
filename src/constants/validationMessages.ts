@@ -1,19 +1,19 @@
 export const VALIDATION_MESSAGES = {
   EMAIL: {
-    REQUIRED: '이메일을 입력해주세요.',
-    INVALID_FORMAT: '올바른 이메일 형식을 입력해주세요.',
+    REQUIRED: 'Enter your email',
+    INVALID_FORMAT: 'Enter a valid email format',
   },
   USERNAME: {
-    REQUIRED: '사용자명을 입력해주세요.',
-    LENGTH: '사용자명은 3-20자 사이여야 합니다.',
+    REQUIRED: 'Enter your username',
+    LENGTH: 'Username must be between 3 and 20 characters',
   },
   PASSWORD: {
-    REQUIRED: '비밀번호를 입력해주세요.',
-    LENGTH: '비밀번호는 6-50자 사이여야 합니다.',
+    REQUIRED: 'Enter your password',
+    LENGTH: 'Password must be between 6 and 50 characters',
   },
   CONFIRM_PASSWORD: {
-    REQUIRED: '비밀번호 확인을 입력해주세요.',
-    MISMATCH: '비밀번호가 일치하지 않습니다.',
+    REQUIRED: 'Enter your password confirmation',
+    MISMATCH: 'Password does not match',
   },
 } as const;
 
