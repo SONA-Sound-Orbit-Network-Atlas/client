@@ -92,13 +92,13 @@ export default function EditProfilePanel() {
               <Iconframe color="primary" size="large" className="mb-[16px]">
                 <FiUser />
               </Iconframe>
-              <p className="text-primary-300 text-sm text-center">
+              {/* <p className="text-primary-300 text-sm text-center">
                 CHANGE AVATAR
-              </p>
+              </p> */}
             </div>
             {/* EDIT PROFILE */}
             <div className="w-full border-b border-gray-border pb-[24px]">
-              <div className="w-full mt-[24px] gap-[20px] flex flex-col">
+              <div className="w-full gap-[20px] flex flex-col">
                 <TextField label="USERNAME" htmlFor="username">
                   <TextInput
                     type="text"
