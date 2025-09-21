@@ -50,7 +50,10 @@ export default function UserCard({
           <div className="flex items-center gap-2">
             <span className="text-text-white font-medium">{username}</span>
             {isMutualFollow && (
-              <FiUsers className="w-4 h-4 text-primary-300" title="맞팔로우" />
+              <FiUsers
+                className="w-4 h-4 text-primary-300"
+                title="Mutual Follow"
+              />
             )}
           </div>
           {!hideFollowButton && (

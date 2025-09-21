@@ -138,7 +138,7 @@ export default function FollowListPanel({
                       username={user.username}
                       isFollowing={buttonState.action === 'unfollow'}
                       isMutualFollow={buttonState.showMutualIcon}
-                      isFollowBack={buttonState.text === '팔로우백'}
+                      isFollowBack={buttonState.isFollowBack}
                       onFollow={
                         !isCurrentUser && buttonState.action === 'follow'
                           ? handleFollow
