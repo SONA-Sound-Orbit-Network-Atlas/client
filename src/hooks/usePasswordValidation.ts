@@ -73,7 +73,7 @@ export const usePasswordValidation = (): UsePasswordValidationReturn => {
       } else if (isChangePasswordFormData(formData)) {
         // 비밀번호 변경용 검증
         if (!formData.currentPassword.trim()) {
-          newErrors.currentPassword = '현재 비밀번호를 입력해주세요.';
+          newErrors.currentPassword = 'Enter your current password';
         }
 
         const passwordError = validatePassword(formData.newPassword);
@@ -90,7 +90,8 @@ export const usePasswordValidation = (): UsePasswordValidationReturn => {
         }
 
         if (formData.currentPassword === formData.newPassword) {
-          newErrors.newPassword = '현재 비밀번호와 새 비밀번호가 같습니다.';
+          newErrors.newPassword =
+            'Current password and new password are the same';
         }
       }
 

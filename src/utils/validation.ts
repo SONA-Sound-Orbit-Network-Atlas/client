@@ -118,7 +118,7 @@ export const validateSignupForm = (
  */
 export const validateIdentifier = (identifier: string): string | null => {
   if (!identifier) {
-    return '이메일 또는 사용자명을 입력해주세요.';
+    return 'Enter your email or username';
   }
   return null;
 };

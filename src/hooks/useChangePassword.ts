@@ -27,7 +27,7 @@ export function useChangePassword(options?: UseChangePasswordOptions) {
   // 폼 검증
   const validateForm = () => {
     if (!formData.currentPassword.trim()) {
-      setError('현재 비밀번호를 입력해주세요.');
+      setError('Enter your current password');
       return false;
     }
 
@@ -39,11 +39,11 @@ export function useChangePassword(options?: UseChangePasswordOptions) {
     }
 
     if (formData.newPassword !== formData.confirmPassword) {
-      setError('새 비밀번호와 확인 비밀번호가 일치하지 않습니다.');
+      setError('New password and confirm password do not match');
       return false;
     }
     if (formData.currentPassword === formData.newPassword) {
-      setError('현재 비밀번호와 새 비밀번호가 같습니다.');
+      setError('Current password and new password are the same');
       return false;
     }
     setError('');
@@ -72,25 +72,25 @@ export function useChangePassword(options?: UseChangePasswordOptions) {
 
       return true; // 성공
     } catch (error: unknown) {
-      console.error('비밀번호 변경 실패:', error);
+      console.error('Password change failed:', error);
 
       // AxiosError인지 확인하는 타입 가드
       if (error && typeof error === 'object' && 'response' in error) {
         const axiosError = error as AxiosError;
 
         if (axiosError.response?.status === 401) {
-          setError('인증이 필요합니다. 다시 로그인해주세요.');
+          setError('Authentication is required. Please log in again.');
         } else if (axiosError.response?.status === 404) {
-          setError('사용자를 찾을 수 없습니다.');
+          setError('User not found');
         } else if (axiosError.response?.status === 409) {
-          setError('현재 비밀번호가 일치하지 않습니다.');
+          setError('Current password does not match');
         } else if (axiosError.response?.status === 400) {
-          setError('잘못된 요청입니다. 입력값을 확인해주세요.');
+          setError('Invalid request. Please check your input.');
         } else {
-          setError('비밀번호 변경에 실패했습니다. 다시 시도해주세요.');
+          setError('Password change failed. Please try again.');
         }
       } else {
-        setError('비밀번호 변경에 실패했습니다. 다시 시도해주세요.');
+        setError('Password change failed. Please try again.');
       }
       return false; // 실패
     }

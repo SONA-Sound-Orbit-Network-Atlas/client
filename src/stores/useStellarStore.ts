@@ -146,7 +146,7 @@ export const useStellarStore = create<StellarStore>((set, get) => ({
     })),
 
   setInitialStellarStore: () =>
-    set((state) => {
+    set(() => {
       const userId = useUserStore.getState().userStore.id ?? '';
       const userName = useUserStore.getState().userStore.username ?? '';
       const now = nowYMD();
@@ -175,8 +175,8 @@ export const useStellarStore = create<StellarStore>((set, get) => ({
           author_name: userName,
           creator_name: userName,
           // 기존 로직 유지
-          create_source_name: state.stellarStore.title,
-          original_source_name: state.stellarStore.title,
+          create_source_name: 'NEW STELLAR SYSTEM',
+          original_source_name: 'NEW STELLAR SYSTEM',
           star,
           planets: [firstPlanet],
         },
