@@ -135,7 +135,9 @@ export default function StellarInfo({
                       }}
                     />
                   ) : (
-                    <p className="text-text-secondary">{String(value)}</p>
+                    <p className="text-text-secondary line-clamp-1 break-all">
+                      {String(value)}
+                    </p>
                   )}
                 </div>
               );
