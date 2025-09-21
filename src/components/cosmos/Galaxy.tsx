@@ -1,5 +1,5 @@
 //은하계 컴포넌트
-import { useMemo } from 'react';
+import { useMemo, useCallback } from 'react';
 import StellarSystem from './StellarSystem';
 import SimpleStellarPoint from './SimpleStellarPoint';
 import LoadingStellarSystem from './LoadingStellarSystem';
@@ -21,9 +21,8 @@ export default function Galaxy({ galaxyId = 'gal_abc123' }: GalaxyProps) {
     isLoading,
     error,
   } = useStellarList(galaxyId);
-  const { selectedStellarId } = useSelectedStellarStore();
+  const { selectedStellarId, mode } = useSelectedStellarStore();
   const { selectStellar } = useStellarSystemSelection();
-  const { mode } = useSelectedStellarStore();
   // 스텔라 리스트 가져오기 - 안전한 데이터 처리
   const stellarSystems: simpleStellar[] = useMemo(() => {
     // 데이터가 없거나 배열이 아닌 경우 빈 배열 반환
@@ -37,9 +36,12 @@ export default function Galaxy({ galaxyId = 'gal_abc123' }: GalaxyProps) {
     return galaxyStellarListData;
   }, [galaxyStellarListData]);
 
-  const handleStellarClick = (stellarId: string) => {
-    selectStellar(stellarId);
-  };
+  const handleStellarClick = useCallback(
+    (stellarId: string) => {
+      selectStellar(stellarId);
+    },
+    [selectStellar]
+  );
 
   // 로딩 상태 처리
   if (isLoading) {

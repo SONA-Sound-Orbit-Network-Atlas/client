@@ -8,7 +8,7 @@ import { useGetStellar } from '@/hooks/api/useStellar';
 import { useSelectedObjectStore } from '@/stores/useSelectedObjectStore';
 
 export default function useStellarSystemSelection() {
-  const { selectedStellarId, setSelectedStellarId } = useSelectedStellarStore();
+  const { setSelectedStellarId } = useSelectedStellarStore();
   const { setStellarStore } = useStellarStore();
   const { setTabValue } = useStellarTabStore();
   const { openSecondarySidebar } = useSidebarStore();
@@ -23,15 +23,11 @@ export default function useStellarSystemSelection() {
   // 클릭 시 호출
   const selectStellar = useCallback(
     (id: string) => {
-      // 이미 선택된 경우: 패널만 정리하고 끝
-      if (id === selectedStellarId) {
-        setTabValue('INFO');
-        openSecondarySidebar('stellar');
-        return;
-      }
+      // 동일 id 클릭도 fetch 및 선택 처리하여 항상 reset/동기화를 트리거합니다.
+      // (이전에는 동일 id일 때 early-return하여 reset이 호출되지 않음)
       setTargetId(id); // 여기서부터 useGetStellar 활성화
     },
-    [selectedStellarId, setTabValue, openSecondarySidebar]
+    []
   );
 
   // 패칭 완료 시 커밋

@@ -61,6 +61,8 @@ export default function StellarInfo({
             case 'system_id':
             case 'properties':
             case 'object_type':
+            case 'synthtype':
+            case 'oscillatortype':
               return null;
 
             case 'stellar_title':

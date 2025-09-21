@@ -15,8 +15,7 @@ export default function StellarSystem({
   visible?: boolean;
 }) {
   const { stellarStore } = useStellarStore();
-  const { selectedStellarId } = useSelectedStellarStore();
-  const { mode } = useSelectedStellarStore();
+  const { selectedStellarId, mode } = useSelectedStellarStore();
   const ref = useRef<THREE.Group>(null);
 
   // 선택된 스텔라가 아니면 렌더링하지 않음

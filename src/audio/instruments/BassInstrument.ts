@@ -5,13 +5,9 @@
 import * as Tone from 'tone';
 import type { MappedAudioParameters } from '../../types/audio';
 import { AudioEngine } from '../core/AudioEngine';
-import {
-  BaseInstrument,
-  type SimplifiedInstrumentMacros,
-  type ResolvedInstrumentContext,
-} from './InstrumentInterface';
+import { AbstractInstrumentBase } from './InstrumentInterface';
 
-export class BassInstrument extends BaseInstrument {
+export class BassInstrument extends AbstractInstrumentBase {
   
   // 베이스 전용 신스와 이펙트 체인
   private bassSynth!: Tone.MonoSynth;        // 메인 베이스 신스 (MonoSynth - 단음 연주에 최적화)
@@ -33,56 +29,56 @@ export class BassInstrument extends BaseInstrument {
     // 베이스 전용 MonoSynth 설정 - 단음 연주에 최적화된 신디사이저
     this.bassSynth = new Tone.MonoSynth({
       oscillator: {
-        type: 'sawtooth' // 톱니파 - 풍부한 하모닉스로 따뜻한 베이스 톤
+        type: 'sine' // 더 부드럽고 둔탁한 저음을 위해 사인파로 변경
       },
       envelope: {
-        attack: 0.01,   // 빠른 어택 - 펀치있는 시작
-        decay: 0.3,     // 적당한 디케이
-        sustain: 0.7,   // 긴 서스테인 - 베이스라인 유지
-        release: 1.2    // 부드러운 릴리즈
+        attack: 0.02,   // 살짝 느린 어택으로 클릭성 완화
+        decay: 0.6,     // 느린 디케이로 더 부드럽게
+        sustain: 0.8,   // 유지량 증가
+        release: 1.6    // 릴리즈 연장으로 연결감 향상
       },
       filterEnvelope: {
         attack: 0.02,
         decay: 0.4,
         sustain: 0.5,
         release: 0.8,
-        baseFrequency: 80, // 낮은 주파수에서 시작 (한 옥타브 낮춤: 150 → 80Hz)
-        octaves: 2
+        baseFrequency: 50, // 더욱 낮은 컷오프 시작으로 둔탁함 증가
+        octaves: 3
       }
     });
 
     // 서브 오실레이터 - 더 깊은 저음을 위한 보조 신디사이저
     this.subOscillator = new Tone.Oscillator({
-      frequency: 20,   // 기본 저음 주파수 (한 옥타브 낮춤: 40 → 20Hz)
+      frequency: 20,   // 서브는 매우 낮은 주파수
       type: 'sine',    // 사인파 - 깨끗하고 깊은 저음
-      volume: -10      // 서브 오실레이터 볼륨 증가 (-12 → -10dB)
+      volume: -6       // 서브 볼륨을 더 올려 베이스 존재감 강화
     });
 
     // 베이스 전용 로우패스 필터 - 고음을 제거하여 따뜻한 톤 생성
     this.bassFilter = new Tone.Filter({
-      frequency: 600,     // SONA 지침: BASS cutoff ≤ 3kHz (더 어둡게: 800 → 600Hz)
+      frequency: 350,     // 컷오프를 더 낮춰 날카로운 고음 제거
       type: 'lowpass',    // 로우패스 - 고음 제거
       rolloff: -24,       // steep rolloff로 고음 완전 제거
-      Q: 2                // 적당한 레조넌스
+      Q: 0.9              // 레조넌스 줄여 뾰족함 완화
     });
 
-    // 베이스 전용 컴프레서 - 펀치있고 일정한 사운드
+    // 베이스 전용 컴프레서 - 부드럽게 다듬기
     this.compressor = new Tone.Compressor({
-      threshold: -15,     // 컴프레션 시작점
-      ratio: 6,           // 강한 컴프레션 (베이스 특성상)
-      attack: 0.002,      // 빠른 어택
-      release: 0.1        // 짧은 릴리즈
+      threshold: -18,     // 컴프레션 시작점 낮춤
+      ratio: 3,           // 과한 컴프레션 완화
+      attack: 0.006,      // 어택을 조금 느리게 하여 클릭성 완화
+      release: 0.18       // 릴리즈 연장
     });
 
-    // 베이스 전용 디스토션 - 따뜻한 새추레이션
+    // 베이스 전용 디스토션 - 매우 약한 새추레이션
     this.distortion = new Tone.Distortion({
-      distortion: 0.3,    // 가벼운 디스토션
-      oversample: '4x'    // 고품질 오버샘플링
+      distortion: 0.04,   // 거의 느껴지지 않는 새추레이션
+      oversample: '2x'
     });
 
-    // 추가 유틸 노드 및 버스 연결
-    this.panner = new Tone.Panner(0);
-    this.stereo = new Tone.StereoWidener(0.2);
+  // 추가 유틸 노드 및 버스 연결
+  this.panner = new Tone.Panner(0);
+  this.stereo = new Tone.StereoWidener(0.12);
     this.sendRev = new Tone.Gain(0);
     this.sendDly = new Tone.Gain(0);
 
@@ -91,15 +87,18 @@ export class BassInstrument extends BaseInstrument {
     this.sendDly.connect(fx.delay!);
 
     // 신호 체인 연결: bassSynth → compressor → bassFilter → distortion → panner → stereo → destination
-    this.bassSynth.chain(this.compressor, this.bassFilter, this.distortion, this.panner, this.stereo, Tone.Destination);
-    
-    // 서브 오실레이터도 같은 체인 경로로 출력
-    this.subOscillator.chain(this.compressor, this.bassFilter, this.panner, this.stereo, Tone.Destination);
+    AudioEngine.instance.ensureMasterChain();
+    const dest = AudioEngine.instance.masterInput ?? Tone.getDestination();
+    // 순서: bassSynth -> distortion -> compressor -> bassFilter -> panner -> stereo -> dest
+    this.bassSynth.chain(this.distortion, this.compressor, this.bassFilter, this.panner, this.stereo, dest);
+
+    // 서브 오실레이터도 같은 체인 경로로 출력 (디스토션은 서브에도 적당히 적용)
+    this.subOscillator.chain(this.distortion, this.compressor, this.bassFilter, this.panner, this.stereo, dest);
 
     // 센드 분기(디스토션 전의 타이트한 신호를 선호하면 위치 조절 가능)
     this.bassFilter.connect(this.sendRev);
 
-    console.log('🎸 BassInstrument 초기화 완료:', this.id);
+  // BassInstrument initialized: this.id
   }
 
   public triggerAttackRelease(
@@ -127,17 +126,20 @@ export class BassInstrument extends BaseInstrument {
         this.subOscillator.start(currentTime);
       }
       
-      // 서브 오실레이터 주파수 설정 (메인 주파수의 절반 - 한 옥타브 아래)
-      this.subOscillator.frequency.setValueAtTime(frequency / 4, currentTime); // 두 옥타브 아래로 변경 (더 깊은 저음)
+  // 서브 오실레이터 주파수 설정 (메인 주파수의 1/4 - 두 옥타브 아래)
+  this.subOscillator.frequency.setValueAtTime(frequency / 4, currentTime);
       
       // 노트 지속 시간 계산 후 서브 오실레이터 정지
-      const noteDurationSeconds = typeof duration === 'string' ? Tone.Time(duration).toSeconds() : duration;
-      const currentTimeSeconds = typeof currentTime === 'number' ? currentTime : Tone.Time(currentTime).toSeconds();
-      const stopTime = currentTimeSeconds + noteDurationSeconds;
+  // 베이스 노트 길이를 살짝 늘려 연결감 향상 (최소 0.4s)
+  const noteDurationSecondsRaw = typeof duration === 'string' ? Tone.Time(duration).toSeconds() : Number(duration);
+  const noteDurationSeconds = Math.max(noteDurationSecondsRaw, 0.4);
+  const currentTimeSeconds = typeof currentTime === 'number' ? currentTime : Tone.Time(currentTime).toSeconds();
+  const stopTime = currentTimeSeconds + noteDurationSeconds;
       this.subOscillator.stop(stopTime);
       
       // 메인 베이스 신스 트리거
-      this.bassSynth.triggerAttackRelease(note, duration, currentTime, vel);
+  // triggerAttackRelease은 string|number 허용 - 여기서는 seconds 단위 숫자를 전달
+  this.bassSynth.triggerAttackRelease(note, noteDurationSeconds, currentTime, vel);
     } catch (error) {
       console.error('BassInstrument triggerAttackRelease 오류:', error);
     }
@@ -181,9 +183,7 @@ export class BassInstrument extends BaseInstrument {
 
   // SONA 매핑된 파라미터 적용
   protected handleParameterUpdate(
-    params: MappedAudioParameters,
-    _macros: SimplifiedInstrumentMacros,
-    _context: ResolvedInstrumentContext
+  params: MappedAudioParameters
   ): void {
     if (this.disposed) return;
 
@@ -199,10 +199,10 @@ export class BassInstrument extends BaseInstrument {
       this.bassFilter.Q.rampTo(resonance, 0.04);
     }
     
-    // 디스토션 양 조절 (거리감과 반비례)
+    // 디스토션 양 조절 (거리감과 반비례) - 매우 보수적으로 적용
     if (this.distortion) {
-      const distortionAmount = 0.1 + ((1 - params.reverbSend) * 0.4);
-      this.distortion.distortion = Math.min(0.5, distortionAmount);
+      const distortionAmount = 0.02 + ((1 - (params.reverbSend ?? 0)) * 0.08);
+      this.distortion.distortion = Math.max(0.001, Math.min(0.06, distortionAmount));
     }
     
     // 서브 오실레이터 볼륨 조절
@@ -213,7 +213,7 @@ export class BassInstrument extends BaseInstrument {
 
     // 팬/스테레오/버스 센드(베이스는 제한적)
     if (this.panner) this.panner.pan.rampTo(Math.max(-0.35, Math.min(0.35, params.pan ?? 0)), 0.05);
-    if (this.stereo) this.stereo.width.rampTo(Math.max(0, Math.min(0.45, params.stereoWidth ?? 0.3)), 0.08);
+  if (this.stereo) this.stereo.width.rampTo(Math.max(0, Math.min(0.25, params.stereoWidth ?? 0.12)), 0.08);
     if (this.sendRev) this.sendRev.gain.rampTo(Math.max(0, Math.min(0.2, params.reverbSend ?? 0)), 0.12);
     if (this.sendDly) this.sendDly.gain.rampTo(Math.max(0, Math.min(0.2, (params.delayFeedback ?? 0) * 0.6)), 0.12);
     
@@ -235,7 +235,7 @@ export class BassInstrument extends BaseInstrument {
 
   protected applyOscillatorType(type: Tone.ToneOscillatorType): void {
     if (this.disposed) return;
-    this.bassSynth?.set({ oscillator: { type } } as any);
+  this.bassSynth?.set({ oscillator: { type } } as Partial<Tone.SynthOptions>);
     if (this.subOscillator) {
       this.subOscillator.type = type as Tone.ToneOscillatorType;
     }
@@ -252,6 +252,6 @@ export class BassInstrument extends BaseInstrument {
     this.distortion?.dispose();
     
     super.dispose();
-    console.log(`🗑️ BassInstrument ${this.id} disposed`);
+  // BassInstrument disposed: this.id
   }
 }

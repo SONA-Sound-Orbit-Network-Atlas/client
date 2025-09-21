@@ -55,7 +55,7 @@ export class RandomManager implements IRandomSource {
     const numericSeed = typeof seed === 'number' ? seed : hashString(seed);
     this.baseSeed = numericSeed >>> 0;
     this.rng = new InternalSeededRng(this.baseSeed);
-    console.log(`🎲 RandomManager seed 설정: ${this.baseSeed}`);
+    // RandomManager seed set: this.baseSeed
   }
 
   // 하위 도메인별 분리된 결정 난수 생성 (role, planetId, step 등)

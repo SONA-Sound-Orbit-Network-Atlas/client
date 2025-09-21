@@ -43,10 +43,14 @@ export interface PropertyDefinition {
   precision?: number; // 소수점 자릿수
 
   // 오디오 매핑 정보
+  // audioTargets는 이 속성이 어떤 오디오 파라미터(target name)에 연결되는지
+  // 선언적으로만 기술합니다. 실제 값 변환(예: non-linear curve, 단위 환산)은
+  // `src/audio/*` 쪽에서 처리해야 합니다. 여기서는 target 이름과 선택적 가중치만
+  // 제공하여 다른 팀의 타입 변경 영향을 최소화합니다.
   audioTargets?: Array<{
     name: string;
-    weight: number;
-    transform?: (normalizedValue: number) => number;
+    // 가중치(선택적) - 기본값 1.0
+    weight?: number;
   }>;
 
   // 역할별 제약사항
@@ -104,7 +108,7 @@ export const PLANET_PROPERTIES: Record<string, PropertyDefinition> = {
   // === 시각적/궤도 속성 ===
   planetSize: {
     key: 'planetSize',
-    label: '행성 크기',
+  label: 'Planet Size',
     description: '행성의 크기 (반지름)',
     category: 'visual',
     min: 0.01,
@@ -113,19 +117,16 @@ export const PLANET_PROPERTIES: Record<string, PropertyDefinition> = {
     defaultValue: 0.5,
     controlType: 'slider',
     precision: 2,
+    // audioTargets는 선언적 매핑만 보유합니다. 실제 변환은 audio 레이어에서 수행됩니다.
     audioTargets: [
-      { name: 'pitchSemitones', weight: 0.7, transform: (n) => (n - 0.5) * 24 },
-      {
-        name: 'rangeWidth',
-        weight: 1.0,
-        transform: (n) => Math.round(5 + Math.pow(n, 0.8) * 20),
-      },
+      { name: 'pitchSemitones', weight: 0.7 },
+      { name: 'rangeWidth', weight: 1.0 },
     ],
   },
 
   planetColor: {
     key: 'planetColor',
-    label: '행성 색상',
+  label: 'Planet Color',
     description: '행성의 색상 (색조)',
     category: 'visual',
     min: 0,
@@ -134,9 +135,9 @@ export const PLANET_PROPERTIES: Record<string, PropertyDefinition> = {
     defaultValue: 180,
     controlType: 'slider',
     audioTargets: [
-      { name: 'toneTint', weight: 1.0, transform: (n) => curve(n, 'sigmoid') },
-      { name: 'wavefoldAmount', weight: 1.0, transform: (n) => n * 0.8 },
-      { name: 'detune', weight: 0.5, transform: (n) => (n - 0.5) * 50 },
+      { name: 'toneTint', weight: 1.0 },
+      { name: 'wavefoldAmount', weight: 1.0 },
+      { name: 'detune', weight: 0.5 },
     ],
     constraints: {
       BASS: { max: 0.6 },
@@ -146,7 +147,7 @@ export const PLANET_PROPERTIES: Record<string, PropertyDefinition> = {
 
   planetBrightness: {
     key: 'planetBrightness',
-    label: '행성 밝기',
+  label: 'Planet Brightness',
     description: '행성의 밝기/자체발광',
     category: 'visual',
     min: 0.3,
@@ -156,17 +157,9 @@ export const PLANET_PROPERTIES: Record<string, PropertyDefinition> = {
     controlType: 'slider',
     precision: 1,
     audioTargets: [
-      {
-        name: 'filterCutoff',
-        weight: 1.0,
-        transform: (n) => 150 + Math.pow(n, 2.8) * (22000 - 150),
-      },
-      {
-        name: 'filterResonance',
-        weight: 1.0,
-        transform: (n) => 0.5 + Math.pow(n, 1.5) * 15,
-      },
-      { name: 'outputGain', weight: 1.0, transform: (n) => -8 + n * 8 },
+      { name: 'filterCutoff', weight: 1.0 },
+      { name: 'filterResonance', weight: 1.0 },
+      { name: 'outputGain', weight: 1.0 },
     ],
     constraints: {
       BASS: { max: 8000 },
@@ -176,7 +169,7 @@ export const PLANET_PROPERTIES: Record<string, PropertyDefinition> = {
 
   distanceFromStar: {
     key: 'distanceFromStar',
-    label: '항성으로부터 거리',
+  label: 'Distance from Star',
     description: '중앙별에서의 거리',
     category: 'orbit',
     min: 1.0,
@@ -186,19 +179,15 @@ export const PLANET_PROPERTIES: Record<string, PropertyDefinition> = {
     controlType: 'slider',
     precision: 1,
     audioTargets: [
-      {
-        name: 'reverbSend',
-        weight: 1.0,
-        transform: (n) => Math.pow(n, 1.8) * 0.7,
-      },
-      { name: 'delayFeedback', weight: 1.0, transform: (n) => n * 0.6 },
-      { name: 'spatialWidth', weight: 1.0, transform: (n) => 0.2 + n * 0.8 },
+      { name: 'reverbSend', weight: 1.0 },
+      { name: 'delayFeedback', weight: 1.0 },
+      { name: 'spatialWidth', weight: 1.0 },
     ],
   },
 
   orbitSpeed: {
     key: 'orbitSpeed',
-    label: '공전 속도',
+  label: 'Orbit Speed',
     description: '궤도 운동 속도',
     category: 'orbit',
     min: 0.01,
@@ -208,22 +197,14 @@ export const PLANET_PROPERTIES: Record<string, PropertyDefinition> = {
     controlType: 'slider',
     precision: 2,
     audioTargets: [
-      {
-        name: 'rate',
-        weight: 1.0,
-        transform: (n) => 1 / 16 + Math.pow(n, 2) * (1 - 1 / 16),
-      },
-      {
-        name: 'pulses',
-        weight: 1.0,
-        transform: (n) => Math.round(2 + Math.pow(n, 1.5) * 14),
-      },
+      { name: 'rate', weight: 1.0 },
+      { name: 'pulses', weight: 1.0 },
     ],
   },
 
   rotationSpeed: {
     key: 'rotationSpeed',
-    label: '자전 속도',
+  label: 'Rotation Speed',
     description: '자전 운동 속도',
     category: 'orbit',
     min: 0.01,
@@ -233,19 +214,15 @@ export const PLANET_PROPERTIES: Record<string, PropertyDefinition> = {
     controlType: 'slider',
     precision: 2,
     audioTargets: [
-      {
-        name: 'tremHz',
-        weight: 1.0,
-        transform: (n) => 0.2 + Math.pow(n, 2) * 12,
-      },
-      { name: 'tremDepth', weight: 1.0, transform: (n) => n * 0.7 },
-      { name: 'vibratoRate', weight: 0.8, transform: (n) => 2 + n * 8 },
+      { name: 'tremHz', weight: 1.0 },
+      { name: 'tremDepth', weight: 1.0 },
+      { name: 'vibratoRate', weight: 0.8 },
     ],
   },
 
   inclination: {
     key: 'inclination',
-    label: '궤도 기울기',
+  label: 'Inclination',
     description: '궤도면의 기울기',
     category: 'orbit',
     min: 1,
@@ -253,14 +230,12 @@ export const PLANET_PROPERTIES: Record<string, PropertyDefinition> = {
     step: 1,
     defaultValue: 0,
     controlType: 'slider',
-    audioTargets: [
-      { name: 'pitchOffset', weight: 0.5, transform: (n) => (n - 0.5) * 12 },
-    ],
+    audioTargets: [{ name: 'pitchOffset', weight: 0.5 }],
   },
 
   eccentricity: {
     key: 'eccentricity',
-    label: '궤도 이심률',
+  label: 'Eccentricity',
     description: '궤도의 찌그러짐 정도',
     category: 'orbit',
     min: 0.0,
@@ -270,15 +245,15 @@ export const PLANET_PROPERTIES: Record<string, PropertyDefinition> = {
     controlType: 'slider',
     precision: 2,
     audioTargets: [
-      { name: 'swingPct', weight: 1.0, transform: (n) => n * 45 },
-      { name: 'accentDb', weight: 1.0, transform: (n) => n * 6 },
-      { name: 'timing', weight: 0.8, transform: (n) => (n - 0.5) * 0.1 },
+      { name: 'swingPct', weight: 1.0 },
+      { name: 'accentDb', weight: 1.0 },
+      { name: 'timing', weight: 0.8 },
     ],
   },
 
   tilt: {
     key: 'tilt',
-    label: '축 기울기',
+  label: 'Axial Tilt',
     description: '자전축의 기울기',
     category: 'orbit',
     min: 0.0,
@@ -287,9 +262,9 @@ export const PLANET_PROPERTIES: Record<string, PropertyDefinition> = {
     defaultValue: 90.0,
     controlType: 'slider',
     audioTargets: [
-      { name: 'pan', weight: 1.0, transform: (n) => (n - 0.5) * 1.6 },
-      { name: 'stereoWidth', weight: 1.0, transform: (n) => 0.1 + n * 1.4 },
-      { name: 'binaural', weight: 0.5, transform: (n) => n * 0.3 },
+      { name: 'pan', weight: 1.0 },
+      { name: 'stereoWidth', weight: 1.0 },
+      { name: 'binaural', weight: 0.5 },
     ],
   },
 };
@@ -312,7 +287,9 @@ export interface UIProperty {
 export function normalizeProperty(key: string, value: number): number {
   const def = PLANET_PROPERTIES[key];
   if (!def) return 0.5;
-  return clamp((value - def.min) / (def.max - def.min), 0, 1);
+  // 항상 0~1로 clamp
+  const normalized = (value - def.min) / (def.max - def.min);
+  return clamp(normalized, 0, 1);
 }
 
 // 기본값 생성
@@ -362,19 +339,17 @@ export function mapPropertiesToAudio(
     const normalizedValue = normalizeProperty(key, value || def.defaultValue);
 
     def.audioTargets.forEach((target) => {
-      let mappedValue = target.transform
-        ? target.transform(normalizedValue)
-        : normalizedValue;
-      mappedValue *= target.weight;
+      // audioTargets는 이제 선언적입니다. 실제 변환(transform)은 audio 레이어에서 수행됩니다.
+      const weight = target.weight ?? 1.0;
+      // 기본 매핑: 정규화된 값에 가중치만 곱하여 전달합니다.
+      let mappedValue = normalizedValue * weight;
 
-      // 역할별 제약 적용
+      // 역할별 제약 적용 (타입 안전하게 처리)
       if (def.constraints?.[role]) {
-        const constraint = def.constraints[role];
+        const constraint = def.constraints[role]!;
         if (constraint.disabled) return;
-        if (constraint.min !== undefined)
-          mappedValue = Math.max(constraint.min, mappedValue);
-        if (constraint.max !== undefined)
-          mappedValue = Math.min(constraint.max, mappedValue);
+        if (constraint.min !== undefined) mappedValue = Math.max(constraint.min, mappedValue);
+        if (constraint.max !== undefined) mappedValue = Math.min(constraint.max, mappedValue);
         if (constraint.scale !== undefined) mappedValue *= constraint.scale;
       }
 

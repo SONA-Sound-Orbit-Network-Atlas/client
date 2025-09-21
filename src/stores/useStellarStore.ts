@@ -1,7 +1,7 @@
 // src/stores/useStellarStore.ts
 import { create } from 'zustand';
 import type {
-  StellarSystem,
+  StellarSystem as StellarSystemType,
   Star,
   Planet,
   InstrumentRole,
@@ -10,6 +10,7 @@ import {
   type StarProperties,
   createDefaultStarProperties,
 } from '@/types/starProperties';
+import { StellarSystem } from '@/audio/core/StellarSystem';
 import {
   type PlanetProperties,
   createDefaultProperties,
@@ -90,7 +91,12 @@ const defaultStarProps: StarProperties = createDefaultStarProperties();
 export const defaultPlanetProps: PlanetProperties = createDefaultProperties();
 
 /***** 2) 초기 스텔라 시스템 (템플릿) *****/
-export const initialStellarStore: StellarSystem = {
+// 스토어에서 사용하는 순수 데이터 타입 (클래스 인스턴스가 아닌), Planet/Star 타입은 data-only
+type StellarStoreData = Omit<StellarSystemType, 'audioEngine' | 'playStateListeners' | 'emitPlayState' | 'onPlayStateChange'> & {
+  planets: Planet[];
+};
+
+export const initialStellarStore: StellarStoreData = {
   id: '',
   title: 'NEW STELLAR SYSTEM',
   galaxy_id: 'gal_abc123',
@@ -120,8 +126,8 @@ export const initialStellarStore: StellarSystem = {
 
 /***** 3) 스토어 타입 *****/
 interface StellarStore {
-  stellarStore: StellarSystem;
-  setStellarStore: (stellarStore: StellarSystem) => void;
+  stellarStore: StellarStoreData;
+  setStellarStore: (stellarStore: StellarStoreData) => void;
   setInitialStellarStore: () => void;
   addNewObjectAndReturnId: () => string;
   deletePlanet: (planetId: string) => boolean;
@@ -154,7 +160,7 @@ export const useStellarStore = create<StellarStore>((set, get) => ({
         planetDetails,
       });
 
-      return {
+      const nextStore = {
         stellarStore: {
           ...initialStellarStore,
           creator_id: userId,
@@ -172,19 +178,41 @@ export const useStellarStore = create<StellarStore>((set, get) => ({
           planets: [firstPlanet],
         },
       };
+
+      // 스토어 갱신 후, 오디오 측에도 즉시 동일한 초기값을 적용합니다.
+      // StellarSystem이 회색 상태라도 setSeed/updateStarProperties는 안전하게 동작해야 합니다.
+      try {
+  const system = StellarSystem.instance;
+        // 결정적 시드 생성
+        const seedStr = `${star.properties.color}|${star.properties.size}|${star.properties.spin}|${star.properties.brightness}`;
+        system.setSeed(seedStr);
+        system.updateStarProperties({
+          color: star.properties.color,
+          size: star.properties.size,
+          spin: star.properties.spin,
+          brightness: star.properties.brightness,
+        });
+        // 첫 행성도 오디오에 즉시 생성
+  system.createPlanet(firstPlanet.role, firstPlanet.id, { synthType: firstPlanet.synthType, oscillatorType: firstPlanet.oscillatorType }, firstPlanet.properties);
+      } catch (err) {
+        // 실패해도 스토어 업데이트는 유지
+        console.debug('스토어 초기화 후 오디오 동기화 중 오류:', err);
+      }
+
+      return nextStore;
     }),
 
   addNewObjectAndReturnId: () => {
     const newPlanetId = createPlanetId();
 
     set((state) => {
-      const prev = state.stellarStore;
+      const prev = state.stellarStore as StellarStoreData;
 
       // ✅ 요청: planetDetails 변수 사용 (랜덤 악기 구성)
       const planetDetails = createRandomPlanetInstrument();
       const newPlanet = makeInitPlanet({
         id: newPlanetId,
-        systemId: prev.id || '',
+        systemId: prev.id ?? '',
         name: 'NEW PLANET',
         planetDetails,
       });
@@ -202,8 +230,8 @@ export const useStellarStore = create<StellarStore>((set, get) => ({
   },
 
   deletePlanet: (planetId) => {
-    const prev = get().stellarStore;
-    const nextPlanets = prev.planets.filter((p) => p.id !== planetId);
+  const prev = get().stellarStore as StellarStoreData;
+  const nextPlanets = (prev.planets || []).filter((p) => p.id !== planetId);
     if (nextPlanets.length === 0) return false; // 규칙 유지: 최소 1개 보장
 
     set({

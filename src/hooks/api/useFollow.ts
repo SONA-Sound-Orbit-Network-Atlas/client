@@ -100,12 +100,12 @@ export function useDeleteFollow() {
 export function useGetFollowers(params: GetFollowersParams) {
   return useQuery<FollowersResponse, AxiosError>({
     queryKey: followKeys.followersList(
-      params.userId,
-      params.page,
-      params.limit
+      params.targetId,
+      params.page || 1,
+      params.limit || 20
     ),
     queryFn: () => followAPI.getFollowers(params),
-    enabled: !!params.userId,
+    enabled: !!params.targetId,
     staleTime: 2 * 60 * 1000, // 2분간 캐시 유지
     gcTime: 5 * 60 * 1000, // 5분간 가비지 컬렉션 방지
     placeholderData: (previousData) => previousData, // 페이지네이션 시 이전 데이터 유지
@@ -121,12 +121,12 @@ export function useGetFollowers(params: GetFollowersParams) {
 export function useGetFollowings(params: GetFollowingsParams) {
   return useQuery<FollowingsResponse, AxiosError>({
     queryKey: followKeys.followingsList(
-      params.userId,
-      params.page,
-      params.limit
+      params.targetId,
+      params.page || 1,
+      params.limit || 20
     ),
     queryFn: () => followAPI.getFollowings(params),
-    enabled: !!params.userId,
+    enabled: !!params.targetId,
     staleTime: 2 * 60 * 1000, // 2분간 캐시 유지
     gcTime: 5 * 60 * 1000, // 5분간 가비지 컬렉션 방지
     placeholderData: (previousData) => previousData, // 페이지네이션 시 이전 데이터 유지

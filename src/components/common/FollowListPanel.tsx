@@ -8,8 +8,10 @@ import PanelHeader from '@/components/layout/Sidebar/SidebarPanel/PanelHeader';
 import UserCard from '@/components/common/Card/UserCard';
 import { ScrollArea } from '@/components/common/Scrollarea';
 import Button from '@/components/common/Button';
+import ErrorMessage from '@/components/common/ErrorMessage';
 import { useFollowList } from '@/hooks/useFollowList';
 import { useFollowActions } from '@/hooks/useFollowActions';
+import { useUserStore } from '@/stores/useUserStore';
 import type {
   FollowerUser,
   FollowingUser,
@@ -21,15 +23,18 @@ export default function FollowListPanel({
   targetUserId,
   onBack = navigateBack,
 }: FollowListPanelProps) {
+  // 현재 로그인한 사용자 정보
+  const { userStore } = useUserStore();
+
   // 팔로우 액션 훅
   const {
     handleFollow,
     handleUnfollow,
-    isMutualFollow,
-    isFollowBack,
-    isStillFollowing,
-    isStillMutualFollow,
+    getFollowerButtonState,
+    getFollowingButtonState,
     resetStates,
+    error: actionError,
+    clearError,
     isLoading: isActionLoading,
   } = useFollowActions();
 
@@ -43,7 +48,7 @@ export default function FollowListPanel({
     loadMore,
     totalCount,
   } = useFollowList<FollowerUser | FollowingUser>(type, {
-    userId: targetUserId || '',
+    targetId: targetUserId || '',
     limit: 20,
   });
 
@@ -92,6 +97,15 @@ export default function FollowListPanel({
               {config.title} ({totalCount})
             </p>
 
+            {/* 액션 에러 메시지 */}
+            {actionError && (
+              <ErrorMessage
+                message={actionError}
+                onClose={clearError}
+                className="mb-4"
+              />
+            )}
+
             {/* 로딩 상태 */}
             {isLoading && (
               <div className="text-center py-4">
@@ -101,38 +115,46 @@ export default function FollowListPanel({
 
             {/* 에러 상태 */}
             {error && (
-              <div className="text-center py-4">
-                <p className="text-red-400">{config.errorMessage}</p>
-              </div>
+              <ErrorMessage message={config.errorMessage} className="mb-4" />
             )}
 
             {/* 사용자 리스트 */}
             {!isLoading && !error && allUsers.length > 0 && (
               <div className="space-y-3">
-                {allUsers.map((user) => (
-                  <UserCard
-                    key={user.id}
-                    id={user.id}
-                    username={user.username}
-                    isFollowing={
-                      type === 'followers'
-                        ? isMutualFollow(user.isMutual)
-                        : isStillFollowing(user.id)
-                    }
-                    isMutualFollow={
-                      type === 'followers'
-                        ? isMutualFollow(user.isMutual)
-                        : isStillMutualFollow(user.id, user.isMutual)
-                    }
-                    isFollowBack={
-                      type === 'followers' ? isFollowBack(user.isMutual) : false
-                    }
-                    onFollow={type === 'followers' ? handleFollow : undefined}
-                    onUnfollow={handleUnfollow}
-                    onClick={handleUserClick}
-                    isLoading={isActionLoading}
-                  />
-                ))}
+                {allUsers.map((user) => {
+                  // 현재 로그인한 사용자인지 확인
+                  const isCurrentUser = user.id === userStore.id;
+
+                  // 버튼 상태 결정
+                  const buttonState =
+                    type === 'followers'
+                      ? getFollowerButtonState(user)
+                      : getFollowingButtonState(user);
+
+                  return (
+                    <UserCard
+                      key={user.id}
+                      id={user.id}
+                      username={user.username}
+                      isFollowing={buttonState.action === 'unfollow'}
+                      isMutualFollow={buttonState.showMutualIcon}
+                      isFollowBack={buttonState.text === '팔로우백'}
+                      onFollow={
+                        !isCurrentUser && buttonState.action === 'follow'
+                          ? handleFollow
+                          : undefined
+                      }
+                      onUnfollow={
+                        !isCurrentUser && buttonState.action === 'unfollow'
+                          ? handleUnfollow
+                          : undefined
+                      }
+                      onClick={handleUserClick}
+                      isLoading={isActionLoading}
+                      hideFollowButton={isCurrentUser}
+                    />
+                  );
+                })}
               </div>
             )}
 

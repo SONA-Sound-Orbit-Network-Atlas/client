@@ -6,7 +6,7 @@ import Sidebar from '@/components/layout/Sidebar/Sidebar';
 
 export default function SpacePage() {
   const canvasStyle = {
-    background: '#1a1a1a',
+    background: '#000000',
     width: '100%',
     height: '100%',
   };

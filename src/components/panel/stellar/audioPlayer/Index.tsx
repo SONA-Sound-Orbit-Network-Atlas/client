@@ -40,6 +40,16 @@ export default function AudioPlayer({ className }: AudioPlayerProps) {
     return () => off();
   }, [system]);
 
+  // 추가 동기: 컴포넌트 마운트 또는 스텔라 변경 시 system 상태로 playing 동기화
+  useEffect(() => {
+    try {
+      const count = system.getPlayingPlanetsCount();
+      setPlaying(count > 0);
+    } catch (err) {
+      console.debug('AudioPlayer: initial playing sync failed', err);
+    }
+  }, [system, stellarStore.id]);
+
   const handleTogglePlay = useCallback(async (nextIsPlaying: boolean) => {
     // Play 컴포넌트는 토글 후 상태를 전달함
     const willPlay = nextIsPlaying;
@@ -48,6 +58,12 @@ export default function AudioPlayer({ className }: AudioPlayerProps) {
       if (initializing) return;
       setInitializing(true);
       try {
+        // 사용자 액션(Play 버튼)에서 반드시 Tone context를 시작합니다.
+        try {
+          await (await import('tone')).start();
+        } catch (err) {
+          console.debug('Tone.start() 호출 중 오류(무시 가능):', err);
+        }
         await system.initialize();
         setReady(true);
         // 최초 초기화 직후에도 현재 설정된 마스터 볼륨을 반드시 반영
@@ -65,38 +81,35 @@ export default function AudioPlayer({ className }: AudioPlayerProps) {
 
       // 폴백: StellarSystem에 행성이 없을 경우 zustand 스토어에서 생성
       if (planets.length === 0 && stellarStore.planets.length > 0) {
-        console.log('▶️ system에 행성이 없어 스토어 기반으로 생성합니다...');
+  
         for (const p of stellarStore.planets) {
           const synthType = p.synthType ?? getDefaultSynthType(p.role);
           const oscillatorType = p.oscillatorType ?? getDefaultOscillatorType(p.role, synthType);
-          system.createPlanet(p.role, p.id, { synthType, oscillatorType });
-          // 안전하게 속성 적용
-          try {
-            system.updatePlanetProperties(p.id, p.properties as PlanetProperties);
-          } catch (err) {
-            console.warn('스토어 기반 행성 속성 적용 실패:', err);
-          }
+          system.createPlanet(p.role, p.id, { synthType, oscillatorType }, p.properties as PlanetProperties);
         }
         planets = system.getPlanets();
       }
 
       // 행성이 없으면 아무 소리도 내지 않음 (데모 행성 생성 제거)
       if (planets.length === 0) {
-        console.log('▶️ 재생 요청: 행성이 없어 소리를 내지 않습니다.');
         return;
       }
 
-      // 모든 행성의 패턴을 시작
+      // 모든 행성의 패턴을 시작 (실시간 상태 재확인하여 중복 시작 방지)
       for (const planet of planets) {
-        if (!planet.isPlaying) {
-          await system.startPlanetPattern(planet.id);
-          console.log(`🎵 ${planet.name} 패턴 재생 시작`);
+        try {
+          const latest = system.getPlanet(planet.id);
+          if (!latest || !latest.isPlaying) {
+            await system.startPlanetPattern(planet.id);
+          }
+        } catch (err) {
+          console.warn(`AudioPlayer: startPlanetPattern failed for ${planet.id}`, err);
         }
       }
     } else {
       // 모든 패턴 정지
-      system.stopAllPatterns();
-      console.log('⏹️ 모든 패턴 정지');
+  system.stopAllPatterns();
+  console.debug('⏹️ 모든 패턴 정지');
     }
   }, [initializing, ready, system, engine, stellarStore.planets]);
 

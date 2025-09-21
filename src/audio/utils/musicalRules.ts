@@ -357,10 +357,8 @@ export function enhancePatternMusically(
   // 2. 싱코페이션 적용
   enhanced = applySyncopation(enhanced, role, rng);
   
-  // 3. 최종 품질 검증
-  const quality = calculateMusicalQuality(enhanced, role);
-  
-  console.log(`🎼 ${role} 음악적 품질: ${(quality * 100).toFixed(1)}%`);
+  // 3. 최종 품질 검증 (계산은 내부 검증용으로 유지되나 출력은 생략)
+  calculateMusicalQuality(enhanced, role);
   
   return enhanced;
 }
