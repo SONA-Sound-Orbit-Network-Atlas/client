@@ -59,7 +59,7 @@ export default function StellarIndex() {
               {/* Breadcrumb */}
               <Breadcrumb />
 
-              <ScrollArea className="h-full">
+              <ScrollArea className="h-[calc(100%-48px)]">
                 <TabsContent value="INFO" className="p-4">
                   <Info isStellarOwner={isStellarOwner} />
                 </TabsContent>
