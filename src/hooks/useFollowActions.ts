@@ -81,38 +81,42 @@ export function useFollowActions() {
     const isFollowed = followedUsers.has(user.id);
     const isUnfollowed = unfollowedUsers.has(user.id);
 
-    // 팔로우한 상태 (로컬 상태 또는 API 데이터)
+    // 상대방이 나를 팔로우하고 있는 경우 (팔로우백 가능 상태)
+    if (user.viewer_is_followed_by) {
+      // 내가 이미 팔로우하고 있는 경우 (상호 팔로우)
+      if (isFollowed || (user.viewer_is_following && !isUnfollowed)) {
+        return {
+          text: 'UNFOLLOW',
+          action: 'unfollow' as const,
+          showMutualIcon: true,
+          isFollowBack: false,
+        };
+      }
+      // 내가 팔로우하지 않는 경우 (팔로우백)
+      return {
+        text: 'FOLLOW BACK',
+        action: 'follow' as const,
+        showMutualIcon: false,
+        isFollowBack: true,
+      };
+    }
+
+    // 내가 팔로우하고 있지만 상대방이 나를 팔로우하지 않는 경우
     if (isFollowed || (user.viewer_is_following && !isUnfollowed)) {
       return {
-        text: '언팔로우',
+        text: 'UNFOLLOW',
         action: 'unfollow' as const,
-        showMutualIcon: isFollowed || (user.isMutual && !isUnfollowed),
-      };
-    }
-
-    // 팔로우백 가능 상태 (언팔로우했지만 상대방이 나를 팔로우하는 경우)
-    if (isUnfollowed && user.viewer_is_followed_by) {
-      return {
-        text: '팔로우백',
-        action: 'follow' as const,
         showMutualIcon: false,
-      };
-    }
-
-    // 일반 팔로우 상태
-    if (user.viewer_is_followed_by) {
-      return {
-        text: '팔로우백',
-        action: 'follow' as const,
-        showMutualIcon: false,
+        isFollowBack: false,
       };
     }
 
     // 기본 팔로우 상태
     return {
-      text: '팔로우',
+      text: 'FOLLOW',
       action: 'follow' as const,
       showMutualIcon: false,
+      isFollowBack: false,
     };
   };
 
@@ -127,24 +131,27 @@ export function useFollowActions() {
 
     if (user.viewer_is_following && !isUnfollowed) {
       return {
-        text: '언팔로우',
+        text: 'UNFOLLOW',
         action: 'unfollow' as const,
         showMutualIcon: user.isMutual,
+        isFollowBack: false,
       };
     }
 
     if (user.viewer_is_followed_by) {
       return {
-        text: '팔로우백',
+        text: 'FOLLOW BACK',
         action: 'follow' as const,
         showMutualIcon: false,
+        isFollowBack: true,
       };
     }
 
     return {
-      text: '팔로우',
+      text: 'FOLLOW',
       action: 'follow' as const,
       showMutualIcon: false,
+      isFollowBack: false,
     };
   };
 

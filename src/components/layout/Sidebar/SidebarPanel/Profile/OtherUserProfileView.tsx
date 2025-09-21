@@ -1,12 +1,20 @@
-import { FiUser, FiUserCheck } from 'react-icons/fi';
+import { FiUser, FiUserCheck, FiUsers } from 'react-icons/fi';
 import { useProfileStore } from '@/stores/useProfileStore';
+import { useUserStore } from '@/stores/useUserStore';
 import { navigateBack } from '@/utils/profileNavigation';
 import { useGetUserProfile } from '@/hooks/api/useUser';
-import { useGetFollowCount } from '@/hooks/api/useFollow';
+import {
+  useGetFollowCount,
+  useGetFollowings,
+  useGetFollowers,
+} from '@/hooks/api/useFollow';
+import { useFollowActions } from '@/hooks/useFollowActions';
+import { calculateFollowRelation } from '@/utils/followRelation';
 import ProfileStateWrapper from './ProfileStateWrapper';
 import PanelHeader from '../PanelHeader';
 import Iconframe from '@/components/common/Iconframe';
 import StatCard from '@/components/common/Card/StatCard';
+import Button from '@/components/common/Button';
 import { ScrollArea } from '@/components/common/Scrollarea';
 
 interface OtherUserProfileViewProps {
@@ -17,6 +25,7 @@ export default function OtherUserProfileView({
   userId,
 }: OtherUserProfileViewProps) {
   const { setProfilePanelMode, pushNavigationHistory } = useProfileStore();
+  const { userStore } = useUserStore();
 
   // 다른 유저의 프로필 데이터 조회
   const {
@@ -32,8 +41,73 @@ export default function OtherUserProfileView({
     error: statsError,
   } = useGetFollowCount(userId.toString());
 
-  const isLoading = isProfileLoading || isStatsLoading;
-  const error = profileError || statsError;
+  // 현재 사용자의 팔로잉 목록 조회
+  const {
+    data: myFollowings,
+    isLoading: isFollowingsLoading,
+    error: followingsError,
+  } = useGetFollowings({
+    targetId: userStore.id,
+    limit: 100,
+  });
+
+  // 상대방의 팔로워 목록 조회
+  const {
+    data: targetFollowers,
+    isLoading: isFollowersLoading,
+    error: followersError,
+  } = useGetFollowers({
+    targetId: userId,
+    limit: 100,
+  });
+
+  // 팔로우 액션 훅
+  const {
+    handleFollow,
+    handleUnfollow,
+    getFollowerButtonState,
+    isLoading: isActionLoading,
+  } = useFollowActions();
+
+  const isLoading =
+    isProfileLoading ||
+    isStatsLoading ||
+    isFollowingsLoading ||
+    isFollowersLoading;
+  const error = profileError || statsError || followingsError || followersError;
+
+  // 팔로우 관계 계산 - API 응답을 직접 사용
+  const followRelation = (() => {
+    if (!myFollowings || !targetFollowers) return null;
+
+    // 내가 상대방을 팔로우하는지 확인
+    const viewer_is_following = myFollowings.items.some(
+      (user) => user.id === userId
+    );
+
+    // 상대방이 나를 팔로우하는지 확인 (팔로워 목록에서 현재 사용자 찾기)
+    const viewer_is_followed_by = targetFollowers.items.some(
+      (user) => user.id === userStore.id
+    );
+
+    const isMutual = viewer_is_following && viewer_is_followed_by;
+
+    return {
+      viewer_is_following,
+      viewer_is_followed_by,
+      isMutual,
+    };
+  })();
+
+  // FollowListPanel과 동일한 로직으로 버튼 상태 결정
+  const buttonState = followRelation
+    ? getFollowerButtonState({
+        id: userId,
+        viewer_is_following: followRelation.viewer_is_following,
+        viewer_is_followed_by: followRelation.viewer_is_followed_by,
+        isMutual: followRelation.isMutual,
+      })
+    : null;
 
   const handleFollowersClick = () => {
     // 현재 상태를 히스토리에 저장
@@ -63,7 +137,7 @@ export default function OtherUserProfileView({
         <ScrollArea className="flex-1 min-h-0">
           <div className="flex flex-col">
             <div className="flex flex-col items-center border-b border-gray-border p-6">
-              <div className="flex flex-col items-center mb-[24px]">
+              <div className="flex flex-col items-center">
                 {profile?.image &&
                 typeof profile.image === 'string' &&
                 !profile.image.includes('defaults/avatar.png') ? (
@@ -83,13 +157,43 @@ export default function OtherUserProfileView({
                     <FiUser />
                   </Iconframe>
                 )}
-                <h3 className="text-white font-semibold text-base">
-                  {profile?.username || 'Loading...'}
-                </h3>
+                <div className="flex items-center gap-2">
+                  <h3 className="text-white font-semibold text-base">
+                    {profile?.username || 'Loading...'}
+                  </h3>
+                  {buttonState?.showMutualIcon && (
+                    <FiUsers
+                      className="w-4 h-4 text-primary-300"
+                      title="MUTUAL FOLLOW"
+                    />
+                  )}
+                </div>
                 {profile?.about && (
                   <p className="text-text-muted text-sm text-center">
                     {profile.about}
                   </p>
+                )}
+                {/* 팔로우 버튼 - FollowListPanel과 동일한 로직 */}
+                {buttonState && (
+                  <Button
+                    color={
+                      buttonState.action === 'unfollow'
+                        ? 'secondary'
+                        : 'primary'
+                    }
+                    size="lg"
+                    onClick={() => {
+                      if (buttonState.action === 'unfollow') {
+                        handleUnfollow(userId);
+                      } else {
+                        handleFollow(userId);
+                      }
+                    }}
+                    disabled={isActionLoading}
+                    className="mt-4 w-full"
+                  >
+                    {buttonState.text}
+                  </Button>
                 )}
               </div>
             </div>
