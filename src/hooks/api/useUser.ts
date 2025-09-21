@@ -62,21 +62,14 @@ export function useUpdateUserProfile() {
         updated_at: updatedUser.updated_at,
       });
 
-      // 캐시 업데이트 (서버에서 받은 최신 데이터로)
+      // currentUserProfile 쿼리 무효화 대신 setQueryData를 사용하여 즉시 업데이트
+      queryClient.setQueryData(userKeys.currentUserProfile(), updatedUser);
+
+      // userProfile 쿼리도 setQueryData로 직접 업데이트
       queryClient.setQueryData(
         userKeys.userProfile(updatedUser.id),
         updatedUser
       );
-
-      // currentUserProfile 쿼리 무효화 (userStore 자동 업데이트)
-      queryClient.invalidateQueries({
-        queryKey: userKeys.currentUserProfile(),
-      });
-
-      // userProfile 쿼리 무효화
-      queryClient.invalidateQueries({
-        queryKey: userKeys.userProfile(updatedUser.id),
-      });
     },
     onError: (error: AxiosError) => {
       console.error('프로필 수정 실패:', error);

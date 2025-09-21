@@ -133,13 +133,11 @@ export const usePasswordValidation = (): UsePasswordValidationReturn => {
           // 현재 비밀번호도 newPassword와 동일한 검증 적용
           error = validatePassword(value);
         } else if (field === 'confirmPassword') {
-          let passwordValue: string;
+          let passwordValue = '';
           if (isPasswordFormData(formData)) {
             passwordValue = formData.password;
           } else if (isChangePasswordFormData(formData)) {
             passwordValue = formData.newPassword;
-          } else {
-            passwordValue = '';
           }
           error = validateConfirmPassword(passwordValue, value);
         }
