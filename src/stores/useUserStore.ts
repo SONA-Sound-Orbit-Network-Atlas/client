@@ -33,7 +33,7 @@ export const useUserStore = create<UserStore>((set) => ({
     set({ isLoggedIn });
   },
   initializeAuth: async () => {
-    const token = localStorage.getItem('accessToken');
+    const token = localStorage.getItem('access_token');
     if (!token) {
       return;
     }

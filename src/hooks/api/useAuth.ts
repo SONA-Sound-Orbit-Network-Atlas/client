@@ -25,7 +25,7 @@ export function useLogin(data: LoginData) {
       const { access_token, user } = response;
 
       // access_token을 localStorage에 저장
-      localStorage.setItem('accessToken', access_token);
+      localStorage.setItem('access_token', access_token);
 
       // 사용자 정보를 스토어에 저장
       setUserStore({
@@ -69,8 +69,8 @@ export function useLogout() {
       console.warn('로그아웃 API 호출 실패:', error);
     },
     onSettled: async () => {
-      // localStorage에서 accessToken과 userInfo 제거
-      localStorage.removeItem('accessToken');
+      // localStorage에서 access_token과 userInfo 제거
+      localStorage.removeItem('access_token');
       localStorage.removeItem('userInfo');
 
       // 사용자 스토어 완전 초기화
