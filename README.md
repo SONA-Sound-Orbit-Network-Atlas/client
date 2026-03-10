@@ -6,6 +6,11 @@
 
 **Live Service**: [https://sona-sound.vercel.app/](https://sona-sound.vercel.app/)
 
+
+## 시연 영상
+https://github.com/user-attachments/assets/4a8f340f-de62-4446-bae1-55ad005040a0
+
+
 ## 📖 프로젝트 소개
 
 SONA는 **3D 우주 공간에서 음악을 창작하고 탐험하는 혁신적인 플랫폼**입니다. 사용자는 가상의 우주에서 스텔라 시스템(Stellar System)을 만들고, 각 천체의 물리적 특성을 조정하여 독창적인 음악을 생성할 수 있습니다.
