@@ -8,7 +8,7 @@
 
 
 ## 시연 영상
-https://github.com/user-attachments/assets/4a8f340f-de62-4446-bae1-55ad005040a0
+https://github.com/user-attachments/assets/703e3130-8d3f-4d6e-8112-19d01e85b631
 
 
 ## 📖 프로젝트 소개
